@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, Lock, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import AnimatedWaveBackground from "../components/AnimatedWaveBackground";
 import "../styles/login.css";
@@ -58,6 +59,7 @@ function Login() {
       console.error('Error caching credentials:', error);
     }
   };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -143,52 +145,32 @@ function Login() {
 
   return (
     <div className="mesob-auth-wrapper">
-      {/* Animated wave background with particles */}
-      <AnimatedWaveBackground />
+      <AnimatedWaveBackground className="absolute inset-0 z-20" />
+
       <div className="mesob-auth-container">
         <div className="mesob-auth-card">
-          {/* Logo and Header Section */}
-          <div className="mesob-logo-section">
-            <div className="mesob-logo-circle">
-              <img
-                src="/Mesob-short-png.png"
-                alt="MESOB Logo"
-              />
-            </div>
-            <div className="mesob-title-amharic">
-              በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ
-            </div>
-            <div className="mesob-title-amharic">
-              የመሶብ አገልግሎት
-            </div>
-            <div className="mesob-title-english">
-              Federal Democratic Republic of Ethiopia
-            </div>
-            <div className="mesob-service-title">
-              MESOB Service
-            </div>
-            <div className="mesob-welcome">
-              Welcome
-            </div>
-            <div className="mesob-subtitle">
-              Sign in to your account
-            </div>
+          <div className="mesob-header-image">
+            <img
+              src="/image.png"
+              alt="MESOB Service"
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="mesob-form" noValidate>
-            {serverError && (
-              <div className="mesob-alert mesob-alert-error" role="alert">
-                {serverError}
-              </div>
-            )}
+          <div className="mesob-welcome-section">
+            <div className="mesob-welcome">Welcome</div>
+            <div className="mesob-subtitle">Access the Mesob wellness Center System</div>
+          </div>
 
-            {/* Email */}
+          {serverError && (
+            <div className="mesob-alert mesob-alert-error" role="alert">
+              {serverError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mesob-form" noValidate>
             <div className="mesob-form-group">
-              <label className="mesob-form-label">
-                Username<span className="mesob-required">*</span>
-              </label>
-              <div className="mesob-input-icon-wrapper">
-                <span className="mesob-input-icon">👤</span>
+              <div className="mesob-input-wrapper">
+                <User className="mesob-input-icon" style={{ width: '20px', height: '20px' }} />
                 <input
                   type="email"
                   name="email"
@@ -196,9 +178,11 @@ function Login() {
                   onChange={handleChange}
                   placeholder="Username"
                   disabled={loading}
-                  className={`mesob-form-input ${errors.email ? "error" : ""}`}
                   autoComplete="username email"
                   list="mesob-email-suggestions"
+                  className={`mesob-form-input mesob-form-input--with-icon ${
+                    errors.email ? "error" : ""
+                  } ${loading ? "opacity-60" : ""}`}
                 />
               </div>
               <datalist id="mesob-email-suggestions">
@@ -211,13 +195,9 @@ function Login() {
               )}
             </div>
 
-            {/* Password */}
             <div className="mesob-form-group">
-              <label className="mesob-form-label">
-                Password<span className="mesob-required">*</span>
-              </label>
-              <div className="mesob-password-wrapper">
-                <span className="mesob-input-icon">🔒</span>
+              <div className="mesob-input-wrapper mesob-password-wrapper">
+                <Lock className="mesob-input-icon" style={{ width: '20px', height: '20px'}} />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -225,17 +205,23 @@ function Login() {
                   onChange={handleChange}
                   placeholder="Password"
                   disabled={loading}
-                  className={`mesob-form-input ${errors.password ? "error" : ""}`}
                   autoComplete="current-password"
+                  className={`mesob-form-input mesob-form-input--with-icon ${
+                    errors.password ? "error" : ""
+                  } ${loading ? "opacity-60" : ""}`}
                 />
                 <button
                   type="button"
-                  className="mesob-password-toggle"
                   onClick={() => setShowPassword((prev) => !prev)}
                   disabled={loading}
                   aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="mesob-password-toggle"
                 >
-                  {showPassword ? "🙈" : "👁"}
+                  {showPassword ? (
+                    <EyeOff style={{ width: '20px', height: '20px' }} />
+                  ) : (
+                    <Eye style={{ width: '20px', height: '20px' }} />
+                  )}
                 </button>
               </div>
               {errors.password && (
@@ -243,24 +229,32 @@ function Login() {
               )}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
-              className="mesob-btn mesob-btn-primary"
               disabled={loading}
+              className="mesob-btn mesob-btn-primary"
             >
               {loading ? "Signing in..." : "Login"}
             </button>
           </form>
 
-          {/* Footer */}
           <div className="mesob-footer">
-            <p className="mesob-footer-text">
-              Don't have an account?{" "}
-              <Link to="/register" className="mesob-link">
+            <div className="mesob-footer-brand">Wellness</div>
+            
+            <div style={{ marginTop: '1rem', paddingTop: '0.75rem' }}>
+              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.875rem' }}>Don't have an account? </span>
+              <a 
+                href="/register" 
+                style={{ 
+                  color: '#f5b224', 
+                  textDecoration: 'none', 
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
                 Create one here
-              </Link>
-            </p>
+              </a>
+            </div>
           </div>
         </div>
       </div>
