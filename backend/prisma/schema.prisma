@@ -113,6 +113,7 @@ model User {
   recordedVitals VitalRecord[] @relation("RecordedBy")
   wellnessPlans WellnessPlan[]
   feedback      Feedback[]
+  notifications Notification[]
   
   @@index([email])
   @@index([role])
@@ -339,4 +340,49 @@ model Center {
   @@index([code])
   @@index([region, status])
   @@map("centers")
+}
+
+// Notification - System notifications for admins
+enum NotificationType {
+  SYSTEM_ALERT    // System errors, maintenance, security
+  USER_REGISTRATION // New user registrations
+  DATA_ISSUE      // Missing vitals, incomplete profiles
+}
+
+enum NotificationSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid // Admin receiving the notification
+  
+  // Notification Details
+  type      NotificationType
+  severity  NotificationSeverity
+  title     String
+  message   String
+  
+  // Status
+  isRead    Boolean  @default(false)
+  
+  // Metadata
+  relatedId String?  // ID of related entity (user, appointment, etc.)
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([severity])
+  @@index([userId, isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
 }

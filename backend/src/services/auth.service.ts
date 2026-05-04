@@ -3,6 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { UserRole, Gender } from "../generated/prisma";
 import { env } from "../config/env";
 import { prisma } from "../config/prisma";
+import { NotificationService } from "./notifications.service";
 
 // Constants
 const SALT_ROUNDS = 12;
@@ -178,6 +179,23 @@ export class AuthService {
 
       return newUser;
     });
+
+    // Create notification for system admin about new registration
+    const admins = await prisma.user.findMany({
+      where: { role: UserRole.SYSTEM_ADMIN },
+      select: { id: true },
+    });
+
+    for (const admin of admins) {
+      await NotificationService.createNotification(
+        admin.id,
+        "USER_REGISTRATION",
+        "HIGH",
+        "New User Registration",
+        `New ${input.role} registered: ${input.fullName} (${input.email})`,
+        user.id
+      );
+    }
 
     // Generate JWT token
     const token = this.generateToken(user.id, user.role);
