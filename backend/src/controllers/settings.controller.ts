@@ -70,7 +70,7 @@ export const updateSettings = async (
       return;
     }
 
-    const { maxLoginAttempts, sessionTimeout, maintenanceMode } = req.body;
+    const { maxLoginAttempts, sessionTimeout, maintenanceMode, lockoutDuration } = req.body;
 
     // Validate input
     if (maxLoginAttempts !== undefined) {
@@ -95,10 +95,22 @@ export const updateSettings = async (
       }
     }
 
+    if (lockoutDuration !== undefined) {
+      const duration = parseInt(lockoutDuration, 10);
+      if (isNaN(duration) || duration < 5 || duration > 120) {
+        res.status(400).json({
+          status: "error",
+          message: "Lockout duration must be between 5 and 120 minutes",
+        });
+        return;
+      }
+    }
+
     const updatedSettings = await SettingsService.updateSettings({
       maxLoginAttempts: maxLoginAttempts ? parseInt(maxLoginAttempts, 10) : undefined,
       sessionTimeout: sessionTimeout ? parseInt(sessionTimeout, 10) : undefined,
       maintenanceMode: typeof maintenanceMode === "boolean" ? maintenanceMode : undefined,
+      lockoutDuration: lockoutDuration ? parseInt(lockoutDuration, 10) : undefined,
     });
 
     res.status(200).json({

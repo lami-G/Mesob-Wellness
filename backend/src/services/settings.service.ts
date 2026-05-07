@@ -4,6 +4,7 @@ interface SystemSettings {
   maxLoginAttempts: number;
   sessionTimeout: number;
   maintenanceMode: boolean;
+  lockoutDuration: number; // in minutes
 }
 
 class SettingsService {
@@ -16,11 +17,13 @@ class SettingsService {
       const maxLoginAttempts = parseInt(process.env.MAX_LOGIN_ATTEMPTS || "2", 10);
       const sessionTimeout = parseInt(process.env.SESSION_TIMEOUT || "30", 10);
       const maintenanceMode = process.env.MAINTENANCE_MODE === "true";
+      const lockoutDuration = parseInt(process.env.LOCKOUT_DURATION || "30", 10);
 
       return {
         maxLoginAttempts,
         sessionTimeout,
         maintenanceMode,
+        lockoutDuration,
       };
     } catch (error) {
       console.error("Error getting settings:", error);
@@ -28,6 +31,7 @@ class SettingsService {
         maxLoginAttempts: 2,
         sessionTimeout: 30,
         maintenanceMode: false,
+        lockoutDuration: 30,
       };
     }
   }
@@ -43,6 +47,9 @@ class SettingsService {
       }
       if (settings.maintenanceMode !== undefined) {
         process.env.MAINTENANCE_MODE = settings.maintenanceMode.toString();
+      }
+      if (settings.lockoutDuration !== undefined) {
+        process.env.LOCKOUT_DURATION = settings.lockoutDuration.toString();
       }
 
       return this.getSettings();
@@ -60,6 +67,11 @@ class SettingsService {
   static async isMaintenanceMode(): Promise<boolean> {
     const settings = await this.getSettings();
     return settings.maintenanceMode;
+  }
+
+  static async getLockoutDuration(): Promise<number> {
+    const settings = await this.getSettings();
+    return settings.lockoutDuration;
   }
 }
 

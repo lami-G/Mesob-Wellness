@@ -45,4 +45,15 @@ export const settingsService = {
   async updateMaintenanceMode(enabled) {
     return this.updateSettings({ maintenanceMode: enabled });
   },
+
+  // Get lockout duration
+  async getLockoutDuration() {
+    const settings = await this.getSettings();
+    return settings.lockoutDuration;
+  },
+
+  // Update lockout duration
+  async updateLockoutDuration(duration) {
+    return this.updateSettings({ lockoutDuration: duration });
+  },
 };

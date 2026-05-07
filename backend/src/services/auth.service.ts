@@ -271,13 +271,14 @@ export class AuthService {
       // Increment failed login attempts
       const newFailedAttempts = user.failedLoginAttempts + 1;
       const maxAttempts = await SettingsService.getMaxLoginAttempts();
+      const lockoutDuration = await SettingsService.getLockoutDuration();
       
       let updateData: any = { failedLoginAttempts: newFailedAttempts };
       
       // Lock account if max attempts reached
       if (newFailedAttempts >= maxAttempts) {
         updateData.isLocked = true;
-        updateData.lockedUntil = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
+        updateData.lockedUntil = new Date(Date.now() + lockoutDuration * 60 * 1000); // Lock for specified duration
       }
       
       await prisma.user.update({

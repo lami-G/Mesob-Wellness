@@ -7,6 +7,7 @@ function SystemSettings() {
     maxLoginAttempts: 2,
     sessionTimeout: 30,
     maintenanceMode: false,
+    lockoutDuration: 30,
   });
 
   const [saved, setSaved] = useState(false);
@@ -116,6 +117,24 @@ function SystemSettings() {
               className="setting-input"
               min="5"
               max="480"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="setting-item">
+            <div className="setting-label">
+              <label htmlFor="lockoutDuration">Account Lockout Duration (minutes)</label>
+              <p className="setting-description">How long to lock account after max failed attempts</p>
+            </div>
+            <input
+              type="number"
+              id="lockoutDuration"
+              name="lockoutDuration"
+              value={settings.lockoutDuration}
+              onChange={handleChange}
+              className="setting-input"
+              min="5"
+              max="120"
               disabled={loading}
             />
           </div>
