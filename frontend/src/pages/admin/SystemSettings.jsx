@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { settingsService } from "../../services/settingsService";
 import "../../styles/admin-settings.css";
 
 function SystemSettings() {
   const [settings, setSettings] = useState({
-    maxLoginAttempts: 5,
+    maxLoginAttempts: 2,
     sessionTimeout: 30,
     maintenanceMode: false,
   });
@@ -24,13 +25,15 @@ function SystemSettings() {
 
   const loadSettings = async () => {
     try {
-      // Load settings from localStorage (simulating backend)
-      const savedSettings = localStorage.getItem("systemSettings");
-      if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
-      }
+      setLoading(true);
+      const data = await settingsService.getSettings();
+      setSettings(data);
+      setError("");
     } catch (err) {
       console.error("Error loading settings:", err);
+      setError("Failed to load settings");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,7 +41,7 @@ function SystemSettings() {
     const { name, value, type, checked } = e.target;
     setSettings((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : parseInt(value) || value,
     }));
     setSaved(false);
     setError("");
@@ -49,15 +52,12 @@ function SystemSettings() {
       setLoading(true);
       setError("");
       
-      // Save settings to localStorage (simulating backend)
-      localStorage.setItem("systemSettings", JSON.stringify(settings));
+      await settingsService.updateSettings(settings);
       
       setSaved(true);
-      alert("✓ Settings saved successfully!");
       setTimeout(() => setSaved(false), 5000);
     } catch (err) {
-      setError("Failed to save settings");
-      alert("✗ Failed to save settings");
+      setError(err.response?.data?.message || "Failed to save settings");
       console.error("Error saving settings:", err);
     } finally {
       setLoading(false);
@@ -65,11 +65,7 @@ function SystemSettings() {
   };
 
   const handleReset = () => {
-    setSettings({
-      maxLoginAttempts: 5,
-      sessionTimeout: 30,
-      maintenanceMode: false,
-    });
+    loadSettings();
     setSaved(false);
     setError("");
   };
@@ -178,7 +174,7 @@ function SystemSettings() {
             className="btn-reset-settings"
             disabled={loading}
           >
-            ↻ Reset to Default
+            ↻ Reload Settings
           </button>
         </div>
       </div>

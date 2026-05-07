@@ -4,6 +4,7 @@ import { UserRole, Gender } from "../generated/prisma";
 import { env } from "../config/env";
 import { prisma } from "../config/prisma";
 import { NotificationService } from "./notifications.service";
+import SettingsService from "./settings.service";
 
 // Constants
 const SALT_ROUNDS = 12;
@@ -269,7 +270,7 @@ export class AuthService {
     if (!isPasswordValid) {
       // Increment failed login attempts
       const newFailedAttempts = user.failedLoginAttempts + 1;
-      const maxAttempts = 2; // Default max attempts
+      const maxAttempts = await SettingsService.getMaxLoginAttempts();
       
       let updateData: any = { failedLoginAttempts: newFailedAttempts };
       
