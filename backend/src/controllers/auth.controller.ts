@@ -270,7 +270,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     if (error instanceof Error) {
       // Handle known errors
-      if (error.message.includes("Invalid") || error.message.includes("deactivated")) {
+      if (error.message.includes("Invalid") || error.message.includes("deactivated") || error.message.includes("locked") || error.message.includes("cannot login")) {
         res.status(401).json({
           status: "error",
           message: error.message,

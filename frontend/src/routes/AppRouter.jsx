@@ -31,9 +31,12 @@ function AppRouter() {
   }, []);
 
   // Show maintenance page for non-admin users when maintenance mode is on
-  // Admins can always access /admin route
+  // Allow login and admin routes even in maintenance mode
+  const isLoginRoute = window.location.pathname === "/login";
+  const isRegisterRoute = window.location.pathname === "/register";
   const isAdminRoute = window.location.pathname.startsWith("/admin");
-  if (maintenanceMode && user?.role !== "SYSTEM_ADMIN" && !isAdminRoute) {
+  
+  if (maintenanceMode && user?.role !== "SYSTEM_ADMIN" && !isLoginRoute && !isRegisterRoute && !isAdminRoute) {
     return <MaintenanceMode />;
   }
   return (

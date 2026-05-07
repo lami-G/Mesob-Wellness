@@ -674,3 +674,66 @@ export const getAuditLogs = async (
     });
   }
 };
+
+/**
+ * POST /api/v1/admin/users/:id/unlock
+ * Unlock a user account that is locked due to failed login attempts
+ */
+export const unlockUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const { id } = req.params;
+
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
+      return;
+    }
+
+    // Update user to unlock account
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        isLocked: false,
+        lockedUntil: null,
+        failedLoginAttempts: 0,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "User account unlocked successfully",
+      data: {
+        id: user.id,
+        email: user.email,
+        isLocked: user.isLocked,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("not found")) {
+      res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+      return;
+    }
+
+    console.error("Unlock user error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to unlock user account",
+    });
+  }
+};

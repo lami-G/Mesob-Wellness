@@ -235,6 +235,21 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
+    // Check if account is locked
+    if (user.isLocked && user.lockedUntil) {
+      const now = new Date();
+      if (now < user.lockedUntil) {
+        const minutesRemaining = Math.ceil((user.lockedUntil.getTime() - now.getTime()) / 60000);
+        throw new Error(`Account is locked. Try again in ${minutesRemaining} minutes.`);
+      } else {
+        // Unlock the account if lockout period has expired
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { isLocked: false, lockedUntil: null, failedLoginAttempts: 0 },
+        });
+      }
+    }
+
     if (!user.isActive) {
       throw new Error("Account is deactivated. Please contact support.");
     }
@@ -252,12 +267,29 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(input.password, user.password);
 
     if (!isPasswordValid) {
+      // Increment failed login attempts
+      const newFailedAttempts = user.failedLoginAttempts + 1;
+      const maxAttempts = 2; // Default max attempts
+      
+      let updateData: any = { failedLoginAttempts: newFailedAttempts };
+      
+      // Lock account if max attempts reached
+      if (newFailedAttempts >= maxAttempts) {
+        updateData.isLocked = true;
+        updateData.lockedUntil = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
+      }
+      
+      await prisma.user.update({
+        where: { id: user.id },
+        data: updateData,
+      });
+
       // Log failed login attempt
       await this.createAuditLog({
         userId: user.id,
         action: "LOGIN_FAILED",
         resource: "USER",
-        details: { reason: "invalid_password" },
+        details: { reason: "invalid_password", attempts: newFailedAttempts },
         ipAddress: auditContext?.ipAddress,
         userAgent: auditContext?.userAgent,
       });
@@ -268,11 +300,16 @@ export class AuthService {
     // Step B: Token Generation
     const token = this.generateToken(user.id, user.role);
 
-    // Update last login timestamp and create audit log
+    // Update last login timestamp, reset failed attempts, and create audit log
     await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
-        data: { lastLoginAt: new Date() },
+        data: { 
+          lastLoginAt: new Date(),
+          failedLoginAttempts: 0,
+          isLocked: false,
+          lockedUntil: null,
+        },
       }),
       prisma.auditLog.create({
         data: {
