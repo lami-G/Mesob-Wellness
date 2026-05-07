@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { api } from "../../services/adminService";
+import ChangePasswordModal from "../../components/admin/ChangePasswordModal";
 import "../../styles/admin-settings.css";
 
 function AdminProfile() {
@@ -9,6 +10,7 @@ function AdminProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -146,7 +148,7 @@ function AdminProfile() {
           <div className="card-body">
             <div className="security-item">
               <div className="security-info"><h3>Change Password</h3><p>Update your password regularly</p></div>
-              <button className="btn-action" onClick={() => alert("Coming soon")}>Change Password</button>
+              <button className="btn-action" onClick={() => setShowChangePasswordModal(true)}>Change Password</button>
             </div>
             <hr className="divider" />
             <div className="security-item">
@@ -161,6 +163,12 @@ function AdminProfile() {
           </div>
         </div>
       </div>
+
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        userName={formData.fullName}
+      />
     </div>
   );
 }
