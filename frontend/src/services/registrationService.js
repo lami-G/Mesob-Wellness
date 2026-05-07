@@ -10,7 +10,6 @@ export const registrationService = {
       },
       body: JSON.stringify(userData),
     });
-    SVGFEBlendElement
     const data = await response.json();
 
     if (!response.ok) {
