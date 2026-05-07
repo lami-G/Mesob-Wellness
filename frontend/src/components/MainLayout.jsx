@@ -43,7 +43,11 @@ function MainLayout({ children }) {
 
   const handleProfileClick = () => {
     setShowUserMenu(false);
-    navigate("/dashboard?tab=profile");
+    if (location.pathname === "/nurse") {
+      navigate("/nurse?tab=profile");
+    } else {
+      navigate("/dashboard?tab=profile");
+    }
   };
 
   const getInitials = (name) => {
