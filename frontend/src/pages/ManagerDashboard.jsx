@@ -976,7 +976,6 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
                   <span style={{ color: '#ffffff', fontWeight: 900, textShadow: '0 0 10px rgba(255,255,255,0.4)' }}>{`${value} patients`}</span>,
                   <span style={{ color: '#e0e0e0', fontWeight: 600, textTransform: 'capitalize' }}>BP Risk Category</span>
                 ]}
-                ]}
               />
               <Bar dataKey="value" name="Patients" radius={[0, 6, 6, 0]}>
                 {bpDisplay.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
