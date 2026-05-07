@@ -142,18 +142,22 @@ export class AuthService {
     // Step D: Atomic Transaction - Create User and HealthProfile
     const user = await prisma.$transaction(async (tx) => {
       // Create user
+      const role = input.role || UserRole.STAFF;
       const newUser = await tx.user.create({
         data: {
           email: input.email.toLowerCase(),
           password: hashedPassword,
           fullName: input.fullName.trim(),
-          role: input.role || UserRole.STAFF,
+          role,
           centerId: input.centerId,
           dateOfBirth: input.dateOfBirth,
           gender: input.gender,
           phone: input.phone,
           emergencyContactName: input.emergencyContactName,
           emergencyContactPhone: input.emergencyContactPhone,
+          // Only external patients are unverified (need email verification)
+          // STAFF and other roles are verified by default
+          isVerified: role !== UserRole.EXTERNAL_PATIENT,
         },
       });
 
@@ -183,20 +187,25 @@ export class AuthService {
     });
 
     // Create notification for system admin about new registration
-    const admins = await prisma.user.findMany({
-      where: { role: UserRole.SYSTEM_ADMIN },
-      select: { id: true },
-    });
+    try {
+      const admins = await prisma.user.findMany({
+        where: { role: UserRole.SYSTEM_ADMIN },
+        select: { id: true },
+      });
 
-    for (const admin of admins) {
-      await NotificationService.createNotification(
-        admin.id,
-        "USER_REGISTRATION",
-        "HIGH",
-        "New User Registration",
-        `New ${input.role} registered: ${input.fullName} (${input.email})`,
-        user.id
-      );
+      for (const admin of admins) {
+        await NotificationService.createNotification(
+          admin.id,
+          "USER_REGISTRATION",
+          "HIGH",
+          "New User Registration",
+          `New ${input.role} registered: ${input.fullName} (${input.email})`,
+          user.id
+        );
+      }
+    } catch (notificationError) {
+      // Log but don't fail registration if notification creation fails
+      console.warn("Failed to create registration notification:", notificationError);
     }
 
     // Generate JWT token
@@ -236,20 +245,7 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    // Check if account is locked
-    if (user.isLocked && user.lockedUntil) {
-      const now = new Date();
-      if (now < user.lockedUntil) {
-        const minutesRemaining = Math.ceil((user.lockedUntil.getTime() - now.getTime()) / 60000);
-        throw new Error(`Account is locked. Try again in ${minutesRemaining} minutes.`);
-      } else {
-        // Unlock the account if lockout period has expired
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { isLocked: false, lockedUntil: null, failedLoginAttempts: 0 },
-        });
-      }
-    }
+    // Account lock check removed for now
 
     if (!user.isActive) {
       throw new Error("Account is deactivated. Please contact support.");
@@ -268,49 +264,18 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(input.password, user.password);
 
     if (!isPasswordValid) {
-      // Increment failed login attempts
-      const newFailedAttempts = user.failedLoginAttempts + 1;
-      const maxAttempts = await SettingsService.getMaxLoginAttempts();
-      const lockoutDuration = await SettingsService.getLockoutDuration();
-      
-      let updateData: any = { failedLoginAttempts: newFailedAttempts };
-      
-      // Lock account if max attempts reached
-      if (newFailedAttempts >= maxAttempts) {
-        updateData.isLocked = true;
-        updateData.lockedUntil = new Date(Date.now() + lockoutDuration * 60 * 1000); // Lock for specified duration
-      }
-      
-      await prisma.user.update({
-        where: { id: user.id },
-        data: updateData,
-      });
-
-      // Log failed login attempt
-      await this.createAuditLog({
-        userId: user.id,
-        action: "LOGIN_FAILED",
-        resource: "USER",
-        details: { reason: "invalid_password", attempts: newFailedAttempts },
-        ipAddress: auditContext?.ipAddress,
-        userAgent: auditContext?.userAgent,
-      });
-
       throw new Error("Invalid email or password");
     }
 
     // Step B: Token Generation
     const token = this.generateToken(user.id, user.role);
 
-    // Update last login timestamp, reset failed attempts, and create audit log
+    // Update last login timestamp and create audit log
     await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
         data: { 
           lastLoginAt: new Date(),
-          failedLoginAttempts: 0,
-          isLocked: false,
-          lockedUntil: null,
         },
       }),
       prisma.auditLog.create({

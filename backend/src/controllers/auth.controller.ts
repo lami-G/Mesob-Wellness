@@ -68,6 +68,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       data: result,
     });
   } catch (error) {
+    console.error("Registration error:", error);
+    
     if (error instanceof Error) {
       if (
         error.message.includes("email") ||
@@ -82,7 +84,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       }
     }
 
-    console.error("Registration error:", error);
     res.status(500).json({
       status: "error",
       message: "Registration failed. Please try again later.",
@@ -140,7 +141,7 @@ export const createUser = async (req: AuthRequest, res: Response): Promise<void>
     
     // SYSTEM_ADMIN can create any role
     if (creatorRole === UserRole.SYSTEM_ADMIN) {
-      // Can create any role
+      // Can create any role - centerId is optional
     }
     // MANAGER can only create NURSE_OFFICER and STAFF
     else if (creatorRole === UserRole.MANAGER) {

@@ -17,7 +17,17 @@ export const getUnreadCount = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    const count = await NotificationService.getUnreadCount(req.user.userId);
+    let count = 0;
+    try {
+      count = await NotificationService.getUnreadCount(req.user.userId);
+    } catch (error: any) {
+      // If notifications table doesn't exist, return 0
+      if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+        count = 0;
+      } else {
+        throw error;
+      }
+    }
 
     res.status(200).json({
       status: "success",

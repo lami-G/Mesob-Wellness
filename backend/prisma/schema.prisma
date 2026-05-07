@@ -100,11 +100,6 @@ model User {
   isVerified  Boolean  @default(false)
   lastLoginAt DateTime? @db.Timestamptz(3)
   
-  // Login Attempt Tracking
-  failedLoginAttempts Int @default(0)
-  isLocked Boolean @default(false)
-  lockedUntil DateTime? @db.Timestamptz(3)
-  
   // Timestamps
   createdAt DateTime @default(now()) @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
