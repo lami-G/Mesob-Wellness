@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import AdminService from "../services/admin.service";
 import prisma from "../config/prisma";
+import { NotificationService } from "../services/notifications.service";
 import {
   UserFilters,
   CenterFilters,
@@ -313,6 +314,23 @@ export const createUser = async (
         isVerified: true,
       },
     });
+
+    // Create notification for system admin about new user creation
+    const admins = await prisma.user.findMany({
+      where: { role: "SYSTEM_ADMIN" },
+      select: { id: true },
+    });
+
+    for (const admin of admins) {
+      await NotificationService.createNotification(
+        admin.id,
+        "USER_REGISTRATION",
+        "HIGH",
+        "New User Created",
+        `New ${role} created by admin: ${fullName} (${email})`,
+        newUser.id
+      );
+    }
 
     res.status(201).json({
       status: "success",
