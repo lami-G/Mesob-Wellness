@@ -62,13 +62,23 @@ export const getNotifications = async (req: AuthRequest, res: Response): Promise
     const limit = parseInt(req.query.limit as string) || 20;
     const offset = parseInt(req.query.offset as string) || 0;
 
-    const result = await NotificationService.getNotifications(req.user.userId, {
-      type,
-      severity,
-      isRead,
-      limit,
-      offset,
-    });
+    let result: any = { notifications: [], total: 0 };
+    try {
+      result = await NotificationService.getNotifications(req.user.userId, {
+        type,
+        severity,
+        isRead,
+        limit,
+        offset,
+      });
+    } catch (error: any) {
+      // If notifications table doesn't exist, return empty list
+      if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+        result = { notifications: [], total: 0 };
+      } else {
+        throw error;
+      }
+    }
 
     res.status(200).json({
       status: "success",
