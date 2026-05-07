@@ -71,9 +71,7 @@ function AppRouter() {
         path="/manager"
         element={
           <RoleBasedRoute allowedRoles={["MANAGER"]}>
-            <MainLayout>
-              <ManagerDashboard />
-            </MainLayout>
+            <ManagerDashboard />
           </RoleBasedRoute>
         }
       />
@@ -81,9 +79,7 @@ function AppRouter() {
         path="/regional"
         element={
           <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE", "FEDERAL_OFFICE"]}>
-            <MainLayout>
-              <RegionalDashboard />
-            </MainLayout>
+            <RegionalDashboard />
           </RoleBasedRoute>
         }
       />
