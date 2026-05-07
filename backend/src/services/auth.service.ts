@@ -35,6 +35,7 @@ export interface AuthResponse {
     fullName: string;
     role: UserRole;
     isActive: boolean;
+    profilePicture?: string | null;
   };
   token: string;
 }
@@ -302,6 +303,7 @@ export class AuthService {
         fullName: user.fullName,
         role: user.role,
         isActive: user.isActive,
+        profilePicture: user.profilePicture,
       },
       token,
     };

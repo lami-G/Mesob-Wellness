@@ -87,7 +87,7 @@ export const markAsRead = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     const notification = await NotificationService.markAsRead(id);
 
@@ -147,7 +147,7 @@ export const deleteNotification = async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
     await NotificationService.deleteNotification(id);
 
