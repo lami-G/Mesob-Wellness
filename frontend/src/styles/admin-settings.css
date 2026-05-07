@@ -572,3 +572,12 @@
   background: white;
   display: block;
 }
+
+.btn-action.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-action.btn-danger:hover {
+  background: #b91c1c;
+}

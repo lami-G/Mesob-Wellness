@@ -405,3 +405,59 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
     });
   }
 };
+
+/**
+ * POST /api/v1/auth/change-password
+ * Change user password (requires authentication)
+ */
+export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate required fields
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({
+        status: "error",
+        message: "Current password and new password are required",
+      });
+      return;
+    }
+
+    // Change password
+    await AuthService.changePassword(req.user.userId, currentPassword, newPassword);
+
+    res.status(200).json({
+      status: "success",
+      message: "Password changed successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (
+        error.message.includes("incorrect") ||
+        error.message.includes("not found") ||
+        error.message.includes("Invalid password") ||
+        error.message.includes("does not have a password")
+      ) {
+        res.status(400).json({
+          status: "error",
+          message: error.message,
+        });
+        return;
+      }
+    }
+
+    console.error("Change password error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to change password",
+    });
+  }
+};

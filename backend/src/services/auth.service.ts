@@ -395,6 +395,53 @@ export class AuthService {
   }
 
   /**
+   * Change user password
+   */
+  static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+    // Get user
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Verify current password
+    if (!user.password) {
+      throw new Error("User does not have a password set");
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Current password is incorrect");
+    }
+
+    // Validate new password
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.valid) {
+      throw new Error(passwordValidation.message || "Invalid password");
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    // Create audit log
+    await this.createAuditLog({
+      userId,
+      action: "PASSWORD_CHANGED",
+      resource: "USER",
+      details: { method: "self_service" },
+    });
+  }
+
+  /**
    * Get user by ID (for middleware)
    */
   static async getUserById(userId: string) {
