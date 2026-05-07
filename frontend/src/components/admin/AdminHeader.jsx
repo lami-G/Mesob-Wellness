@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { notificationService } from "../../services/notificationService";
+import NotificationPanel from "./NotificationPanel";
 
 function AdminHeader({ 
-  user, 
   onToggleSidebar, 
   onTabChange, 
   title = "MESOB Wellness System",
@@ -13,12 +14,37 @@ function AdminHeader({
   lastUpdated
 }) {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Live clock
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const count = await notificationService.getUnreadCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
+
+  const handleNotificationClick = () => {
+    setShowNotifications(true);
+    if (unreadCount > 0) {
+      notificationService.markAllAsRead().then(() => {
+        setUnreadCount(0);
+      });
+    }
+  };
+
   const [currentTime, setCurrentTime] = useState(new Date());
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
@@ -38,11 +64,15 @@ function AdminHeader({
     navigate("/login");
   };
 
+  const getInitials = (name) => {
+    if (!name) return "SA";
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase();
+  };
+
   const getHeaderActions = () => {
     if (dashboardType === "manager" || dashboardType === "regional") {
       return (
         <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          {/* Live Clock */}
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -74,7 +104,6 @@ function AdminHeader({
             </div>
           </div>
 
-          {/* Last Updated */}
           {lastUpdated && (
             <div style={{ 
               fontSize: '0.75rem', 
@@ -91,7 +120,6 @@ function AdminHeader({
             </div>
           )}
 
-          {/* Refresh Button */}
           {onRefresh && (
             <button
               onClick={onRefresh}
@@ -129,89 +157,97 @@ function AdminHeader({
       );
     }
 
-    // Default admin actions
     return (
       <div className="header-actions">
-        <button className="notification-btn" title="Notifications">
+        <button 
+          className="notification-btn" 
+          title="Notifications"
+          onClick={handleNotificationClick}
+        >
           🔔
-          <span className="notification-badge">3</span>
+          {unreadCount > 0 && (
+            <span className="notification-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+          )}
         </button>
       </div>
     );
   };
 
   return (
-    <header className="admin-header">
-      <div className="header-left">
-        <button 
-          className="sidebar-toggle"
-          onClick={onToggleSidebar}
-          title="Toggle sidebar"
-        >
-          ☰
-        </button>
-        <h1 className="page-title">{title}</h1>
-      </div>
-
-      <div className="header-right">
-        {dashboardType === "admin" && (
-          <div className="search-bar">
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="search-input"
-            />
-          </div>
-        )}
-
-        {getHeaderActions()}
-
-        <div className="user-menu">
+    <>
+      <header className="admin-header">
+        <div className="header-left">
           <button 
-            className="user-btn"
-            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="sidebar-toggle"
+            onClick={onToggleSidebar}
+            title="Toggle sidebar"
           >
-            <span className="user-avatar">
-              {user?.profilePicture ? (
-                <img src={user.profilePicture} alt={user?.fullName} className="avatar-img" />
-              ) : (
-                "👤"
-              )}
-            </span>
-            <span className="user-name">{user?.fullName}</span>
-            <span className="dropdown-arrow">▼</span>
+            ☰
           </button>
+          <h1 className="page-title">{title}</h1>
+        </div>
 
-          {showUserMenu && (
-            <div className="user-dropdown">
-              {dashboardType === "admin" && (
-                <>
-                  <button 
-                    className="dropdown-item"
-                    onClick={handleProfileClick}
-                  >
-                    👤 Profile
-                  </button>
-                  <button 
-                    className="dropdown-item"
-                    onClick={handleSettingsClick}
-                  >
-                    ⚙️ Settings
-                  </button>
-                  <hr className="dropdown-divider" />
-                </>
-              )}
-              <button 
-                className="dropdown-item logout"
-                onClick={handleLogout}
-              >
-                🚪 Logout
-              </button>
+        <div className="header-right">
+          {dashboardType === "admin" && (
+            <div className="search-bar">
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="search-input"
+              />
             </div>
           )}
+
+          {getHeaderActions()}
+
+          <div className="user-menu">
+            <button 
+              className="user-btn"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <span className="user-avatar">
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt={user?.fullName} className="avatar-img" />
+                ) : (
+                  <div className="avatar-initials">{getInitials(user?.fullName)}</div>
+                )}
+              </span>
+              <span className="user-name">{user?.fullName}</span>
+              <span className="dropdown-arrow">▼</span>
+            </button>
+
+            {showUserMenu && (
+              <div className="user-dropdown">
+                {dashboardType === "admin" && (
+                  <>
+                    <button 
+                      className="dropdown-item"
+                      onClick={handleProfileClick}
+                    >
+                      👤 Profile
+                    </button>
+                    <button 
+                      className="dropdown-item"
+                      onClick={handleSettingsClick}
+                    >
+                      ⚙️ Settings
+                    </button>
+                    <hr className="dropdown-divider" />
+                  </>
+                )}
+                <button 
+                  className="dropdown-item logout"
+                  onClick={handleLogout}
+                >
+                  🚪 Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+    </>
   );
 }
 
