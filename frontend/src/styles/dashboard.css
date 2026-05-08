@@ -1723,3 +1723,349 @@
 .wellness-plan-header .btn {
   white-space: nowrap;
 }
+
+
+/* ========================================
+   FEEDBACK FORM STYLES - MODERN DESIGN
+   ======================================== */
+
+.feedback-form {
+  background: linear-gradient(135deg, #284394 0%, #2563eb 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  backdrop-filter: none !important;
+}
+
+.feedback-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.feedback-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #ffffff;
+}
+
+.feedback-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+.feedback-success {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 0.5rem;
+  color: #155724;
+}
+
+.success-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.feedback-success strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.feedback-success p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* NPS Section */
+.nps-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.nps-header {
+  margin-bottom: 1.5rem;
+}
+
+.nps-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: #284394;
+}
+
+.nps-scale-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.nps-scale {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.nps-button {
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  background: white;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #495057;
+}
+
+.nps-button:hover {
+  border-color: #284394;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.nps-button.active {
+  background: #284394;
+  color: white;
+  border-color: #284394;
+  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+}
+
+.nps-feedback {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.nps-feedback-detractor {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.nps-feedback-passive {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.nps-feedback-promoter {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.nps-emoji {
+  font-size: 1.5rem;
+}
+
+/* Ratings Section */
+.ratings-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.section-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+  color: #284394;
+  font-weight: 600;
+}
+
+.rating-group {
+  margin-bottom: 1.75rem;
+}
+
+.rating-group:last-child {
+  margin-bottom: 0;
+}
+
+.rating-header {
+  margin-bottom: 1rem;
+}
+
+.rating-label {
+  display: block;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.25rem;
+}
+
+.rating-description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.rating-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rating-button {
+  flex: 1;
+  min-width: 70px;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  background: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating-button:hover {
+  border-color: #284394;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.rating-button.active {
+  background: #284394;
+  border-color: #284394;
+  color: white;
+  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+}
+
+.rating-number {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #f59e0b;
+}
+
+.rating-stars {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #f59e0b;
+}
+
+/* Comments Section */
+.comments-section {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+
+.form-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.feedback-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.feedback-textarea:focus {
+  outline: none;
+  border-color: #223E8E;
+  box-shadow: 0 0 0 3px rgba(34, 62, 142, 0.1);
+}
+
+.feedback-textarea:disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-large {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.btn-large:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nps-scale {
+    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+  }
+
+  .rating-buttons {
+    gap: 0.5rem;
+  }
+
+  .rating-button {
+    min-width: 60px;
+    padding: 0.6rem;
+  }
+
+  .feedback-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .nps-section,
+  .ratings-section,
+  .comments-section {
+    padding: 1.5rem;
+  }
+
+  .btn-large {
+    min-width: 150px;
+    padding: 0.75rem 1.5rem;
+  }
+}
