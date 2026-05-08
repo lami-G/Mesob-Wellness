@@ -140,8 +140,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       let onlineCount = total;
       let walkin = 0;
 
-      // NO_SHOW appointments are not in the queue, so count is 0 for now
-      const noShow = 0;
+      // NO_SHOW appointments - fetch from queue
+      const noShow = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
       // Walk-ins are external patients who had vitals recorded today (no appointment needed)
@@ -314,7 +314,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       IN_PROGRESS: mappedAppointments.filter(a => a.appointmentStatus === 'IN_PROGRESS').length,
       IN_SERVICE: mappedAppointments.filter(a => a.appointmentStatus === 'IN_SERVICE').length,
       COMPLETED: mappedAppointments.filter(a => a.appointmentStatus === 'COMPLETED').length,
-      NO_SHOW: noShowCount,
+      NO_SHOW: mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length,
     };
 
     const statusDistribution = {

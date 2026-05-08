@@ -257,6 +257,7 @@ export async function getQueueAppointments(dateString?: string) {
           AppointmentStatus.IN_PROGRESS,
           AppointmentStatus.IN_SERVICE,
           AppointmentStatus.COMPLETED,
+          AppointmentStatus.NO_SHOW,
           // Legacy support
           AppointmentStatus.PENDING,
           AppointmentStatus.CONFIRMED,
