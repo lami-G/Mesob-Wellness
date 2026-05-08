@@ -153,7 +153,8 @@ export const getDashboardMetrics = async (
       return;
     }
 
-    const metrics = await AdminService.getDashboardMetrics();
+    const timePeriod = req.query.timePeriod as string | undefined;
+    const metrics = await AdminService.getDashboardMetrics(timePeriod);
 
     res.status(200).json({
       status: "success",

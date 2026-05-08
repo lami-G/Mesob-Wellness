@@ -2069,3 +2069,43 @@
     padding: 0.75rem 1.5rem;
   }
 }
+
+
+/* ========================================
+   RECHARTS CUSTOMIZATION
+   ======================================== */
+
+/* Remove default Recharts cursor/tooltip overlay */
+.recharts-surface {
+  cursor: default !important;
+}
+
+.recharts-default-tooltip {
+  display: none !important;
+}
+
+.recharts-cursor {
+  display: none !important;
+}
+
+/* Disable the white rectangle on chart hover */
+.recharts-wrapper {
+  cursor: default !important;
+}
+
+.recharts-wrapper:hover {
+  cursor: default !important;
+}
+
+/* Remove any chart interaction overlays */
+.recharts-cartesian-axis-tick {
+  cursor: default !important;
+}
+
+.recharts-bar {
+  cursor: default !important;
+}
+
+.recharts-line {
+  cursor: default !important;
+}
