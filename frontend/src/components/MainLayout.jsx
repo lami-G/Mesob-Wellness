@@ -28,6 +28,11 @@ function MainLayout({ children }) {
     }
   }, [showUserMenu]);
 
+  // Close dropdown when location changes
+  useEffect(() => {
+    setShowUserMenu(false);
+  }, [location.pathname, location.search]);
+
   // Check if user has manager access
   const hasManagerAccess = () => {
     return (
@@ -43,11 +48,8 @@ function MainLayout({ children }) {
 
   const handleProfileClick = () => {
     setShowUserMenu(false);
-    if (location.pathname === "/nurse") {
-      navigate("/nurse?tab=profile");
-    } else {
-      navigate("/dashboard?tab=profile");
-    }
+    // Emit a custom event that the dashboard can listen to
+    window.dispatchEvent(new CustomEvent('profileClicked'));
   };
 
   const getInitials = (name) => {
@@ -82,10 +84,9 @@ function MainLayout({ children }) {
                   {user?.profilePicture ? (
                     <img src={user.profilePicture} alt={user?.fullName} className="avatar-img-header" />
                   ) : (
-                    <div className="avatar-initials-header">{getInitials(user?.fullName)}</div>
+                    <span className="avatar-icon-header">👤</span>
                   )}
                 </span>
-                <span className="user-name-header">{user?.fullName}</span>
                 <span className="dropdown-arrow-header">▼</span>
               </button>
 

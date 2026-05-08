@@ -33,6 +33,16 @@ function NurseDashboard() {
     }
   }, [searchParams]);
 
+  // Listen for profile click from dropdown
+  useEffect(() => {
+    const handleProfileClick = () => {
+      setActiveTab('profile');
+    };
+    
+    window.addEventListener('profileClicked', handleProfileClick);
+    return () => window.removeEventListener('profileClicked', handleProfileClick);
+  }, []);
+
   const handleCapacityUpdate = (newCapacity) => {
     setCapacity(newCapacity);
   };
@@ -176,7 +186,7 @@ function NurseDashboard() {
             {activeTab === 'walkin' && '🚶 Register Walk-in'}
             {activeTab === 'wellness' && '🎯 Create Wellness Plan'}
             {activeTab === 'history' && '📚 Customer History'}
-            
+            {activeTab === 'profile' && '👤 Profile'}
           </h1>
         </div>
 

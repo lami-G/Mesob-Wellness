@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { api } from "../../services/adminService";
+import api from "../../services/api";
 import ChangePasswordModal from "../../components/admin/ChangePasswordModal";
 import "../../styles/admin-settings.css";
 
@@ -10,7 +10,9 @@ function AdminProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showPictureMenu, setShowPictureMenu] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -21,13 +23,13 @@ function AdminProfile() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await api.get("/users/me");
+        const response = await api.get("/api/v1/users/me");
         const userData = response.data.data;
         setFormData({
           fullName: userData.fullName || "",
           email: userData.email || "",
           phone: userData.phone || "",
-          role: userData.role || "SYSTEM_ADMIN",
+          role: userData.roleId || "SYSTEM_ADMIN",
         });
         if (userData.profilePicture) {
           setProfilePicture(userData.profilePicture);
@@ -49,9 +51,12 @@ function AdminProfile() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const updatePayload = { name: formData.fullName, phone: formData.phone };
-      if (profilePicture) updatePayload.profilePicture = profilePicture;
-      await api.put("/users/me", updatePayload);
+      const updatePayload = { 
+        fullName: formData.fullName, 
+        phone: formData.phone 
+      };
+      if (profilePicture !== undefined) updatePayload.profilePicture = profilePicture;
+      await api.put("/api/v1/users/me", updatePayload);
       const updatedUser = { ...user, ...formData, profilePicture };
       localStorage.setItem("mesob_user", JSON.stringify(updatedUser));
       if (updateUser) updateUser(updatedUser);
@@ -65,7 +70,13 @@ function AdminProfile() {
     }
   };
 
-  const handlePictureClick = () => fileInputRef.current?.click();
+  const handlePictureClick = () => {
+    if (profilePicture) {
+      setShowPictureMenu(!showPictureMenu);
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -87,15 +98,43 @@ function AdminProfile() {
           canvas.width = width;
           canvas.height = height;
           canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
-          setProfilePicture(canvas.toDataURL("image/jpeg", 0.7));
+          const base64Image = canvas.toDataURL("image/jpeg", 0.7);
+          setProfilePicture(base64Image);
+          // Upload immediately
+          uploadProfilePicture(base64Image);
         };
         img.src = event.target?.result;
       };
       reader.readAsDataURL(file);
     }
+    setShowPictureMenu(false);
   };
 
-  const getInitials = (name) => name.split(" ").map((n) => n[0]).join("").toUpperCase();
+  const uploadProfilePicture = async (imageData) => {
+    setIsUploadingPicture(true);
+    try {
+      const updatePayload = { profilePicture: imageData };
+      await api.put("/api/v1/users/me", updatePayload);
+      const updatedUser = { ...user, profilePicture: imageData };
+      localStorage.setItem("mesob_user", JSON.stringify(updatedUser));
+      if (updateUser) updateUser(updatedUser);
+      alert("Profile picture uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      alert("Failed to upload profile picture.");
+    } finally {
+      setIsUploadingPicture(false);
+    }
+  };
+
+  const handleDeletePicture = () => {
+    setProfilePicture(null);
+    setShowPictureMenu(false);
+  };
+
+  const handleChangePicture = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="settings-page">
@@ -107,10 +146,36 @@ function AdminProfile() {
         <div className="profile-picture-card">
           <div className="profile-picture-container">
             <div className="profile-avatar-large">
-              {profilePicture ? <img src={profilePicture} alt={formData.fullName} /> : <div className="avatar-initials">{getInitials(formData.fullName || "SA")}</div>}
+              {profilePicture ? (
+                <img src={profilePicture} alt={formData.fullName} />
+              ) : (
+                <span className="avatar-icon">ðŸ‘¤</span>
+              )}
             </div>
-            {isEditing && <button className="btn-camera-overlay" onClick={handlePictureClick} title="Change profile picture">í³·</button>}
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+            <button
+              className="btn-camera-overlay"
+              onClick={handlePictureClick}
+              title="Change profile picture"
+            >
+              ðŸ“·
+            </button>
+            {showPictureMenu && profilePicture && (
+              <div className="picture-menu">
+                <button className="menu-item" onClick={handleChangePicture}>
+                  Change
+                </button>
+                <button className="menu-item delete" onClick={handleDeletePicture}>
+                  Delete
+                </button>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
           </div>
           <div className="profile-info-text">
             <h2>{formData.fullName || "System Admin"}</h2>
@@ -121,44 +186,112 @@ function AdminProfile() {
         <div className="settings-card">
           <div className="card-header">
             <h2>Profile Information</h2>
-            <button className="btn-edit" onClick={() => setIsEditing(!isEditing)}>{isEditing ? "Cancel" : "Edit"}</button>
+            <button
+              className="btn-edit"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? "Cancel" : "Edit"}
+            </button>
           </div>
           <div className="card-body">
             <div className="form-group">
               <label>Full Name</label>
-              <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} disabled={!isEditing} className="form-input" />
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                disabled={!isEditing}
+                className="form-input"
+              />
             </div>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} disabled={!isEditing} className="form-input" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                disabled={!isEditing}
+                className="form-input"
+              />
             </div>
             <div className="form-group">
               <label>Phone</label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} disabled={!isEditing} className="form-input" />
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                disabled={!isEditing}
+                className="form-input"
+              />
             </div>
             <div className="form-group">
               <label>Role</label>
-              <input type="text" name="role" value={formData.role} disabled className="form-input" />
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                disabled
+                className="form-input"
+              />
             </div>
-            {isEditing && <div className="form-actions"><button className="btn-save" onClick={handleSave} disabled={isSaving}>{isSaving ? "Saving..." : "Save Changes"}</button></div>}
+            {isEditing && (
+              <div className="form-actions">
+                <button
+                  className="btn-save"
+                  onClick={handleSave}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div className="settings-card">
-          <div className="card-header"><h2>Account Security</h2></div>
+          <div className="card-header">
+            <h2>Account Security</h2>
+          </div>
           <div className="card-body">
             <div className="security-item">
-              <div className="security-info"><h3>Change Password</h3><p>Update your password regularly</p></div>
-              <button className="btn-action" onClick={() => setShowChangePasswordModal(true)}>Change Password</button>
+              <div className="security-info">
+                <h3>Change Password</h3>
+                <p>Update your password regularly</p>
+              </div>
+              <button
+                className="btn-action"
+                onClick={() => setShowChangePasswordModal(true)}
+              >
+                Change Password
+              </button>
             </div>
             <hr className="divider" />
             <div className="security-item">
-              <div className="security-info"><h3>Two-Factor Authentication</h3><p>Add extra security</p></div>
-              <button className="btn-action" onClick={() => alert("Coming soon")}>Enable 2FA</button>
+              <div className="security-info">
+                <h3>Two-Factor Authentication</h3>
+                <p>Add extra security</p>
+              </div>
+              <button
+                className="btn-action"
+                onClick={() => alert("Coming soon")}
+              >
+                Enable 2FA
+              </button>
             </div>
             <hr className="divider" />
             <div className="security-item">
-              <div className="security-info"><h3>Active Sessions</h3><p>Manage login sessions</p></div>
-              <button className="btn-action" onClick={() => alert("Coming soon")}>View Sessions</button>
+              <div className="security-info">
+                <h3>Active Sessions</h3>
+                <p>Manage login sessions</p>
+              </div>
+              <button
+                className="btn-action"
+                onClick={() => alert("Coming soon")}
+              >
+                View Sessions
+              </button>
             </div>
           </div>
         </div>
