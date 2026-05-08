@@ -283,14 +283,118 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
       )}
 
       {/* KPI Cards */}
-      <div className="mgr-kpi-grid">
+      <div className="mgr-kpi-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '2rem'
+      }}>
         {statCards.map((c) => (
-          <div key={c.label} className="mgr-kpi-card">
-            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}>{c.icon}</div>
-            <div className="mgr-kpi-body">
-              <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
-              <div className="mgr-kpi-label">{c.label}</div>
-              <div className="mgr-kpi-sub">{c.sub}</div>
+          <div key={c.label} className="mgr-kpi-card" style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+            border: '2px solid #e5e7eb',
+            borderRadius: '16px',
+            padding: '1.75rem',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+            position: 'relative',
+            overflow: 'hidden',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12)';
+            e.currentTarget.style.borderColor = c.color;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
+            e.currentTarget.style.borderColor = '#e5e7eb';
+          }}>
+            {/* Decorative background */}
+            <div style={{
+              position: 'absolute',
+              top: '-40px',
+              right: '-40px',
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${c.color}15 0%, transparent 70%)`,
+              pointerEvents: 'none'
+            }} />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              {/* Icon and Label */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                marginBottom: '1rem'
+              }}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem'
+                }}>
+                  <div style={{
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    color: '#6b7280',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}>
+                    {c.label}
+                  </div>
+                  <div style={{
+                    fontSize: '0.8rem',
+                    color: '#9ca3af',
+                    fontWeight: 500
+                  }}>
+                    {c.sub}
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '2rem',
+                  background: `${c.color}15`,
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '60px',
+                  height: '60px'
+                }}>
+                  {c.icon}
+                </div>
+              </div>
+
+              {/* Value */}
+              <div style={{
+                fontSize: '2.5rem',
+                fontWeight: 900,
+                color: c.color,
+                lineHeight: 1,
+                marginBottom: '0.5rem'
+              }}>
+                {c.value}
+              </div>
+
+              {/* Progress bar for visual appeal */}
+              <div style={{
+                height: '4px',
+                background: '#e5e7eb',
+                borderRadius: '2px',
+                overflow: 'hidden',
+                marginTop: '1rem'
+              }}>
+                <div style={{
+                  height: '100%',
+                  background: `linear-gradient(90deg, ${c.color}, ${c.color}80)`,
+                  width: `${Math.min((c.value / 100) * 100, 100)}%`,
+                  borderRadius: '2px',
+                  transition: 'width 0.8s ease'
+                }} />
+              </div>
             </div>
           </div>
         ))}
@@ -299,35 +403,180 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
       {/* Performance Metrics */}
       <div className="mgr-charts-row" style={{ marginTop: '1.5rem' }}>
         {/* Completion Rate Gauge */}
-        <div className="mgr-chart-card">
-          <div className="mgr-chart-header">
-            <h3>Completion Rate</h3>
-            <span className={`mgr-status-badge ${completionRate > 80 ? 'normal' : completionRate > 60 ? 'moderate' : 'critical'}`}>
+        <div className="mgr-chart-card" style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+          border: '2px solid #e5e7eb',
+          borderRadius: '16px',
+          padding: '2rem',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Decorative background */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            right: '-50px',
+            width: '200px',
+            height: '200px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          <div className="mgr-chart-header" style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>
+              📊 Completion Rate
+            </h3>
+            <span className={`mgr-status-badge`} style={{
+              display: 'inline-block',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '20px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              background: completionRate > 80 ? 'rgba(34, 197, 94, 0.15)' : completionRate > 60 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+              color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444',
+              border: completionRate > 80 ? '1px solid #22c55e' : completionRate > 60 ? '1px solid #f59e0b' : '1px solid #ef4444'
+            }}>
               {completionRate > 80 ? '🟢 Excellent' : completionRate > 60 ? '🟡 Good' : '🔴 Needs Attention'}
             </span>
           </div>
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '4rem', fontWeight: 800, color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444' }}>
-              {completionRate}%
+
+          <div style={{ padding: '2rem 0', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            {/* Circular Progress */}
+            <div style={{
+              position: 'relative',
+              width: '180px',
+              height: '180px',
+              margin: '0 auto 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              {/* Background circle */}
+              <svg style={{ position: 'absolute', width: '100%', height: '100%' }} viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="80" fill="none" stroke="#e5e7eb" strokeWidth="8" />
+                {/* Progress circle */}
+                <circle
+                  cx="90"
+                  cy="90"
+                  r="80"
+                  fill="none"
+                  stroke={completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444'}
+                  strokeWidth="8"
+                  strokeDasharray={`${(completionRate / 100) * 502.4} 502.4`}
+                  strokeLinecap="round"
+                  style={{
+                    transform: 'rotate(-90deg)',
+                    transformOrigin: '90px 90px',
+                    transition: 'stroke-dasharray 0.8s ease'
+                  }}
+                />
+              </svg>
+              {/* Center text */}
+              <div style={{ textAlign: 'center', zIndex: 2 }}>
+                <div style={{
+                  fontSize: '3.5rem',
+                  fontWeight: 900,
+                  color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444',
+                  lineHeight: 1
+                }}>
+                  {completionRate}%
+                </div>
+              </div>
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#6b7280', marginTop: '0.5rem' }}>
-              {summary?.completedAppointments || 0} of {summary?.totalAppointments || 0} appointments completed
+
+            <div style={{
+              fontSize: '0.95rem',
+              color: '#6b7280',
+              fontWeight: 500,
+              marginTop: '1rem'
+            }}>
+              <div style={{ fontWeight: 700, color: '#1f2937', marginBottom: '0.25rem' }}>
+                {summary?.completedAppointments || 0} of {summary?.totalAppointments || 0}
+              </div>
+              <div>appointments completed</div>
             </div>
           </div>
         </div>
 
-        {/* Feedback Score */}
-        <div className="mgr-chart-card">
-          <div className="mgr-chart-header">
-            <h3>Average Feedback</h3>
-            <p>Patient satisfaction score</p>
+        {/* Average Feedback Score */}
+        <div className="mgr-chart-card" style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+          border: '2px solid #e5e7eb',
+          borderRadius: '16px',
+          padding: '2rem',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Decorative background */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            right: '-50px',
+            width: '200px',
+            height: '200px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }} />
+
+          <div className="mgr-chart-header" style={{ position: 'relative', zIndex: 1 }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>
+              ⭐ Average Feedback
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#6b7280', fontWeight: 500 }}>
+              Patient satisfaction score
+            </p>
           </div>
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '4rem', fontWeight: 800, color: '#3b82f6' }}>
+
+          <div style={{ padding: '2rem 0', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+            {/* Star Rating Display */}
+            <div style={{
+              fontSize: '3.5rem',
+              fontWeight: 900,
+              color: '#3b82f6',
+              lineHeight: 1,
+              marginBottom: '1rem'
+            }}>
               {summary?.averageFeedback ? summary.averageFeedback.toFixed(1) : '0.0'}
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#6b7280', marginTop: '0.5rem' }}>
-              ⭐ Out of 5.0
+
+            {/* Star visualization */}
+            <div style={{
+              fontSize: '2rem',
+              letterSpacing: '0.25rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '0.25rem'
+            }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  style={{
+                    opacity: star <= Math.round(summary?.averageFeedback || 0) ? 1 : 0.2,
+                    transition: 'opacity 0.3s ease',
+                    display: 'inline-block'
+                  }}
+                >
+                  ⭐
+                </span>
+              ))}
+            </div>
+
+            <div style={{
+              fontSize: '0.95rem',
+              color: '#6b7280',
+              fontWeight: 500
+            }}>
+              <div style={{ fontWeight: 700, color: '#1f2937', marginBottom: '0.25rem' }}>
+                Out of 5.0
+              </div>
+              <div>
+                {summary?.averageFeedback >= 4.5 ? '🟢 Excellent' : summary?.averageFeedback >= 3.5 ? '🟡 Good' : summary?.averageFeedback >= 2.5 ? '🟠 Fair' : '🔴 Needs Improvement'}
+              </div>
             </div>
           </div>
         </div>
