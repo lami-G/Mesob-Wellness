@@ -10,9 +10,10 @@ function AdminProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showPictureMenu, setShowPictureMenu] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -50,27 +51,49 @@ function AdminProfile() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
     try {
       const updatePayload = { 
         fullName: formData.fullName, 
         phone: formData.phone 
       };
       if (profilePicture !== undefined) updatePayload.profilePicture = profilePicture;
+      
       await api.put("/api/v1/users/me", updatePayload);
-      const updatedUser = { ...user, ...formData, profilePicture };
-      localStorage.setItem("mesob_user", JSON.stringify(updatedUser));
-      if (updateUser) updateUser(updatedUser);
+      
+      // Fetch fresh user data from backend to ensure consistency
+      const response = await api.get("/api/v1/users/me");
+      const freshUserData = response.data.data;
+      
+      // Merge fresh data with existing user to preserve all fields
+      const mergedUser = {
+        ...user,
+        id: freshUserData.id,
+        fullName: freshUserData.fullName,
+        email: freshUserData.email,
+        phone: freshUserData.phone,
+        profilePicture: freshUserData.profilePicture,
+        // Map roleId to role if needed
+        role: user.role || freshUserData.roleId
+      };
+      
+      localStorage.setItem("mesob_user", JSON.stringify(mergedUser));
+      if (updateUser) updateUser(mergedUser);
+      
       setIsEditing(false);
-      alert("Profile updated successfully!");
+      setShowPictureMenu(false);
+      setSuccessMessage("Profile updated successfully!");
     } catch (error) {
       console.error("Error saving profile:", error);
-      alert("Failed to save profile.");
+      setErrorMessage("Failed to save profile.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handlePictureClick = () => {
+    setIsEditing(true);
     if (profilePicture) {
       setShowPictureMenu(!showPictureMenu);
     } else {
@@ -100,8 +123,6 @@ function AdminProfile() {
           canvas.getContext("2d")?.drawImage(img, 0, 0, width, height);
           const base64Image = canvas.toDataURL("image/jpeg", 0.7);
           setProfilePicture(base64Image);
-          // Upload immediately
-          uploadProfilePicture(base64Image);
         };
         img.src = event.target?.result;
       };
@@ -110,34 +131,94 @@ function AdminProfile() {
     setShowPictureMenu(false);
   };
 
-  const uploadProfilePicture = async (imageData) => {
-    setIsUploadingPicture(true);
-    try {
-      const updatePayload = { profilePicture: imageData };
-      await api.put("/api/v1/users/me", updatePayload);
-      const updatedUser = { ...user, profilePicture: imageData };
-      localStorage.setItem("mesob_user", JSON.stringify(updatedUser));
-      if (updateUser) updateUser(updatedUser);
-      alert("Profile picture uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      alert("Failed to upload profile picture.");
-    } finally {
-      setIsUploadingPicture(false);
-    }
-  };
-
   const handleDeletePicture = () => {
     setProfilePicture(null);
     setShowPictureMenu(false);
   };
 
   const handleChangePicture = () => {
+    setShowPictureMenu(false);
     fileInputRef.current?.click();
   };
 
+  const handleCancel = () => {
+    setIsEditing(false);
+    setShowPictureMenu(false);
+    setErrorMessage("");
+    setSuccessMessage("");
+    // Reload profile data to discard changes
+    const fetchProfileData = async () => {
+      try {
+        const response = await api.get("/api/v1/users/me");
+        const userData = response.data.data;
+        setFormData({
+          fullName: userData.fullName || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          role: userData.roleId || "SYSTEM_ADMIN",
+        });
+        if (userData.profilePicture) {
+          setProfilePicture(userData.profilePicture);
+        } else {
+          setProfilePicture(null);
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+    fetchProfileData();
+  };
+
+  // Auto-dismiss success message
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  // Auto-dismiss error message
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   return (
     <div className="settings-page">
+      {successMessage && (
+        <div style={{
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          backgroundColor: "#4caf50",
+          color: "white",
+          padding: "16px 24px",
+          borderRadius: "4px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+          animation: "slideIn 0.3s ease-out"
+        }}>
+          ✓ {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div style={{
+          position: "fixed",
+          top: "20px",
+          right: "20px",
+          backgroundColor: "#f44336",
+          color: "white",
+          padding: "16px 24px",
+          borderRadius: "4px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+          animation: "slideIn 0.3s ease-out"
+        }}>
+          ✗ {errorMessage}
+        </div>
+      )}
       <div className="page-header">
         <h1>Admin Profile</h1>
         <p>Manage your profile information</p>
@@ -186,12 +267,14 @@ function AdminProfile() {
         <div className="settings-card">
           <div className="card-header">
             <h2>Profile Information</h2>
-            <button
-              className="btn-edit"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              {isEditing ? "Cancel" : "Edit"}
-            </button>
+            {!isEditing && (
+              <button
+                className="btn-edit"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+            )}
           </div>
           <div className="card-body">
             <div className="form-group">
@@ -240,6 +323,15 @@ function AdminProfile() {
             {isEditing && (
               <div className="form-actions">
                 <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={handleCancel}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
                   className="btn-save"
                   onClick={handleSave}
                   disabled={isSaving}
@@ -265,32 +357,6 @@ function AdminProfile() {
                 onClick={() => setShowChangePasswordModal(true)}
               >
                 Change Password
-              </button>
-            </div>
-            <hr className="divider" />
-            <div className="security-item">
-              <div className="security-info">
-                <h3>Two-Factor Authentication</h3>
-                <p>Add extra security</p>
-              </div>
-              <button
-                className="btn-action"
-                onClick={() => alert("Coming soon")}
-              >
-                Enable 2FA
-              </button>
-            </div>
-            <hr className="divider" />
-            <div className="security-item">
-              <div className="security-info">
-                <h3>Active Sessions</h3>
-                <p>Manage login sessions</p>
-              </div>
-              <button
-                className="btn-action"
-                onClick={() => alert("Coming soon")}
-              >
-                View Sessions
               </button>
             </div>
           </div>

@@ -7,6 +7,7 @@ function MainLayout({ children }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [displayUser, setDisplayUser] = useState(user);
   const userMenuRef = useRef(null);
   const dashboardTab =
     new URLSearchParams(location.search).get("tab") || "appointments";
@@ -32,6 +33,12 @@ function MainLayout({ children }) {
   useEffect(() => {
     setShowUserMenu(false);
   }, [location.pathname, location.search]);
+
+  // Update displayUser when user changes and log it
+  useEffect(() => {
+    console.log("Auth user after update:", user);
+    setDisplayUser(user);
+  }, [user]);
 
   // Check if user has manager access
   const hasManagerAccess = () => {
@@ -81,8 +88,8 @@ function MainLayout({ children }) {
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
                 <span className="user-avatar-header">
-                  {user?.profilePicture ? (
-                    <img src={user.profilePicture} alt={user?.fullName} className="avatar-img-header" />
+                  {displayUser?.profilePicture ? (
+                    <img src={displayUser.profilePicture} alt={displayUser?.fullName} className="avatar-img-header" />
                   ) : (
                     <span className="avatar-icon-header">👤</span>
                   )}
