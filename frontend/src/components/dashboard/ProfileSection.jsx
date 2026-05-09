@@ -174,6 +174,11 @@ function ProfileSection({ onLogout }) {
       };
       if (profilePicture) updatePayload.profilePicture = profilePicture;
 
+      console.log('Sending update payload:', {
+        ...updatePayload,
+        profilePicture: profilePicture ? `[base64 image, ${profilePicture.length} chars]` : undefined
+      });
+
       await api.put('/api/v1/users/me', updatePayload);
 
       const updatedUser = { ...user, ...editFormData, profilePicture };
