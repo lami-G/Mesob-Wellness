@@ -23,7 +23,7 @@ function RegionalSidebar({
     { id: "overview", label: "Overview", icon: "📊" },
     { id: "centers", label: "Centers", icon: "🏥", count: centersCount },
     { id: "managers", label: "Managers", icon: "👔" },
-    { id: "performance", label: "Performance", icon: "📈" },
+    { id: "performance", label: "Analytics", icon: "📈" },
   ];
 
   return (

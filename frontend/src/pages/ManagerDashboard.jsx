@@ -11,6 +11,7 @@ import {
 import '../styles/admin-layout.css';
 import '../styles/admin-dashboard.css';
 import '../styles/tooltip-fix.css';
+import '../styles/dashboard-tokens.css';
 
 // ─── Custom Tooltip Components ────────────────────────────────────────────────
 // Outstanding custom tooltips with perfect visibility
@@ -207,7 +208,6 @@ const ManagerDashboard = () => {
 
   const tabs = [
     { id: 'overview',  label: '📊 Overview'  },
-    { id: 'capacity',  label: '🎛️ Capacity'  },
     { id: 'analytics', label: '📈 Analytics' },
     { id: 'users',     label: `👥 Staff (${users.length})`     },
     { id: 'audit',     label: '🔍 Audit'     },
@@ -245,13 +245,6 @@ const ManagerDashboard = () => {
               </div>
             </div>
             <OverviewTab loading={loading} capacityInfo={capacityInfo} bookingStats={bookingStats} />
-          </div>
-        );
-      case 'capacity':
-        return (
-          <div className="dashboard-section">
-            <h2>🎛️ Capacity Management</h2>
-            <CapacityTab loading={loading} capacityInfo={capacityInfo} />
           </div>
         );
       case 'analytics':
@@ -344,117 +337,25 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats }) => {
   return (
     <div className="mgr-overview">
       {/* KPI Cards — Production-Level Design */}
-      <div className="mgr-kpi-grid" style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
-      }}>
+      <div className="dash-kpi-grid">
         {statCards.map((c) => (
-          <div key={c.label} className="mgr-kpi-card" style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-            border: '1px solid #e5e7eb',
-            borderRadius: '12px',
-            padding: '1.75rem',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            {/* Decorative background */}
-            <div style={{
-              position: 'absolute',
-              top: '-40px',
-              right: '-40px',
-              width: '150px',
-              height: '150px',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${c.color}15 0%, transparent 70%)`,
-              pointerEvents: 'none'
-            }} />
-
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Icon and Label */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                marginBottom: '1rem'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    color: '#6b7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    {c.label}
-                  </div>
-                  <div style={{
-                    fontSize: '0.8rem',
-                    color: '#9ca3af',
-                    fontWeight: 500
-                  }}>
-                    {c.sub}
-                  </div>
-                </div>
-                <div style={{
-                  fontSize: '2rem',
-                  background: `${c.color}15`,
-                  padding: '0.75rem',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '60px',
-                  height: '60px'
-                }}>
-                  {c.icon}
-                </div>
-              </div>
-
-              {/* Value */}
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 900,
-                color: c.color,
-                lineHeight: 1,
-                marginBottom: '0.5rem'
-              }}>
-                {c.value}
-              </div>
-
-              {/* Progress bar for visual appeal */}
-              <div style={{
-                height: '4px',
-                background: '#e5e7eb',
-                borderRadius: '2px',
-                overflow: 'hidden',
-                marginTop: '1rem'
-              }}>
-                <div style={{
-                  height: '100%',
-                  background: `linear-gradient(90deg, ${c.color}, ${c.color}80)`,
-                  width: `${Math.min((c.value / 100) * 100, 100)}%`,
-                  borderRadius: '2px',
-                  transition: 'width 0.8s ease'
-                }} />
-              </div>
+          <div key={c.label} className="dash-kpi-card">
+            <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
+              {c.icon}
+            </div>
+            <div className="dash-kpi-body">
+              <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
+              <div className="dash-kpi-label">{c.label}</div>
+              <div className="dash-kpi-sub">{c.sub}</div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Charts Row */}
-      <div className="mgr-charts-row">
-        {/* Enhanced Daily Service Delivery Chart — Production-Ready */}
-        <div className="mgr-chart-card mgr-chart-wide mgr-enhanced-service-delivery" style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
+      <div className="dash-charts-row">
+        {/* Daily Service Delivery Chart */}
+        <div className="dash-chart-card mgr-enhanced-service-delivery" style={{
           borderRadius: '12px',
           padding: '1.25rem',
           boxShadow: '0 4px 12px rgba(0,0,0,0.05)',

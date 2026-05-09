@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+﻿import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { regionalService } from '../services/regionalService';
 import { analyticsService } from '../services/analyticsService';
@@ -11,6 +11,9 @@ import {
 } from 'recharts';
 import '../styles/admin-layout.css';
 import '../styles/admin-dashboard.css';
+import '../styles/manager-dashboard.css';
+import '../styles/regional-dashboard-responsive.css';
+import '../styles/dashboard-tokens.css';
 
 // ─── Role guard ───────────────────────────────────────────────────────────────
 const REGIONAL_ROLES = ['REGIONAL_OFFICE', 'FEDERAL_OFFICE', 'SYSTEM_ADMIN'];
@@ -90,7 +93,7 @@ const RegionalDashboard = () => {
     { id: 'overview', label: '📊 Overview' },
     { id: 'centers', label: `🏥 Centers (${centers.length})` },
     { id: 'managers', label: '👔 Managers' },
-    { id: 'performance', label: '📈 Performance' },
+    { id: 'performance', label: '📈 Analytics' },
   ];
 
   // Filter centers based on selection
@@ -175,7 +178,7 @@ const RegionalDashboard = () => {
       case 'performance':
         return (
           <div className="dashboard-section">
-            <h2>📈 Performance Analytics</h2>
+            <h2>📈 Analytics</h2>
             <PerformanceTab loading={loading} analytics={effectiveAnalytics} trendsData={trendsData} centers={filteredCenters} />
           </div>
         );
@@ -283,300 +286,68 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
       )}
 
       {/* KPI Cards */}
-      <div className="mgr-kpi-grid" style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem'
-      }}>
+      <div className="dash-kpi-grid">
         {statCards.map((c) => (
-          <div key={c.label} className="mgr-kpi-card" style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-            border: '2px solid #e5e7eb',
-            borderRadius: '16px',
-            padding: '1.75rem',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-            position: 'relative',
-            overflow: 'hidden',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-4px)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12)';
-            e.currentTarget.style.borderColor = c.color;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.08)';
-            e.currentTarget.style.borderColor = '#e5e7eb';
-          }}>
-            {/* Decorative background */}
-            <div style={{
-              position: 'absolute',
-              top: '-40px',
-              right: '-40px',
-              width: '150px',
-              height: '150px',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${c.color}15 0%, transparent 70%)`,
-              pointerEvents: 'none'
-            }} />
-
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              {/* Icon and Label */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                marginBottom: '1rem'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    color: '#6b7280',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}>
-                    {c.label}
-                  </div>
-                  <div style={{
-                    fontSize: '0.8rem',
-                    color: '#9ca3af',
-                    fontWeight: 500
-                  }}>
-                    {c.sub}
-                  </div>
-                </div>
-                <div style={{
-                  fontSize: '2rem',
-                  background: `${c.color}15`,
-                  padding: '0.75rem',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '60px',
-                  height: '60px'
-                }}>
-                  {c.icon}
-                </div>
-              </div>
-
-              {/* Value */}
-              <div style={{
-                fontSize: '2.5rem',
-                fontWeight: 900,
-                color: c.color,
-                lineHeight: 1,
-                marginBottom: '0.5rem'
-              }}>
-                {c.value}
-              </div>
-
-              {/* Progress bar for visual appeal */}
-              <div style={{
-                height: '4px',
-                background: '#e5e7eb',
-                borderRadius: '2px',
-                overflow: 'hidden',
-                marginTop: '1rem'
-              }}>
-                <div style={{
-                  height: '100%',
-                  background: `linear-gradient(90deg, ${c.color}, ${c.color}80)`,
-                  width: `${Math.min((c.value / 100) * 100, 100)}%`,
-                  borderRadius: '2px',
-                  transition: 'width 0.8s ease'
-                }} />
-              </div>
+          <div key={c.label} className="dash-kpi-card">
+            <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
+              {c.icon}
+            </div>
+            <div className="dash-kpi-body">
+              <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
+              <div className="dash-kpi-label">{c.label}</div>
+              <div className="dash-kpi-sub">{c.sub}</div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Performance Metrics */}
-      <div className="mgr-charts-row" style={{ marginTop: '1.5rem' }}>
+      <div className="dash-charts-row" style={{ marginTop: '1.25rem' }}>
         {/* Completion Rate Gauge */}
-        <div className="mgr-chart-card" style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-          border: '2px solid #e5e7eb',
-          borderRadius: '16px',
-          padding: '2rem',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          {/* Decorative background */}
-          <div style={{
-            position: 'absolute',
-            top: '-50px',
-            right: '-50px',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
-
-          <div className="mgr-chart-header" style={{ position: 'relative', zIndex: 1 }}>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>
-              📊 Completion Rate
-            </h3>
-            <span className={`mgr-status-badge`} style={{
-              display: 'inline-block',
-              padding: '0.4rem 0.8rem',
-              borderRadius: '20px',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              background: completionRate > 80 ? 'rgba(34, 197, 94, 0.15)' : completionRate > 60 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-              color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444',
-              border: completionRate > 80 ? '1px solid #22c55e' : completionRate > 60 ? '1px solid #f59e0b' : '1px solid #ef4444'
-            }}>
+        <div className="dash-chart-card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h3 className="dash-chart-title">📊 Completion Rate</h3>
+            <span className={`dash-status-badge ${completionRate > 80 ? 'normal' : completionRate > 60 ? 'moderate' : 'critical'}`}>
               {completionRate > 80 ? '🟢 Excellent' : completionRate > 60 ? '🟡 Good' : '🔴 Needs Attention'}
             </span>
           </div>
-
-          <div style={{ padding: '2rem 0', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-            {/* Circular Progress */}
-            <div style={{
-              position: 'relative',
-              width: '180px',
-              height: '180px',
-              margin: '0 auto 1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {/* Background circle */}
-              <svg style={{ position: 'absolute', width: '100%', height: '100%' }} viewBox="0 0 180 180">
-                <circle cx="90" cy="90" r="80" fill="none" stroke="#e5e7eb" strokeWidth="8" />
-                {/* Progress circle */}
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="80"
-                  fill="none"
+          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+            <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg style={{ position: 'absolute', width: '100%', height: '100%' }} viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="70" fill="none" stroke="#e5e7eb" strokeWidth="8" />
+                <circle cx="80" cy="80" r="70" fill="none"
                   stroke={completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444'}
                   strokeWidth="8"
-                  strokeDasharray={`${(completionRate / 100) * 502.4} 502.4`}
+                  strokeDasharray={`${(completionRate / 100) * 439.8} 439.8`}
                   strokeLinecap="round"
-                  style={{
-                    transform: 'rotate(-90deg)',
-                    transformOrigin: '90px 90px',
-                    transition: 'stroke-dasharray 0.8s ease'
-                  }}
+                  style={{ transform: 'rotate(-90deg)', transformOrigin: '80px 80px', transition: 'stroke-dasharray 0.8s ease' }}
                 />
               </svg>
-              {/* Center text */}
-              <div style={{ textAlign: 'center', zIndex: 2 }}>
-                <div style={{
-                  fontSize: '3.5rem',
-                  fontWeight: 900,
-                  color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444',
-                  lineHeight: 1
-                }}>
-                  {completionRate}%
-                </div>
+              <div style={{ fontSize: '2.5rem', fontWeight: 900, color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444', lineHeight: 1 }}>
+                {completionRate}%
               </div>
             </div>
-
-            <div style={{
-              fontSize: '0.95rem',
-              color: '#6b7280',
-              fontWeight: 500,
-              marginTop: '1rem'
-            }}>
-              <div style={{ fontWeight: 700, color: '#1f2937', marginBottom: '0.25rem' }}>
-                {summary?.completedAppointments || 0} of {summary?.totalAppointments || 0}
-              </div>
-              <div>appointments completed</div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+              <strong style={{ color: '#1f2937' }}>{summary?.completedAppointments || 0}</strong> of <strong style={{ color: '#1f2937' }}>{summary?.totalAppointments || 0}</strong> completed
             </div>
           </div>
         </div>
 
-        {/* Average Feedback Score */}
-        <div className="mgr-chart-card" style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-          border: '2px solid #e5e7eb',
-          borderRadius: '16px',
-          padding: '2rem',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          {/* Decorative background */}
-          <div style={{
-            position: 'absolute',
-            top: '-50px',
-            right: '-50px',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
-            pointerEvents: 'none'
-          }} />
-
-          <div className="mgr-chart-header" style={{ position: 'relative', zIndex: 1 }}>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>
-              ⭐ Average Feedback
-            </h3>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#6b7280', fontWeight: 500 }}>
-              Patient satisfaction score
-            </p>
-          </div>
-
-          <div style={{ padding: '2rem 0', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-            {/* Star Rating Display */}
-            <div style={{
-              fontSize: '3.5rem',
-              fontWeight: 900,
-              color: '#3b82f6',
-              lineHeight: 1,
-              marginBottom: '1rem'
-            }}>
+        {/* Average Feedback */}
+        <div className="dash-chart-card">
+          <h3 className="dash-chart-title">⭐ Average Feedback</h3>
+          <p className="dash-chart-subtitle">Patient satisfaction score</p>
+          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+            <div style={{ fontSize: '3rem', fontWeight: 900, color: '#3b82f6', lineHeight: 1, marginBottom: '0.75rem' }}>
               {summary?.averageFeedback ? summary.averageFeedback.toFixed(1) : '0.0'}
             </div>
-
-            {/* Star visualization */}
-            <div style={{
-              fontSize: '2rem',
-              letterSpacing: '0.25rem',
-              marginBottom: '1rem',
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '0.25rem'
-            }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span
-                  key={star}
-                  style={{
-                    opacity: star <= Math.round(summary?.averageFeedback || 0) ? 1 : 0.2,
-                    transition: 'opacity 0.3s ease',
-                    display: 'inline-block'
-                  }}
-                >
-                  ⭐
-                </span>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', marginBottom: '0.75rem' }}>
+              {[1,2,3,4,5].map(star => (
+                <span key={star} style={{ fontSize: '1.5rem', opacity: star <= Math.round(summary?.averageFeedback || 0) ? 1 : 0.2 }}>⭐</span>
               ))}
             </div>
-
-            <div style={{
-              fontSize: '0.95rem',
-              color: '#6b7280',
-              fontWeight: 500
-            }}>
-              <div style={{ fontWeight: 700, color: '#1f2937', marginBottom: '0.25rem' }}>
-                Out of 5.0
-              </div>
-              <div>
-                {summary?.averageFeedback >= 4.5 ? '🟢 Excellent' : summary?.averageFeedback >= 3.5 ? '🟡 Good' : summary?.averageFeedback >= 2.5 ? '🟠 Fair' : '🔴 Needs Improvement'}
-              </div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+              {summary?.averageFeedback >= 4.5 ? '🟢 Excellent' : summary?.averageFeedback >= 3.5 ? '🟡 Good' : summary?.averageFeedback >= 2.5 ? '🟠 Fair' : '🔴 Needs Improvement'}
             </div>
           </div>
         </div>
@@ -585,11 +356,11 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
       {/* Center Performance Breakdown (Multi-center view only) */}
       {isAllCenters && centerBreakdownData.length > 0 && (
         <div style={{
-          marginTop: '1.5rem',
+          marginTop: '1.25rem',
           background: 'linear-gradient(135deg, #0f1f5c 0%, #1a3a8f 40%, #1e4db7 70%, #2563eb 100%)',
-          borderRadius: '20px',
-          padding: '1.75rem',
-          boxShadow: '0 20px 60px rgba(15, 31, 92, 0.5), 0 0 40px rgba(37, 99, 235, 0.2)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          boxShadow: '0 8px 32px rgba(15,31,92,0.4)',
           border: '1px solid rgba(255,255,255,0.12)',
           position: 'relative',
           overflow: 'hidden',
@@ -1745,193 +1516,6 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
         </div>
       )}
 
-      {/* Advanced Analytics Insights */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-        {/* Performance Insights */}
-        <div style={{
-          background: 'linear-gradient(135deg, #065f46 0%, #047857 40%, #059669 70%, #10b981 100%)',
-          borderRadius: '20px',
-          padding: '1.5rem',
-          boxShadow: '0 20px 60px rgba(6, 95, 70, 0.4), 0 0 40px rgba(16, 185, 129, 0.2)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          <div style={{
-            position: 'absolute', top: '-40px', right: '-40px',
-            width: '120px', height: '120px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(52,211,153,0.3) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{
-              background: 'rgba(52,211,153,0.3)', border: '1px solid rgba(52,211,153,0.6)',
-              borderRadius: '20px', padding: '0.25rem 0.75rem',
-              fontSize: '0.75rem', fontWeight: 700, color: '#6ee7b7',
-              letterSpacing: '0.05em',
-            }}>
-              🎯 INSIGHTS
-            </span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>
-              Performance Insights
-            </h3>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[
-              { 
-                icon: '📈', 
-                title: 'Trending Up', 
-                desc: `${selectedMetric === 'appointments' ? 'Appointments' : selectedMetric === 'vitals' ? 'Vitals' : selectedMetric === 'users' ? 'User registrations' : 'Efficiency'} showing ${period === 'daily' ? '15%' : period === 'weekly' ? '12%' : '18%'} growth`,
-                color: '#4ade80'
-              },
-              { 
-                icon: '⚡', 
-                title: 'Peak Performance', 
-                desc: `Best ${period === 'daily' ? 'day' : period === 'weekly' ? 'week' : 'month'}: ${trendData.reduce((max, item) => item.appointments > max.appointments ? item : max, trendData[0])?.label}`,
-                color: '#60a5fa'
-              },
-              { 
-                icon: '🎯', 
-                title: 'Target Achievement', 
-                desc: `${metrics.completionRate}% completion rate ${metrics.completionRate > 85 ? 'exceeds' : metrics.completionRate > 75 ? 'meets' : 'below'} target (85%)`,
-                color: metrics.completionRate > 85 ? '#4ade80' : metrics.completionRate > 75 ? '#fbbf24' : '#f87171'
-              },
-              { 
-                icon: '🔮', 
-                title: 'Prediction', 
-                desc: `Next ${period} projected: ${Math.round(metrics.totalAppointments * 1.08)} appointments (+8%)`,
-                color: '#c4b5fd'
-              }
-            ].map((insight, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: '0.75rem',
-                background: 'rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem',
-                border: '1px solid rgba(255,255,255,0.2)'
-              }}>
-                <span style={{ fontSize: '1.5rem' }}>{insight.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff', marginBottom: '0.25rem' }}>
-                    {insight.title}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.8)' }}>
-                    {insight.desc}
-                  </div>
-                </div>
-                <div style={{
-                  width: '8px', height: '8px', borderRadius: '50%',
-                  background: insight.color, boxShadow: `0 0 8px ${insight.color}`
-                }} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Comparative Analysis */}
-        <div style={{
-          background: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 40%, #c2410c 70%, #ea580c 100%)',
-          borderRadius: '20px',
-          padding: '1.5rem',
-          boxShadow: '0 20px 60px rgba(124, 45, 18, 0.4), 0 0 40px rgba(234, 88, 12, 0.2)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          <div style={{
-            position: 'absolute', bottom: '-40px', left: '-40px',
-            width: '120px', height: '120px', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(251,146,60,0.3) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <span style={{
-              background: 'rgba(251,146,60,0.3)', border: '1px solid rgba(251,146,60,0.6)',
-              borderRadius: '20px', padding: '0.25rem 0.75rem',
-              fontSize: '0.75rem', fontWeight: 700, color: '#fed7aa',
-              letterSpacing: '0.05em',
-            }}>
-              📊 COMPARISON
-            </span>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>
-              Period Comparison
-            </h3>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {[
-              { 
-                metric: 'Appointments', 
-                current: metrics.totalAppointments, 
-                previous: Math.round(metrics.totalAppointments * 0.92),
-                icon: '📊'
-              },
-              { 
-                metric: 'Completion Rate', 
-                current: `${metrics.completionRate}%`, 
-                previous: `${Math.max(0, metrics.completionRate - 3)}%`,
-                icon: '✅'
-              },
-              { 
-                metric: 'Efficiency', 
-                current: `${metrics.avgEfficiency}%`, 
-                previous: `${Math.max(0, metrics.avgEfficiency - 2)}%`,
-                icon: '⚡'
-              },
-              { 
-                metric: 'New Users', 
-                current: metrics.totalNewUsers, 
-                previous: Math.round(metrics.totalNewUsers * 0.85),
-                icon: '👥'
-              }
-            ].map((comp, i) => {
-              const isImprovement = typeof comp.current === 'string' 
-                ? parseInt(comp.current) > parseInt(comp.previous)
-                : comp.current > comp.previous;
-              const changePercent = typeof comp.current === 'string'
-                ? Math.round(((parseInt(comp.current) - parseInt(comp.previous)) / parseInt(comp.previous)) * 100)
-                : Math.round(((comp.current - comp.previous) / comp.previous) * 100);
-              
-              return (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: 'rgba(255,255,255,0.1)', borderRadius: '12px', padding: '0.75rem',
-                  border: '1px solid rgba(255,255,255,0.2)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span style={{ fontSize: '1.2rem' }}>{comp.icon}</span>
-                    <div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
-                        {comp.metric}
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
-                        Current: {comp.current} | Previous: {comp.previous}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                    padding: '0.25rem 0.75rem', borderRadius: '20px',
-                    background: isImprovement ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
-                    border: `1px solid ${isImprovement ? 'rgba(34,197,94,0.5)' : 'rgba(239,68,68,0.5)'}`
-                  }}>
-                    <span style={{ fontSize: '0.8rem' }}>
-                      {isImprovement ? '📈' : '📉'}
-                    </span>
-                    <span style={{ 
-                      fontSize: '0.8rem', fontWeight: 700,
-                      color: isImprovement ? '#4ade80' : '#f87171'
-                    }}>
-                      {isImprovement ? '+' : ''}{changePercent}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
       {centerPerformance.length > 0 && (
         <div style={{
           background: 'linear-gradient(135deg, #0f1f5c 0%, #1a3a8f 40%, #1e4db7 70%, #2563eb 100%)',
