@@ -571,6 +571,8 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                   <option value="diabetes">Diabetes</option>
                   <option value="heart_issues">Heart Issues</option>
                   <option value="respiratory_issues">Respiratory Issues</option>
+                  <option value="normal">Normal</option>
+                  <option value="other">Other</option>
                 </select>
                 <button
                   type="button"

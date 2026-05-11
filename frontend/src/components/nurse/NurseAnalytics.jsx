@@ -120,13 +120,15 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       console.log('📊 Total patients in period:', totalPatients);
       console.log('📊 Health conditions data:', conditions);
       
-      // Define all 5 conditions with their colors (combining heart and respiratory)
+      // Define all 7 conditions with their colors - distinct and easily distinguishable
       const allConditions = [
-        { key: 'hypertension', label: 'Hypertension', color: '#8b5cf6' },
-        { key: 'overweight', label: 'Overweight', color: '#10b981' },
-        { key: 'obesity', label: 'Obesity', color: '#f97316' },
-        { key: 'diabetes', label: 'Diabetes', color: '#f59e0b' },
-        { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' },
+        { key: 'hypertension', label: 'Hypertension', color: '#dc2626' },      // Red
+        { key: 'overweight', label: 'Overweight', color: '#f59e0b' },          // Amber/Orange
+        { key: 'obesity', label: 'Obesity', color: '#7c3aed' },                // Purple
+        { key: 'diabetes', label: 'Diabetes', color: '#2563eb' },              // Blue
+        { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' }, // Pink
+        { key: 'normal', label: 'Normal', color: '#10b981' },                  // Green
+        { key: 'other', label: 'Other', color: '#64748b' },                    // Slate Gray
       ];
       
       // Create a map of condition counts
