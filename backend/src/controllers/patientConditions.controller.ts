@@ -193,16 +193,26 @@ export async function getConditionsByPeriod(
       return;
     }
 
-    // Get all nurse-approved conditions within the date range
+    // Get all wellness plans within the date range
     const conditions = await PatientConditionsService.getConditionsByDateRange(start, end);
+
+    // Total wellness plans count
+    const totalWellnessPlans = conditions.length;
 
     // Aggregate condition counts
     const conditionCounts: Record<string, number> = {};
     conditions.forEach((record) => {
-      const conditionList = record.conditions as string[];
-      conditionList.forEach((condition) => {
-        conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
-      });
+      const conditionList = record.conditions as string[] | null;
+      
+      // If no conditions or empty array, count as "normal"
+      if (!conditionList || conditionList.length === 0) {
+        conditionCounts['normal'] = (conditionCounts['normal'] || 0) + 1;
+      } else {
+        // Count each condition
+        conditionList.forEach((condition) => {
+          conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
+        });
+      }
     });
 
     // Convert to array format
@@ -214,6 +224,9 @@ export async function getConditionsByPeriod(
     res.status(200).json({
       status: 'success',
       data: result,
+      meta: {
+        totalWellnessPlans: totalWellnessPlans,
+      },
     });
   } catch (error) {
     console.error('Get conditions by period error:', error);

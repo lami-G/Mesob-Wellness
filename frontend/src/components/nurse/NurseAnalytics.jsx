@@ -104,6 +104,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       });
       
       const conditions = response.data.data || [];
+      const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
+      
+      console.log('📊 Total wellness plans in period:', totalWellnessPlans);
+      console.log('📊 Health conditions data:', conditions);
       
       // Get total unique patients in the period (from vitals records)
       const vitalsRes = await api.get('/api/v1/vitals/all', {
@@ -143,11 +147,16 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         }
       });
       
-      // Map counts to conditions and calculate percentages
+      console.log('📊 Condition map:', conditionMap);
+      console.log('📊 Total wellness plans for percentage calc:', totalWellnessPlans);
+      
+      // Map counts to conditions and calculate percentages based on total wellness plans
       const rankedConditions = allConditions.map(c => ({
         ...c,
         count: conditionMap[c.key] || 0,
-        percentage: totalPatients > 0 ? Math.round((conditionMap[c.key] || 0) / totalPatients * 100) : 0,
+        percentage: totalWellnessPlans > 0 
+          ? Math.round((conditionMap[c.key] || 0) / totalWellnessPlans * 100) 
+          : 0,
         totalPatients: totalPatients
       })).sort((a, b) => b.count - a.count);
       
@@ -250,10 +259,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const noShow = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
-      // Walk-ins are external patients who had vitals recorded today (no appointment needed)
+      // Walk-ins = number of wellness plans created for patients WITHOUT appointments in the period
       try {
         console.log('=== COUNTING WALK-INS ===');
-        // Get all vitals records for the selected date
+        
+        // Get all wellness plans created in the period
         const vitalsRes = await api.get('/api/v1/vitals/all', {
           params: {
             startDate: startDate.toISOString(),
@@ -270,26 +280,36 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           const vitalsUserIds = [...new Set(vitalsRecords.map(v => v.userId).filter(Boolean))];
           console.log('Users with vitals:', vitalsUserIds);
           
-          // Check which users are external
+          // For each user with vitals, count their completed wellness plans in the period
           for (const userId of vitalsUserIds) {
             try {
-              const userRes = await api.get(`/api/v1/users/${userId}`);
-              const userData = userRes.data?.data || userRes.data;
+              // Check if user has appointments in this period
+              const hasAppointment = mappedAppointments.some(apt => apt.customerId === userId);
               
-              if (userData?.isExternal === true) {
-                // Count vitals records for this external user
-                const userVitalsCount = vitalsRecords.filter(v => v.userId === userId).length;
-                if (userVitalsCount > 0) {
-                  walkin += 1; // Count each external user once
-                  console.log(`✓ Walk-in user ${userData.fullName}: ${userVitalsCount} vitals records`);
+              // If no appointment, this is a walk-in - count their wellness plans
+              if (!hasAppointment) {
+                const plansRes = await api.get(`/api/v1/plans/${userId}`);
+                const plansData = plansRes.data?.data || plansRes.data || [];
+                
+                if (Array.isArray(plansData)) {
+                  // Count wellness plans created in this period
+                  const periodPlans = plansData.filter(p => {
+                    const pDate = new Date(p.createdAt);
+                    return pDate >= startDate && pDate <= endDate;
+                  });
+                  
+                  walkin += periodPlans.length; // Count each wellness plan
+                  if (periodPlans.length > 0) {
+                    console.log(`✓ Walk-in user ${userId}: ${periodPlans.length} wellness plans`);
+                  }
                 }
               }
             } catch (err) {
-              console.log(`Could not fetch user ${userId}:`, err.message);
+              console.log(`Could not fetch data for user ${userId}:`, err.message);
             }
           }
         }
-        console.log('Total walk-ins:', walkin);
+        console.log('Total walk-in services completed:', walkin);
         console.log('=== WALK-IN COUNT COMPLETE ===');
       } catch (err) {
         console.error('Failed to count walk-ins:', err);
@@ -679,9 +699,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                         {healthConditions.map((condition) => {
                           // Calculate height in pixels based on actual patient count relative to dynamic max
                           const heightPx = (condition.count / yAxisMax) * 350;
-                          const percentage = condition.totalPatients > 0 
-                            ? Math.round((condition.count / condition.totalPatients) * 100) 
-                            : 0;
+                          const percentage = condition.percentage; // Use pre-calculated percentage
                           
                           return (
                             <div 
