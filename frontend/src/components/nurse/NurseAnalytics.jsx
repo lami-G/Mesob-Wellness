@@ -479,60 +479,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
       </div>
 
-      {/* Performance Metrics */}
+      {/* Appointment Breakdown and Activity Summary - Side by Side */}
       <div className="analytics-metrics-grid">
-        <div className="card metrics-card">
-          <h3>Performance Metrics</h3>
-          
-          <div className="metric-item">
-            <div className="metric-label">
-              <span>Completion Rate</span>
-              <span className="metric-value">{analytics.completionRate}%</span>
-            </div>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${analytics.completionRate}%` }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="metric-item">
-            <div className="metric-label">
-              <span>Capacity Utilization</span>
-              <span className="metric-value">{analytics.capacityUtilization}%</span>
-            </div>
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${analytics.capacityUtilization}%` }}
-              ></div>
-            </div>
-          </div>
-
-          <div className="metric-item">
-            <p><strong>Average Wait Time:</strong> {analytics.averageWaitTime} min</p>
-          </div>
-        </div>
-
         <div className="card metrics-card">
           <h3>Appointment Breakdown</h3>
           
-          <div className="breakdown-item">
-            <span>⏳ Waiting</span>
-            <span className="breakdown-value">{analytics.waitingAppointments}</span>
-          </div>
-          
-          <div className="breakdown-item">
-            <span>🔄 In Progress</span>
-            <span className="breakdown-value">{analytics.inProgressAppointments}</span>
-          </div>
-          
-          <div className="breakdown-item">
-            <span>💉 In Service</span>
-            <span className="breakdown-value">{analytics.inServiceAppointments}</span>
-          </div>
-
           <div className="breakdown-item">
             <span>✅ Completed</span>
             <span className="breakdown-value">{analytics.completedAppointments}</span>
@@ -543,104 +494,18 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             <span className="breakdown-value" title="Patient didn't show up for scheduled appointment">{analytics.noShowAppointments}</span>
           </div>
         </div>
-      </div>
 
-      {/* Activity Summary */}
-      <div className="card activity-card">
-        <h3 style={{ margin: 0 }}>Today's Activity Summary</h3>
-        
-        <div className="activity-grid">
-          <div className="activity-item">
-            <p className="activity-label">💉 Vitals Recorded</p>
-            <p className="activity-value">{analytics.vitalsRecorded}</p>
+        <div className="card metrics-card">
+          <h3>Today's Activity Summary</h3>
+          
+          <div className="breakdown-item">
+            <span>💉 Vitals Recorded</span>
+            <span className="breakdown-value">{analytics.vitalsRecorded}</span>
           </div>
 
-          <div className="activity-item">
-            <p className="activity-label">🎯 Wellness Plans</p>
-            <p className="activity-value">{analytics.wellnessPlansCreated}</p>
-          </div>
-
-          <div className="activity-item">
-            <p className="activity-label">⏱️ Avg Wait Time</p>
-            <p className="activity-value">{analytics.averageWaitTime}m</p>
-          </div>
-
-          <div className="activity-item">
-            <p className="activity-label">📊 Completion %</p>
-            <p className="activity-value">{analytics.completionRate}%</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Charts Section */}
-      <div className="charts-section">
-        <div className="chart-container">
-          <div className="card chart-card">
-            <h3>Appointment Status Distribution</h3>
-            {chartData.statusDistribution && (
-              <Pie 
-                data={chartData.statusDistribution}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: true,
-                  plugins: {
-                    legend: {
-                      position: 'bottom',
-                    },
-                  },
-                }}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="chart-container">
-          <div className="card chart-card">
-            <h3>7-Day Appointment Trend</h3>
-            {chartData.appointmentTrend && (
-              <Line 
-                data={chartData.appointmentTrend}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: true,
-                  plugins: {
-                    legend: {
-                      display: true,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            )}
-          </div>
-        </div>
-
-        <div className="chart-container full-width">
-          <div className="card chart-card">
-            <h3>Hourly Appointment Breakdown</h3>
-            {chartData.hourlyBreakdown && (
-              <Bar 
-                data={chartData.hourlyBreakdown}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: true,
-                  plugins: {
-                    legend: {
-                      display: true,
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                }}
-              />
-            )}
+          <div className="breakdown-item">
+            <span>🎯 Wellness Plans</span>
+            <span className="breakdown-value">{analytics.wellnessPlansCreated}</span>
           </div>
         </div>
       </div>
