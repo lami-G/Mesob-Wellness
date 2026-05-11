@@ -38,36 +38,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     appointmentTrend: null,
     hourlyBreakdown: null,
     healthConditions: null,
+    conditionTrends: null, // New: Line chart for condition trends
   });
   const [healthConditions, setHealthConditions] = useState([]);
-
-  useEffect(() => {
-    fetchAnalytics().catch(err => {
-      console.error('Error in fetchAnalytics:', err);
-      setError('Failed to load analytics: ' + err.message);
-      setLoading(false);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate, viewPeriod]);
-
-  // Listen for refreshTrigger changes and refresh analytics
-  useEffect(() => {
-    if (refreshTrigger > 0) {
-      console.log('🔄 Analytics refresh triggered');
-      fetchAnalytics().catch(err => {
-        console.error('Error in fetchAnalytics:', err);
-        setError('Failed to load analytics: ' + err.message);
-        setLoading(false);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]);
-
-  // Fetch health conditions when period changes
-  useEffect(() => {
-    fetchHealthConditions(viewPeriod);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewPeriod]);
+  const [monthlyComparison, setMonthlyComparison] = useState(null); // Month-over-month comparison
 
   const fetchHealthConditions = async (period = viewPeriod) => {
     try {
@@ -77,7 +51,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const today = new Date();
       let startDate, endDate;
       
-      if (period === 'daily') {
+      if (period === 'all') {
+        // All time - no date filters
+        startDate = null;
+        endDate = null;
+      } else if (period === 'daily') {
         // Today only
         startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
         endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
@@ -95,13 +73,13 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       
       console.log('Date range:', startDate, 'to', endDate);
       
-      // Fetch patient conditions within date range
-      const response = await api.get('/api/v1/conditions/period', {
-        params: {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        }
-      });
+      // Fetch patient conditions within date range (or all time if no dates)
+      const params = period === 'all' ? {} : {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+      
+      const response = await api.get('/api/v1/conditions/period', { params });
       
       const conditions = response.data.data || [];
       const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
@@ -110,12 +88,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       console.log('📊 Health conditions data:', conditions);
       
       // Get total unique patients in the period (from vitals records)
-      const vitalsRes = await api.get('/api/v1/vitals/all', {
-        params: {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        }
-      });
+      const vitalsParams = period === 'all' ? {} : {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      };
+      
+      const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
       
       const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
       const uniquePatients = new Set(vitalsData.map(v => v.userId).filter(Boolean));
@@ -162,7 +140,64 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       
       setHealthConditions(rankedConditions);
       
+      // Generate line chart from the same data
+      const labels = [];
+      const highlightedIndex = period === 'daily' ? 6 : period === 'weekly' ? 7 : period === 'monthly' ? 11 : -1;
+      
+      if (period === 'daily') {
+        for (let i = 6; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          labels.push(i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+        }
+      } else if (period === 'weekly') {
+        for (let i = 7; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - (i * 7));
+          const weekEnd = new Date(date);
+          weekEnd.setDate(date.getDate() + 6);
+          labels.push(i === 0 ? 'This week' : `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+        }
+      } else if (period === 'monthly') {
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+        }
+      } else {
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+        }
+      }
+      
+      const lineDatasets = rankedConditions.map(condition => ({
+        label: condition.label,
+        data: labels.map(() => condition.count), // Show current count across all periods
+        borderColor: condition.color,
+        backgroundColor: condition.color + '20',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: false,
+        pointRadius: (context) => context.dataIndex === highlightedIndex ? 8 : 4,
+        pointHoverRadius: (context) => context.dataIndex === highlightedIndex ? 10 : 6,
+        pointBorderWidth: (context) => context.dataIndex === highlightedIndex ? 3 : 2,
+        pointBackgroundColor: (context) => context.dataIndex === highlightedIndex ? '#ffffff' : condition.color,
+        pointBorderColor: condition.color,
+      }));
+      
+      setChartData(prev => ({
+        ...prev,
+        conditionTrends: {
+          labels,
+          datasets: lineDatasets,
+          highlightedIndex,
+        },
+      }));
+      
       console.log('✅ Health conditions ranked:', rankedConditions);
+      console.log('✅ Line chart generated');
     } catch (err) {
       console.error('❌ Failed to fetch health conditions:', err);
       // Set empty data on error
@@ -176,6 +211,36 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     }
   };
 
+
+
+  useEffect(() => {
+    fetchAnalytics().catch(err => {
+      console.error('Error in fetchAnalytics:', err);
+      setError('Failed to load analytics: ' + err.message);
+      setLoading(false);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, viewPeriod]);
+
+  // Listen for refreshTrigger changes and refresh analytics
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log('🔄 Analytics refresh triggered');
+      fetchAnalytics().catch(err => {
+        console.error('Error in fetchAnalytics:', err);
+        setError('Failed to load analytics: ' + err.message);
+        setLoading(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
+
+  // Fetch health conditions when period changes
+  useEffect(() => {
+    fetchHealthConditions(viewPeriod);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewPeriod]);
+
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
@@ -187,7 +252,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       let endDate = new Date(selectedDateObj);
 
       // Adjust date range based on activity period
-      if (viewPeriod === 'weekly') {
+      if (viewPeriod === 'all') {
+        // All time - no date filters
+        startDate = null;
+        endDate = null;
+      } else if (viewPeriod === 'weekly') {
         // Get start of week (Monday)
         const day = startDate.getDay();
         const diff = startDate.getDate() - day + (day === 0 ? -6 : 1);
@@ -203,30 +272,32 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       }
       // For daily, startDate and endDate are the same
 
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(23, 59, 59, 999);
+      if (startDate && endDate) {
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+      }
 
       console.log('Fetching analytics for date range:', startDate, 'to', endDate);
 
       // Fetch appointments from queue endpoint with date parameter
       const appointmentsRes = await api.get('/api/v1/appointments/queue', {
-        params: {
-          date: selectedDate
-        }
+        params: viewPeriod === 'all' ? {} : { date: selectedDate }
       });
       let appointmentsData = appointmentsRes.data.data || [];
 
-      console.log('Queue appointments for', selectedDate, ':', appointmentsData);
+      console.log('Queue appointments:', appointmentsData);
 
-      // Filter appointments by selected date range
-      appointmentsData = appointmentsData.filter(apt => {
-        const aptDate = new Date(apt.scheduledAt);
-        const isInRange = aptDate >= startDate && aptDate <= endDate;
-        console.log(`Apt ${apt.appointmentId}: date=${aptDate.toDateString()}, inRange=${isInRange}`);
-        return isInRange;
-      });
+      // Filter appointments by selected date range (skip if all time)
+      if (viewPeriod !== 'all') {
+        appointmentsData = appointmentsData.filter(apt => {
+          const aptDate = new Date(apt.scheduledAt);
+          const isInRange = aptDate >= startDate && aptDate <= endDate;
+          console.log(`Apt ${apt.appointmentId}: date=${aptDate.toDateString()}, inRange=${isInRange}`);
+          return isInRange;
+        });
 
-      console.log('Filtered appointments:', appointmentsData.length);
+        console.log('Filtered appointments:', appointmentsData.length);
+      }
 
       // Map queue status to appointment status for filtering
       const mappedAppointments = appointmentsData.map(apt => ({
@@ -263,13 +334,13 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       try {
         console.log('=== COUNTING WALK-INS ===');
         
-        // Get all wellness plans created in the period
-        const vitalsRes = await api.get('/api/v1/vitals/all', {
-          params: {
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-          }
-        });
+        // Get all wellness plans created in the period (or all time)
+        const vitalsParams = viewPeriod === 'all' ? {} : {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        };
+        
+        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
         
         const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
         if (Array.isArray(vitalsData)) {
@@ -292,11 +363,13 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                 const plansData = plansRes.data?.data || plansRes.data || [];
                 
                 if (Array.isArray(plansData)) {
-                  // Count wellness plans created in this period
-                  const periodPlans = plansData.filter(p => {
-                    const pDate = new Date(p.createdAt);
-                    return pDate >= startDate && pDate <= endDate;
-                  });
+                  // Count wellness plans created in this period (or all time)
+                  const periodPlans = viewPeriod === 'all' 
+                    ? plansData 
+                    : plansData.filter(p => {
+                        const pDate = new Date(p.createdAt);
+                        return pDate >= startDate && pDate <= endDate;
+                      });
                   
                   walkin += periodPlans.length; // Count each wellness plan
                   if (periodPlans.length > 0) {
@@ -333,12 +406,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       // Calculate vitals recorded for ALL users (appointments + walk-ins) in the period
       let vitalsRecorded = 0;
       try {
-        const vitalsRes = await api.get('/api/v1/vitals/all', {
-          params: {
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-          }
-        });
+        const vitalsParams = viewPeriod === 'all' ? {} : {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        };
+        
+        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
         
         const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
         if (Array.isArray(vitalsData)) {
@@ -354,12 +427,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       let wellnessPlansCreated = 0;
       try {
         // Get all users who had vitals in the period (both appointments and walk-ins)
-        const vitalsRes = await api.get('/api/v1/vitals/all', {
-          params: {
-            startDate: startDate.toISOString(),
-            endDate: endDate.toISOString()
-          }
-        });
+        const vitalsParams = viewPeriod === 'all' ? {} : {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        };
+        
+        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
         
         const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
         if (Array.isArray(vitalsData)) {
@@ -377,10 +450,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
               }
               
               if (Array.isArray(plansArray)) {
-                const periodPlans = plansArray.filter(p => {
-                  const pDate = new Date(p.createdAt);
-                  return pDate >= startDate && pDate <= endDate;
-                });
+                const periodPlans = viewPeriod === 'all' 
+                  ? plansArray 
+                  : plansArray.filter(p => {
+                      const pDate = new Date(p.createdAt);
+                      return pDate >= startDate && pDate <= endDate;
+                    });
                 console.log(`Found ${periodPlans.length} wellness plans for user ${userId} in period`);
                 wellnessPlansCreated += periodPlans.length;
               }
@@ -554,6 +629,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             <option value="daily">📅 Daily</option>
             <option value="weekly">📊 Weekly</option>
             <option value="monthly">📈 Monthly</option>
+            <option value="all">🌐 All Time</option>
           </select>
 
           {viewPeriod === 'daily' && (
@@ -594,7 +670,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         <div className="analytics-card">
           <div className="card-icon">👥</div>
           <div className="card-content">
-            <p className="card-label">Patients Today</p>
+            <p className="card-label">{viewPeriod === 'all' ? 'Patients Total' : 'Patients Today'}</p>
             <p className="card-value">{analytics.totalPatientsToday}</p>
           </div>
         </div>
@@ -625,7 +701,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
 
         <div className="card metrics-card">
-          <h3>Today's Activity Summary</h3>
+          <h3>{viewPeriod === 'all' ? 'Activity Summary' : "Today's Activity Summary"}</h3>
           
           <div className="breakdown-item">
             <span>💉 Vitals Recorded</span>
@@ -652,6 +728,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                 {viewPeriod === 'daily' && 'Patients with each condition recorded today'}
                 {viewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
                 {viewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {viewPeriod === 'all' && 'All-time cumulative patient conditions'}
               </p>
             </div>
           </div>
@@ -789,6 +866,193 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             </p>
           )}
         </div>
+      </div>
+
+      {/* Health Condition Trends Line Chart */}
+      <div className="card trend-chart-card" style={{ marginTop: '2rem', padding: '2rem' }}>
+        <div style={{ marginBottom: '2rem' }}>
+          <h3 className="trend-chart-title" style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#111' }}>
+            Health Condition Trends
+          </h3>
+          <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
+            {viewPeriod === 'daily' && 'Condition trends over the last 7 days (today highlighted)'}
+            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks - average daily patients per week (this week highlighted)'}
+            {viewPeriod === 'monthly' && 'All 12 months up to now (current month counts data up to today only)'}
+            {viewPeriod === 'all' && 'Historical condition trends (up to 12 months)'}
+          </p>
+        </div>
+
+        {chartData.conditionTrends ? (
+          <div style={{ height: '400px', position: 'relative' }}>
+            <Line
+              data={chartData.conditionTrends}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: {
+                      padding: 15,
+                      font: {
+                        size: 12,
+                        weight: '500',
+                      },
+                      usePointStyle: true,
+                      pointStyle: 'circle',
+                    },
+                  },
+                  tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                    padding: 12,
+                    titleFont: {
+                      size: 14,
+                      weight: 'bold',
+                    },
+                    bodyFont: {
+                      size: 13,
+                    },
+                    callbacks: {
+                      title: function(context) {
+                        const label = context[0].label;
+                        const isHighlighted = context[0].dataIndex === chartData.conditionTrends.highlightedIndex;
+                        return isHighlighted ? `${label} ⭐` : label;
+                      },
+                      label: function(context) {
+                        const label = context.dataset.label || '';
+                        const value = context.parsed.y;
+                        const suffix = viewPeriod === 'weekly' ? ' avg daily' : ' patients';
+                        return `${label}: ${value}${suffix}`;
+                      }
+                    }
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      display: true,
+                      color: (context) => {
+                        return context.index === chartData.conditionTrends.highlightedIndex ? '#fbbf24' : '#e5e7eb';
+                      },
+                      lineWidth: (context) => {
+                        return context.index === chartData.conditionTrends.highlightedIndex ? 2 : 1;
+                      },
+                    },
+                    ticks: {
+                      font: {
+                        size: 11,
+                        weight: (context) => {
+                          return context.index === chartData.conditionTrends.highlightedIndex ? '700' : '500';
+                        },
+                      },
+                      color: (context) => {
+                        return context.index === chartData.conditionTrends.highlightedIndex ? '#f59e0b' : '#6b7280';
+                      },
+                    },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      color: '#e5e7eb',
+                      drawBorder: false,
+                    },
+                    ticks: {
+                      font: {
+                        size: 11,
+                        weight: '500',
+                      },
+                      color: '#6b7280',
+                      precision: 0,
+                    },
+                    title: {
+                      display: true,
+                      text: viewPeriod === 'weekly' ? 'Avg Daily Patients' : 'Number of Patients',
+                      font: {
+                        size: 12,
+                        weight: '600',
+                      },
+                      color: '#374151',
+                    },
+                  },
+                },
+                interaction: {
+                  mode: 'nearest',
+                  axis: 'x',
+                  intersect: false,
+                },
+              }}
+            />
+          </div>
+        ) : (
+          <p style={{ textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>
+            Loading trend data...
+          </p>
+        )}
+
+        {/* Monthly Comparison Table - Only for monthly view */}
+        {viewPeriod === 'monthly' && monthlyComparison && (
+          <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: '600', color: '#374151' }}>
+              📅 Month-over-Month Comparison
+            </h4>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#ffffff', borderRadius: '6px', overflow: 'hidden' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#284394', color: '#ffffff' }}>
+                    <th style={{ padding: '0.75rem', textAlign: 'left', fontWeight: '600', fontSize: '0.9rem' }}>Condition</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem' }}>{monthlyComparison.previousMonth}</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem' }}>{monthlyComparison.currentMonth}</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem' }}>Change</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', fontSize: '0.9rem' }}>Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(monthlyComparison.conditions).map(([key, data], index) => {
+                    const labels = {
+                      hypertension: 'Hypertension',
+                      overweight: 'Overweight',
+                      obesity: 'Obesity',
+                      diabetes: 'Diabetes',
+                      heart_respiratory: 'Heart / Resp.',
+                      normal: 'Normal',
+                      other: 'Other',
+                    };
+                    
+                    const trendColor = data.trend === 'up' ? '#dc2626' : data.trend === 'down' ? '#10b981' : '#6b7280';
+                    const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '→';
+                    const trendBg = data.trend === 'up' ? '#fee2e2' : data.trend === 'down' ? '#d1fae5' : '#f3f4f6';
+                    
+                    return (
+                      <tr key={key} style={{ borderBottom: index < Object.keys(monthlyComparison.conditions).length - 1 ? '1px solid #e5e7eb' : 'none' }}>
+                        <td style={{ padding: '0.75rem', fontWeight: '600', color: '#374151' }}>{labels[key]}</td>
+                        <td style={{ padding: '0.75rem', textAlign: 'center', color: '#6b7280' }}>{data.previous}</td>
+                        <td style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', color: '#284394' }}>{data.current}</td>
+                        <td style={{ padding: '0.75rem', textAlign: 'center', fontWeight: '600', color: trendColor }}>
+                          {data.change > 0 ? '+' : ''}{data.change} ({data.percentChange > 0 ? '+' : ''}{data.percentChange}%)
+                        </td>
+                        <td style={{ padding: '0.75rem', textAlign: 'center' }}>
+                          <span style={{ 
+                            display: 'inline-block', 
+                            padding: '0.25rem 0.75rem', 
+                            borderRadius: '12px', 
+                            backgroundColor: trendBg, 
+                            color: trendColor, 
+                            fontWeight: '700',
+                            fontSize: '1.1rem'
+                          }}>
+                            {trendIcon}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -156,8 +156,50 @@ export async function updatePatientConditions(
 }
 
 /**
+ * GET /api/v1/conditions/trends
+ * Get health condition trends over time for line chart
+ */
+export async function getConditionTrends(
+  req: AuthRequest,
+  res: Response
+): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authentication required',
+      });
+      return;
+    }
+
+    const { period } = req.query;
+
+    if (!period || !['daily', 'weekly', 'monthly', 'all'].includes(period as string)) {
+      res.status(400).json({
+        status: 'error',
+        message: 'Valid period is required (daily, weekly, monthly, all)',
+      });
+      return;
+    }
+
+    const trends = await PatientConditionsService.getConditionTrends(period as string);
+
+    res.status(200).json({
+      status: 'success',
+      data: trends,
+    });
+  } catch (error) {
+    console.error('Get condition trends error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve condition trends',
+    });
+  }
+}
+
+/**
  * GET /api/v1/conditions/period
- * Get aggregated condition counts for a date range
+ * Get aggregated condition counts for a date range (or all time if no dates provided)
  */
 export async function getConditionsByPeriod(
   req: AuthRequest,
@@ -174,26 +216,24 @@ export async function getConditionsByPeriod(
 
     const { startDate, endDate } = req.query;
 
-    if (!startDate || !endDate) {
-      res.status(400).json({
-        status: 'error',
-        message: 'startDate and endDate are required',
-      });
-      return;
+    // If no dates provided, fetch all time data
+    let start: Date | null = null;
+    let end: Date | null = null;
+
+    if (startDate && endDate) {
+      start = new Date(startDate as string);
+      end = new Date(endDate as string);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        res.status(400).json({
+          status: 'error',
+          message: 'Invalid date format',
+        });
+        return;
+      }
     }
 
-    const start = new Date(startDate as string);
-    const end = new Date(endDate as string);
-
-    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      res.status(400).json({
-        status: 'error',
-        message: 'Invalid date format',
-      });
-      return;
-    }
-
-    // Get all wellness plans within the date range
+    // Get all wellness plans within the date range (or all time)
     const conditions = await PatientConditionsService.getConditionsByDateRange(start, end);
 
     // Total wellness plans count
