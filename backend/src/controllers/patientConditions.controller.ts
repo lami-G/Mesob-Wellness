@@ -9,6 +9,54 @@ import { AuthRequest } from '../middleware/auth.middleware';
 import * as PatientConditionsService from '../services/patientConditions.service';
 
 /**
+ * GET /api/v1/conditions/all/list
+ * Get all patient conditions (for analytics)
+ */
+export async function getAllPatientConditions(
+  req: AuthRequest,
+  res: Response
+): Promise<void> {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: 'error',
+        message: 'Authentication required',
+      });
+      return;
+    }
+
+    // Authorization: Only staff can view all conditions
+    const allowedRoles = [
+      'NURSE_OFFICER',
+      'MANAGER',
+      'REGIONAL_OFFICE',
+      'FEDERAL_OFFICE',
+      'SYSTEM_ADMIN',
+    ];
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        status: 'error',
+        message: 'Insufficient permissions to view all patient conditions',
+      });
+      return;
+    }
+
+    const conditions = await PatientConditionsService.getAllPatientConditions();
+
+    res.status(200).json({
+      status: 'success',
+      data: conditions,
+    });
+  } catch (error) {
+    console.error('Get all patient conditions error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve patient conditions',
+    });
+  }
+}
+
+/**
  * GET /api/v1/conditions/:patientId
  * Get conditions for a specific patient
  */

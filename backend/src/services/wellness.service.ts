@@ -100,3 +100,15 @@ export async function deleteWellnessPlan(id: string) {
     where: { id },
   });
 }
+
+export async function getAllWellnessPlans() {
+  return prisma.wellnessPlan.findMany({
+    orderBy: { createdAt: 'asc' },
+    select: {
+      id: true,
+      userId: true,
+      createdAt: true,
+      conditions: true,
+    },
+  });
+}

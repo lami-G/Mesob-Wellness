@@ -43,6 +43,167 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
   const [healthConditions, setHealthConditions] = useState([]);
   const [monthlyComparison, setMonthlyComparison] = useState(null); // Month-over-month comparison
 
+  // Generate dynamic line chart using SAME endpoint as bar chart
+  const generateDynamicLineChart = async (period, rankedConditions) => {
+    try {
+      console.log('📈 Generating line chart for period:', period);
+      
+      const today = new Date();
+      let labels = [];
+      let dataPointsPromises = [];
+      let highlightedIndex = -1;
+      
+      if (period === 'daily') {
+        const daysToShow = 7;
+        highlightedIndex = daysToShow - 1;
+        
+        for (let i = daysToShow - 1; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          date.setHours(0, 0, 0, 0);
+          const dateEnd = new Date(date);
+          dateEnd.setHours(23, 59, 59, 999);
+          
+          labels.push(i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+          
+          const params = {
+            startDate: date.toISOString(),
+            endDate: dateEnd.toISOString()
+          };
+          
+          dataPointsPromises.push(
+            api.get('/api/v1/conditions/period', { params })
+              .then(res => res.data?.data || [])
+              .catch(() => [])
+          );
+        }
+      } else if (period === 'weekly') {
+        const weeksToShow = 8;
+        highlightedIndex = weeksToShow - 1;
+        
+        for (let i = weeksToShow - 1; i >= 0; i--) {
+          const weekStart = new Date();
+          weekStart.setDate(weekStart.getDate() - (i * 7));
+          weekStart.setHours(0, 0, 0, 0);
+          const weekEnd = new Date(weekStart);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          weekEnd.setHours(23, 59, 59, 999);
+          
+          labels.push(i === 0 ? 'This week' : `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+          
+          const params = {
+            startDate: weekStart.toISOString(),
+            endDate: weekEnd.toISOString()
+          };
+          
+          dataPointsPromises.push(
+            api.get('/api/v1/conditions/period', { params })
+              .then(res => res.data?.data || [])
+              .catch(() => [])
+          );
+        }
+      } else if (period === 'monthly') {
+        const monthsToShow = 12;
+        highlightedIndex = monthsToShow - 1;
+        
+        for (let i = monthsToShow - 1; i >= 0; i--) {
+          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
+          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
+          if (i === 0) monthEnd.setTime(today.getTime());
+          
+          labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+          
+          const params = {
+            startDate: monthStart.toISOString(),
+            endDate: monthEnd.toISOString()
+          };
+          
+          dataPointsPromises.push(
+            api.get('/api/v1/conditions/period', { params })
+              .then(res => res.data?.data || [])
+              .catch(() => [])
+          );
+        }
+      } else {
+        const monthsToShow = 12;
+        highlightedIndex = -1;
+        
+        for (let i = monthsToShow - 1; i >= 0; i--) {
+          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
+          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
+          if (i === 0) monthEnd.setTime(today.getTime());
+          
+          labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+          
+          const params = {
+            startDate: monthStart.toISOString(),
+            endDate: monthEnd.toISOString()
+          };
+          
+          dataPointsPromises.push(
+            api.get('/api/v1/conditions/period', { params })
+              .then(res => res.data?.data || [])
+              .catch(() => [])
+          );
+        }
+      }
+      
+      const dataPoints = await Promise.all(dataPointsPromises);
+      
+      const lineDatasets = rankedConditions.map((condition, index) => {
+        const conditionData = dataPoints.map(conditionsInPeriod => {
+          const conditionMap = {};
+          conditionsInPeriod.forEach(c => {
+            const key = c.condition.toLowerCase().replace(/ /g, '_');
+            if (key === 'heart_issues' || key === 'respiratory_issues') {
+              conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
+            } else {
+              conditionMap[key] = (conditionMap[key] || 0) + c.count;
+            }
+          });
+          // Add tiny offset to prevent perfect overlap (0.01 * index)
+          // This makes overlapping lines visible without affecting readability
+          const baseValue = conditionMap[condition.key] || 0;
+          return baseValue + (index * 0.01);
+        });
+        
+        return {
+          label: condition.label,
+          data: conditionData,
+          borderColor: condition.color,
+          backgroundColor: condition.color + '20',
+          borderWidth: 3, // Slightly thicker lines for better visibility
+          tension: 0.4,
+          fill: false,
+          pointRadius: (context) => context.dataIndex === highlightedIndex ? 8 : 5,
+          pointHoverRadius: (context) => context.dataIndex === highlightedIndex ? 10 : 7,
+          pointBorderWidth: (context) => context.dataIndex === highlightedIndex ? 3 : 2,
+          pointBackgroundColor: (context) => context.dataIndex === highlightedIndex ? '#ffffff' : condition.color,
+          pointBorderColor: condition.color,
+          pointStyle: 'circle',
+        };
+      });
+      
+      setChartData(prev => ({
+        ...prev,
+        conditionTrends: {
+          labels,
+          datasets: lineDatasets,
+          highlightedIndex,
+        },
+      }));
+      
+      console.log('✅ Line chart generated');
+    } catch (err) {
+      console.error('❌ Failed to generate line chart:', err);
+      setChartData(prev => ({
+        ...prev,
+        conditionTrends: null,
+      }));
+    }
+  };
+
+
   const fetchHealthConditions = async (period = viewPeriod) => {
     try {
       console.log('🔍 Fetching health conditions for period:', period);
@@ -140,64 +301,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       
       setHealthConditions(rankedConditions);
       
-      // Generate line chart from the same data
-      const labels = [];
-      const highlightedIndex = period === 'daily' ? 6 : period === 'weekly' ? 7 : period === 'monthly' ? 11 : -1;
-      
-      if (period === 'daily') {
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          labels.push(i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
-        }
-      } else if (period === 'weekly') {
-        for (let i = 7; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - (i * 7));
-          const weekEnd = new Date(date);
-          weekEnd.setDate(date.getDate() + 6);
-          labels.push(i === 0 ? 'This week' : `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
-        }
-      } else if (period === 'monthly') {
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date();
-          date.setMonth(date.getMonth() - i);
-          labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-        }
-      } else {
-        for (let i = 11; i >= 0; i--) {
-          const date = new Date();
-          date.setMonth(date.getMonth() - i);
-          labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
-        }
-      }
-      
-      const lineDatasets = rankedConditions.map(condition => ({
-        label: condition.label,
-        data: labels.map(() => condition.count), // Show current count across all periods
-        borderColor: condition.color,
-        backgroundColor: condition.color + '20',
-        borderWidth: 2,
-        tension: 0.4,
-        fill: false,
-        pointRadius: (context) => context.dataIndex === highlightedIndex ? 8 : 4,
-        pointHoverRadius: (context) => context.dataIndex === highlightedIndex ? 10 : 6,
-        pointBorderWidth: (context) => context.dataIndex === highlightedIndex ? 3 : 2,
-        pointBackgroundColor: (context) => context.dataIndex === highlightedIndex ? '#ffffff' : condition.color,
-        pointBorderColor: condition.color,
-      }));
-      
-      setChartData(prev => ({
-        ...prev,
-        conditionTrends: {
-          labels,
-          datasets: lineDatasets,
-          highlightedIndex,
-        },
-      }));
+      // Generate line chart with DYNAMIC date ranges based on actual data
+      await generateDynamicLineChart(period, rankedConditions);
       
       console.log('✅ Health conditions ranked:', rankedConditions);
-      console.log('✅ Line chart generated');
     } catch (err) {
       console.error('❌ Failed to fetch health conditions:', err);
       // Set empty data on error
@@ -922,7 +1029,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       },
                       label: function(context) {
                         const label = context.dataset.label || '';
-                        const value = context.parsed.y;
+                        // Round to remove the tiny offset we added for visibility
+                        const value = Math.round(context.parsed.y);
                         const suffix = viewPeriod === 'weekly' ? ' avg daily' : ' patients';
                         return `${label}: ${value}${suffix}`;
                       }

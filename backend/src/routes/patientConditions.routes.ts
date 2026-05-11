@@ -11,6 +11,9 @@ const router = Router();
 // All routes require authentication
 router.use(authenticate);
 
+// GET /api/v1/conditions/all/list - Get all patient conditions (for analytics)
+router.get('/all/list', PatientConditionsController.getAllPatientConditions);
+
 // GET /api/v1/conditions/trends - Get condition trends for line chart
 router.get('/trends', PatientConditionsController.getConditionTrends);
 

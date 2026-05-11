@@ -8,6 +8,56 @@ import prisma from '../config/prisma';
 import { Prisma } from '../generated/prisma';
 
 /**
+ * Get all patient conditions (for analytics)
+ * Returns all condition records from wellness plans with dates
+ */
+export async function getAllPatientConditions() {
+  const wellnessPlans = await prisma.wellnessPlan.findMany({
+    orderBy: { createdAt: 'asc' },
+    select: {
+      id: true,
+      userId: true,
+      conditions: true,
+      createdAt: true,
+    },
+  });
+
+  // Flatten the conditions array into individual records
+  const flattenedRecords: Array<{
+    id: string;
+    patientId: string;
+    condition: string;
+    createdAt: Date;
+  }> = [];
+
+  wellnessPlans.forEach(plan => {
+    const conditions = plan.conditions as string[] | null;
+    
+    // If no conditions or empty array, this is a "normal" patient
+    if (!conditions || (Array.isArray(conditions) && conditions.length === 0)) {
+      flattenedRecords.push({
+        id: plan.id,
+        patientId: plan.userId,
+        condition: 'normal',
+        createdAt: plan.createdAt,
+      });
+    } else if (Array.isArray(conditions)) {
+      // Add each condition as a separate record
+      conditions.forEach((condition: any) => {
+        flattenedRecords.push({
+          id: plan.id,
+          patientId: plan.userId,
+          condition: typeof condition === 'string' ? condition : String(condition),
+          createdAt: plan.createdAt,
+        });
+      });
+    }
+  });
+
+  return flattenedRecords;
+}
+
+/**
  * Upsert patient conditions (create or update)
  * 
  * @param patientId - Patient user ID

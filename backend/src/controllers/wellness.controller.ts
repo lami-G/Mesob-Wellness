@@ -175,6 +175,55 @@ export const getWellnessPlans = async (
 };
 
 /**
+ * GET /api/v1/plans/all/list
+ * Get all wellness plans (for analytics)
+ */
+export const getAllWellnessPlans = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    // Authorization: Only staff can view all plans
+    const allowedRoles = [
+      "NURSE_OFFICER",
+      "MANAGER",
+      "REGIONAL_OFFICE",
+      "FEDERAL_OFFICE",
+      "SYSTEM_ADMIN",
+    ];
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        status: "error",
+        message: "Insufficient permissions to view all wellness plans",
+      });
+      return;
+    }
+
+    const plans = await WellnessService.getAllWellnessPlans();
+
+    res.status(200).json({
+      status: "success",
+      data: plans,
+    });
+  } catch (error) {
+    console.error("Get all wellness plans error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve wellness plans",
+    });
+  }
+};
+
+
+/**
  * PUT /api/v1/plans/:id
  * Update an existing wellness plan
  */
