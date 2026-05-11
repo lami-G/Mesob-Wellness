@@ -18,6 +18,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     return `${year}-${month}-${day}`;
   });
   const [activityPeriod, setActivityPeriod] = useState('daily'); // daily, weekly, monthly
+  const [conditionViewPeriod, setConditionViewPeriod] = useState('daily'); // For health conditions chart
   const [analytics, setAnalytics] = useState({
     totalAppointments: 0,
     completedAppointments: 0,
@@ -37,7 +38,9 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     statusDistribution: null,
     appointmentTrend: null,
     hourlyBreakdown: null,
+    healthConditions: null,
   });
+  const [healthConditions, setHealthConditions] = useState([]);
 
   useEffect(() => {
     fetchAnalytics().catch(err => {
@@ -60,6 +63,108 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger]);
+
+  // Fetch health conditions when period changes
+  useEffect(() => {
+    fetchHealthConditions(conditionViewPeriod);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conditionViewPeriod]);
+
+  const fetchHealthConditions = async (period = conditionViewPeriod) => {
+    try {
+      console.log('🔍 Fetching health conditions for period:', period);
+      
+      // Calculate date range based on period
+      const today = new Date();
+      let startDate, endDate;
+      
+      if (period === 'daily') {
+        // Today only
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+      } else if (period === 'weekly') {
+        // Last 7 days (including today)
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+      } else if (period === 'monthly') {
+        // From 1st of current month to today
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+      }
+      
+      console.log('Date range:', startDate, 'to', endDate);
+      
+      // Fetch patient conditions within date range
+      const response = await api.get('/api/v1/conditions/period', {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        }
+      });
+      
+      const conditions = response.data.data || [];
+      
+      // Get total unique patients in the period (from vitals records)
+      const vitalsRes = await api.get('/api/v1/vitals/all', {
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        }
+      });
+      
+      const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
+      const uniquePatients = new Set(vitalsData.map(v => v.userId).filter(Boolean));
+      const totalPatients = uniquePatients.size;
+      
+      console.log('📊 Total patients in period:', totalPatients);
+      console.log('📊 Health conditions data:', conditions);
+      
+      // Define all 5 conditions with their colors (combining heart and respiratory)
+      const allConditions = [
+        { key: 'hypertension', label: 'Hypertension', color: '#8b5cf6' },
+        { key: 'overweight', label: 'Overweight', color: '#10b981' },
+        { key: 'obesity', label: 'Obesity', color: '#f97316' },
+        { key: 'diabetes', label: 'Diabetes', color: '#f59e0b' },
+        { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' },
+      ];
+      
+      // Create a map of condition counts
+      const conditionMap = {};
+      conditions.forEach(c => {
+        const key = c.condition.toLowerCase().replace(/ /g, '_');
+        // Combine heart issues and respiratory issues
+        if (key === 'heart_issues' || key === 'respiratory_issues') {
+          conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
+        } else {
+          conditionMap[key] = (conditionMap[key] || 0) + c.count;
+        }
+      });
+      
+      // Map counts to conditions and calculate percentages
+      const rankedConditions = allConditions.map(c => ({
+        ...c,
+        count: conditionMap[c.key] || 0,
+        percentage: totalPatients > 0 ? Math.round((conditionMap[c.key] || 0) / totalPatients * 100) : 0,
+        totalPatients: totalPatients
+      })).sort((a, b) => b.count - a.count);
+      
+      setHealthConditions(rankedConditions);
+      
+      console.log('✅ Health conditions ranked:', rankedConditions);
+    } catch (err) {
+      console.error('❌ Failed to fetch health conditions:', err);
+      // Set empty data on error
+      setHealthConditions([
+        { key: 'hypertension', label: 'Hypertension', color: '#8b5cf6', count: 0, percentage: 0, totalPatients: 0 },
+        { key: 'overweight', label: 'Overweight', color: '#10b981', count: 0, percentage: 0, totalPatients: 0 },
+        { key: 'obesity', label: 'Obesity', color: '#f97316', count: 0, percentage: 0, totalPatients: 0 },
+        { key: 'diabetes', label: 'Diabetes', color: '#f59e0b', count: 0, percentage: 0, totalPatients: 0 },
+        { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899', count: 0, percentage: 0, totalPatients: 0 },
+      ]);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -287,6 +392,9 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
       // Generate chart data with all appointments
       generateChartData(mappedAppointments, noShow);
+
+      // Fetch health conditions data
+      await fetchHealthConditions();
     } catch (err) {
       console.error('Failed to fetch analytics:', err);
       if (err?.response?.status === 403) {
@@ -507,6 +615,180 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             <span>🎯 Wellness Plans</span>
             <span className="breakdown-value">{analytics.wellnessPlansCreated}</span>
           </div>
+        </div>
+      </div>
+
+      {/* Health Conditions Ranked Chart */}
+      <div className="card" style={{ marginTop: '2rem', padding: '2rem' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#111' }}>
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </h3>
+              <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
+                {conditionViewPeriod === 'daily' && 'Patients with each condition recorded today'}
+                {conditionViewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {conditionViewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+              </p>
+            </div>
+            
+            {/* Toggle Buttons */}
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => setConditionViewPeriod('daily')}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  border: conditionViewPeriod === 'daily' ? '2px solid #667eea' : '1px solid #d1d5db',
+                  backgroundColor: conditionViewPeriod === 'daily' ? '#667eea' : '#fff',
+                  color: conditionViewPeriod === 'daily' ? '#fff' : '#374151',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: conditionViewPeriod === 'daily' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Daily
+              </button>
+              <button
+                onClick={() => setConditionViewPeriod('weekly')}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  border: conditionViewPeriod === 'weekly' ? '2px solid #667eea' : '1px solid #d1d5db',
+                  backgroundColor: conditionViewPeriod === 'weekly' ? '#667eea' : '#fff',
+                  color: conditionViewPeriod === 'weekly' ? '#fff' : '#374151',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: conditionViewPeriod === 'weekly' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Weekly
+              </button>
+              <button
+                onClick={() => setConditionViewPeriod('monthly')}
+                style={{
+                  padding: '0.5rem 1.25rem',
+                  border: conditionViewPeriod === 'monthly' ? '2px solid #667eea' : '1px solid #d1d5db',
+                  backgroundColor: conditionViewPeriod === 'monthly' ? '#667eea' : '#fff',
+                  color: conditionViewPeriod === 'monthly' ? '#fff' : '#374151',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: conditionViewPeriod === 'monthly' ? '600' : '500',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Monthly
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Vertical Bar Chart */}
+        <div style={{ marginTop: '2rem', position: 'relative', paddingLeft: '3rem' }}>
+          {healthConditions.length > 0 && healthConditions[0].totalPatients > 0 ? (
+            (() => {
+              // Calculate dynamic Y-axis scale
+              const maxCount = Math.max(...healthConditions.map(c => c.count), 1);
+              const roundedMax = Math.ceil(maxCount / 10) * 10; // Round up to nearest 10
+              const yAxisMax = roundedMax < 10 ? 10 : roundedMax; // Minimum 10
+              const step = yAxisMax / 6; // 7 labels (0 to max)
+              const yAxisLabels = Array.from({ length: 7 }, (_, i) => Math.round(yAxisMax - (i * step)));
+              
+              return (
+                <>
+                  {/* Y-axis label */}
+                  <div style={{ position: 'absolute', left: '0', top: '175px', transform: 'rotate(-90deg)', transformOrigin: 'left center', fontSize: '0.9rem', fontWeight: '600', color: '#6b7280', whiteSpace: 'nowrap' }}>
+                    Patients
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    {/* Y-axis */}
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '350px', paddingRight: '1rem', borderRight: '2px solid #e5e7eb' }}>
+                      {yAxisLabels.map((label, index) => (
+                        <span key={index} style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: '500' }}>
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Chart area with grid lines */}
+                    <div style={{ flex: 1, position: 'relative' }}>
+                      {/* Horizontal grid lines */}
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '350px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        {yAxisLabels.map((_, i) => (
+                          <div key={i} style={{ height: '1px', backgroundColor: '#e5e7eb', width: '100%' }} />
+                        ))}
+                      </div>
+
+                      {/* Bars */}
+                      <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end', height: '350px', gap: '1rem', padding: '0 1rem' }}>
+                        {healthConditions.map((condition) => {
+                          // Calculate height based on actual patient count relative to dynamic max
+                          const heightPercentage = (condition.count / yAxisMax) * 100;
+                          
+                          return (
+                            <div key={condition.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', maxWidth: '120px' }}>
+                              {/* Count above bar */}
+                              {condition.count > 0 && (
+                                <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111', marginBottom: '0.25rem' }}>
+                                  {condition.count}
+                                </div>
+                              )}
+                              
+                              {/* Bar */}
+                              <div
+                                style={{
+                                  width: '100%',
+                                  height: `${heightPercentage}%`,
+                                  maxHeight: '100%',
+                                  backgroundColor: condition.color,
+                                  borderRadius: '8px 8px 0 0',
+                                  transition: 'height 0.5s ease',
+                                  minHeight: condition.count > 0 ? '10px' : '0',
+                                  position: 'relative'
+                                }}
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* X-axis labels */}
+                  <div style={{ display: 'flex', marginTop: '1rem', marginLeft: '4rem' }}>
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'space-around', gap: '1rem', padding: '0 1rem' }}>
+                      {healthConditions.map((condition) => (
+                        <div key={condition.key} style={{ flex: 1, maxWidth: '120px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.9rem', fontWeight: '500', color: '#374151', wordBreak: 'break-word' }}>
+                            {condition.label}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '8px', textAlign: 'center' }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#6b7280' }}>
+                      Total patients in period: <span style={{ fontWeight: '700', color: '#374151' }}>{healthConditions[0].totalPatients}</span>
+                    </p>
+                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#9ca3af' }}>
+                      Bars show number of patients with each condition
+                    </p>
+                  </div>
+                </>
+              );
+            })()
+          ) : (
+            <p style={{ textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>
+              No health conditions data available for this period.
+            </p>
+          )}
         </div>
       </div>
     </div>

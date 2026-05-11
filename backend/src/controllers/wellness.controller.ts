@@ -26,7 +26,8 @@ export const createWellnessPlan = async (
       exerciseRecommendations,
       stressManagementAdvice,
       goals, 
-      duration 
+      duration,
+      conditions
     } = req.body;
 
     // Validate required fields
@@ -82,7 +83,8 @@ export const createWellnessPlan = async (
       planText,
       goals: goalsString,
       duration,
-    });
+      conditions: Array.isArray(conditions) ? conditions : undefined,
+    }, req.user.userId);
 
     res.status(201).json({
       status: "success",
