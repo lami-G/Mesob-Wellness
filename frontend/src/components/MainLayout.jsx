@@ -7,6 +7,7 @@ function MainLayout({ children }) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [displayUser, setDisplayUser] = useState(user);
   const userMenuRef = useRef(null);
   const dashboardTab =
     new URLSearchParams(location.search).get("tab") || "appointments";
@@ -28,6 +29,17 @@ function MainLayout({ children }) {
     }
   }, [showUserMenu]);
 
+  // Close dropdown when location changes
+  useEffect(() => {
+    setShowUserMenu(false);
+  }, [location.pathname, location.search]);
+
+  // Update displayUser when user changes and log it
+  useEffect(() => {
+    console.log("Auth user after update:", user);
+    setDisplayUser(user);
+  }, [user]);
+
   // Check if user has manager access
   const hasManagerAccess = () => {
     return (
@@ -43,11 +55,8 @@ function MainLayout({ children }) {
 
   const handleProfileClick = () => {
     setShowUserMenu(false);
-    if (location.pathname === "/nurse") {
-      navigate("/nurse?tab=profile");
-    } else {
-      navigate("/dashboard?tab=profile");
-    }
+    // Emit a custom event that the dashboard can listen to
+    window.dispatchEvent(new CustomEvent('profileClicked'));
   };
 
   const getInitials = (name) => {
@@ -79,13 +88,12 @@ function MainLayout({ children }) {
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
                 <span className="user-avatar-header">
-                  {user?.profilePicture ? (
-                    <img src={user.profilePicture} alt={user?.fullName} className="avatar-img-header" />
+                  {displayUser?.profilePicture ? (
+                    <img src={displayUser.profilePicture} alt={displayUser?.fullName} className="avatar-img-header" />
                   ) : (
-                    <div className="avatar-initials-header">{getInitials(user?.fullName)}</div>
+                    <span className="avatar-icon-header">👤</span>
                   )}
                 </span>
-                <span className="user-name-header">{user?.fullName}</span>
                 <span className="dropdown-arrow-header">▼</span>
               </button>
 
