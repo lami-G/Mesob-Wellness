@@ -17,8 +17,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
-  const [activityPeriod, setActivityPeriod] = useState('daily'); // daily, weekly, monthly
-  const [conditionViewPeriod, setConditionViewPeriod] = useState('daily'); // For health conditions chart
+  const [viewPeriod, setViewPeriod] = useState('daily'); // Unified period for both analytics and health conditions
   const [analytics, setAnalytics] = useState({
     totalAppointments: 0,
     completedAppointments: 0,
@@ -49,7 +48,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       setLoading(false);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate, activityPeriod]);
+  }, [selectedDate, viewPeriod]);
 
   // Listen for refreshTrigger changes and refresh analytics
   useEffect(() => {
@@ -66,11 +65,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
   // Fetch health conditions when period changes
   useEffect(() => {
-    fetchHealthConditions(conditionViewPeriod);
+    fetchHealthConditions(viewPeriod);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conditionViewPeriod]);
+  }, [viewPeriod]);
 
-  const fetchHealthConditions = async (period = conditionViewPeriod) => {
+  const fetchHealthConditions = async (period = viewPeriod) => {
     try {
       console.log('🔍 Fetching health conditions for period:', period);
       
@@ -177,14 +176,14 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       let endDate = new Date(selectedDateObj);
 
       // Adjust date range based on activity period
-      if (activityPeriod === 'weekly') {
+      if (viewPeriod === 'weekly') {
         // Get start of week (Monday)
         const day = startDate.getDay();
         const diff = startDate.getDate() - day + (day === 0 ? -6 : 1);
         startDate.setDate(diff);
         // End of week (Sunday)
         endDate.setDate(startDate.getDate() + 6);
-      } else if (activityPeriod === 'monthly') {
+      } else if (viewPeriod === 'monthly') {
         // Start of month
         startDate.setDate(1);
         // End of month
@@ -518,8 +517,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <select
-            value={activityPeriod}
-            onChange={(e) => setActivityPeriod(e.target.value)}
+            value={viewPeriod}
+            onChange={(e) => setViewPeriod(e.target.value)}
             style={{
               padding: '0.5rem 1rem',
               borderRadius: '6px',
@@ -535,7 +534,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             <option value="monthly">📈 Monthly</option>
           </select>
 
-          {activityPeriod === 'daily' && (
+          {viewPeriod === 'daily' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <label style={{ fontWeight: 600, color: '#374151' }}>Date:</label>
               <input
@@ -628,62 +627,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </h3>
               <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
-                {conditionViewPeriod === 'daily' && 'Patients with each condition recorded today'}
-                {conditionViewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
-                {conditionViewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {viewPeriod === 'daily' && 'Patients with each condition recorded today'}
+                {viewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {viewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
               </p>
-            </div>
-            
-            {/* Toggle Buttons */}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                onClick={() => setConditionViewPeriod('daily')}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  border: conditionViewPeriod === 'daily' ? '2px solid #667eea' : '1px solid #d1d5db',
-                  backgroundColor: conditionViewPeriod === 'daily' ? '#667eea' : '#fff',
-                  color: conditionViewPeriod === 'daily' ? '#fff' : '#374151',
-                  borderRadius: '6px',
-                  fontSize: '0.9rem',
-                  fontWeight: conditionViewPeriod === 'daily' ? '600' : '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                Daily
-              </button>
-              <button
-                onClick={() => setConditionViewPeriod('weekly')}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  border: conditionViewPeriod === 'weekly' ? '2px solid #667eea' : '1px solid #d1d5db',
-                  backgroundColor: conditionViewPeriod === 'weekly' ? '#667eea' : '#fff',
-                  color: conditionViewPeriod === 'weekly' ? '#fff' : '#374151',
-                  borderRadius: '6px',
-                  fontSize: '0.9rem',
-                  fontWeight: conditionViewPeriod === 'weekly' ? '600' : '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                Weekly
-              </button>
-              <button
-                onClick={() => setConditionViewPeriod('monthly')}
-                style={{
-                  padding: '0.5rem 1.25rem',
-                  border: conditionViewPeriod === 'monthly' ? '2px solid #667eea' : '1px solid #d1d5db',
-                  backgroundColor: conditionViewPeriod === 'monthly' ? '#667eea' : '#fff',
-                  color: conditionViewPeriod === 'monthly' ? '#fff' : '#374151',
-                  borderRadius: '6px',
-                  fontSize: '0.9rem',
-                  fontWeight: conditionViewPeriod === 'monthly' ? '600' : '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                Monthly
-              </button>
             </div>
           </div>
         </div>
@@ -728,30 +675,69 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       {/* Bars */}
                       <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-around', alignItems: 'flex-end', height: '350px', gap: '1rem', padding: '0 1rem' }}>
                         {healthConditions.map((condition) => {
-                          // Calculate height based on actual patient count relative to dynamic max
-                          const heightPercentage = (condition.count / yAxisMax) * 100;
+                          // Calculate height in pixels based on actual patient count relative to dynamic max
+                          const heightPx = (condition.count / yAxisMax) * 350;
+                          const percentage = condition.totalPatients > 0 
+                            ? Math.round((condition.count / condition.totalPatients) * 100) 
+                            : 0;
                           
                           return (
-                            <div key={condition.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', maxWidth: '120px' }}>
-                              {/* Count above bar */}
-                              {condition.count > 0 && (
-                                <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#111', marginBottom: '0.25rem' }}>
-                                  {condition.count}
+                            <div 
+                              key={condition.key} 
+                              style={{ 
+                                flex: 1, 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                alignItems: 'center', 
+                                justifyContent: 'flex-end', 
+                                maxWidth: '120px',
+                                position: 'relative',
+                                cursor: 'pointer'
+                              }}
+                              className="condition-bar-container"
+                            >
+                              {/* Hover Tooltip */}
+                              <div 
+                                className="condition-tooltip"
+                                style={{
+                                  position: 'absolute',
+                                  bottom: `${heightPx + 10}px`,
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                                  color: '#fff',
+                                  padding: '0.75rem 1rem',
+                                  borderRadius: '8px',
+                                  whiteSpace: 'nowrap',
+                                  fontSize: '0.9rem',
+                                  fontWeight: '600',
+                                  opacity: 0,
+                                  pointerEvents: 'none',
+                                  transition: 'opacity 0.2s ease',
+                                  zIndex: 10,
+                                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                                }}
+                              >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                  <div style={{ width: '12px', height: '12px', backgroundColor: condition.color, borderRadius: '2px' }} />
+                                  <span>{condition.label}</span>
                                 </div>
-                              )}
+                                <div style={{ fontSize: '1rem', fontWeight: '700', marginTop: '0.25rem' }}>
+                                  {condition.count} patients ({percentage}%)
+                                </div>
+                              </div>
                               
                               {/* Bar */}
                               <div
                                 style={{
                                   width: '100%',
-                                  height: `${heightPercentage}%`,
-                                  maxHeight: '100%',
+                                  height: `${heightPx}px`,
                                   backgroundColor: condition.color,
                                   borderRadius: '8px 8px 0 0',
-                                  transition: 'height 0.5s ease',
-                                  minHeight: condition.count > 0 ? '10px' : '0',
+                                  transition: 'all 0.3s ease',
                                   position: 'relative'
                                 }}
+                                className="condition-bar"
                               />
                             </div>
                           );
@@ -773,14 +759,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                     </div>
                   </div>
 
-                  <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '8px', textAlign: 'center' }}>
-                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#6b7280' }}>
-                      Total patients in period: <span style={{ fontWeight: '700', color: '#374151' }}>{healthConditions[0].totalPatients}</span>
-                    </p>
-                    <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: '#9ca3af' }}>
-                      Bars show number of patients with each condition
-                    </p>
-                  </div>
+
                 </>
               );
             })()

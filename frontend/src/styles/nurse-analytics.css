@@ -268,3 +268,21 @@
     width: 100%;
   }
 }
+
+/* Health Conditions Bar Chart Hover Effects */
+.condition-bar-container:hover .condition-tooltip {
+  opacity: 1 !important;
+}
+
+.condition-bar-container:hover .condition-bar {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.condition-bar {
+  transition: all 0.3s ease;
+}
+
+.condition-tooltip {
+  transition: opacity 0.2s ease;
+}

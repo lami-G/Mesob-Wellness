@@ -110,21 +110,28 @@ export async function getAllNurseApprovedConditions() {
 
 /**
  * Get all nurse-approved conditions within a date range
+ * Now queries wellness plans directly to include ALL patients with wellness plans in the period
  */
 export async function getConditionsByDateRange(
   startDate: Date,
   endDate: Date
 ) {
-  return await prisma.patientCondition.findMany({
+  // Get all wellness plans created in the date range
+  const wellnessPlans = await prisma.wellnessPlan.findMany({
     where: {
-      isNurseApproved: true,
-      approvedAt: {
+      createdAt: {
         gte: startDate,
         lte: endDate,
       },
     },
     select: {
+      userId: true,
       conditions: true,
     },
   });
+
+  // Return conditions from wellness plans (each plan represents one patient)
+  return wellnessPlans.map(plan => ({
+    conditions: plan.conditions as string[],
+  }));
 }
