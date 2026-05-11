@@ -13,7 +13,7 @@ model User {
   password              String?
   fullName              String
   role                  UserRole           @default(STAFF)
-  employeeId            String?
+  employeeId            String?            @unique
   isExternal            Boolean            @default(false)
   canLogin              Boolean            @default(true)
   centerId              String?            @db.Uuid

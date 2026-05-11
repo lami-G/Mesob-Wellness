@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import * as UsersService from "../services/users.service";
+import { prisma } from "../config/prisma";
 
 /**
  * GET /api/v1/users
@@ -29,6 +30,7 @@ export const searchUsers = async (req: AuthRequest, res: Response): Promise<void
         phone: user.phone,
         role: user.role,
         isExternal: user.isExternal,
+        employeeId: user.employeeId,
       })),
     });
   } catch (error) {
@@ -42,7 +44,7 @@ export const searchUsers = async (req: AuthRequest, res: Response): Promise<void
 
 /**
  * GET /api/v1/users/:id
- * Get user by ID
+ * Get user by ID (UUID or employeeId)
  */
 export const getUserById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -56,7 +58,29 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    const user = await UsersService.getUserProfile(userId);
+    let user;
+    
+    // Check if it's a 6-digit employeeId format (000001, 000009, etc.)
+    if (/^\d{6}$/.test(userId)) {
+      // Search by employeeId
+      user = await prisma.user.findUnique({
+        where: { employeeId: userId },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          phone: true,
+          dateOfBirth: true,
+          gender: true,
+          isExternal: true,
+          employeeId: true,
+        },
+      });
+    } else {
+      // Search by UUID
+      user = await UsersService.getUserProfile(userId);
+    }
 
     if (!user) {
       res.status(404).json({
@@ -77,6 +101,7 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
         dateOfBirth: user.dateOfBirth,
         gender: user.gender,
         isExternal: user.isExternal,
+        employeeId: user.employeeId,
       },
     });
   } catch (error) {
