@@ -228,41 +228,40 @@ export async function updateAppointmentStatus(
 
 
 export async function getQueueAppointments(dateString?: string) {
-  let startDate: Date;
-  let endDate: Date;
+  let whereClause: any = {
+    status: {
+      in: [
+        AppointmentStatus.WAITING,
+        AppointmentStatus.IN_PROGRESS,
+        AppointmentStatus.IN_SERVICE,
+        AppointmentStatus.COMPLETED,
+        AppointmentStatus.NO_SHOW,
+        // Legacy support
+        AppointmentStatus.PENDING,
+        AppointmentStatus.CONFIRMED,
+      ],
+    },
+  };
 
   if (dateString) {
     // Parse the provided date string (YYYY-MM-DD format)
     const [year, month, day] = dateString.split('-').map(Number);
-    startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-    endDate = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0, 0));
+    const startDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    const endDate = new Date(Date.UTC(year, month - 1, day + 1, 0, 0, 0, 0));
+    
+    console.log(`Fetching queue appointments for date range: ${startDate.toISOString()} to ${endDate.toISOString()}`);
+    
+    whereClause.scheduledAt = {
+      gte: startDate,
+      lt: endDate,
+    };
   } else {
-    // Use today's date in UTC
-    const now = new Date();
-    startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-    endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0, 0));
+    // No date provided - fetch all appointments (all time)
+    console.log('Fetching all queue appointments (all time)');
   }
 
-  console.log(`Fetching queue appointments for date range: ${startDate.toISOString()} to ${endDate.toISOString()}`);
-
   const appointments = await prisma.appointment.findMany({
-    where: {
-      scheduledAt: {
-        gte: startDate,
-        lt: endDate,
-      },
-      status: {
-        in: [
-          AppointmentStatus.WAITING,
-          AppointmentStatus.IN_PROGRESS,
-          AppointmentStatus.IN_SERVICE,
-          AppointmentStatus.COMPLETED,
-          // Legacy support
-          AppointmentStatus.PENDING,
-          AppointmentStatus.CONFIRMED,
-        ],
-      },
-    },
+    where: whereClause,
     orderBy: { scheduledAt: 'asc' },
     include: {
       user: {

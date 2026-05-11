@@ -78,6 +78,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
       IN_PROGRESS: 'status-in-progress',
       IN_SERVICE: 'status-in-service',
       COMPLETED: 'status-completed',
+      NO_SHOW: 'status-no-show',
     };
     return colors[status] || 'status-waiting';
   };
@@ -160,6 +161,12 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
             onClick={() => setFilter('COMPLETED')}
           >
             Completed ({queue.filter(q => q.status === 'COMPLETED').length})
+          </button>
+          <button 
+            className={`filter-btn ${filter === 'NO_SHOW' ? 'active' : ''}`}
+            onClick={() => setFilter('NO_SHOW')}
+          >
+            No Show ({queue.filter(q => q.status === 'NO_SHOW').length})
           </button>
         </div>
       </div>
