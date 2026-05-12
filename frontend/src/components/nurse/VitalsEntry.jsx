@@ -378,7 +378,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
             <div className="selected-customer">
               <div className="customer-info">
                 <p><strong>{selectedCustomer.fullName}</strong></p>
-                <p>ID: {selectedCustomer.id}</p>
+                <p>ID: {selectedCustomer.userId || selectedCustomer.id}</p>
                 <p>Email: {selectedCustomer.email}</p>
               </div>
               <button
@@ -463,6 +463,9 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
                           <div key={customer.id} className="result-item-inline">
                             <div className="customer-info-inline">
                               <p className="customer-name-inline">{customer.fullName}</p>
+                              <p className="customer-details-inline">
+                                ID: {customer.userId || customer.id}
+                              </p>
                               <p className="customer-details-inline">
                                 Email: {customer.email}
                               </p>
