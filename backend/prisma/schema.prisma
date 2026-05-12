@@ -13,7 +13,7 @@ model User {
   password              String?
   fullName              String
   role                  UserRole           @default(STAFF)
-  employeeId            String?
+  userId                String             @unique
   isExternal            Boolean            @default(false)
   canLogin              Boolean            @default(true)
   centerId              String?            @db.Uuid
@@ -44,7 +44,7 @@ model User {
   @@index([role])
   @@index([centerId])
   @@index([createdAt])
-  @@index([employeeId])
+  @@index([userId])
   @@index([isExternal])
   @@map("users")
 }

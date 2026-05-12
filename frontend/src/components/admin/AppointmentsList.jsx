@@ -47,6 +47,7 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
       <table className="data-table">
         <thead>
           <tr>
+            <th>Patient ID</th>
             <th>Patient</th>
             <th>Reason</th>
             <th>Scheduled</th>
@@ -59,11 +60,12 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
         <tbody>
           {appointments.length === 0 ? (
             <tr>
-              <td colSpan="7" className="table-empty">No appointments found</td>
+              <td colSpan="8" className="table-empty">No appointments found</td>
             </tr>
           ) : (
             appointments.map((apt) => (
               <tr key={apt.id}>
+                <td className="cell-id">{apt.user?.userId || "N/A"}</td>
                 <td className="cell-name">{apt.user?.fullName || "N/A"}</td>
                 <td className="cell-reason">{apt.reason}</td>
                 <td className="cell-date">{formatDate(apt.scheduledAt)}</td>
