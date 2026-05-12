@@ -16,7 +16,7 @@
 /* Static Totals Row */
 .static-totals-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -31,11 +31,18 @@
   box-shadow: 0 4px 20px rgba(40, 67, 148, 0.3);
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
 }
 
 .static-total-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 32px rgba(40, 67, 148, 0.4);
+}
+
+.static-total-card:active {
+  transform: translateY(-2px);
 }
 
 .static-icon {

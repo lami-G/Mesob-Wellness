@@ -91,6 +91,8 @@ const AdminService = {
         inactive: await prisma.user.count({ where: { isActive: false } }),
         verified: await prisma.user.count({ where: { isVerified: true } }),
         unverified: await prisma.user.count({ where: { isVerified: false } }),
+        externalPatients: await prisma.user.count({ where: { role: "EXTERNAL_PATIENT" } }),
+        staff: await prisma.user.count({ where: { role: "STAFF" } }),
         byRole: users.reduce((acc: any, u: any) => {
           acc[u.role] = u._count;
           return acc;

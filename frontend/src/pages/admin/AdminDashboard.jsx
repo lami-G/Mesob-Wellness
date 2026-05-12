@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
 import DashboardMetrics from "../../components/admin/DashboardMetrics";
-import DashboardCharts from "../../components/admin/DashboardCharts";
 import RegionManagement from "./RegionManagement";
 import UserManagement from "./UserManagement";
 import CenterManagement from "./CenterManagement";
@@ -31,8 +30,7 @@ function AdminDashboard() {
         return (
           <div className="dashboard-section">
             <h2>System Dashboard</h2>
-            <DashboardMetrics />
-            <DashboardCharts />
+            <DashboardMetrics onTabChange={setActiveTab} />
           </div>
         );
       case "regions":

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 
-function DashboardMetrics() {
+function DashboardMetrics({ onTabChange }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -65,36 +65,48 @@ function DashboardMetrics() {
 
   return (
     <div className="dashboard-metrics">
-      {/* Static Totals Row - 4 cards */}
+      {/* Static Totals Row - 3 cards */}
       <div className="static-totals-row">
-        <div className="static-total-card">
+        <button 
+          className="static-total-card"
+          onClick={() => onTabChange && onTabChange("users")}
+        >
           <div className="static-icon">👥</div>
           <div className="static-content">
             <div className="static-value">{totalUsers}</div>
             <div className="static-label">Total Users</div>
+            <div className="breakdown-items">
+              <div className="breakdown-item">
+                <span className="breakdown-label" style={{ color: '#ffffff' }}>External Patients:</span>
+                <span className="breakdown-value" style={{ color: '#ffffff' }}>{metrics.users?.externalPatients || 0}</span>
+              </div>
+              <div className="breakdown-item">
+                <span className="breakdown-label" style={{ color: '#ffffff' }}>Staff:</span>
+                <span className="breakdown-value" style={{ color: '#ffffff' }}>{metrics.users?.staff || 0}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="static-total-card">
+        </button>
+        <button 
+          className="static-total-card"
+          onClick={() => onTabChange && onTabChange("centers")}
+        >
           <div className="static-icon">🏥</div>
           <div className="static-content">
             <div className="static-value">{totalCenters}</div>
             <div className="static-label">Total Centers</div>
           </div>
-        </div>
-        <div className="static-total-card">
+        </button>
+        <button 
+          className="static-total-card"
+          onClick={() => onTabChange && onTabChange("regions")}
+        >
           <div className="static-icon">🗺️</div>
           <div className="static-content">
             <div className="static-value">{totalRegions}</div>
             <div className="static-label">Total Regions</div>
           </div>
-        </div>
-        <div className="static-total-card">
-          <div className="static-icon">👨‍⚕️</div>
-          <div className="static-content">
-            <div className="static-value">{totalPatients}</div>
-            <div className="static-label">Total Patients</div>
-          </div>
-        </div>
+        </button>
       </div>
 
       {/* Header with Controls */}
@@ -110,6 +122,7 @@ function DashboardMetrics() {
             onChange={(e) => setTimePeriod(e.target.value)}
             className="time-period-select"
           >
+            <option value="all">All</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
@@ -133,7 +146,7 @@ function DashboardMetrics() {
             <div className="metric-main">
               <span className="metric-value">{totalAppointments}</span>
               <span className="metric-label">
-                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : "This Month"}
+                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : timePeriod === "monthly" ? "This Month" : "All Time"}
               </span>
             </div>
           </div>
@@ -149,7 +162,7 @@ function DashboardMetrics() {
             <div className="metric-main">
               <span className="metric-value">{totalWalkIns}</span>
               <span className="metric-label">
-                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : "This Month"}
+                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : timePeriod === "monthly" ? "This Month" : "All Time"}
               </span>
             </div>
           </div>
@@ -165,7 +178,7 @@ function DashboardMetrics() {
             <div className="metric-main">
               <span className="metric-value">{totalFeedback}</span>
               <span className="metric-label">
-                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : "This Month"}
+                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : timePeriod === "monthly" ? "This Month" : "All Time"}
               </span>
             </div>
           </div>
@@ -181,7 +194,7 @@ function DashboardMetrics() {
             <div className="metric-main">
               <span className="metric-value">{totalPatientsServed}</span>
               <span className="metric-label">
-                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : "This Month"}
+                {timePeriod === "daily" ? "Today" : timePeriod === "weekly" ? "This Week" : timePeriod === "monthly" ? "This Month" : "All Time"}
               </span>
             </div>
           </div>

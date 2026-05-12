@@ -360,16 +360,6 @@ function AdminHeader({
         </div>
 
         <div className="header-right">
-          {dashboardType === "admin" && (
-            <div className="search-bar">
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="search-input"
-              />
-            </div>
-          )}
-
           {getHeaderActions()}
 
           <div className="user-menu">
