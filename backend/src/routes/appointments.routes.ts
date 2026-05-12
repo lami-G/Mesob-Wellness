@@ -6,6 +6,7 @@ import {
   updateAppointment,
   sendReminderHandler,
   getQueueHandler,
+  getAvailableSlotsHandler,
 } from "../controllers/appointments.controller";
 import { authenticate, authorizeMinRole } from "../middleware/auth.middleware";
 import { UserRole } from "../generated/prisma";
@@ -19,6 +20,14 @@ router.get(
   authenticate,
   authorizeMinRole(UserRole.STAFF),
   getAppointments,
+);
+
+// Get available time slots for a date - STAFF and above
+router.get(
+  "/available-slots",
+  authenticate,
+  authorizeMinRole(UserRole.STAFF),
+  getAvailableSlotsHandler,
 );
 
 // Get queue - NURSE_OFFICER and above

@@ -21,11 +21,15 @@ function BookingCalendar() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState("");
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingReason, setBookingReason] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
+  const bookingFormRef = React.useRef(null);
 
-  const DAILY_SLOTS = 100;
+  const DAILY_SLOTS = 36; // 9 hours * 4 slots per hour
 
   useEffect(() => {
     fetchAppointments();
@@ -80,26 +84,72 @@ function BookingCalendar() {
     return DAILY_SLOTS - booked;
   };
 
+  const fetchAvailableTimeSlots = async (date) => {
+    try {
+      setLoadingSlots(true);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      
+      const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}`);
+      let slots = response.data.data.availableSlots || [];
+      
+      // Filter out past time slots if booking for today
+      const isToday = date.toDateString() === new Date().toDateString();
+      if (isToday) {
+        const now = new Date();
+        slots = slots.filter(slotISO => {
+          const slotTime = new Date(slotISO);
+          return slotTime > now; // Only show future slots
+        });
+      }
+      
+      setAvailableSlots(slots);
+      setError('');
+      
+      // Scroll to booking form after slots are loaded
+      setTimeout(() => {
+        if (bookingFormRef.current) {
+          bookingFormRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest' 
+          });
+        }
+      }, 100);
+    } catch (err) {
+      setError('Failed to load available time slots');
+      console.error(err);
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const formatTimeSlot = (isoString) => {
+    const date = new Date(isoString);
+    // Convert to Ethiopia time (UTC+3)
+    const ethiopiaTime = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+    const hours = ethiopiaTime.getUTCHours();
+    const minutes = ethiopiaTime.getUTCMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${String(minutes).padStart(2, '0')} ${ampm}`;
+  };
+
   const handleBookAppointment = async () => {
-    if (!selectedDate || !bookingReason.trim()) {
-      setError("Please select a date and reason");
+    if (!selectedDate || !selectedTime || !bookingReason.trim()) {
+      setError("Please select a date, time, and provide a reason");
       return;
     }
 
     try {
       setBookingLoading(true);
       
-      // Send date in local YYYY-MM-DD format to preserve the selected date
-      // Don't use toISOString() as it converts to UTC which can shift the date
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      const dateString = `${year}-${month}-${day}`;
-      
-      console.log(`Booking appointment for date: ${dateString}`);
+      console.log(`Booking appointment for: ${selectedTime}`);
       
       const response = await api.post("/api/v1/appointments", {
-        scheduledAt: dateString,
+        scheduledAt: selectedTime, // Send the ISO string with time
         reason: bookingReason,
       });
 
@@ -113,6 +163,8 @@ function BookingCalendar() {
       setShowBookingForm(false);
       setBookingReason("");
       setSelectedDate(null);
+      setSelectedTime("");
+      setAvailableSlots([]);
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to book appointment");
@@ -157,7 +209,12 @@ function BookingCalendar() {
         <div
           key={day}
           className={`calendar-day ${isToday ? "today" : ""} ${isPast ? "past" : ""} ${isSelected ? "selected" : ""} ${available === 0 ? "full" : ""}`}
-          onClick={() => !isPast && setSelectedDate(date)}
+          onClick={() => {
+            if (!isPast) {
+              setSelectedDate(date);
+              fetchAvailableTimeSlots(date);
+            }
+          }}
         >
           <div className="day-number">{day}</div>
           <div
@@ -206,34 +263,67 @@ function BookingCalendar() {
       <div className="calendar-grid">{renderCalendar()}</div>
 
       {selectedDate && (
-        <div className="booking-form">
+        <div className="booking-form" ref={bookingFormRef}>
           <h4>Book Appointment for {selectedDate.toDateString()}</h4>
-          <textarea
-            placeholder="Reason for visit"
-            value={bookingReason}
-            onChange={(e) => setBookingReason(e.target.value)}
-            disabled={bookingLoading}
-            rows="3"
-          />
-          <div className="form-actions">
-            <button
-              className="btn btn-primary"
-              onClick={handleBookAppointment}
-              disabled={bookingLoading}
-            >
-              {bookingLoading ? "Booking..." : "Confirm Booking"}
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => {
-                setSelectedDate(null);
-                setBookingReason("");
-              }}
-              disabled={bookingLoading}
-            >
-              Cancel
-            </button>
-          </div>
+          
+          {loadingSlots ? (
+            <p>Loading available time slots...</p>
+          ) : availableSlots.length === 0 ? (
+            <p className="alert alert-error">No available time slots for this date</p>
+          ) : (
+            <>
+              <div className="form-group">
+                <label className="form-label">Select Time</label>
+                <select
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  disabled={bookingLoading}
+                  className="form-input"
+                  required
+                >
+                  <option value="">Choose a time slot...</option>
+                  {availableSlots.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {formatTimeSlot(slot)}
+                    </option>
+                  ))}
+                </select>
+                <small style={{ color: '#666', fontSize: '0.85rem' }}>
+                  {availableSlots.length} slot{availableSlots.length !== 1 ? 's' : ''} available (15 min each)
+                </small>
+              </div>
+
+              <textarea
+                placeholder="Reason for visit"
+                value={bookingReason}
+                onChange={(e) => setBookingReason(e.target.value)}
+                disabled={bookingLoading}
+                rows="3"
+              />
+              
+              <div className="form-actions">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleBookAppointment}
+                  disabled={bookingLoading || !selectedTime}
+                >
+                  {bookingLoading ? "Booking..." : "Confirm Booking"}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setSelectedDate(null);
+                    setSelectedTime("");
+                    setBookingReason("");
+                    setAvailableSlots([]);
+                  }}
+                  disabled={bookingLoading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 

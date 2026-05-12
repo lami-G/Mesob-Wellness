@@ -5,6 +5,7 @@ import {
   getAppointmentById,
   updateAppointmentStatus,
   getQueueAppointments,
+  getAvailableTimeSlots,
 } from "../services/appointments.service";
 import { sendAppointmentReminder } from "../services/email.service";
 import { AppointmentStatus } from "../generated/prisma";
@@ -296,6 +297,42 @@ export async function getQueueHandler(req: AuthRequest, res: Response): Promise<
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve queue",
+    });
+  }
+}
+
+
+/**
+ * GET /api/v1/appointments/available-slots?date=YYYY-MM-DD
+ * Get available time slots for a specific date
+ */
+export async function getAvailableSlotsHandler(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const date = req.query.date as string;
+
+    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      res.status(400).json({
+        status: 'error',
+        message: 'Valid date parameter is required (YYYY-MM-DD format)',
+      });
+      return;
+    }
+
+    const availableSlots = await getAvailableTimeSlots(date);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        date,
+        availableSlots,
+        totalSlots: availableSlots.length,
+      },
+    });
+  } catch (error) {
+    console.error('Get available slots error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to get available time slots',
     });
   }
 }

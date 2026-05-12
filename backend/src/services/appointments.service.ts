@@ -18,81 +18,73 @@ interface Appointment {
 }
 
 export async function createAppointment(input: AppointmentInput): Promise<Appointment> {
-  // Parse the date from scheduledAt - handle both YYYY-MM-DD and ISO formats
-  let appointmentDate: Date;
+  // Parse the date and time from scheduledAt
+  let appointmentDateTime: Date;
   
   console.log(`[createAppointment] Input scheduledAt: ${input.scheduledAt}`);
   
-  if (input.scheduledAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    // Date string format (YYYY-MM-DD) - create UTC date to avoid timezone issues
+  // Handle ISO format with time (e.g., "2026-05-15T08:30:00+03:00")
+  if (input.scheduledAt.includes('T')) {
+    appointmentDateTime = new Date(input.scheduledAt);
+    console.log(`[createAppointment] Parsed ISO format with time`);
+  } 
+  // Handle date-only format (YYYY-MM-DD) - legacy support
+  else if (input.scheduledAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
     const [year, month, day] = input.scheduledAt.split('-').map(Number);
-    appointmentDate = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-    console.log(`[createAppointment] Parsed YYYY-MM-DD format: year=${year}, month=${month}, day=${day}`);
+    appointmentDateTime = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    
+    // Auto-assign next available slot for date-only bookings
+    const SERVICE_START_HOUR = 5;
+    const SERVICE_START_MINUTE = 30;
+    appointmentDateTime.setUTCHours(SERVICE_START_HOUR, SERVICE_START_MINUTE, 0, 0);
+    console.log(`[createAppointment] Date-only format - assigning first slot`);
   } else {
-    // ISO format - parse normally
-    appointmentDate = new Date(input.scheduledAt);
-    appointmentDate.setUTCHours(0, 0, 0, 0);
-    console.log(`[createAppointment] Parsed ISO format`);
+    throw new Error('Invalid date format. Use ISO format with time or YYYY-MM-DD');
   }
 
-  // Service hours: 2:30 AM to 11:30 AM (UTC)
-  const SERVICE_START_HOUR = 2; // 2:30 AM
+  // Service hours in Ethiopia (UTC+3): 8:30 AM to 5:30 PM EAT
+  // Converted to UTC: 5:30 AM to 2:30 PM UTC
+  const SERVICE_START_HOUR = 5; // 5:30 AM UTC = 8:30 AM EAT
   const SERVICE_START_MINUTE = 30;
-  const SERVICE_END_HOUR = 11; // 11:30 AM
+  const SERVICE_END_HOUR = 14; // 2:30 PM UTC = 5:30 PM EAT
   const SERVICE_END_MINUTE = 30;
-  const TIME_PER_CUSTOMER_MINUTES = 15; // 15 minutes per customer
 
-  // Get all appointments for THIS SPECIFIC DATE to find the next available slot
-  const startOfDay = new Date(appointmentDate);
-  startOfDay.setUTCHours(0, 0, 0, 0);
-  
-  const endOfDay = new Date(appointmentDate);
-  endOfDay.setUTCHours(23, 59, 59, 999);
-  
-  console.log(`[createAppointment] Appointment date (UTC): ${appointmentDate.toISOString()}`);
-  console.log(`[createAppointment] Date range: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`);
+  // Validate that the requested time is within service hours
+  const hours = appointmentDateTime.getUTCHours();
+  const minutes = appointmentDateTime.getUTCMinutes();
+  const totalMinutes = hours * 60 + minutes;
+  const serviceStartMinutes = SERVICE_START_HOUR * 60 + SERVICE_START_MINUTE;
+  const serviceEndMinutes = SERVICE_END_HOUR * 60 + SERVICE_END_MINUTE;
 
-  const existingAppointments = await prisma.appointment.findMany({
+  if (totalMinutes < serviceStartMinutes || totalMinutes >= serviceEndMinutes) {
+    throw new Error('Appointment time must be between 8:30 AM and 5:30 PM (Ethiopia time)');
+  }
+
+  // Validate that the time is on a 15-minute interval
+  if (minutes % 15 !== 0) {
+    throw new Error('Appointment time must be on 15-minute intervals (e.g., 8:30, 8:45, 9:00)');
+  }
+
+  // Check if this exact time slot is already booked
+  const existingAppointment = await prisma.appointment.findFirst({
     where: {
-      scheduledAt: {
-        gte: startOfDay,
-        lte: endOfDay,
+      scheduledAt: appointmentDateTime,
+      status: {
+        notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW],
       },
     },
-    orderBy: { scheduledAt: 'asc' },
   });
 
-  console.log(`[createAppointment] Found ${existingAppointments.length} existing appointments on this date`);
-
-  // Calculate next available time slot
-  let nextSlotTime = new Date(appointmentDate);
-  nextSlotTime.setUTCHours(SERVICE_START_HOUR, SERVICE_START_MINUTE, 0, 0);
-
-  // If there are existing appointments, find the next available slot after the last one
-  if (existingAppointments.length > 0) {
-    const lastAppointment = existingAppointments[existingAppointments.length - 1];
-    nextSlotTime = new Date(lastAppointment.scheduledAt);
-    nextSlotTime.setUTCMinutes(nextSlotTime.getUTCMinutes() + TIME_PER_CUSTOMER_MINUTES);
-    console.log(`[createAppointment] Last appointment at: ${lastAppointment.scheduledAt.toISOString()}, next slot: ${nextSlotTime.toISOString()}`);
+  if (existingAppointment) {
+    throw new Error('This time slot is already booked. Please choose another time.');
   }
 
-  // Check if the calculated time is within service hours
-  const hours = nextSlotTime.getUTCHours();
-  const minutes = nextSlotTime.getUTCMinutes();
-  const totalMinutes = hours * 60 + minutes;
-  const serviceEndTotalMinutes = SERVICE_END_HOUR * 60 + SERVICE_END_MINUTE;
-
-  // If time exceeds service hours, reject the booking (day is full)
-  if (totalMinutes > serviceEndTotalMinutes) {
-    throw new Error('No available slots for this date. Please choose another date.');
-  }
-
-  console.log(`[createAppointment] Booking appointment at: ${nextSlotTime.toISOString()}`);
+  console.log(`[createAppointment] Booking appointment at: ${appointmentDateTime.toISOString()}`);
 
   const appointment = await prisma.appointment.create({
     data: {
       userId: input.patientId,
-      scheduledAt: nextSlotTime,
+      scheduledAt: appointmentDateTime,
       reason: input.reason,
       status: AppointmentStatus.WAITING,
     },
@@ -106,6 +98,60 @@ export async function createAppointment(input: AppointmentInput): Promise<Appoin
     status: appointment.status.toLowerCase(),
     createdAt: appointment.createdAt.toISOString(),
   };
+}
+
+export async function getAvailableTimeSlots(dateString: string): Promise<string[]> {
+  // Parse the date (YYYY-MM-DD format)
+  const [year, month, day] = dateString.split('-').map(Number);
+  const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
+
+  // Get all booked appointments for this date
+  const bookedAppointments = await prisma.appointment.findMany({
+    where: {
+      scheduledAt: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+      status: {
+        notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW],
+      },
+    },
+    select: {
+      scheduledAt: true,
+    },
+  });
+
+  // Create set of booked times for quick lookup
+  const bookedTimes = new Set(
+    bookedAppointments.map(apt => apt.scheduledAt.toISOString())
+  );
+
+  // Generate all possible time slots (8:30 AM - 5:15 PM Ethiopia time)
+  // In UTC: 5:30 AM - 2:15 PM
+  const SERVICE_START_HOUR = 5;
+  const SERVICE_START_MINUTE = 30;
+  const SERVICE_END_HOUR = 14;
+  const SERVICE_END_MINUTE = 15; // Last slot at 5:15 PM (14:15 UTC)
+  const SLOT_INTERVAL = 15;
+
+  const availableSlots: string[] = [];
+  const slotDate = new Date(Date.UTC(year, month - 1, day, SERVICE_START_HOUR, SERVICE_START_MINUTE, 0, 0));
+
+  while (
+    slotDate.getUTCHours() < SERVICE_END_HOUR ||
+    (slotDate.getUTCHours() === SERVICE_END_HOUR && slotDate.getUTCMinutes() <= SERVICE_END_MINUTE)
+  ) {
+    const slotISO = slotDate.toISOString();
+    
+    if (!bookedTimes.has(slotISO)) {
+      availableSlots.push(slotISO);
+    }
+
+    slotDate.setUTCMinutes(slotDate.getUTCMinutes() + SLOT_INTERVAL);
+  }
+
+  return availableSlots;
 }
 
 export async function listAppointments(userId?: string, status?: string): Promise<Appointment[]> {
