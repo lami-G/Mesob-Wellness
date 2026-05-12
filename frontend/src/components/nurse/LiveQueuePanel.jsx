@@ -66,8 +66,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
       item.customerId?.includes(searchTerm);
     
     if (filter === 'all') {
-      // Show all statuses except COMPLETED by default
-      return matchesSearch && item.status !== 'COMPLETED';
+      return matchesSearch;
     }
     return matchesSearch && item.status === filter;
   });
@@ -136,7 +135,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
             className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
-            All ({queue.filter(q => q.status !== 'COMPLETED').length})
+            All ({queue.length})
           </button>
           <button 
             className={`filter-btn ${filter === 'WAITING' ? 'active' : ''}`}

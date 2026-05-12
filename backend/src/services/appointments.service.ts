@@ -323,8 +323,8 @@ export async function getQueueAppointments(dateString?: string) {
         AppointmentStatus.WAITING,
         AppointmentStatus.IN_PROGRESS,
         AppointmentStatus.IN_SERVICE,
-        AppointmentStatus.COMPLETED,
         AppointmentStatus.NO_SHOW,
+        AppointmentStatus.COMPLETED,
         // Legacy support
         AppointmentStatus.PENDING,
         AppointmentStatus.CONFIRMED,
@@ -360,6 +360,7 @@ export async function getQueueAppointments(dateString?: string) {
           email: true,
           phone: true,
           userId: true,
+          isExternal: true,
         },
       },
     },
@@ -367,6 +368,9 @@ export async function getQueueAppointments(dateString?: string) {
 
   console.log(`Found ${appointments.length} appointments in queue`);
 
+  // All appointments in this list are appointment-based (they have appointment records)
+  // Walk-ins (whether external patients or staff coming for emergency) don't have appointment records
+  // So we only return appointments that exist in the appointments table
   return appointments.map((apt) => ({
     id: apt.id,
     appointmentId: apt.id,
