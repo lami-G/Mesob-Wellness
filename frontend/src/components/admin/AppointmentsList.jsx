@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
+import api from "../../services/api";
 
 function AppointmentsList({ filters, onEdit, onDelete }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
+  const [cancellationReason, setCancellationReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
@@ -32,6 +37,49 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString() + " " + new Date(date).toLocaleTimeString();
+  };
+
+  const openCancelModal = (appointmentId) => {
+    setSelectedAppointmentId(appointmentId);
+    setCancellationReason("");
+    setShowCancelModal(true);
+    // Auto-scroll to modal after a brief delay to ensure it's rendered
+    setTimeout(() => {
+      const modal = document.querySelector(".modal-overlay");
+      if (modal) {
+        modal.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
+  };
+
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setSelectedAppointmentId(null);
+    setCancellationReason("");
+  };
+
+  const confirmCancelAppointment = async () => {
+    if (!cancellationReason.trim()) {
+      alert("Please provide a cancellation reason");
+      return;
+    }
+
+    try {
+      setCancelling(true);
+      await api.delete(`/api/v1/appointments/${selectedAppointmentId}/cancel`, {
+        data: {
+          cancellationReason,
+        },
+      });
+      closeCancelModal();
+      fetchAppointments();
+      alert("✅ Appointment cancelled successfully!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to cancel appointment");
+      console.error(err);
+    } finally {
+      setCancelling(false);
+    }
   };
 
   if (loading) {
@@ -84,6 +132,15 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
                   >
                     ✎
                   </button>
+                  {(apt.status === "WAITING" || apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS" || apt.status === "IN_SERVICE") && (
+                    <button 
+                      className="btn-icon cancel"
+                      onClick={() => openCancelModal(apt.id)}
+                      title="Cancel Appointment"
+                    >
+                      ❌
+                    </button>
+                  )}
                   <button 
                     className="btn-icon delete"
                     onClick={() => onDelete(apt.id)}
@@ -117,6 +174,45 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
           >
             Next →
           </button>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="modal-overlay" onClick={closeCancelModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Cancel Appointment</h3>
+              <button className="modal-close" onClick={closeCancelModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>Please provide a reason for cancelling this appointment:</p>
+              <textarea
+                className="cancel-reason-input"
+                placeholder="e.g., Staff unavailable, Schedule conflict, etc."
+                value={cancellationReason}
+                onChange={(e) => setCancellationReason(e.target.value)}
+                rows="4"
+              />
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary"
+                onClick={closeCancelModal}
+                disabled={cancelling}
+              >
+                Keep Appointment
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={confirmCancelAppointment}
+                disabled={cancelling || !cancellationReason.trim()}
+              >
+                {cancelling ? "Cancelling..." : "Confirm Cancellation"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
