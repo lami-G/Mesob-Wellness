@@ -28,6 +28,7 @@ function BookingCalendar() {
   const [bookingReason, setBookingReason] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
   const bookingFormRef = React.useRef(null);
+  const errorRef = React.useRef(null);
 
   const DAILY_SLOTS = 36; // 9 hours * 4 slots per hour
 
@@ -140,6 +141,12 @@ function BookingCalendar() {
   const handleBookAppointment = async () => {
     if (!selectedDate || !selectedTime || !bookingReason.trim()) {
       setError("Please select a date, time, and provide a reason");
+      // Auto-scroll to error message
+      setTimeout(() => {
+        if (errorRef.current) {
+          errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
       return;
     }
 
@@ -167,7 +174,14 @@ function BookingCalendar() {
       setAvailableSlots([]);
       setError("");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to book appointment");
+      const errorMessage = err.response?.data?.message || "Failed to book appointment";
+      setError(errorMessage);
+      // Auto-scroll to error message
+      setTimeout(() => {
+        if (errorRef.current) {
+          errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
     } finally {
       setBookingLoading(false);
     }
@@ -233,7 +247,7 @@ function BookingCalendar() {
     <div className="card booking-calendar">
       <h2>📅 Booking Calendar</h2>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {error && <div className="alert alert-error" ref={errorRef}>{error}</div>}
 
       <div className="calendar-header">
         <button onClick={prevMonth} className="nav-btn">

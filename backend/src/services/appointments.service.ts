@@ -1,6 +1,5 @@
 import { AppointmentStatus } from "../generated/prisma";
 import { prisma } from "../config/prisma";
-import { env } from "../config/env";
 
 interface AppointmentInput {
   patientId: string; // UUID string
@@ -17,7 +16,46 @@ interface Appointment {
   createdAt: string;
 }
 
+export async function checkStaffActiveAppointment(staffId: string): Promise<boolean> {
+  const activeAppointment = await prisma.appointment.findFirst({
+    where: {
+      userId: staffId,
+      status: {
+        in: [AppointmentStatus.WAITING, AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS, AppointmentStatus.IN_SERVICE],
+      },
+    },
+  });
+  return !!activeAppointment;
+}
+
+export async function getStaffActiveAppointment(staffId: string) {
+  return prisma.appointment.findFirst({
+    where: {
+      userId: staffId,
+      status: {
+        in: [AppointmentStatus.WAITING, AppointmentStatus.CONFIRMED, AppointmentStatus.IN_PROGRESS, AppointmentStatus.IN_SERVICE],
+      },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phone: true,
+        },
+      },
+    },
+  });
+}
+
 export async function createAppointment(input: AppointmentInput): Promise<Appointment> {
+  // Check if staff already has an active appointment
+  const hasActiveAppointment = await checkStaffActiveAppointment(input.patientId);
+  if (hasActiveAppointment) {
+    throw new Error('Staff member already has an active appointment. Please cancel the existing appointment before booking a new one.');
+  }
+
   // Parse the date and time from scheduledAt
   let appointmentDateTime: Date;
   
@@ -246,9 +284,14 @@ export async function updateAppointmentStatus(
       if (prescription) updateData.prescription = prescription;
       break;
     case AppointmentStatus.CANCELLED:
-    case AppointmentStatus.NO_SHOW:
       updateData.cancelledAt = new Date();
       if (cancellationReason) updateData.cancellationReason = cancellationReason;
+      break;
+    case AppointmentStatus.NO_SHOW:
+      // NO_SHOW automatically cancels the appointment
+      updateData.status = AppointmentStatus.CANCELLED;
+      updateData.cancelledAt = new Date();
+      updateData.cancellationReason = cancellationReason || 'No-show';
       break;
   }
 
@@ -338,4 +381,42 @@ export async function getQueueAppointments(dateString?: string) {
     type: 'ONLINE', // Default to ONLINE, can be enhanced later
     notes: apt.notes || undefined,
   }));
+}
+
+export async function cancelAppointment(
+  id: string,
+  cancellationReason: string
+) {
+  const appointment = await prisma.appointment.findUnique({
+    where: { id },
+  });
+
+  if (!appointment) {
+    throw new Error('Appointment not found');
+  }
+
+  // Check if appointment can be cancelled (not already completed or cancelled)
+  if (appointment.status === AppointmentStatus.COMPLETED || appointment.status === AppointmentStatus.CANCELLED) {
+    throw new Error(`Cannot cancel appointment with status ${appointment.status}`);
+  }
+
+  return prisma.appointment.update({
+    where: { id },
+    data: {
+      status: AppointmentStatus.CANCELLED,
+      cancelledAt: new Date(),
+      cancellationReason,
+      updatedAt: new Date(),
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phone: true,
+        },
+      },
+    },
+  });
 }
