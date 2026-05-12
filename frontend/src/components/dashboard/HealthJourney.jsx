@@ -14,7 +14,6 @@ function normalizeVitalRecord(record) {
     ...record,
     systolicBP: record.systolic ?? null,
     diastolicBP: record.diastolic ?? null,
-    weight: record.weightKg ?? null,
     glucose: extractGlucoseFromNotes(record.notes),
   };
 }
@@ -347,7 +346,6 @@ function HealthJourney() {
   const [error, setError] = useState("");
   const [dateRange, setDateRange] = useState("30");
   const [generatingPDF, setGeneratingPDF] = useState(false);
-  const [activeChartTab, setActiveChartTab] = useState("weight");
   const ITEMS_PER_PAGE = 10;
 
   const handleViewWellnessPlan = async () => {
@@ -400,98 +398,6 @@ function HealthJourney() {
       status: healthScore >= 80 ? 'Healthy' : healthScore >= 60 ? 'Monitor' : 'Attention Needed',
       statusColor: healthScore >= 80 ? 'green' : healthScore >= 60 ? 'yellow' : 'red'
     };
-  };
-
-  // Generate health recommendations
-  const generateRecommendations = () => {
-    if (!vitals.length) return [];
-    
-    const latest = vitals[0];
-    const recommendations = [];
-    
-    if (latest.systolicBP >= 140) {
-      recommendations.push({
-        type: 'warning',
-        text: '🩺 Your blood pressure is high. Reduce sodium intake and increase physical activity.',
-        action: 'View Wellness Plan'
-      });
-    } else if (latest.systolicBP >= 130) {
-      recommendations.push({
-        type: 'info',
-        text: '⚠️ Monitor your blood pressure regularly. Maintain healthy habits.',
-        action: 'Learn More'
-      });
-    }
-    
-    if (latest.glucose >= 126) {
-      recommendations.push({
-        type: 'warning',
-        text: '🍎 Your glucose level is elevated. Reduce sugar intake and exercise regularly.',
-        action: 'View Wellness Plan'
-      });
-    }
-    
-    if (latest.bmi >= 30) {
-      recommendations.push({
-        type: 'warning',
-        text: '💪 Increase physical activity and follow your exercise plan.',
-        action: 'View Wellness Plan'
-      });
-    } else if (latest.bmi >= 25) {
-      recommendations.push({
-        type: 'info',
-        text: '🏃 Maintain your current exercise routine.',
-        action: 'View Plan'
-      });
-    }
-    
-    if (recommendations.length === 0) {
-      recommendations.push({
-        type: 'success',
-        text: '✅ Great! Keep maintaining your healthy lifestyle.',
-        action: null
-      });
-    }
-    
-    return recommendations;
-  };
-
-  const exportHistoryCsv = () => {
-    if (!vitals.length) return;
-
-    const headers = [
-      "RecordedAt",
-      "WeightKg",
-      "BMI",
-      "Systolic",
-      "Diastolic",
-      "HeartRate",
-      "Glucose",
-      "Temperature",
-      "OxygenSaturation",
-    ];
-    const rows = vitals.map((v) => [
-      v.recordedAt,
-      v.weight ?? "",
-      v.bmi ?? "",
-      v.systolicBP ?? "",
-      v.diastolicBP ?? "",
-      v.heartRate ?? "",
-      v.glucose ?? "",
-      v.temperature ?? "",
-      v.oxygenSaturation ?? "",
-    ]);
-
-    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `health-journey-${dateRange}d.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
   };
 
   const exportAsPdf = async () => {
@@ -650,10 +556,6 @@ function HealthJourney() {
   const latest = getLatestVital();
   const chronologicalVitals = [...vitals].reverse();
 
-  const weightTrendData = chronologicalVitals
-    .filter((v) => v.weight != null)
-    .map((v) => ({ date: v.recordedAt, value: Number(v.weight) }));
-
   const bpTrendData = chronologicalVitals
     .filter((v) => v.systolicBP != null && v.diastolicBP != null)
     .map((v) => ({
@@ -715,14 +617,6 @@ function HealthJourney() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={exportHistoryCsv}
-            disabled={!vitals.length}
-          >
-            📊 Export CSV
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary"
             onClick={exportAsPdf}
             disabled={generatingPDF || !vitals.length}
           >
@@ -770,17 +664,6 @@ function HealthJourney() {
               <div className="vital-comparison-grid">
                 <h3>📈 Progress Metrics</h3>
                 <div className="comparison-cards">
-                  {latest.weight != null && (
-                    <div className="comparison-card">
-                      <span className="comparison-label">Weight</span>
-                      <span className="comparison-current">{latest.weight.toFixed(1)} kg</span>
-                      {calculateComparison(latest, getPreviousVital(), 'weight') && (
-                        <span className={`comparison-change change-${calculateComparison(latest, getPreviousVital(), 'weight').direction}`}>
-                          {calculateComparison(latest, getPreviousVital(), 'weight').direction === 'up' ? '↑' : '↓'} {Math.abs(calculateComparison(latest, getPreviousVital(), 'weight').diff)} kg
-                        </span>
-                      )}
-                    </div>
-                  )}
                   {latest.systolicBP && latest.diastolicBP && (
                     <div className="comparison-card">
                       <span className="comparison-label">Blood Pressure</span>
@@ -821,16 +704,6 @@ function HealthJourney() {
             <div className="latest-vitals">
               <h3>Latest Vital Signs</h3>
               <div className="vitals-grid">
-                {latest.weight != null && (
-                  <div className="vital-card">
-                    <span className="vital-label">Weight</span>
-                    <span className="vital-value">
-                      {latest.weight.toFixed(1)}
-                    </span>
-                    <span className="vital-unit">kg</span>
-                  </div>
-                )}
-
                 {latest.bmi && (
                   <div className="vital-card">
                     <span className="vital-label">BMI</span>
@@ -898,24 +771,7 @@ function HealthJourney() {
                 {new Date(latest.recordedAt).toLocaleDateString()}
               </p>
 
-              <div className="risk-indicators">
-                <h4>Health Risk Indicators</h4>
-                {riskIndicators.length === 0 ? (
-                  <p className="risk-empty">
-                    No risk indicators available for this latest record.
-                  </p>
-                ) : (
-                  <div className="risk-grid">
-                    {riskIndicators.map((risk, idx) => (
-                      <div key={idx} className={`risk-card risk-${risk.color}`}>
-                        <span className="risk-title">{risk.label}</span>
-                        <span className="risk-value">{risk.value}</span>
-                        <span className="risk-level">{risk.level}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+
             </div>
           )}
 
@@ -926,17 +782,6 @@ function HealthJourney() {
               <div className="comparison-metrics">
                 <h3>Progress & Comparison</h3>
                 <div className="comparison-grid">
-                  {comparison.weight.change !== null && (
-                    <div className="comparison-card">
-                      <span className="comparison-label">Weight Change</span>
-                      <div className="comparison-value">
-                        <span className={`change-amount ${comparison.weight.trend}`}>
-                          {comparison.weight.trend === 'down' ? '↓' : comparison.weight.trend === 'up' ? '↑' : '→'} {Math.abs(comparison.weight.change)} kg
-                        </span>
-                        <span className="change-percent">({comparison.weight.percent}%)</span>
-                      </div>
-                    </div>
-                  )}
                   {comparison.bp.systolicChange !== null && (
                     <div className="comparison-card">
                       <span className="comparison-label">Blood Pressure Change</span>
@@ -964,88 +809,9 @@ function HealthJourney() {
             ) : null;
           })()}
 
-          {/* Health Recommendations Section */}
-          {!loading && vitals.length > 0 && (() => {
-            const recommendations = generateRecommendations();
-            return (
-              <div className="health-recommendations">
-                <h3>Health Recommendations</h3>
-                <div className="recommendations-list">
-                  {recommendations.map((rec, idx) => (
-                    <div key={idx} className={`recommendation-item rec-${rec.type}`}>
-                      <p className="rec-text">{rec.text}</p>
-                      {rec.action && (
-                        <button className="btn btn-small btn-primary">
-                          {rec.action}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+          {/* Health Recommendations Section - REMOVED */}
 
-          <div className="trend-charts">
-            <h3>Trend Graphs</h3>
-            
-            {/* Chart Tabs */}
-            <div className="chart-tabs">
-              <button 
-                className={`chart-tab ${activeChartTab === 'weight' ? 'active' : ''}`}
-                onClick={() => setActiveChartTab('weight')}
-              >
-                📊 Weight
-              </button>
-              <button 
-                className={`chart-tab ${activeChartTab === 'bp' ? 'active' : ''}`}
-                onClick={() => setActiveChartTab('bp')}
-              >
-                💓 Blood Pressure
-              </button>
-              <button 
-                className={`chart-tab ${activeChartTab === 'glucose' ? 'active' : ''}`}
-                onClick={() => setActiveChartTab('glucose')}
-              >
-                🍬 Glucose
-              </button>
-            </div>
-
-            {/* Chart Display */}
-            <div className="trend-chart-display">
-              {activeChartTab === 'weight' && (
-                <TrendChart
-                  title="Weight Trend"
-                  unit=" kg"
-                  points={weightTrendData}
-                  colorClass="trend-weight"
-                  thresholds={[]}
-                />
-              )}
-              {activeChartTab === 'bp' && (
-                <DualTrendChart
-                  title="Blood Pressure Trend"
-                  points={bpTrendData}
-                />
-              )}
-              {activeChartTab === 'glucose' && (
-                <TrendChart
-                  title="Glucose Trend"
-                  unit=" mg/dL"
-                  points={glucoseTrendData}
-                  colorClass="trend-glucose"
-                  thresholds={[
-                    { value: 100, label: "100", className: "threshold-glucose" },
-                    {
-                      value: 126,
-                      label: "126",
-                      className: "threshold-glucose-high",
-                    },
-                  ]}
-                />
-              )}
-            </div>
-          </div>
+          {/* Trend Graphs Section - REMOVED */}
 
           {vitals.length === 0 && !error && (
             <div className="empty-state-card">
