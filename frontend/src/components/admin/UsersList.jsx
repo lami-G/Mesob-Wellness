@@ -77,7 +77,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
           ) : (
             users.map((user) => (
               <tr key={user.id}>
-                <td className="cell-id">{user.employeeId || "N/A"}</td>
+                <td className="cell-id">{user.userId || "N/A"}</td>
                 <td className="cell-name">{user.fullName}</td>
                 <td className="cell-email">{user.email || "N/A"}</td>
                 <td className="cell-role">

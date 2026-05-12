@@ -1,15 +1,16 @@
 /**
  * Sequential ID Generator
  * Generates user-friendly sequential IDs like 0001, 0002, etc.
+ * These IDs are used as the userId field for all users.
  */
 
 import { prisma } from '../config/prisma';
 
 /**
- * Generate the next sequential display ID for a user
+ * Generate the next sequential display ID for a user (userId)
  * Format: 4-digit zero-padded number (e.g., "0001", "0042", "1234")
  * 
- * @returns Promise<string> The next sequential ID
+ * @returns Promise<string> The next sequential userId
  */
 export async function generateNextDisplayId(): Promise<string> {
   try {
@@ -32,7 +33,7 @@ export async function generateNextDisplayId(): Promise<string> {
  * Format a display ID for UI presentation
  * Adds prefix or formatting as needed
  * 
- * @param displayId The sequential ID
+ * @param displayId The sequential userId
  * @returns Formatted display ID
  */
 export function formatDisplayId(displayId: string): string {
@@ -42,9 +43,9 @@ export function formatDisplayId(displayId: string): string {
 }
 
 /**
- * Parse and validate a display ID
+ * Parse and validate a display ID (userId)
  * 
- * @param displayId The display ID to validate
+ * @param displayId The userId to validate
  * @returns boolean True if valid
  */
 export function isValidDisplayId(displayId: string): boolean {

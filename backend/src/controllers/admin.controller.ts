@@ -314,7 +314,7 @@ export const createUser = async (
         role,
         centerId: centerId || null,
         isActive: true,
-        employeeId: displayId, // Sequential display ID
+        userId: displayId, // Sequential display ID
         // Only external patients are unverified, others are verified by default
         isVerified: role !== "EXTERNAL_PATIENT",
       },
@@ -325,7 +325,7 @@ export const createUser = async (
         role: true,
         isActive: true,
         isVerified: true,
-        employeeId: true,
+        userId: true,
       },
     });
 

@@ -183,7 +183,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
                 <span className="queue-number">#{idx + 1}</span>
                 <span className="customer-name">{item.customerName}</span>
                 <span className="customer-id" style={{ fontSize: '0.85rem', color: '#666' }}>
-                  ID: {item.employeeId || item.customerId?.substring(0, 8) + '...'}
+                  ID: {item.userId || item.customerId?.substring(0, 8) + '...'}
                 </span>
                 <span className="appointment-type">{getAppointmentType(item.type)}</span>
                 <span className={`status-badge ${getStatusColor(item.status)}`}>

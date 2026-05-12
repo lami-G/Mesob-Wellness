@@ -65,7 +65,7 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
           ) : (
             appointments.map((apt) => (
               <tr key={apt.id}>
-                <td className="cell-id">{apt.user?.employeeId || "N/A"}</td>
+                <td className="cell-id">{apt.user?.userId || "N/A"}</td>
                 <td className="cell-name">{apt.user?.fullName || "N/A"}</td>
                 <td className="cell-reason">{apt.reason}</td>
                 <td className="cell-date">{formatDate(apt.scheduledAt)}</td>

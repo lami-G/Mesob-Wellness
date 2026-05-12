@@ -18,7 +18,7 @@ export async function getUserProfile(userId: string) {
       isActive: true,
       isVerified: true,
       isExternal: true,
-      employeeId: true,
+      userId: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -125,7 +125,7 @@ export async function searchUsers(searchTerm: string) {
           },
         },
         {
-          employeeId: {
+          userId: {
             contains: searchTerm,
             mode: 'insensitive',
           },
@@ -142,7 +142,7 @@ export async function searchUsers(searchTerm: string) {
       dateOfBirth: true,
       gender: true,
       isExternal: true,
-      employeeId: true,
+      userId: true,
     },
     take: 20, // Limit results
     orderBy: {

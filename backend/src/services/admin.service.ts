@@ -427,7 +427,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true, employeeId: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.appointment.count({ where }),
@@ -479,7 +479,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true, employeeId: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.vitalRecord.count({ where }),
@@ -526,7 +526,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true, employeeId: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.feedback.count({ where }),
@@ -573,7 +573,7 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true, employeeId: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.auditLog.count({ where }),

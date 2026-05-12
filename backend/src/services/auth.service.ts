@@ -38,7 +38,7 @@ export interface AuthResponse {
     role: UserRole;
     isActive: boolean;
     profilePicture?: string | null;
-    employeeId?: string | null;
+    userId?: string;
   };
   token: string;
 }
@@ -154,7 +154,7 @@ export class AuthService {
           password: hashedPassword,
           fullName: input.fullName.trim(),
           role,
-          employeeId: displayId, // Sequential display ID
+          userId: displayId, // Sequential display ID
           centerId: input.centerId,
           dateOfBirth: input.dateOfBirth,
           gender: input.gender,
@@ -231,7 +231,7 @@ export class AuthService {
         fullName: user.fullName,
         role: user.role,
         isActive: user.isActive,
-        employeeId: user.employeeId, // Include display ID
+        userId: user.userId, // Include display ID
       },
       token,
     };
@@ -315,7 +315,7 @@ export class AuthService {
         role: user.role,
         isActive: user.isActive,
         profilePicture: user.profilePicture,
-        employeeId: user.employeeId, // Include display ID
+        userId: user.userId, // Include display ID
       },
       token,
     };
@@ -431,7 +431,7 @@ export class AuthService {
         gender: true,
         phone: true,
         profilePicture: true,
-        employeeId: true, // Include display ID
+        userId: true, // Include display ID
       },
     });
   }

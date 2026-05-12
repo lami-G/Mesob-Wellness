@@ -30,7 +30,7 @@ export const searchUsers = async (req: AuthRequest, res: Response): Promise<void
         phone: user.phone,
         role: user.role,
         isExternal: user.isExternal,
-        employeeId: user.employeeId,
+        userId: user.userId,
       })),
     });
   } catch (error) {
@@ -60,11 +60,11 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
 
     let user;
     
-    // Check if it's a 4-digit employeeId format (0001, 0009, etc.)
+    // Check if it's a 4-digit userId format (0001, 0009, etc.)
     if (/^\d{4}$/.test(userId)) {
-      // Search by employeeId
+      // Search by userId
       user = await prisma.user.findUnique({
-        where: { employeeId: userId },
+        where: { userId: userId },
         select: {
           id: true,
           email: true,
@@ -74,7 +74,7 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
           dateOfBirth: true,
           gender: true,
           isExternal: true,
-          employeeId: true,
+          userId: true,
         },
       });
     } else {
@@ -101,7 +101,7 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
         dateOfBirth: user.dateOfBirth,
         gender: user.gender,
         isExternal: user.isExternal,
-        employeeId: user.employeeId,
+        userId: user.userId,
       },
     });
   } catch (error) {
