@@ -3,6 +3,7 @@ import { AuthRequest } from "../middleware/auth.middleware";
 import AdminService from "../services/admin.service";
 import prisma from "../config/prisma";
 import { NotificationService } from "../services/notifications.service";
+import { generateNextDisplayId } from "../utils/sequentialId";
 import {
   UserFilters,
   CenterFilters,
@@ -302,6 +303,9 @@ export const createUser = async (
     const bcrypt = await import("bcryptjs");
     const hashedPassword = await bcrypt.default.hash(password, 10);
 
+    // Generate sequential display ID
+    const displayId = await generateNextDisplayId();
+
     const newUser = await prisma.user.create({
       data: {
         fullName,
@@ -310,6 +314,7 @@ export const createUser = async (
         role,
         centerId: centerId || null,
         isActive: true,
+        userId: displayId, // Sequential display ID
         // Only external patients are unverified, others are verified by default
         isVerified: role !== "EXTERNAL_PATIENT",
       },
@@ -320,6 +325,7 @@ export const createUser = async (
         role: true,
         isActive: true,
         isVerified: true,
+        userId: true,
       },
     });
 

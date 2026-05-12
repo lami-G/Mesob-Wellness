@@ -3,6 +3,7 @@ import { prisma } from "../config/prisma";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { AppointmentStatus, UserRole } from "../generated/prisma";
 import bcrypt from "bcryptjs";
+import { generateNextDisplayId } from "../utils/sequentialId";
 
 // ─── System Settings ──────────────────────────────────────────────────────────
 export async function getSystemSettings(req: Request, res: Response) {
@@ -519,6 +520,9 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await prisma.$transaction(async (tx) => {
+      // Generate sequential userId
+      const displayId = await generateNextDisplayId();
+      
       const user = await tx.user.create({
         data: {
           fullName: fullName.trim(),
@@ -528,6 +532,7 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
           isActive: true,
           phone: phone || null,
           centerId: centerId || null,
+          userId: displayId,
         },
         select: {
           id: true,

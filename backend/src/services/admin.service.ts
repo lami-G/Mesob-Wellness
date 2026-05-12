@@ -230,14 +230,38 @@ const AdminService = {
         }),
       };
 
-      // Get walk-in patients (external patients) - filtered by date
-      const walkInWhere: any = dateFrom ? { 
-        isExternal: true,
-        createdAt: { gte: dateFrom }
-      } : { isExternal: true };
+      // Get walk-in completed visits (count vital records without completed appointments)
+      // Each vital record for a patient without a COMPLETED appointment = 1 walk-in visit
+      // This includes external patients AND staff coming for emergency without appointment
+      const walkInCompletedWhere: any = dateFrom ? { 
+        recordedAt: { gte: dateFrom }
+      } : {};
+
+      // Get all vital records in the date range
+      const allVitalRecords = await prisma.vitalRecord.findMany({
+        where: walkInCompletedWhere,
+        select: { userId: true },
+      });
+
+      // Get all COMPLETED appointments in the date range
+      const completedAppointments = await prisma.appointment.findMany({
+        where: dateFrom ? { 
+          scheduledAt: { gte: dateFrom },
+          status: "COMPLETED"
+        } : {
+          status: "COMPLETED"
+        },
+        select: { userId: true },
+      });
+
+      // Get unique user IDs with completed appointments
+      const completedAppointmentUserIds = new Set(completedAppointments.map(apt => apt.userId));
+
+      // Count vital records for users WITHOUT completed appointments (walk-in visits)
+      const walkInVisitCount = allVitalRecords.filter(vr => !completedAppointmentUserIds.has(vr.userId)).length;
 
       const walkInStats = {
-        total: await prisma.user.count({ where: walkInWhere }),
+        total: walkInVisitCount,
       };
 
       // Get completed appointments - filtered by date
@@ -427,7 +451,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.appointment.count({ where }),
@@ -479,7 +503,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.vitalRecord.count({ where }),
@@ -526,7 +550,7 @@ const AdminService = {
           skip,
           take,
           include: {
-            user: { select: { fullName: true, email: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.feedback.count({ where }),
@@ -573,7 +597,7 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true } },
+            user: { select: { fullName: true, email: true, userId: true } },
           },
         }),
         prisma.auditLog.count({ where }),
