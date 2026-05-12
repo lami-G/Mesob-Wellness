@@ -144,6 +144,9 @@ export async function getAvailableTimeSlots(dateString: string): Promise<string[
   const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
+  console.log(`[getAvailableTimeSlots] Querying for date: ${dateString}`);
+  console.log(`[getAvailableTimeSlots] UTC range: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`);
+
   // Get all booked appointments for this date
   const bookedAppointments = await prisma.appointment.findMany({
     where: {
@@ -157,7 +160,13 @@ export async function getAvailableTimeSlots(dateString: string): Promise<string[
     },
     select: {
       scheduledAt: true,
+      userId: true,
     },
+  });
+
+  console.log(`[getAvailableTimeSlots] Found ${bookedAppointments.length} booked appointments`);
+  bookedAppointments.forEach(apt => {
+    console.log(`  - Appointment at ${apt.scheduledAt.toISOString()} for user ${apt.userId}`);
   });
 
   // Create set of booked times for quick lookup
@@ -188,6 +197,8 @@ export async function getAvailableTimeSlots(dateString: string): Promise<string[
 
     slotDate.setUTCMinutes(slotDate.getUTCMinutes() + SLOT_INTERVAL);
   }
+
+  console.log(`[getAvailableTimeSlots] Available slots: ${availableSlots.length}`);
 
   return availableSlots;
 }

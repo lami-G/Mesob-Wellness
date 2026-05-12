@@ -27,6 +27,7 @@ function BookingCalendar() {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [bookingReason, setBookingReason] = useState("");
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [slotsCache, setSlotsCache] = useState({}); // Cache for slot counts by date
   const bookingFormRef = React.useRef(null);
   const errorRef = React.useRef(null);
 
@@ -35,6 +36,11 @@ function BookingCalendar() {
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  // Fetch slot counts for all dates in the current month
+  useEffect(() => {
+    fetchMonthSlotCounts();
+  }, [currentDate]);
 
   const fetchAppointments = async () => {
     try {
@@ -73,16 +79,45 @@ function BookingCalendar() {
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   };
 
-  const getAppointmentsForDate = (date) => {
-    return appointments.filter((apt) => {
-      const aptDate = new Date(apt.scheduledAt).toDateString();
-      return aptDate === date.toDateString();
-    });
+  const fetchMonthSlotCounts = async () => {
+    const daysInMonth = getDaysInMonth(currentDate);
+    const newCache = {};
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        day,
+      );
+      const isPast = date < new Date() && date.toDateString() !== new Date().toDateString();
+      
+      if (!isPast) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const dayStr = String(date.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${dayStr}`;
+
+        try {
+          const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}`);
+          const slots = response.data.data.availableSlots || [];
+          newCache[dateString] = slots.length;
+        } catch (err) {
+          newCache[dateString] = DAILY_SLOTS; // Default to full if error
+        }
+      }
+    }
+
+    setSlotsCache(newCache);
   };
 
   const getAvailableSlots = (date) => {
-    const booked = getAppointmentsForDate(date).length;
-    return DAILY_SLOTS - booked;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    
+    // Return cached slot count or default to full
+    return slotsCache[dateString] !== undefined ? slotsCache[dateString] : DAILY_SLOTS;
   };
 
   const fetchAvailableTimeSlots = async (date) => {
@@ -173,6 +208,9 @@ function BookingCalendar() {
       setSelectedTime("");
       setAvailableSlots([]);
       setError("");
+      
+      // Refresh slot counts after booking
+      fetchMonthSlotCounts();
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to book appointment";
       setError(errorMessage);
