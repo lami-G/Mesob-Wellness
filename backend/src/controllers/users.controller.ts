@@ -60,8 +60,8 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
 
     let user;
     
-    // Check if it's a 6-digit employeeId format (000001, 000009, etc.)
-    if (/^\d{6}$/.test(userId)) {
+    // Check if it's a 4-digit employeeId format (0001, 0009, etc.)
+    if (/^\d{4}$/.test(userId)) {
       // Search by employeeId
       user = await prisma.user.findUnique({
         where: { employeeId: userId },
