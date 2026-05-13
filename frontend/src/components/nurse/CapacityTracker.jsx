@@ -6,7 +6,7 @@ function CapacityTracker() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const DAILY_SLOTS = 100;
+  const DAILY_SLOTS = 36; // 9 hours * 4 slots per hour (matching BookingCalendar)
 
   useEffect(() => {
     fetchCapacity();
@@ -17,19 +17,29 @@ function CapacityTracker() {
   const fetchCapacity = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/v1/analytics/capacity');
-      const data = response.data.data;
       
-      // Map backend response to component state
+      // Get today's date
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      
+      // Fetch available slots for today
+      const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}`);
+      const availableSlots = response.data.data.availableSlots || [];
+      const booked = DAILY_SLOTS - availableSlots.length;
+      
       setCapacity({
-        booked: data.slotsUsed || 0,
-        available: data.slotsRemaining || 0,
-        total: data.dailyLimit || 100,
-        utilizationPct: data.utilizationPct || 0,
+        booked: booked,
+        available: availableSlots.length,
+        total: DAILY_SLOTS,
+        utilizationPct: Math.round((booked / DAILY_SLOTS) * 100),
       });
       setError('');
     } catch (err) {
-      // If endpoint fails, calculate from appointments
+      console.error('Failed to fetch capacity:', err);
+      // Fallback to appointments count
       fetchAppointmentsCount();
     } finally {
       setLoading(false);
@@ -58,6 +68,7 @@ function CapacityTracker() {
         booked: todayCount,
         available: DAILY_SLOTS - todayCount,
         total: DAILY_SLOTS,
+        utilizationPct: Math.round((todayCount / DAILY_SLOTS) * 100),
       });
     } catch (err) {
       setError('Failed to load capacity');

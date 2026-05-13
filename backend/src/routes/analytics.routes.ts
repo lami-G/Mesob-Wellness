@@ -27,5 +27,7 @@ router.get("/audit-logs",           authenticate, authorizeMinRole(UserRole.MANA
 
 // ─── Trends (daily / weekly / monthly) ───────────────────────────────────────
 router.get("/trends",               authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getTrends);
+router.get("/health-by-center",     authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getHealthByCenter);
+router.get("/vitals-trends",        authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getVitalsTrends);
 
 export default router;

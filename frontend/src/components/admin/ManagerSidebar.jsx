@@ -21,11 +21,11 @@ function ManagerSidebar({
   const capacityColor = usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e';
 
   const menuItems = [
-    { id: "overview", label: "Overview", icon: "📊" },
-    { id: "analytics", label: "Analytics", icon: "📈" },
-    { id: "users", label: "Staff", icon: "👥", count: staffCount },
-    { id: "audit", label: "Audit", icon: "🔍" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
+    { id: "overview", label: "Overview" },
+    { id: "analytics", label: "Analytics" },
+    { id: "users", label: "Staff", count: staffCount },
+    { id: "audit", label: "Audit" },
+    { id: "settings", label: "Settings" },
   ];
 
   return (
@@ -61,7 +61,6 @@ function ManagerSidebar({
             onClick={() => onTabChange(item.id)}
             title={item.label}
           >
-            <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">
               {item.label}
               {item.count !== undefined && (

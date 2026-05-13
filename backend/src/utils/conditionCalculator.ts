@@ -10,6 +10,7 @@ export interface VitalsInput {
   diastolic?: number | null;
   bmi?: number | null;
   glucose?: number | null;
+  glucoseType?: string | null;
   heartRate?: number | null;
   oxygenSaturation?: number | null;
 }
@@ -39,9 +40,23 @@ export function calculateConditionsFromVitals(vitals: VitalsInput): string[] {
     }
   }
 
-  // Diabetes: Glucose >= 126 mg/dL
-  if (vitals.glucose && vitals.glucose >= 126) {
-    conditions.push('diabetes');
+  // Diabetes/Prediabetes: Glucose thresholds based on type
+  if (vitals.glucose) {
+    const glucoseType = vitals.glucoseType?.toUpperCase() || 'FBS';
+    
+    if (glucoseType === 'FBS') {
+      // Fasting Blood Sugar thresholds
+      if (vitals.glucose >= 126) {
+        conditions.push('diabetes');
+      } else if (vitals.glucose >= 100) {
+        conditions.push('prediabetes');
+      }
+    } else if (glucoseType === 'RBS') {
+      // Random Blood Sugar (after meal) thresholds
+      if (vitals.glucose > 200) {
+        conditions.push('hyperglycemia');
+      }
+    }
   }
 
   // Heart Issues: Heart rate < 60 or > 100 bpm

@@ -299,10 +299,8 @@ export async function updateAppointmentStatus(
       if (cancellationReason) updateData.cancellationReason = cancellationReason;
       break;
     case AppointmentStatus.NO_SHOW:
-      // NO_SHOW automatically cancels the appointment
-      updateData.status = AppointmentStatus.CANCELLED;
-      updateData.cancelledAt = new Date();
-      updateData.cancellationReason = cancellationReason || 'No-show';
+      // NO_SHOW status - keep as is
+      if (cancellationReason) updateData.cancellationReason = cancellationReason;
       break;
   }
 

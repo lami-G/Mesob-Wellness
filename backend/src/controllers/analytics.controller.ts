@@ -252,13 +252,49 @@ export async function getQueueAnalytics(req: Request, res: Response) {
 // ─── Health Analytics (real DB) ──────────────────────────────────────────────
 export async function getHealthAnalytics(req: Request, res: Response) {
   try {
+    const { dateRange, center, condition } = req.query;
+    
+    // Calculate date filter
+    let dateFilter: any = {};
+    if (dateRange && dateRange !== 'all') {
+      const days = parseInt(dateRange as string) || 30;
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      startDate.setHours(0, 0, 0, 0);
+      dateFilter = { gte: startDate };
+    }
+
+    // Build center filter for queries
+    let centerFilter: any = {};
+    if (center && center !== 'all') {
+      centerFilter = { recorder: { centerId: center as string } };
+    }
+
     const totalPatients = await prisma.user.count({
-      where: { role: UserRole.STAFF },
+      where: { role: UserRole.STAFF, ...(center && center !== 'all' ? { centerId: center as string } : {}) },
     });
 
     // Get patient conditions from patient_conditions table (nurse-approved only)
+    // Filter by date if provided and center if provided
+    // For center filtering, we need to find patients whose vitals were recorded at that center
+    let patientConditionWhere: any = {
+      isNurseApproved: true,
+      ...(Object.keys(dateFilter).length > 0 && { calculatedAt: dateFilter }),
+    };
+
+    if (center && center !== 'all') {
+      // Get all patients who have vitals recorded at this center
+      const patientsAtCenter = await prisma.vitalRecord.findMany({
+        where: { recorder: { centerId: center as string } },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      const patientIds = patientsAtCenter.map(v => v.userId);
+      patientConditionWhere.patientId = { in: patientIds };
+    }
+
     const nurseApprovedConditions = await prisma.patientCondition.findMany({
-      where: { isNurseApproved: true },
+      where: patientConditionWhere,
       select: { conditions: true },
     });
 
@@ -266,22 +302,32 @@ export async function getHealthAnalytics(req: Request, res: Response) {
     const conditionCounts: Record<string, number> = {};
     nurseApprovedConditions.forEach((record) => {
       const conditions = record.conditions as string[];
-      conditions.forEach((condition) => {
-        conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
+      conditions.forEach((cond) => {
+        conditionCounts[cond] = (conditionCounts[cond] || 0) + 1;
       });
     });
 
-    // Sort conditions by prevalence
-    const patientConditions = Object.entries(conditionCounts)
-      .map(([condition, count]) => ({ condition, count }))
+    // Filter by selected condition if provided
+    let patientConditions = Object.entries(conditionCounts)
+      .map(([cond, count]) => ({ condition: cond, count }))
       .sort((a, b) => b.count - a.count);
 
+    if (condition && condition !== 'all') {
+      patientConditions = patientConditions.filter(
+        (item) => item.condition.toLowerCase() === (condition as string).toLowerCase()
+      );
+    }
+
     // BP analytics from vital_records
+    let bpWhere: any = {
+      systolic: { not: null },
+      diastolic: { not: null },
+      ...(Object.keys(dateFilter).length > 0 && { recordedAt: dateFilter }),
+      ...centerFilter,
+    };
+
     const bpRecords = await prisma.vitalRecord.findMany({
-      where: {
-        systolic: { not: null },
-        diastolic: { not: null },
-      },
+      where: bpWhere,
       select: { systolic: true, diastolic: true, bpCategory: true },
       orderBy: { recordedAt: "desc" },
       take: 200,
@@ -303,7 +349,11 @@ export async function getHealthAnalytics(req: Request, res: Response) {
 
     // BMI analytics
     const bmiRecords = await prisma.vitalRecord.findMany({
-      where: { bmi: { not: null } },
+      where: {
+        bmi: { not: null },
+        ...(Object.keys(dateFilter).length > 0 && { recordedAt: dateFilter }),
+        ...centerFilter,
+      },
       select: { bmi: true, bmiCategory: true },
       orderBy: { recordedAt: "desc" },
       take: 200,
@@ -350,7 +400,17 @@ export async function getHealthAnalytics(req: Request, res: Response) {
     }
 
     // Total vitals recorded
-    const totalVitalsRecorded = await prisma.vitalRecord.count();
+    const totalVitalsRecorded = await prisma.vitalRecord.count({
+      where: {
+        ...(Object.keys(dateFilter).length > 0 && { recordedAt: dateFilter }),
+        ...centerFilter,
+      },
+    });
+
+    // Calculate critical count (high risk vitals)
+    const criticalCount = bpRecords.filter(
+      (r) => r.bpCategory === "HYPERTENSIVE_CRISIS"
+    ).length;
 
     res.json({
       success: true,
@@ -358,7 +418,8 @@ export async function getHealthAnalytics(req: Request, res: Response) {
         totalPatients,
         totalVitalsRecorded,
         highRiskCount: highRiskBP,
-        patientConditions, // Nurse-approved conditions from patient_conditions table
+        criticalCount: criticalCount,
+        patientConditions,
         averageBP: { systolic: avgSystolic, diastolic: avgDiastolic },
         averageBmi: avgBmi,
         bpRiskDistribution: {
@@ -706,5 +767,124 @@ export async function getTrends(req: Request, res: Response) {
   } catch (error) {
     console.error("Error fetching trends:", error);
     res.status(500).json({ success: false, message: "Failed to fetch trends" });
+  }
+}
+
+
+// ─── Health Analytics by Center ───────────────────────────────────────────────
+export async function getHealthByCenter(req: Request, res: Response) {
+  try {
+    // Get all centers
+    const centers = await prisma.center.findMany({
+      select: { id: true, name: true },
+    });
+
+    // For each center, calculate health metrics
+    const centerHealthData = await Promise.all(
+      centers.map(async (center) => {
+        // Get vitals for this center
+        const vitals = await prisma.vitalRecord.findMany({
+          where: {
+            user: {
+              centerId: center.id,
+            },
+          },
+          select: {
+            systolic: true,
+            diastolic: true,
+            glucose: true,
+            bmi: true,
+            bpCategory: true,
+          },
+          orderBy: { recordedAt: 'desc' },
+          take: 100,
+        });
+
+        // Calculate averages
+        let avgSystolic = 0;
+        let avgGlucose = 0;
+        let avgBMI = 0;
+        let healthyCount = 0;
+
+        if (vitals.length > 0) {
+          const totalSys = vitals.reduce((s, v) => s + (v.systolic || 0), 0);
+          const totalGlucose = vitals.reduce((s, v) => s + (v.glucose || 0), 0);
+          const totalBMI = vitals.reduce((s, v) => s + (v.bmi || 0), 0);
+
+          avgSystolic = Math.round(totalSys / vitals.length);
+          avgGlucose = Math.round(totalGlucose / vitals.length);
+          avgBMI = Math.round((totalBMI / vitals.length) * 10) / 10;
+
+          // Count healthy (normal BP and normal BMI)
+          healthyCount = vitals.filter(
+            (v) => v.bpCategory === 'NORMAL' || v.bpCategory === 'ELEVATED'
+          ).length;
+        }
+
+        const healthyPercent = vitals.length > 0 ? Math.round((healthyCount / vitals.length) * 100) : 0;
+
+        return {
+          centerName: center.name,
+          centerId: center.id,
+          avgSystolic,
+          avgGlucose,
+          avgBMI,
+          healthyPercent,
+          totalVitals: vitals.length,
+        };
+      })
+    );
+
+    res.json({ success: true, data: centerHealthData });
+  } catch (error) {
+    console.error('Error fetching health by center:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch health by center' });
+  }
+}
+
+// ─── Vital Signs Trends ───────────────────────────────────────────────────────
+export async function getVitalsTrends(req: Request, res: Response) {
+  try {
+    const { dateRange = '30' } = req.query;
+    const days = parseInt(dateRange as string) || 30;
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    // Get daily averages for the last N days
+    const trendsData = await Promise.all(
+      Array.from({ length: days }, (_, i) => {
+        const date = new Date();
+        date.setDate(date.getDate() - (days - 1 - i));
+        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+
+        return prisma.vitalRecord.aggregate({
+          where: {
+            recordedAt: { gte: dayStart, lte: dayEnd },
+          },
+          _avg: {
+            systolic: true,
+            diastolic: true,
+            heartRate: true,
+            bmi: true,
+            temperature: true,
+            oxygenSaturation: true,
+          },
+        }).then((agg) => ({
+          date: dayStart.toISOString(),
+          avgSystolic: Math.round(agg._avg.systolic || 0),
+          avgDiastolic: Math.round(agg._avg.diastolic || 0),
+          avgHeartRate: Math.round(agg._avg.heartRate || 0),
+          avgBMI: Math.round((agg._avg.bmi || 0) * 10) / 10,
+          avgTemperature: Math.round((agg._avg.temperature || 0) * 10) / 10,
+          avgOxygenSaturation: Math.round(agg._avg.oxygenSaturation || 0),
+        }));
+      })
+    );
+
+    res.json({ success: true, data: trendsData });
+  } catch (error) {
+    console.error('Error fetching vitals trends:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch vitals trends' });
   }
 }
