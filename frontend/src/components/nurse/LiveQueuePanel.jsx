@@ -27,7 +27,12 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
     try {
       setLoading(true);
       console.log('📋 Fetching queue...');
-      const response = await api.get('/api/v1/appointments/queue');
+      
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date();
+      const dateString = today.toISOString().split('T')[0];
+      
+      const response = await api.get(`/api/v1/appointments/queue?date=${dateString}`);
       console.log('📋 Queue response:', response.data);
       
       const data = response.data.data;

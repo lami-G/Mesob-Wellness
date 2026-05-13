@@ -195,25 +195,8 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       setSuccess('Wellness plan created successfully!');
       setCreatedPlanId(response.data.data.id);
       
-      // For walk-in users (no appointmentId), automatically mark as completed
-      if (!appointmentId) {
-        try {
-          // Trigger queue refresh to update analytics
-          if (onStatusChanged) {
-            onStatusChanged();
-          }
-          
-          // Auto-navigate back after a short delay
-          setTimeout(() => {
-            setSuccess('');
-            if (onBackToQueue) {
-              onBackToQueue();
-            }
-          }, 2000);
-        } catch (err) {
-          console.error('Error in walk-in completion:', err);
-        }
-      }
+      // Don't auto-redirect for walk-in users - wait for download button click
+      // For appointment patients, show the buttons and let them decide
       
       // Scroll to success message
       setTimeout(() => {
@@ -256,7 +239,15 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      // Keep the buttons visible - don't reset form
+      // For walk-in patients: redirect to queue after download
+      if (!appointmentId) {
+        setTimeout(() => {
+          setSuccess('');
+          if (onBackToQueue) {
+            onBackToQueue();
+          }
+        }, 1000);
+      }
     } catch (err) {
       console.error('Failed to download PDF:', err);
       setError('Failed to generate PDF');
@@ -347,7 +338,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       {success && <div ref={successRef} className="alert alert-success">{success}</div>}
       
       {/* PDF Download and Mark as Completed Buttons */}
-      {createdPlanId && !success && (
+      {createdPlanId && (
         <div style={{
           marginBottom: '1.5rem',
           padding: '1rem',
@@ -356,22 +347,41 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           borderRadius: '8px',
         }}>
           <p style={{ margin: '0 0 1rem 0', color: '#1E40AF', fontWeight: 600 }}>
-            📄 Your wellness plan is ready!
+            {appointmentId ? '✓ Wellness plan created!' : '📄 Download report to give to patient'}
           </p>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleDownloadPDF}
-              disabled={generatingPDF}
-              className="btn btn-primary"
-              style={{
-                cursor: generatingPDF ? 'not-allowed' : 'pointer',
-                opacity: generatingPDF ? 0.6 : 1,
-                flex: 1,
-                minWidth: '200px',
-              }}
-            >
-              {generatingPDF ? '📄 Generating PDF...' : '📄 Download Health Report PDF'}
-            </button>
+            {/* For walk-in patients: show download button for nurse to give to patient */}
+            {!appointmentId && (
+              <button
+                onClick={handleDownloadPDF}
+                disabled={generatingPDF}
+                className="btn btn-primary"
+                style={{
+                  cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                  opacity: generatingPDF ? 0.6 : 1,
+                  flex: 1,
+                  minWidth: '200px',
+                }}
+              >
+                {generatingPDF ? '📄 Generating PDF...' : '📄 Download Report for Patient'}
+              </button>
+            )}
+            {/* For appointment patients: show download button */}
+            {appointmentId && (
+              <button
+                onClick={handleDownloadPDF}
+                disabled={generatingPDF}
+                className="btn btn-primary"
+                style={{
+                  cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                  opacity: generatingPDF ? 0.6 : 1,
+                  flex: 1,
+                  minWidth: '200px',
+                }}
+              >
+                {generatingPDF ? '📄 Generating PDF...' : '📄 Download Health Report PDF'}
+              </button>
+            )}
             {/* Only show "Mark as Completed" button for staff with appointments */}
             {onBackToQueue && appointmentId && (
               <button
