@@ -5,16 +5,16 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
   const { user } = useAuth();
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "health", label: "Health Analytics", icon: "🏥" },
-    { id: "regions", label: "Regions", icon: "🌍" },
-    { id: "users", label: "Users", icon: "👥" },
-    { id: "centers", label: "Centers", icon: "🏢" },
-    { id: "appointments", label: "Appointments", icon: "📅" },
-    { id: "vitals", label: "Health Data", icon: "💊" },
-    { id: "feedback", label: "Feedback", icon: "⭐" },
-    { id: "audit", label: "Audit Logs", icon: "📋" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
+    { id: "dashboard", label: "Dashboard" },
+    { id: "health", label: "Health Analytics" },
+    { id: "regions", label: "Regions" },
+    { id: "users", label: "Users" },
+    { id: "centers", label: "Centers" },
+    { id: "appointments", label: "Appointments" },
+    { id: "vitals", label: "Health Data" },
+    { id: "feedback", label: "Feedback" },
+    { id: "audit", label: "Audit Logs" },
+    { id: "settings", label: "Settings" },
   ];
 
   return (
@@ -38,7 +38,6 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
             onClick={() => onTabChange(item.id)}
             title={item.label}
           >
-            <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
           </button>
         ))}

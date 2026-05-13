@@ -36,7 +36,7 @@ function DashboardMetrics({ onTabChange }) {
   const [vitalsTrends, setVitalsTrends] = useState(null);
   const [centerData, setCenterData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(false);
-  const [dateRange, setDateRange] = useState("30");
+  const [dateRange, setDateRange] = useState("all");
   const [selectedCenter, setSelectedCenter] = useState("all");
   const [selectedCondition, setSelectedCondition] = useState("all");
   const [centers, setCenters] = useState([]);

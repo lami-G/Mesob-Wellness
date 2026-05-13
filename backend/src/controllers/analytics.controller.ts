@@ -276,12 +276,25 @@ export async function getHealthAnalytics(req: Request, res: Response) {
 
     // Get patient conditions from patient_conditions table (nurse-approved only)
     // Filter by date if provided and center if provided
+    // For center filtering, we need to find patients whose vitals were recorded at that center
+    let patientConditionWhere: any = {
+      isNurseApproved: true,
+      ...(Object.keys(dateFilter).length > 0 && { calculatedAt: dateFilter }),
+    };
+
+    if (center && center !== 'all') {
+      // Get all patients who have vitals recorded at this center
+      const patientsAtCenter = await prisma.vitalRecord.findMany({
+        where: { recorder: { centerId: center as string } },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      const patientIds = patientsAtCenter.map(v => v.userId);
+      patientConditionWhere.patientId = { in: patientIds };
+    }
+
     const nurseApprovedConditions = await prisma.patientCondition.findMany({
-      where: {
-        isNurseApproved: true,
-        ...(Object.keys(dateFilter).length > 0 && { calculatedAt: dateFilter }),
-        ...(center && center !== 'all' && { patient: { centerId: center as string } }),
-      },
+      where: patientConditionWhere,
       select: { conditions: true },
     });
 

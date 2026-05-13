@@ -20,10 +20,10 @@ function RegionalSidebar({
     : 'Regional Office';
 
   const menuItems = [
-    { id: "overview", label: "Overview", icon: "📊" },
-    { id: "centers", label: "Centers", icon: "🏥", count: centersCount },
-    { id: "managers", label: "Managers", icon: "👔" },
-    { id: "performance", label: "Analytics", icon: "📈" },
+    { id: "overview", label: "Overview" },
+    { id: "centers", label: "Centers", count: centersCount },
+    { id: "managers", label: "Managers" },
+    { id: "performance", label: "Analytics" },
   ];
 
   return (
@@ -60,7 +60,6 @@ function RegionalSidebar({
             onClick={() => onTabChange(item.id)}
             title={item.label}
           >
-            <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">
               {item.label}
               {item.count !== undefined && (
