@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AdminLayout from "../../layouts/AdminLayout";
 import DashboardMetrics from "../../components/admin/DashboardMetrics";
+import HealthDashboard from "../../components/admin/HealthDashboard";
 import RegionManagement from "./RegionManagement";
 import UserManagement from "./UserManagement";
 import CenterManagement from "./CenterManagement";
@@ -12,6 +13,7 @@ import SystemSettings from "./SystemSettings";
 import AdminProfile from "./AdminProfile";
 import "../../styles/admin-layout.css";
 import "../../styles/admin-dashboard.css";
+import "../../styles/admin-health-dashboard.css";
 import "../../styles/admin-filters.css";
 import "../../styles/admin-tables.css";
 import "../../styles/admin-health.css";
@@ -31,6 +33,12 @@ function AdminDashboard() {
           <div className="dashboard-section">
             <h2>System Dashboard</h2>
             <DashboardMetrics onTabChange={setActiveTab} />
+          </div>
+        );
+      case "health":
+        return (
+          <div className="health-section">
+            <HealthDashboard />
           </div>
         );
       case "regions":

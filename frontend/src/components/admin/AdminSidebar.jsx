@@ -6,9 +6,10 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "health", label: "Health Analytics", icon: "🏥" },
     { id: "regions", label: "Regions", icon: "🌍" },
     { id: "users", label: "Users", icon: "👥" },
-    { id: "centers", label: "Centers", icon: "🏥" },
+    { id: "centers", label: "Centers", icon: "🏢" },
     { id: "appointments", label: "Appointments", icon: "📅" },
     { id: "vitals", label: "Health Data", icon: "💊" },
     { id: "feedback", label: "Feedback", icon: "⭐" },

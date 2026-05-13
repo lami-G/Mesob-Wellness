@@ -210,7 +210,7 @@ model Notification {
   isRead    Boolean              @default(false)
   relatedId String?
   createdAt DateTime             @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime             @updatedAt @db.Timestamptz(3)
+  updatedAt DateTime             @default(now()) @updatedAt @db.Timestamptz(3)
   user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])

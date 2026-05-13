@@ -179,6 +179,37 @@ function SystemSettings() {
           </div>
         </div>
 
+        {/* System Health */}
+        <div className="settings-section">
+          <h2>System Health</h2>
+          <div className="health-metrics-grid">
+            <div className="health-metric-card">
+              <div className="health-icon">⚡</div>
+              <div className="health-content">
+                <p className="health-label">API Response Time</p>
+                <p className="health-value">245ms</p>
+                <span className="health-status good">✓ Good</span>
+              </div>
+            </div>
+            <div className="health-metric-card">
+              <div className="health-icon">🔌</div>
+              <div className="health-content">
+                <p className="health-label">Database Connections</p>
+                <p className="health-value">12/50</p>
+                <span className="health-status good">✓ Good</span>
+              </div>
+            </div>
+            <div className="health-metric-card">
+              <div className="health-icon">⏱️</div>
+              <div className="health-content">
+                <p className="health-label">System Uptime</p>
+                <p className="health-value">99.9%</p>
+                <span className="health-status good">✓ Good</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Action Buttons */}
         <div className="settings-actions">
           <button 
