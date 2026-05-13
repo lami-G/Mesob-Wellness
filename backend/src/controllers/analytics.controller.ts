@@ -3,6 +3,7 @@ import { prisma } from "../config/prisma";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { AppointmentStatus, UserRole } from "../generated/prisma";
 import bcrypt from "bcryptjs";
+import { generateNextDisplayId } from "../utils/sequentialId";
 
 // ─── System Settings ──────────────────────────────────────────────────────────
 export async function getSystemSettings(req: Request, res: Response) {
@@ -255,6 +256,26 @@ export async function getHealthAnalytics(req: Request, res: Response) {
       where: { role: UserRole.STAFF },
     });
 
+    // Get patient conditions from patient_conditions table (nurse-approved only)
+    const nurseApprovedConditions = await prisma.patientCondition.findMany({
+      where: { isNurseApproved: true },
+      select: { conditions: true },
+    });
+
+    // Count occurrences of each condition
+    const conditionCounts: Record<string, number> = {};
+    nurseApprovedConditions.forEach((record) => {
+      const conditions = record.conditions as string[];
+      conditions.forEach((condition) => {
+        conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
+      });
+    });
+
+    // Sort conditions by prevalence
+    const patientConditions = Object.entries(conditionCounts)
+      .map(([condition, count]) => ({ condition, count }))
+      .sort((a, b) => b.count - a.count);
+
     // BP analytics from vital_records
     const bpRecords = await prisma.vitalRecord.findMany({
       where: {
@@ -337,6 +358,7 @@ export async function getHealthAnalytics(req: Request, res: Response) {
         totalPatients,
         totalVitalsRecorded,
         highRiskCount: highRiskBP,
+        patientConditions, // Nurse-approved conditions from patient_conditions table
         averageBP: { systolic: avgSystolic, diastolic: avgDiastolic },
         averageBmi: avgBmi,
         bpRiskDistribution: {
@@ -498,6 +520,9 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = await prisma.$transaction(async (tx) => {
+      // Generate sequential userId
+      const displayId = await generateNextDisplayId();
+      
       const user = await tx.user.create({
         data: {
           fullName: fullName.trim(),
@@ -507,6 +532,7 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
           isActive: true,
           phone: phone || null,
           centerId: centerId || null,
+          userId: displayId,
         },
         select: {
           id: true,

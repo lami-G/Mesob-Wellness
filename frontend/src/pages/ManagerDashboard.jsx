@@ -4,6 +4,7 @@ import { analyticsService } from '../services/analyticsService';
 import AdminLayout from '../layouts/AdminLayout';
 import Button from '../components/forms/Button';
 import Input from '../components/forms/Input';
+import HealthConditionTrendsPanel from '../components/analytics/HealthConditionTrendsPanel';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -936,50 +937,6 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
   const { raw, sample, label: periodLabel, c1, c2, c3 } = periodMap[period];
   const { data: trendData, isDemo } = resolveData(raw, sample);
 
-  // ── BP Risk ──
-  const BP_SAMPLE = [
-    { name: 'Normal',   value: 42, fill: '#10b981' },
-    { name: 'Elevated', value: 18, fill: '#06b6d4' },
-    { name: 'Stage 1',  value: 12, fill: '#3b82f6' },
-    { name: 'Stage 2',  value: 6,  fill: '#1d4ed8' },
-    { name: 'Crisis',   value: 2,  fill: '#0ea5e9' },
-  ];
-  const bpRaw = healthData?.bpRiskDistribution;
-  const bpBuilt = bpRaw ? [
-    { name: 'Normal',   value: bpRaw.normal   ?? 0, fill: '#10b981' },
-    { name: 'Elevated', value: bpRaw.elevated  ?? 0, fill: '#06b6d4' },
-    { name: 'Stage 1',  value: bpRaw.stage1    ?? 0, fill: '#3b82f6' },
-    { name: 'Stage 2',  value: bpRaw.stage2    ?? 0, fill: '#1d4ed8' },
-    { name: 'Crisis',   value: bpRaw.crisis    ?? 0, fill: '#0ea5e9' },
-  ] : null;
-  const bpHasData = bpBuilt && bpBuilt.some(d => d.value > 0);
-  const bpDisplay = bpHasData ? bpBuilt : BP_SAMPLE;
-
-  // ── BMI ──
-  const BMI_SAMPLE = [
-    { name: 'Underweight', value: 5,  color: '#06b6d4' },
-    { name: 'Normal',      value: 60, color: '#10b981' },
-    { name: 'Overweight',  value: 25, color: '#3b82f6' },
-    { name: 'Obesity',     value: 10, color: '#0ea5e9' },
-  ];
-  const bmiRaw = healthData?.bmiDistribution;
-  const bmiBuilt = bmiRaw ? [
-    { name: 'Underweight', value: bmiRaw.underweight ?? 0, color: '#06b6d4' },
-    { name: 'Normal',      value: bmiRaw.normal      ?? 0, color: '#10b981' },
-    { name: 'Overweight',  value: bmiRaw.overweight  ?? 0, color: '#3b82f6' },
-    { name: 'Obesity',     value: bmiRaw.obesity     ?? 0, color: '#0ea5e9' },
-  ] : null;
-  const bmiHasData = bmiBuilt && bmiBuilt.some(d => d.value > 0);
-  const bmiDisplay = bmiHasData ? bmiBuilt.filter(d => d.value > 0) : BMI_SAMPLE;
-
-  // ── Peak hours ──
-  const peakRaw = (queueData?.peakHours ?? []).map(h => ({ hour: `${h.hour}:00`, patients: h.count }));
-  const peakDisplay = peakRaw.length > 0 ? peakRaw : [
-    { hour: '8:00', patients: 3 }, { hour: '9:00', patients: 8 }, { hour: '10:00', patients: 12 },
-    { hour: '11:00', patients: 9 }, { hour: '12:00', patients: 5 }, { hour: '14:00', patients: 11 },
-    { hour: '15:00', patients: 7 }, { hour: '16:00', patients: 4 },
-  ];
-
   // ── Feedback ──
   const fs = healthData?.feedbackStats;
   const feedbackDisplay = [
@@ -1084,194 +1041,10 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
           ))}
         </div>      </div>
 
-      {/* ── Row 2: Queue + BP ── */}
-      <div className="mgr-charts-row">
-        {/* Peak Hours */}
-        <div className="mgr-dark-card">
-          <div className="mgr-dark-header">
-            <span className="mgr-live-dot" />
-            <span className="mgr-dark-title">📋 Queue — Peak Hours</span>
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={peakDisplay} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-              <defs>
-                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#10b981" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.75} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" vertical={false} />
-              <XAxis dataKey="hour" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <Tooltip 
-                contentStyle={{ 
-                  background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)', 
-                  border: '3px solid rgba(255,255,255,0.5)', 
-                  borderRadius: '16px', 
-                  color: '#ffffff',
-                  boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 50px rgba(255,255,255,0.25), inset 0 2px 0 rgba(255,255,255,0.4)',
-                  padding: '16px 20px',
-                  backdropFilter: 'blur(25px)',
-                  minWidth: '200px'
-                }} 
-                labelStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 900, 
-                  fontSize: '16px',
-                  marginBottom: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 0 10px rgba(255,255,255,0.5)',
-                  borderBottom: '2px solid rgba(255,255,255,0.3)',
-                  paddingBottom: '8px',
-                  display: 'block'
-                }}
-                itemStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  margin: '8px 0',
-                  textShadow: '0 0 8px rgba(255,255,255,0.3)'
-                }}
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }} 
-                formatter={(value, name) => [
-                  <span style={{ color: '#ffffff', fontWeight: 900, textShadow: '0 0 10px rgba(255,255,255,0.4)' }}>{`${value} patients`}</span>,
-                  <span style={{ color: '#e0e0e0', fontWeight: 600, textTransform: 'capitalize' }}>Peak Hour Activity</span>
-                ]}
-              />
-              <Bar dataKey="patients" name="Patients" fill="url(#barGrad)" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mgr-dark-stats">
-            <div className="mgr-dark-stat"><span style={{ color: '#10b981' }}>{queueData?.currentQueueSize ?? 0}</span><small>Current Queue</small></div>
-            <div className="mgr-dark-stat"><span style={{ color: '#06b6d4' }}>{queueData?.averageWaitTime ?? 0}m</span><small>Avg Wait</small></div>
-            <div className="mgr-dark-stat"><span style={{ color: '#3b82f6' }}>{queueData?.completionRate ?? 0}%</span><small>Completion</small></div>
-          </div>
-        </div>
+      <HealthConditionTrendsPanel />
 
-        {/* BP Risk */}
-        <div className="mgr-dark-card">
-          <div className="mgr-dark-header">
-            <span className="mgr-dark-title">🩺 Blood Pressure Risk</span>
-            {!bpHasData && <span className="mgr-demo-badge">Sample</span>}
-          </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={bpDisplay} layout="vertical" margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={58} />
-              <Tooltip 
-                contentStyle={{ 
-                  background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)', 
-                  border: '3px solid rgba(255,255,255,0.5)', 
-                  borderRadius: '16px', 
-                  color: '#ffffff',
-                  boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 50px rgba(255,255,255,0.25), inset 0 2px 0 rgba(255,255,255,0.4)',
-                  padding: '16px 20px',
-                  backdropFilter: 'blur(25px)',
-                  minWidth: '200px'
-                }} 
-                labelStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 900, 
-                  fontSize: '16px',
-                  marginBottom: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 0 10px rgba(255,255,255,0.5)',
-                  borderBottom: '2px solid rgba(255,255,255,0.3)',
-                  paddingBottom: '8px',
-                  display: 'block'
-                }}
-                itemStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  margin: '8px 0',
-                  textShadow: '0 0 8px rgba(255,255,255,0.3)'
-                }}
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }} 
-                formatter={(value, name) => [
-                  <span style={{ color: '#ffffff', fontWeight: 900, textShadow: '0 0 10px rgba(255,255,255,0.4)' }}>{`${value} patients`}</span>,
-                  <span style={{ color: '#e0e0e0', fontWeight: 600, textTransform: 'capitalize' }}>BP Risk Category</span>
-                ]}
-              />
-              <Bar dataKey="value" name="Patients" radius={[0, 6, 6, 0]}>
-                {bpDisplay.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mgr-dark-stats">
-            <div className="mgr-dark-stat"><span style={{ color: '#10b981' }}>{healthData?.totalPatients ?? 0}</span><small>Patients</small></div>
-            <div className="mgr-dark-stat"><span style={{ color: '#3b82f6' }}>{healthData?.highRiskCount ?? 0}</span><small>High Risk</small></div>
-            <div className="mgr-dark-stat"><span style={{ color: '#06b6d4' }}>{healthData?.averageBP ? `${healthData.averageBP.systolic}/${healthData.averageBP.diastolic}` : '—'}</span><small>Avg BP</small></div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Row 3: BMI + Feedback ── */}
+      {/* ── Row 3: Feedback ── */}
       <div className="mgr-charts-row" style={{ marginTop: '1rem' }}>
-        {/* BMI Donut */}
-        <div className="mgr-dark-card">
-          <div className="mgr-dark-header">
-            <span className="mgr-dark-title">⚖️ BMI Distribution</span>
-            {!bmiHasData && <span className="mgr-demo-badge">Sample</span>}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <ResponsiveContainer width="55%" height={200}>
-              <PieChart>
-                <Pie data={bmiDisplay} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
-                  {bmiDisplay.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)', 
-                    border: '3px solid rgba(255,255,255,0.5)', 
-                    borderRadius: '16px', 
-                    color: '#ffffff',
-                    boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 50px rgba(255,255,255,0.25), inset 0 2px 0 rgba(255,255,255,0.4)',
-                    padding: '16px 20px',
-                    backdropFilter: 'blur(25px)',
-                    minWidth: '200px'
-                  }} 
-                  labelStyle={{ 
-                    color: '#ffffff', 
-                    fontWeight: 900, 
-                    fontSize: '16px',
-                    marginBottom: '12px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    textShadow: '0 0 10px rgba(255,255,255,0.5)',
-                    borderBottom: '2px solid rgba(255,255,255,0.3)',
-                    paddingBottom: '8px',
-                    display: 'block'
-                  }}
-                  itemStyle={{ 
-                    color: '#ffffff', 
-                    fontWeight: 700,
-                    fontSize: '14px',
-                    margin: '8px 0',
-                    textShadow: '0 0 8px rgba(255,255,255,0.3)'
-                  }}
-                  formatter={(value, name) => [
-                    <span style={{ color: '#ffffff', fontWeight: 900, textShadow: '0 0 10px rgba(255,255,255,0.4)' }}>{`${value} patients`}</span>,
-                    <span style={{ color: '#e0e0e0', fontWeight: 600, textTransform: 'capitalize' }}>BMI Category</span>
-                  ]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {bmiDisplay.map(d => (
-                <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: '0.78rem', color: '#94a3b8', flex: 1 }}>{d.name}</span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color: d.color }}>{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Feedback Bars */}
         <div className="mgr-dark-card">
           <div className="mgr-dark-header">
