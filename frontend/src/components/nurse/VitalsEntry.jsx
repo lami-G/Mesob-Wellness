@@ -127,6 +127,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
     heartRate: "",
     bmi: "",
     glucose: "",
+    glucoseType: "FBS",
     temperature: "",
     oxygenSaturation: "",
     notes: "",
@@ -141,7 +142,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
 
   const handleCustomerSelect = (customer) => {
     setSelectedCustomer(customer);
-    setCustomerIdInput(customer.id);
+    setCustomerIdInput(customer.userId || customer.id);
     setShowSearch(false);
     setSearchResults([]);
     setSearchTerm('');
@@ -192,7 +193,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
     }
   };
 
-  const getRiskLevel = (value, type) => {
+  const getRiskLevel = (value, type, glucoseType = null) => {
     let level = "Normal";
     let color = "green";
     let category = "";
@@ -332,31 +333,54 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
         description = "Morbidly obese";
       }
     } else if (type === "glucose") {
-      if (value < 70) {
-        level = "Low";
-        color = "red";
-        category = "Hypoglycemia";
-        description = "Dangerously low blood sugar";
-      } else if (value >= 70 && value < 100) {
-        level = "Normal";
-        color = "green";
-        category = "Normal Fasting";
-        description = "Normal blood glucose";
-      } else if (value >= 100 && value < 126) {
-        level = "High";
-        color = "orange";
-        category = "Prediabetes";
-        description = "Elevated blood glucose";
-      } else if (value >= 126 && value < 200) {
-        level = "High";
-        color = "red";
-        category = "Diabetes";
-        description = "Diabetic range";
-      } else if (value >= 200) {
-        level = "High";
-        color = "red";
-        category = "Severe Hyperglycemia";
-        description = "Dangerously high blood sugar";
+      const gType = glucoseType || "FBS";
+      
+      if (gType === "FBS") {
+        // Fasting Blood Sugar thresholds
+        if (value < 70) {
+          level = "Low";
+          color = "red";
+          category = "Hypoglycemia";
+          description = "Dangerously low blood sugar";
+        } else if (value >= 70 && value < 100) {
+          level = "Normal";
+          color = "green";
+          category = "Normal Fasting";
+          description = "Normal blood glucose (FBS)";
+        } else if (value >= 100 && value < 126) {
+          level = "High";
+          color = "orange";
+          category = "Prediabetes";
+          description = "Elevated blood glucose (FBS)";
+        } else if (value >= 126 && value < 200) {
+          level = "High";
+          color = "red";
+          category = "Diabetes";
+          description = "Diabetic range (FBS)";
+        } else if (value >= 200) {
+          level = "High";
+          color = "red";
+          category = "Severe Hyperglycemia";
+          description = "Dangerously high blood sugar";
+        }
+      } else if (gType === "RBS") {
+        // Random Blood Sugar (after meal) thresholds
+        if (value < 70) {
+          level = "Low";
+          color = "red";
+          category = "Hypoglycemia";
+          description = "Dangerously low blood sugar";
+        } else if (value >= 70 && value <= 200) {
+          level = "Normal";
+          color = "green";
+          category = "Normal Range";
+          description = "Normal blood glucose (after meal)";
+        } else if (value > 200) {
+          level = "High";
+          color = "red";
+          category = "Hyperglycemia";
+          description = "High blood sugar (after meal)";
+        }
       }
     } else if (type === "temperature") {
       if (value < 35) {
@@ -440,10 +464,11 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
     }
 
     // Show risk indicators only (no validation, no blocking)
-    if (name !== 'notes' && value && value.trim() !== '') {
+    if (name !== 'notes' && name !== 'glucoseType' && value && value.trim() !== '') {
       const numValue = parseFloat(value);
       if (!isNaN(numValue)) {
-        const risk = getRiskLevel(numValue, name);
+        const glucoseTypeForCalc = name === 'glucose' ? vitals.glucoseType : null;
+        const risk = getRiskLevel(numValue, name, glucoseTypeForCalc);
         setAlerts((prev) => ({
           ...prev,
           [name]: risk,
@@ -482,6 +507,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
         heartRate: vitals.heartRate ? parseInt(vitals.heartRate) : null,
         bmi: vitals.bmi ? parseFloat(vitals.bmi) : null,
         glucose: vitals.glucose ? parseInt(vitals.glucose) : null,
+        glucoseType: vitals.glucose ? vitals.glucoseType : null,
         temperature: vitals.temperature ? parseFloat(vitals.temperature) : null,
         oxygenSaturation: vitals.oxygenSaturation
           ? parseInt(vitals.oxygenSaturation)
@@ -504,6 +530,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
         heartRate: "",
         bmi: "",
         glucose: "",
+        glucoseType: "FBS",
         temperature: "",
         oxygenSaturation: "",
         notes: "",
@@ -741,6 +768,27 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
           </div>
 
           <div className="form-group">
+            <label className="form-label">O₂ Saturation</label>
+            <div className="input-with-alert">
+              <input
+                type="number"
+                name="oxygenSaturation"
+                value={vitals.oxygenSaturation}
+                onChange={handleChange}
+                placeholder="%"
+                disabled={loading}
+                className="form-input"
+              />
+              {alerts.oxygenSaturation && (
+                <div className={`risk-alert risk-${alerts.oxygenSaturation.color}`} title={alerts.oxygenSaturation.description}>
+                  <span className="risk-level">{alerts.oxygenSaturation.level}</span>
+                  <span className="risk-category">{alerts.oxygenSaturation.category}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-group">
             <label className="form-label">Glucose</label>
             <div className="input-with-alert">
               <input
@@ -759,48 +807,18 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Temperature</label>
-            <div className="input-with-alert">
-              <input
-                type="number"
-                step="0.1"
-                name="temperature"
-                value={vitals.temperature}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <select
+                name="glucoseType"
+                value={vitals.glucoseType}
                 onChange={handleChange}
-                placeholder="°C"
                 disabled={loading}
                 className="form-input"
-              />
-              {alerts.temperature && (
-                <div className={`risk-alert risk-${alerts.temperature.color}`} title={alerts.temperature.description}>
-                  <span className="risk-level">{alerts.temperature.level}</span>
-                  <span className="risk-category">{alerts.temperature.category}</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">O₂ Saturation</label>
-            <div className="input-with-alert">
-              <input
-                type="number"
-                name="oxygenSaturation"
-                value={vitals.oxygenSaturation}
-                onChange={handleChange}
-                placeholder="%"
-                disabled={loading}
-                className="form-input"
-              />
-              {alerts.oxygenSaturation && (
-                <div className={`risk-alert risk-${alerts.oxygenSaturation.color}`} title={alerts.oxygenSaturation.description}>
-                  <span className="risk-level">{alerts.oxygenSaturation.level}</span>
-                  <span className="risk-category">{alerts.oxygenSaturation.category}</span>
-                </div>
-              )}
+                style={{ width: '150px', boxSizing: 'border-box' }}
+              >
+                <option value="FBS">FBS (Fasting)</option>
+                <option value="RBS">RBS (After Meal)</option>
+              </select>
             </div>
           </div>
         </div>

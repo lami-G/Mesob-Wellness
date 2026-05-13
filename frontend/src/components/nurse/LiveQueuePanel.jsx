@@ -170,7 +170,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
             className={`filter-btn ${filter === 'NO_SHOW' ? 'active' : ''}`}
             onClick={() => setFilter('NO_SHOW')}
           >
-            No Show ({queue.filter(q => q.status === 'NO_SHOW').length})
+            Absent ({queue.filter(q => q.status === 'NO_SHOW').length})
           </button>
         </div>
       </div>

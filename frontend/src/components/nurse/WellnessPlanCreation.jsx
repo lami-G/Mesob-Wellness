@@ -131,7 +131,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
   };
 
   const handleSelectCustomer = (customer) => {
-    setSelectedCustomerId(customer.id);
+    setSelectedCustomerId(customer.userId || customer.id);
     setSelectedCustomerName(customer.fullName);
     setSearchResults([]);
     setSearchTerm('');
@@ -650,7 +650,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     <div className="customer-info-inline">
                       <p className="customer-name-inline">{customer.fullName}</p>
                       <p className="customer-details-inline">Email: {customer.email}</p>
-                      <p className="customer-details-inline">ID: {customer.id}</p>
+                      <p className="customer-details-inline">ID: {customer.userId || customer.id}</p>
                     </div>
                     <button
                       type="button"

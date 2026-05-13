@@ -52,7 +52,7 @@ function RegisterWalkIn({ onSuccess }) {
     setAlert({ type: 'success', message: `Selected: ${patient.fullName}` });
     // Trigger navigation to vitals tab via parent
     if (onSuccess) {
-      onSuccess({ patientId: patient.id, action: 'recordVitals' });
+      onSuccess({ patientId: patient.userId || patient.id, action: 'recordVitals' });
     }
   };
 
@@ -128,7 +128,7 @@ function RegisterWalkIn({ onSuccess }) {
       // Navigate to vitals entry
       setTimeout(() => {
         if (onSuccess) {
-          onSuccess({ patientId: newPatient.id, action: 'recordVitals' });
+          onSuccess({ patientId: newPatient.userId || newPatient.id, action: 'recordVitals' });
         }
       }, 1500);
     } catch (err) {

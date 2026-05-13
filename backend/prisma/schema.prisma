@@ -96,6 +96,8 @@ model VitalRecord {
   heartRate        Int?
   temperature      Float?
   oxygenSaturation Int?
+  glucose          Int?
+  glucoseType      String?
   notes            String?
   recordedAt       DateTime               @default(now()) @db.Timestamptz(3)
   recorder         User                   @relation("RecordedBy", fields: [recordedBy], references: [id])

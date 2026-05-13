@@ -20,7 +20,7 @@ function CustomerHistoryView({ customerId }) {
     if (storedCustomer) {
       try {
         const customer = JSON.parse(storedCustomer);
-        setSelectedCustomerId(customer.id);
+        setSelectedCustomerId(customer.userId || customer.id);
         setSelectedCustomerName(customer.fullName);
         sessionStorage.removeItem('selectedCustomerForHistory');
       } catch (err) {
@@ -62,7 +62,7 @@ function CustomerHistoryView({ customerId }) {
   };
 
   const handleSelectCustomer = (customer) => {
-    setSelectedCustomerId(customer.id);
+    setSelectedCustomerId(customer.userId || customer.id);
     setSelectedCustomerName(customer.fullName);
     setSearchResults([]);
     setSearchTerm('');

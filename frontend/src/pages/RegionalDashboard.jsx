@@ -1138,7 +1138,7 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
         return {
           dataKeys: ['appointments', 'completed', 'noShow'],
           colors: ['#6366f1', '#22d3ee', '#f59e0b'],
-          names: ['Total Appointments', 'Completed', 'No Show']
+          names: ['Total Appointments', 'Completed', 'Absent']
         };
       case 'vitals':
         return {
@@ -1176,7 +1176,7 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
         {[
           { icon: '📊', label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
           { icon: '✅', label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
-          { icon: '❌', label: `No Show (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
+          { icon: '❌', label: `Absent (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
           { icon: '🩺', label: 'Vitals Recorded', value: metrics.totalVitals, color: '#7c3aed', trend: '+15%' },
           { icon: '👥', label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
           { icon: '⚡', label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
@@ -1450,7 +1450,7 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
                   <th style={{ padding: '1rem', textAlign: 'left', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>Period</th>
                   <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>📊 Appointments</th>
                   <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>✅ Completed</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>❌ No Show</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>❌ Absent</th>
                   <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>🩺 Vitals</th>
                   <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>👥 New Users</th>
                   <th style={{ padding: '1rem', textAlign: 'center', color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>⚡ Efficiency</th>
@@ -1494,7 +1494,7 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
               </div>
               <div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f87171' }}>{metrics.noShowRate}%</div>
-                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>No Show Rate</div>
+                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>Absent Rate</div>
               </div>
               <div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fb923c' }}>{metrics.avgEfficiency}%</div>

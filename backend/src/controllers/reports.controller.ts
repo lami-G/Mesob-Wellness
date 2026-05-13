@@ -128,7 +128,17 @@ const generateHealthReport = async (patientId: string | string[], nurseId: strin
       
       doc.fontSize(9).font('Helvetica-Oblique').fillColor('#6B7280')
         .text(`Recorded: ${new Date(v.recordedAt).toLocaleString()}`, 50, y);
-      y += 30;
+      y += 20;
+      
+      // Add notes section if notes exist
+      if (v.notes) {
+        doc.roundedRect(50, y, 495, 60, 5).lineWidth(1).stroke('#E5E7EB');
+        doc.fontSize(9).font('Helvetica').fillColor('#6B7280').text('Notes', 60, y + 10);
+        doc.fontSize(11).font('Helvetica').fillColor('#374151').text(v.notes, 60, y + 28, { width: 475 });
+        y += 75;
+      } else {
+        y += 10;
+      }
     }
 
     // ===== WELLNESS PLAN =====

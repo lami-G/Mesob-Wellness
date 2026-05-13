@@ -34,6 +34,7 @@ interface VitalsRequestBody {
   heartRate?: unknown;
   bmi?: unknown;
   glucose?: unknown;
+  glucoseType?: unknown;
   temperature?: unknown;
   oxygenSaturation?: unknown;
   notes?: unknown;
@@ -122,6 +123,7 @@ export async function postVitals(
       heartRate,
       bmi,
       glucose,
+      glucoseType,
       temperature,
       oxygenSaturation,
       notes,
@@ -156,6 +158,7 @@ export async function postVitals(
     const temperatureValue = toNumber(temperature);
     const oxygenValue = toNumber(oxygenSaturation);
     const notesValue = typeof notes === "string" ? notes.trim() : "";
+    const glucoseTypeValue = typeof glucoseType === "string" ? glucoseType.trim().toUpperCase() : null;
 
     const hasAnySupportedVital =
       systolic !== null ||
@@ -199,13 +202,6 @@ export async function postVitals(
       }
     }
 
-    const combinedNotes = [
-      notesValue,
-      glucoseValue !== null ? `Blood glucose: ${glucoseValue} mg/dL` : "",
-    ]
-      .filter(Boolean)
-      .join(" | ");
-
     const record = await prisma.vitalRecord.create({
       data: {
         userId: patientId,
@@ -219,7 +215,9 @@ export async function postVitals(
           bmiValue !== null ? getBmiCategoryFromValue(bmiValue) : undefined,
         temperature: temperatureValue ?? undefined,
         oxygenSaturation: oxygenValue ?? undefined,
-        notes: combinedNotes || undefined,
+        glucose: glucoseValue ?? undefined,
+        glucoseType: glucoseTypeValue as any ?? undefined,
+        notes: notesValue || undefined,
       },
     });
 
@@ -230,6 +228,7 @@ export async function postVitals(
         diastolic,
         bmi: bmiValue,
         glucose: glucoseValue,
+        glucoseType: glucoseTypeValue,
         heartRate: heartRateValue,
         oxygenSaturation: oxygenValue,
       });

@@ -116,7 +116,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
       // Pass customer info to VitalsEntry via NurseDashboard
       if (onNavigateToVitals) {
         onNavigateToVitals({
-          customerId: currentCustomer.customerId,
+          customerId: currentCustomer.userId || currentCustomer.customerId,
           customerName: currentCustomer.customerName,
           appointmentId: currentCustomer.appointmentId,
         });
@@ -146,7 +146,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
         cancellationReason: 'Patient did not show up',
       });
 
-      setSuccess(`${currentCustomer?.customerName} marked as No-Show`);
+      setSuccess(`${currentCustomer?.customerName} marked as Absent`);
       setShowRecordVitalsButton(false);
       
       // Refresh queue to show next customer
@@ -207,7 +207,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
                     disabled={loading}
                     style={{ flex: 1 }}
                   >
-                    ❌ Mark No-Show
+                    ❌ Mark Absent
                   </button>
                 </div>
               )}

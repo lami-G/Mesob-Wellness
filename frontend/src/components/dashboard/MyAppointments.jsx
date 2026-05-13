@@ -165,6 +165,10 @@ function MyAppointments() {
 
   const filteredAppointments = appointments.filter((apt) => {
     if (filter === "all") return true;
+    if (filter === "CONFIRMED") {
+      // Upcoming = all appointments that are not completed or cancelled
+      return apt.status !== "COMPLETED" && apt.status !== "CANCELLED";
+    }
     return apt.status === filter;
   });
 

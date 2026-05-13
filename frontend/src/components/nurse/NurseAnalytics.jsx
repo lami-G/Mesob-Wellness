@@ -629,7 +629,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     };
 
     const statusDistribution = {
-      labels: ['Waiting', 'In Progress', 'In Service', 'Completed', 'No Show'],
+      labels: ['Waiting', 'In Progress', 'In Service', 'Completed', 'Absent'],
       datasets: [
         {
           data: [statusCounts.WAITING, statusCounts.IN_PROGRESS, statusCounts.IN_SERVICE, statusCounts.COMPLETED, statusCounts.NO_SHOW],
