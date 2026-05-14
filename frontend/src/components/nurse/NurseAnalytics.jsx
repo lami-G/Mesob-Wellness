@@ -388,7 +388,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
       // Fetch appointments from queue endpoint with date parameter
       const appointmentsRes = await api.get('/api/v1/appointments/queue', {
-        params: viewPeriod === 'all' ? {} : { date: selectedDate }
+        params: viewPeriod === 'all' 
+          ? {} 
+          : { 
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString()
+            }
       });
       let appointmentsData = appointmentsRes.data.data || [];
 

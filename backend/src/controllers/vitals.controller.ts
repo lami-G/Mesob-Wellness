@@ -90,22 +90,41 @@ function getBloodPressureCategoryFromValues(
 async function resolvePatientUserId(inputId: string): Promise<string | null> {
   const trimmedId = inputId.trim();
 
-  const user = await prisma.user.findUnique({
-    where: { id: trimmedId },
-    select: { id: true },
-  });
+  // Check if it looks like a UUID (contains hyphens and is 36 chars)
+  const isUUID = trimmedId.length === 36 && trimmedId.includes('-');
 
-  if (user) {
-    return user.id;
+  if (isUUID) {
+    // Try to find by UUID (id)
+    const userById = await prisma.user.findUnique({
+      where: { id: trimmedId },
+      select: { id: true },
+    });
+
+    if (userById) {
+      return userById.id;
+    }
+  } else {
+    // Try to find by 4-digit userId
+    const userByUserId = await prisma.user.findUnique({
+      where: { userId: trimmedId },
+      select: { id: true },
+    });
+
+    if (userByUserId) {
+      return userByUserId.id;
+    }
   }
 
-  const appointment = await prisma.appointment.findUnique({
-    where: { id: trimmedId },
-    select: { userId: true },
-  });
+  // Finally try to find by appointment ID (if it's a UUID)
+  if (isUUID) {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: trimmedId },
+      select: { userId: true },
+    });
 
-  if (appointment) {
-    return appointment.userId;
+    if (appointment) {
+      return appointment.userId;
+    }
   }
 
   return null;
