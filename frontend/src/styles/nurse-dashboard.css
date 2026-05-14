@@ -153,6 +153,11 @@
   background: #f0fdf4;
 }
 
+.queue-item.status-no-show {
+  border-left: 4px solid #ef4444;
+  background: #fef2f2;
+}
+
 .queue-item-header {
   display: flex;
   align-items: center;
@@ -211,6 +216,11 @@
 .status-badge.status-completed {
   background: #dcfce7;
   color: #166534;
+}
+
+.status-badge.status-no-show {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .queue-item-details {
