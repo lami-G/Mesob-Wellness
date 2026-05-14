@@ -450,34 +450,92 @@ export async function getConditionTrends(period: string) {
 
 /**
  * Get all nurse-approved conditions within a date range (or all time if dates are null)
- * Now queries wellness plans directly to include ALL patients with wellness plans in the period
+ * Queries vitals records to find patients with vitals in the period,
+ * then gets their latest wellness plans to determine conditions
+ * Returns unique patient count per condition
  */
 export async function getConditionsByDateRange(
   startDate: Date | null,
   endDate: Date | null
 ) {
-  // Build where clause conditionally
-  const whereClause: any = {};
+  // Build where clause for vitals records
+  const vitalsWhereClause: any = {};
   
   if (startDate && endDate) {
-    whereClause.createdAt = {
+    vitalsWhereClause.recordedAt = {
       gte: startDate,
       lte: endDate,
     };
   }
-  // If no dates, fetch all wellness plans (all time)
 
-  // Get all wellness plans created in the date range (or all time)
+  // Get all vitals records in the date range (or all time)
+  const vitalsRecords = await prisma.vitalRecord.findMany({
+    where: vitalsWhereClause,
+    select: {
+      userId: true,
+    },
+    distinct: ['userId'], // Get unique users with vitals in this period
+  });
+
+  console.log(`[getConditionsByDateRange] Found ${vitalsRecords.length} unique users with vitals in date range`);
+  console.log(`[getConditionsByDateRange] Date range: ${startDate?.toISOString()} to ${endDate?.toISOString()}`);
+
+  // Get unique user IDs
+  const userIds = vitalsRecords.map(v => v.userId);
+
+  if (userIds.length === 0) {
+    console.log(`[getConditionsByDateRange] No users found, returning empty result`);
+    return [];
+  }
+
+  // Get the latest wellness plan for each user
   const wellnessPlans = await prisma.wellnessPlan.findMany({
-    where: whereClause,
+    where: {
+      userId: {
+        in: userIds,
+      },
+      isActive: true,
+    },
     select: {
       userId: true,
       conditions: true,
     },
+    orderBy: { createdAt: 'desc' },
+    distinct: ['userId'], // Get latest plan per user
   });
 
-  // Return conditions from wellness plans (each plan represents one patient)
-  return wellnessPlans.map(plan => ({
-    conditions: plan.conditions as string[],
+  console.log(`[getConditionsByDateRange] Found ${wellnessPlans.length} active wellness plans for these users`);
+
+  // Count unique patients per condition
+  const conditionPatientMap: Record<string, Set<string>> = {};
+  
+  wellnessPlans.forEach(plan => {
+    const conditions = plan.conditions as string[] | null;
+    
+    // If no conditions or empty array, count as "normal"
+    if (!conditions || conditions.length === 0) {
+      if (!conditionPatientMap['normal']) {
+        conditionPatientMap['normal'] = new Set();
+      }
+      conditionPatientMap['normal'].add(plan.userId);
+    } else {
+      // Add patient to each condition they have
+      conditions.forEach(condition => {
+        if (!conditionPatientMap[condition]) {
+          conditionPatientMap[condition] = new Set();
+        }
+        conditionPatientMap[condition].add(plan.userId);
+      });
+    }
+  });
+
+  // Convert to array format with unique patient counts
+  const result = Object.entries(conditionPatientMap).map(([condition, patientSet]) => ({
+    condition,
+    count: patientSet.size, // Count of unique patients with this condition
   }));
+
+  console.log(`[getConditionsByDateRange] Result:`, result);
+
+  return result;
 }

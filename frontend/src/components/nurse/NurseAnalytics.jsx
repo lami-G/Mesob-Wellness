@@ -79,22 +79,49 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         }
       } else if (period === 'weekly') {
         const weeksToShow = 8;
+        const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        
+        // Calculate start of current week (Monday)
+        const currentWeekStart = new Date(today);
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        currentWeekStart.setDate(today.getDate() - daysToMonday);
+        currentWeekStart.setHours(0, 0, 0, 0);
+        
+        // For current week: Monday to today (incomplete week)
+        const currentWeekEnd = new Date(today);
+        currentWeekEnd.setHours(23, 59, 59, 999);
+        
         highlightedIndex = weeksToShow - 1;
         
         for (let i = weeksToShow - 1; i >= 0; i--) {
-          const weekStart = new Date();
-          weekStart.setDate(weekStart.getDate() - (i * 7));
-          weekStart.setHours(0, 0, 0, 0);
-          const weekEnd = new Date(weekStart);
-          weekEnd.setDate(weekStart.getDate() + 6);
-          weekEnd.setHours(23, 59, 59, 999);
+          let weekStart, weekEnd, label;
           
-          labels.push(i === 0 ? 'This week' : `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+          if (i === 0) {
+            // Current week: Monday to today
+            weekStart = new Date(currentWeekStart);
+            weekEnd = new Date(currentWeekEnd);
+            label = 'This week';
+          } else {
+            // Past weeks: Monday to Sunday (complete weeks)
+            weekStart = new Date(currentWeekStart);
+            weekStart.setDate(currentWeekStart.getDate() - (i * 7));
+            weekStart.setHours(0, 0, 0, 0);
+            
+            weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999);
+            
+            label = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          }
+          
+          labels.push(label);
           
           const params = {
             startDate: weekStart.toISOString(),
             endDate: weekEnd.toISOString()
           };
+          
+          console.log(`[Trend] Week ${i}: ${weekStart.toDateString()} to ${weekEnd.toDateString()}`);
           
           dataPointsPromises.push(
             api.get('/api/v1/conditions/period', { params })
@@ -1002,7 +1029,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           </h3>
           <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
             {viewPeriod === 'daily' && 'Condition trends over the last 7 days (today highlighted)'}
-            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks - average daily patients per week (this week highlighted)'}
+            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks (this week highlighted)'}
             {viewPeriod === 'monthly' && 'All 12 months up to now (current month counts data up to today only)'}
             {viewPeriod === 'all' && 'Historical condition trends (up to 12 months)'}
           </p>
@@ -1050,7 +1077,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                         const label = context.dataset.label || '';
                         // Round to remove the tiny offset we added for visibility
                         const value = Math.round(context.parsed.y);
-                        const suffix = viewPeriod === 'weekly' ? ' avg daily' : ' patients';
+                        const isHighlighted = context.dataIndex === chartData.conditionTrends.highlightedIndex;
+                        
+                        // Show "patients" for highlighted (current) period, "total" for historical
+                        const suffix = isHighlighted ? ' patients' : ' patients';
                         return `${label}: ${value}${suffix}`;
                       }
                     }

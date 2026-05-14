@@ -284,29 +284,13 @@ export async function getConditionsByPeriod(
     // Get all wellness plans within the date range (or all time)
     const conditions = await PatientConditionsService.getConditionsByDateRange(start, end);
 
-    // Total wellness plans count
-    const totalWellnessPlans = conditions.length;
+    // Total wellness plans count (unique patients)
+    const totalWellnessPlans = conditions.reduce((sum, c) => sum + c.count, 0);
 
-    // Aggregate condition counts
-    const conditionCounts: Record<string, number> = {};
-    conditions.forEach((record) => {
-      const conditionList = record.conditions as string[] | null;
-      
-      // If no conditions or empty array, count as "normal"
-      if (!conditionList || conditionList.length === 0) {
-        conditionCounts['normal'] = (conditionCounts['normal'] || 0) + 1;
-      } else {
-        // Count each condition
-        conditionList.forEach((condition) => {
-          conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
-        });
-      }
-    });
-
-    // Convert to array format
-    const result = Object.entries(conditionCounts).map(([condition, count]) => ({
-      condition,
-      count,
+    // Convert to array format (already aggregated by service)
+    const result = conditions.map(c => ({
+      condition: c.condition,
+      count: c.count,
     }));
 
     res.status(200).json({
