@@ -5,7 +5,6 @@ import { analyticsService } from '../services/analyticsService';
 import AdminLayout from '../layouts/AdminLayout';
 import Button from '../components/forms/Button';
 import Input from '../components/forms/Input';
-import HealthConditionTrendsPanel from '../components/analytics/HealthConditionTrendsPanel';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart
@@ -429,6 +428,284 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Outstanding Health Analytics Card Section */}
+      <div style={{
+        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)',
+        borderRadius: '16px',
+        padding: '1.75rem 2rem',
+        marginTop: '1.5rem',
+        marginBottom: '1.5rem',
+        border: '2px solid rgba(40, 67, 148, 0.1)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative gradient overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #284394 0%, #22c55e 50%, #f59e0b 100%)',
+        }} />
+
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1.5rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              boxShadow: '0 4px 16px rgba(34, 197, 94, 0.3)'
+            }}>
+              🏥
+            </div>
+            <div>
+              <h3 style={{
+                margin: 0,
+                fontSize: '1.35rem',
+                fontWeight: 900,
+                color: '#1f2937',
+                letterSpacing: '-0.02em'
+              }}>
+                Health Analytics Overview
+              </h3>
+              <p style={{
+                margin: '0.25rem 0 0 0',
+                fontSize: '0.85rem',
+                color: '#64748b',
+                fontWeight: 500
+              }}>
+                Real-time employee health metrics and condition tracking
+              </p>
+            </div>
+          </div>
+
+          {/* Live Indicator */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'rgba(34, 197, 94, 0.1)',
+            padding: '0.5rem 1rem',
+            borderRadius: '20px',
+            border: '1px solid rgba(34, 197, 94, 0.2)'
+          }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: '#22c55e',
+              boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)',
+              animation: 'mgrPulse 2s ease-in-out infinite'
+            }} />
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 800,
+              color: '#16a34a',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              LIVE DATA
+            </span>
+          </div>
+        </div>
+
+        {/* Health KPI Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '1rem',
+          marginBottom: '1.5rem'
+        }}>
+          {[
+            {
+              icon: '👥',
+              label: 'Total Employees',
+              value: summary.totalEmployees || 0,
+              color: '#284394',
+              bgGradient: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+              trend: null
+            },
+            {
+              icon: '💚',
+              label: 'Healthy',
+              value: summary.healthyCount || 0,
+              percentage: summary.healthyPercentage || 0,
+              color: '#22c55e',
+              bgGradient: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+              trend: '+5%'
+            },
+            {
+              icon: '⚠️',
+              label: 'At Risk',
+              value: summary.atRiskCount || 0,
+              percentage: summary.atRiskPercentage || 0,
+              color: '#f59e0b',
+              bgGradient: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              trend: '-2%'
+            },
+            {
+              icon: '🚨',
+              label: 'Critical',
+              value: summary.criticalCount || 0,
+              percentage: summary.criticalPercentage || 0,
+              color: '#ef4444',
+              bgGradient: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+              trend: '-3%'
+            }
+          ].map((metric, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: metric.bgGradient,
+                borderRadius: '14px',
+                padding: '1.25rem 1.5rem',
+                border: `2px solid ${metric.color}30`,
+                boxShadow: `0 4px 16px ${metric.color}20`,
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = `0 12px 32px ${metric.color}30`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `0 4px 16px ${metric.color}20`;
+              }}
+            >
+              {/* Icon */}
+              <div style={{
+                fontSize: '2rem',
+                marginBottom: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <span>{metric.icon}</span>
+                {metric.trend && (
+                  <span style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    color: metric.trend.startsWith('+') ? '#22c55e' : '#ef4444',
+                    background: metric.trend.startsWith('+') ? '#dcfce7' : '#fee2e2',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '12px',
+                    border: `1px solid ${metric.trend.startsWith('+') ? '#22c55e' : '#ef4444'}40`
+                  }}>
+                    {metric.trend}
+                  </span>
+                )}
+              </div>
+
+              {/* Value */}
+              <div style={{
+                fontSize: '2.25rem',
+                fontWeight: 900,
+                color: metric.color,
+                lineHeight: 1,
+                marginBottom: '0.5rem',
+                display: 'flex',
+                alignItems: 'baseline',
+                gap: '0.5rem'
+              }}>
+                {metric.value}
+                {metric.percentage !== undefined && (
+                  <span style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    color: '#64748b'
+                  }}>
+                    ({metric.percentage}%)
+                  </span>
+                )}
+              </div>
+
+              {/* Label */}
+              <div style={{
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#475569',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {metric.label}
+              </div>
+
+              {/* Decorative element */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-10px',
+                right: '-10px',
+                width: '60px',
+                height: '60px',
+                borderRadius: '50%',
+                background: `${metric.color}15`,
+                filter: 'blur(20px)'
+              }} />
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Stats Footer */}
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          padding: '1rem 1.5rem',
+          background: 'rgba(248, 250, 252, 0.8)',
+          borderRadius: '12px',
+          border: '1px solid rgba(0,0,0,0.05)',
+          flexWrap: 'wrap',
+          justifyContent: 'space-around'
+        }}>
+          {[
+            { icon: '📊', label: 'Conditions Tracked', value: summary.totalConditions || 0, color: '#6366f1' },
+            { icon: '🩺', label: 'Recent Vitals', value: summary.recentVitals || 0, color: '#8b5cf6' },
+            { icon: '📈', label: 'Health Trend', value: 'Improving', color: '#22c55e' },
+            { icon: '⏱️', label: 'Last Updated', value: 'Just now', color: '#64748b' }
+          ].map((stat, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '1.25rem' }}>{stat.icon}</span>
+              <div>
+                <div style={{
+                  fontSize: '1rem',
+                  fontWeight: 800,
+                  color: stat.color,
+                  lineHeight: 1
+                }}>
+                  {stat.value}
+                </div>
+                <div style={{
+                  fontSize: '0.7rem',
+                  color: '#64748b',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.03em'
+                }}>
+                  {stat.label}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
 
@@ -1339,8 +1616,6 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
           </div>
         ))}
       </div>
-
-      <HealthConditionTrendsPanel />
 
       {/* Advanced Control Panel */}
       <div style={{

@@ -4,7 +4,6 @@ import { analyticsService } from '../services/analyticsService';
 import AdminLayout from '../layouts/AdminLayout';
 import Button from '../components/forms/Button';
 import Input from '../components/forms/Input';
-import HealthConditionTrendsPanel from '../components/analytics/HealthConditionTrendsPanel';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -1240,8 +1239,6 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
           </div>
         ))}
       </div>
-
-      <HealthConditionTrendsPanel />
 
       {/* Advanced Control Panel */}
       <div style={{
