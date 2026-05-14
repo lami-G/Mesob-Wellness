@@ -456,28 +456,39 @@ export async function getConditionsByDateRange(
   startDate: Date | null,
   endDate: Date | null
 ) {
-  // Build where clause conditionally
-  const whereClause: any = {};
-  
-  if (startDate && endDate) {
-    whereClause.createdAt = {
-      gte: startDate,
-      lte: endDate,
-    };
+  try {
+    console.log('📊 getConditionsByDateRange called with:', { startDate, endDate });
+    
+    // Build where clause conditionally
+    const whereClause: any = {};
+    
+    if (startDate && endDate) {
+      whereClause.createdAt = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+    // If no dates, fetch all wellness plans (all time)
+
+    console.log('📊 Where clause:', JSON.stringify(whereClause, null, 2));
+
+    // Get all wellness plans created in the date range (or all time)
+    const wellnessPlans = await prisma.wellnessPlan.findMany({
+      where: whereClause,
+      select: {
+        userId: true,
+        conditions: true,
+      },
+    });
+
+    console.log(`📊 Found ${wellnessPlans.length} wellness plans`);
+
+    // Return conditions from wellness plans (each plan represents one patient)
+    return wellnessPlans.map(plan => ({
+      conditions: plan.conditions as string[],
+    }));
+  } catch (error) {
+    console.error('❌ Error in getConditionsByDateRange:', error);
+    throw error;
   }
-  // If no dates, fetch all wellness plans (all time)
-
-  // Get all wellness plans created in the date range (or all time)
-  const wellnessPlans = await prisma.wellnessPlan.findMany({
-    where: whereClause,
-    select: {
-      userId: true,
-      conditions: true,
-    },
-  });
-
-  // Return conditions from wellness plans (each plan represents one patient)
-  return wellnessPlans.map(plan => ({
-    conditions: plan.conditions as string[],
-  }));
 }
