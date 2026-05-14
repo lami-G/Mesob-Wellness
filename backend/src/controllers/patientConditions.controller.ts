@@ -290,15 +290,25 @@ export async function getConditionsByPeriod(
     // Aggregate condition counts
     const conditionCounts: Record<string, number> = {};
     conditions.forEach((record) => {
-      const conditionList = record.conditions as string[] | null;
-      
+      const raw: unknown = record.conditions;
+
+      // Safely normalize to string[] (DB JSON may differ from the nominal Prisma type)
+      let conditionList: string[] = [];
+      if (Array.isArray(raw)) {
+        conditionList = raw.map(String);
+      } else if (typeof raw === 'string' && raw.trim().length > 0) {
+        conditionList = [raw];
+      } else if (raw && typeof raw === 'object') {
+        conditionList = Object.values(raw as Record<string, unknown>).map(String);
+      }
+
       // If no conditions or empty array, count as "normal"
-      if (!conditionList || conditionList.length === 0) {
+      if (conditionList.length === 0) {
         conditionCounts['normal'] = (conditionCounts['normal'] || 0) + 1;
       } else {
-        // Count each condition
         conditionList.forEach((condition) => {
-          conditionCounts[condition] = (conditionCounts[condition] || 0) + 1;
+          const key = condition.toLowerCase().trim();
+          if (key) conditionCounts[key] = (conditionCounts[key] || 0) + 1;
         });
       }
     });
@@ -318,9 +328,12 @@ export async function getConditionsByPeriod(
     });
   } catch (error) {
     console.error('Get conditions by period error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error details:', JSON.stringify(error, null, 2));
     res.status(500).json({
       status: 'error',
       message: 'Failed to retrieve conditions for period',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }

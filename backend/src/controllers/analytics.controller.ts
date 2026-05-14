@@ -9,8 +9,8 @@ import { generateNextDisplayId } from "../utils/sequentialId";
 export async function getSystemSettings(req: Request, res: Response) {
   try {
     const settings = {
-      dailySlotLimit: 100,
-      appointmentIntervalMinutes: 30,
+      dailySlotLimit: 36,
+      appointmentIntervalMinutes: 15,
       walkInEnabled: true,
       autoConfirmBookings: false,
     };
@@ -24,8 +24,8 @@ export async function getSystemSettings(req: Request, res: Response) {
 export async function updateSystemSettings(req: Request, res: Response) {
   try {
     const updatedSettings = {
-      dailySlotLimit: req.body.dailySlotLimit || 100,
-      appointmentIntervalMinutes: req.body.appointmentIntervalMinutes || 30,
+      dailySlotLimit: req.body.dailySlotLimit || 36,
+      appointmentIntervalMinutes: req.body.appointmentIntervalMinutes || 15,
       walkInEnabled: req.body.walkInEnabled !== undefined ? req.body.walkInEnabled : true,
       autoConfirmBookings: req.body.autoConfirmBookings !== undefined ? req.body.autoConfirmBookings : false,
     };
@@ -50,7 +50,7 @@ export async function getCapacityInfo(req: Request, res: Response) {
       },
     });
 
-    const dailyLimit = 100;
+    const dailyLimit = 36; // 9 hours × 4 slots per hour = 36 slots
     const slotsRemaining = Math.max(0, dailyLimit - slotsUsed);
     const utilizationPct = Math.round((slotsUsed / dailyLimit) * 100);
 
