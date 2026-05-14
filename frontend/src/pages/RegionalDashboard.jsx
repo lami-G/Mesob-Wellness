@@ -19,6 +19,139 @@ import '../styles/dashboard-tokens.css';
 // ─── Role guard ───────────────────────────────────────────────────────────────
 const REGIONAL_ROLES = ['REGIONAL_OFFICE', 'FEDERAL_OFFICE', 'SYSTEM_ADMIN'];
 
+// ─── Custom Tooltip for Performance Trends ───────────────────────────────────
+const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0]?.payload || {};
+    const total = data.total || 0;
+    const completed = data.completed || 0;
+    const noShow = data.noShow || 0;
+    const pending = total - completed - noShow;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    return (
+      <div style={{
+        background: '#ffffff',
+        border: '2px solid #e5e7eb',
+        borderRadius: '12px',
+        padding: '16px',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+        color: '#1f2937',
+        minWidth: '240px',
+      }}>
+        {/* Header with day */}
+        <div style={{
+          fontSize: '15px',
+          fontWeight: 700,
+          marginBottom: '12px',
+          paddingBottom: '10px',
+          borderBottom: '2px solid #f3f4f6',
+          color: '#111827',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}>
+          <span style={{ fontSize: '16px' }}>📅</span>
+          {label}
+        </div>
+
+        {/* Metrics List */}
+        <div style={{ display: 'grid', gap: '8px' }}>
+          {/* Total Appointments */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '6px 0',
+          }}>
+            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '14px' }}>📊</span> Total
+            </span>
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#3b82f6' }}>
+              {total}
+            </span>
+          </div>
+
+          {/* Completed */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '6px 0',
+          }}>
+            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '14px' }}>✅</span> Completed
+            </span>
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#10b981' }}>
+              {completed}
+            </span>
+          </div>
+
+          {/* No-Show */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '6px 0',
+          }}>
+            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '14px' }}>❌</span> No-Show
+            </span>
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
+              {noShow}
+            </span>
+          </div>
+
+          {/* Pending (if any) */}
+          {pending > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '6px 0',
+            }}>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '14px' }}>⏳</span> Pending
+              </span>
+              <span style={{ fontSize: '16px', fontWeight: 700, color: '#8b5cf6' }}>
+                {pending}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Completion Rate */}
+        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '2px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280' }}>
+              Completion Rate
+            </span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444' }}>
+              {completionRate}%
+            </span>
+          </div>
+          <div style={{
+            width: '100%',
+            height: '6px',
+            background: '#f3f4f6',
+            borderRadius: '3px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              width: `${completionRate}%`,
+              height: '100%',
+              background: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444',
+              borderRadius: '3px',
+              transition: 'width 0.3s ease',
+            }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 // ─── Root Component ───────────────────────────────────────────────────────────
 const RegionalDashboard = () => {
   const { user } = useAuth();
@@ -225,17 +358,13 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
 
   const statCards = [
     { icon: '🏥', label: 'Centers', value: centers.length, sub: `${centerStats.active} active`, color: '#284394' },
+    { icon: '📅', label: 'Daily Capacity', value: '36 slots', sub: 'appointment slots/day', color: '#284394' },
     { icon: '👥', label: 'Total Staff', value: centerMetrics.totalStaff, sub: 'across all centers', color: '#2563eb' },
     { icon: '📋', label: 'Appointments', value: summary?.totalAppointments || 0, sub: 'total bookings', color: '#16a34a' },
     { icon: '✅', label: 'Completed', value: summary?.completedAppointments || 0, sub: 'appointments', color: '#22c55e' },
     { icon: '⏳', label: 'Pending', value: summary?.pendingAppointments || 0, sub: 'appointments', color: '#f59e0b' },
     { icon: '🩺', label: 'Vitals Recorded', value: summary?.totalVitals || 0, sub: 'health records', color: '#7c3aed' },
   ];
-
-  // Completion rate
-  const completionRate = summary?.totalAppointments > 0
-    ? Math.round((summary.completedAppointments / summary.totalAppointments) * 100)
-    : 0;
 
   // Center breakdown data
   const centerBreakdownData = centers.map(center => ({
@@ -302,57 +431,7 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
         ))}
       </div>
 
-      {/* Performance Metrics */}
-      <div className="dash-charts-row" style={{ marginTop: '1.25rem' }}>
-        {/* Completion Rate Gauge */}
-        <div className="dash-chart-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <h3 className="dash-chart-title">📊 Completion Rate</h3>
-            <span className={`dash-status-badge ${completionRate > 80 ? 'normal' : completionRate > 60 ? 'moderate' : 'critical'}`}>
-              {completionRate > 80 ? '🟢 Excellent' : completionRate > 60 ? '🟡 Good' : '🔴 Needs Attention'}
-            </span>
-          </div>
-          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-            <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg style={{ position: 'absolute', width: '100%', height: '100%' }} viewBox="0 0 160 160">
-                <circle cx="80" cy="80" r="70" fill="none" stroke="#e5e7eb" strokeWidth="8" />
-                <circle cx="80" cy="80" r="70" fill="none"
-                  stroke={completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444'}
-                  strokeWidth="8"
-                  strokeDasharray={`${(completionRate / 100) * 439.8} 439.8`}
-                  strokeLinecap="round"
-                  style={{ transform: 'rotate(-90deg)', transformOrigin: '80px 80px', transition: 'stroke-dasharray 0.8s ease' }}
-                />
-              </svg>
-              <div style={{ fontSize: '2.5rem', fontWeight: 900, color: completionRate > 80 ? '#22c55e' : completionRate > 60 ? '#f59e0b' : '#ef4444', lineHeight: 1 }}>
-                {completionRate}%
-              </div>
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-              <strong style={{ color: '#1f2937' }}>{summary?.completedAppointments || 0}</strong> of <strong style={{ color: '#1f2937' }}>{summary?.totalAppointments || 0}</strong> completed
-            </div>
-          </div>
-        </div>
 
-        {/* Average Feedback */}
-        <div className="dash-chart-card">
-          <h3 className="dash-chart-title">⭐ Average Feedback</h3>
-          <p className="dash-chart-subtitle">Patient satisfaction score</p>
-          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-            <div style={{ fontSize: '3rem', fontWeight: 900, color: '#3b82f6', lineHeight: 1, marginBottom: '0.75rem' }}>
-              {summary?.averageFeedback ? summary.averageFeedback.toFixed(1) : '0.0'}
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', marginBottom: '0.75rem' }}>
-              {[1,2,3,4,5].map(star => (
-                <span key={star} style={{ fontSize: '1.5rem', opacity: star <= Math.round(summary?.averageFeedback || 0) ? 1 : 0.2 }}>⭐</span>
-              ))}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-              {summary?.averageFeedback >= 4.5 ? '🟢 Excellent' : summary?.averageFeedback >= 3.5 ? '🟡 Good' : summary?.averageFeedback >= 2.5 ? '🟠 Fair' : '🔴 Needs Improvement'}
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Center Performance Breakdown (Multi-center view only) */}
       {isAllCenters && centerBreakdownData.length > 0 && (
@@ -552,6 +631,8 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
   const [formError, setFormError] = useState('');
   const [availableRegions, setAvailableRegions] = useState([]);
   const [loadingRegions, setLoadingRegions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'ACTIVE', 'INACTIVE'
   
   const [formData, setFormData] = useState({
     name: '',
@@ -565,7 +646,26 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
     status: 'ACTIVE',
   });
 
-  const sortedCenters = [...centers].sort((a, b) => {
+  // Filter and search centers
+  const filteredCenters = centers.filter(center => {
+    // Status filter
+    if (filterStatus !== 'all' && center.status !== filterStatus) return false;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        center.name?.toLowerCase().includes(query) ||
+        center.code?.toLowerCase().includes(query) ||
+        center.city?.toLowerCase().includes(query) ||
+        center.region?.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
+  });
+
+  const sortedCenters = [...filteredCenters].sort((a, b) => {
     let aVal, bVal;
     switch (sortBy) {
       case 'name':
@@ -835,7 +935,13 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
                     e.stopPropagation();
                     handleEditCenter(center);
                   }}
-                  style={{ width: '100%', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)' }}
+                  style={{ 
+                    width: '100%', 
+                    background: 'rgba(255,255,255,0.2)', 
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    color: 'white',
+                    fontWeight: 600
+                  }}
                 >
                   ✏️ Edit Center
                 </Button>
@@ -886,12 +992,36 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
                     {center.email && <div>📧 {center.email}</div>}
                   </td>
                   <td>
-                    <Button
-                      size="small"
-                      onClick={() => handleEditCenter(center)}
-                    >
-                      ✏️ Edit
-                    </Button>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <Button
+                        size="small"
+                        onClick={() => handleEditCenter(center)}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.5rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.875rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 2px 4px rgba(59,130,246,0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = '#2563eb';
+                          e.target.style.transform = 'translateY(-2px)';
+                          e.target.style.boxShadow = '0 4px 8px rgba(59,130,246,0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = '#3b82f6';
+                          e.target.style.transform = 'translateY(0)';
+                          e.target.style.boxShadow = '0 2px 4px rgba(59,130,246,0.3)';
+                        }}
+                      >
+                        ✏️ Edit
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -1336,7 +1466,7 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
                     <stop offset="100%" stopColor="#f97316" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="4 4" stroke="rgba(0,0,0,0.15)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,85,105,0.8)" horizontal={true} vertical={true} />
                 <XAxis dataKey="label" tick={{ fontSize: 13, fill: '#1e293b', fontWeight: 700 }} axisLine={{ stroke: '#94a3b8' }} tickLine={false} />
                 <YAxis 
                   domain={[0, 100]} 
@@ -1376,20 +1506,10 @@ const PerformanceTab = ({ loading, analytics, trendsData, centers }) => {
                     </linearGradient>
                   ))}
                 </defs>
-                <CartesianGrid strokeDasharray="4 4" stroke="rgba(0,0,0,0.15)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,85,105,0.8)" horizontal={true} vertical={true} />
                 <XAxis dataKey="label" tick={{ fontSize: 13, fill: '#1e293b', fontWeight: 700 }} axisLine={{ stroke: '#94a3b8' }} tickLine={false} />
                 <YAxis tick={{ fontSize: 13, fill: '#1e293b', fontWeight: 700 }} axisLine={{ stroke: '#94a3b8' }} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ 
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)', 
-                    border: '2px solid rgba(0,0,0,0.15)', 
-                    borderRadius: '12px', 
-                    color: '#1f2937',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.15)'
-                  }}
-                  labelStyle={{ color: '#1e293b', fontWeight: 800, fontSize: '14px' }}
-                  itemStyle={{ color: '#1e293b', fontWeight: 700, fontSize: '13px' }}
-                />
+                <Tooltip content={<CustomAppointmentTrendsTooltip />} />
                 <Legend wrapperStyle={{ fontSize: '13px', color: '#1e293b', fontWeight: 700, paddingTop: '12px' }} />
                 {chartConfig.dataKeys.map((key, index) => (
                   <Area 
