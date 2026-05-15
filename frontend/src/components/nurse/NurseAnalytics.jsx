@@ -388,7 +388,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
       // Fetch appointments from queue endpoint with date parameter
       const appointmentsRes = await api.get('/api/v1/appointments/queue', {
-        params: viewPeriod === 'all' ? {} : { date: selectedDate }
+        params: viewPeriod === 'all' 
+          ? {} 
+          : { 
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString()
+            }
       });
       let appointmentsData = appointmentsRes.data.data || [];
 
@@ -437,7 +442,9 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const noShow = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
-      // Walk-ins = number of wellness plans created for patients WITHOUT appointments in the period
+      // Walk-ins = wellness plans created for users WITHOUT appointments on that specific day
+      // For weekly view: sum daily walk-ins (each day checked independently)
+      // For daily view: check that single day
       try {
         console.log('=== COUNTING WALK-INS ===');
         
@@ -461,27 +468,39 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           // For each user with vitals, count their completed wellness plans in the period
           for (const userId of vitalsUserIds) {
             try {
-              // Check if user has appointments in this period
-              const hasAppointment = mappedAppointments.some(apt => apt.customerId === userId);
+              const plansRes = await api.get(`/api/v1/plans/${userId}`);
+              const plansData = plansRes.data?.data || plansRes.data || [];
               
-              // If no appointment, this is a walk-in - count their wellness plans
-              if (!hasAppointment) {
-                const plansRes = await api.get(`/api/v1/plans/${userId}`);
-                const plansData = plansRes.data?.data || plansRes.data || [];
+              if (Array.isArray(plansData)) {
+                // Count wellness plans created in this period (or all time)
+                const periodPlans = viewPeriod === 'all' 
+                  ? plansData 
+                  : plansData.filter(p => {
+                      const pDate = new Date(p.createdAt);
+                      return pDate >= startDate && pDate <= endDate;
+                    });
                 
-                if (Array.isArray(plansData)) {
-                  // Count wellness plans created in this period (or all time)
-                  const periodPlans = viewPeriod === 'all' 
-                    ? plansData 
-                    : plansData.filter(p => {
-                        const pDate = new Date(p.createdAt);
-                        return pDate >= startDate && pDate <= endDate;
-                      });
+                // For each wellness plan, check if user had an appointment on that specific day
+                for (const plan of periodPlans) {
+                  const planDate = new Date(plan.createdAt);
+                  planDate.setHours(0, 0, 0, 0);
                   
-                  walkin += periodPlans.length; // Count each wellness plan
-                  if (periodPlans.length > 0) {
-                    console.log(`✓ Walk-in user ${userId}: ${periodPlans.length} wellness plans`);
+                  // Check if user has appointment on the SAME DAY as the wellness plan
+                  const hasAppointmentOnDay = mappedAppointments.some(apt => {
+                    const aptDate = new Date(apt.scheduledAt);
+                    aptDate.setHours(0, 0, 0, 0);
+                    return apt.customerId === userId && aptDate.getTime() === planDate.getTime();
+                  });
+                  
+                  // Only count as walk-in if NO appointment on that specific day
+                  // This allows staff without appointments on that day to be counted as walk-ins
+                  if (!hasAppointmentOnDay) {
+                    walkin++;
                   }
+                }
+                
+                if (periodPlans.length > 0) {
+                  console.log(`✓ User ${userId}: ${periodPlans.length} wellness plans checked for daily walk-in status`);
                 }
               }
             } catch (err) {
