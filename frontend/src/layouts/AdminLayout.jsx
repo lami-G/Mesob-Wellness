@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import ManagerSidebar from "../components/admin/ManagerSidebar";
 import RegionalSidebar from "../components/admin/RegionalSidebar";
+import FederalSidebar from "../components/admin/FederalSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import "../styles/admin-layout.css";
 
@@ -58,6 +59,8 @@ function AdminLayout({
             centers={centers}
           />
         );
+      case "federal":
+        return <FederalSidebar {...commonProps} />;
       default:
         return <AdminSidebar {...commonProps} />;
     }
@@ -69,6 +72,8 @@ function AdminLayout({
         return "MESOB Manager Portal";
       case "regional":
         return "MESOB Regional Portal";
+      case "federal":
+        return "MESOB Federal Portal";
       default:
         return "MESOB Admin Portal";
     }

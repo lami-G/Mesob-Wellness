@@ -131,7 +131,7 @@ function Login() {
         NURSE_OFFICER: "/nurse",
         MANAGER: "/manager",
         REGIONAL_OFFICE: "/regional",
-        FEDERAL_OFFICE: "/admin",
+        FEDERAL_OFFICE: "/federal",
         SYSTEM_ADMIN: "/admin",
       };
       const route = roleRoutes[result?.user?.role] || "/dashboard";
