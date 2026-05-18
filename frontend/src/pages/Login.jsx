@@ -145,8 +145,6 @@ function Login() {
 
   return (
     <div className="mesob-auth-wrapper">
-      <AnimatedWaveBackground className="absolute inset-0 z-20" />
-
       <div className="mesob-auth-container">
         <div className="mesob-auth-card">
           <div className="mesob-header-image">
@@ -242,11 +240,11 @@ function Login() {
             <div className="mesob-footer-brand">Wellness</div>
             
             <div style={{ marginTop: '1rem', paddingTop: '0.75rem' }}>
-              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.875rem' }}>Don't have an account? </span>
+              <span style={{ color: '#64748B', fontSize: '0.875rem' }}>Don't have an account? </span>
               <a 
                 href="/register" 
                 style={{ 
-                  color: '#f5b224', 
+                  color: '#2347A6', 
                   textDecoration: 'none', 
                   fontWeight: '600',
                   cursor: 'pointer'
