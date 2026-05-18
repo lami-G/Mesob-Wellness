@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
 import ChangePasswordModal from "../../components/admin/ChangePasswordModal";
+import { User, Camera } from "lucide-react";
 import "../../styles/admin-settings.css";
 
 function AdminProfile() {
@@ -230,7 +231,7 @@ function AdminProfile() {
               {profilePicture ? (
                 <img src={profilePicture} alt={formData.fullName} />
               ) : (
-                <span className="avatar-icon">👤</span>
+                <span className="avatar-icon"><User size={48} /></span>
               )}
             </div>
             <button
@@ -238,7 +239,7 @@ function AdminProfile() {
               onClick={handlePictureClick}
               title="Change profile picture"
             >
-              📷
+              <Camera size={20} />
             </button>
             {showPictureMenu && profilePicture && (
               <div className="picture-menu">
