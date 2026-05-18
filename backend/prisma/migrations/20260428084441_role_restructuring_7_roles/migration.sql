@@ -16,20 +16,20 @@ ALTER TABLE "users" ALTER COLUMN "role" SET DEFAULT 'STAFF';
 COMMIT;
 
 -- AlterTable
-ALTER TABLE "appointments" ADD COLUMN     "lastReminderBy" UUID,
-ADD COLUMN     "reminderCount" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "reminderSentAt" TIMESTAMPTZ(3);
+ALTER TABLE "appointments" ADD COLUMN IF NOT EXISTS "lastReminderBy" UUID;
+ALTER TABLE "appointments" ADD COLUMN IF NOT EXISTS "reminderCount" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "appointments" ADD COLUMN IF NOT EXISTS "reminderSentAt" TIMESTAMPTZ(3);
 
 -- AlterTable
-ALTER TABLE "users" ADD COLUMN     "canLogin" BOOLEAN NOT NULL DEFAULT true,
-ADD COLUMN     "employeeId" TEXT,
-ADD COLUMN     "isExternal" BOOLEAN NOT NULL DEFAULT false,
-ALTER COLUMN "email" DROP NOT NULL,
-ALTER COLUMN "password" DROP NOT NULL,
-ALTER COLUMN "role" SET DEFAULT 'STAFF';
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "canLogin" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "employeeId" TEXT;
+ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "isExternal" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "users" ALTER COLUMN "email" DROP NOT NULL;
+ALTER TABLE "users" ALTER COLUMN "password" DROP NOT NULL;
+ALTER TABLE "users" ALTER COLUMN "role" SET DEFAULT 'STAFF';
 
 -- CreateIndex
-CREATE INDEX "users_employeeId_idx" ON "users"("employeeId");
+CREATE INDEX IF NOT EXISTS "users_employeeId_idx" ON "users"("employeeId");
 
 -- CreateIndex
-CREATE INDEX "users_isExternal_idx" ON "users"("isExternal");
+CREATE INDEX IF NOT EXISTS "users_isExternal_idx" ON "users"("isExternal");

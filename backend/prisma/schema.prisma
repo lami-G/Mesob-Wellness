@@ -25,6 +25,8 @@ model User {
   emergencyContactPhone String?
   isActive              Boolean            @default(true)
   isVerified            Boolean            @default(false)
+  failedLoginAttempts   Int                @default(0)
+  lockoutUntil          DateTime?          @db.Timestamptz(3)
   lastLoginAt           DateTime?          @db.Timestamptz(3)
   createdAt             DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt             DateTime           @updatedAt @db.Timestamptz(3)

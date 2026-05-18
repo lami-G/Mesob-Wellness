@@ -9,7 +9,7 @@ import { UserRole } from "../generated/prisma";
  */
 export const getSettings = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -45,12 +45,38 @@ export const getSettings = async (
 };
 
 /**
+ * GET /api/v1/settings/public
+ * Public maintenance-mode status
+ */
+export const getPublicSettings = async (
+  _req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    const settings = await SettingsService.getSettings();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        maintenanceMode: settings.maintenanceMode,
+      },
+    });
+  } catch (error) {
+    console.error("Get public settings error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve public settings",
+    });
+  }
+};
+
+/**
  * PUT /api/v1/settings
  * Update system settings
  */
 export const updateSettings = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -70,7 +96,12 @@ export const updateSettings = async (
       return;
     }
 
-    const { maxLoginAttempts, sessionTimeout, maintenanceMode, lockoutDuration } = req.body;
+    const {
+      maxLoginAttempts,
+      sessionTimeout,
+      maintenanceMode,
+      lockoutDuration,
+    } = req.body;
 
     // Validate input
     if (maxLoginAttempts !== undefined) {
@@ -107,10 +138,15 @@ export const updateSettings = async (
     }
 
     const updatedSettings = await SettingsService.updateSettings({
-      maxLoginAttempts: maxLoginAttempts ? parseInt(maxLoginAttempts, 10) : undefined,
+      maxLoginAttempts: maxLoginAttempts
+        ? parseInt(maxLoginAttempts, 10)
+        : undefined,
       sessionTimeout: sessionTimeout ? parseInt(sessionTimeout, 10) : undefined,
-      maintenanceMode: typeof maintenanceMode === "boolean" ? maintenanceMode : undefined,
-      lockoutDuration: lockoutDuration ? parseInt(lockoutDuration, 10) : undefined,
+      maintenanceMode:
+        typeof maintenanceMode === "boolean" ? maintenanceMode : undefined,
+      lockoutDuration: lockoutDuration
+        ? parseInt(lockoutDuration, 10)
+        : undefined,
     });
 
     res.status(200).json({

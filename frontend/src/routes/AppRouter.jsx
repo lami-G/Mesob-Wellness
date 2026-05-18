@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import MainLayout from "../components/MainLayout";
 import RoleBasedRoute from "../components/RoleBasedRoute";
 import MaintenanceMode from "../components/MaintenanceMode";
+import api from "../services/api";
 import Dashboard from "../pages/Dashboard";
 import NurseDashboard from "../pages/NurseDashboard";
 import ManagerDashboard from "../pages/ManagerDashboard";
@@ -19,17 +20,50 @@ function AppRouter() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   useEffect(() => {
-    const checkMaintenanceMode = () => {
+    let isMounted = true;
+
+    const readLocalSettings = () => {
       const settings = localStorage.getItem("systemSettings");
-      if (settings) {
-        const parsed = JSON.parse(settings);
-        setMaintenanceMode(parsed.maintenanceMode || false);
+      if (!settings) return {};
+      try {
+        return JSON.parse(settings);
+      } catch (error) {
+        console.warn(
+          "Failed to parse systemSettings from localStorage:",
+          error,
+        );
+        return {};
+      }
+    };
+
+    const checkMaintenanceMode = async () => {
+      try {
+        const response = await api.get("/api/v1/settings/public");
+        const isEnabled = Boolean(response?.data?.data?.maintenanceMode);
+
+        if (isMounted) {
+          setMaintenanceMode(isEnabled);
+        }
+
+        const current = readLocalSettings();
+        localStorage.setItem(
+          "systemSettings",
+          JSON.stringify({ ...current, maintenanceMode: isEnabled }),
+        );
+      } catch (error) {
+        const current = readLocalSettings();
+        if (isMounted) {
+          setMaintenanceMode(Boolean(current.maintenanceMode));
+        }
       }
     };
 
     checkMaintenanceMode();
     const interval = setInterval(checkMaintenanceMode, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Show maintenance page for non-admin users when maintenance mode is on
@@ -37,8 +71,14 @@ function AppRouter() {
   const isLoginRoute = window.location.pathname === "/login";
   const isRegisterRoute = window.location.pathname === "/register";
   const isAdminRoute = window.location.pathname.startsWith("/admin");
-  
-  if (maintenanceMode && user?.role !== "SYSTEM_ADMIN" && !isLoginRoute && !isRegisterRoute && !isAdminRoute) {
+
+  if (
+    maintenanceMode &&
+    user?.role !== "SYSTEM_ADMIN" &&
+    !isLoginRoute &&
+    !isRegisterRoute &&
+    !isAdminRoute
+  ) {
     return <MaintenanceMode />;
   }
   return (

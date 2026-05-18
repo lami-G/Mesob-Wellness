@@ -83,30 +83,30 @@ function DashboardMetrics({ onTabChange }) {
   const fetchHealthData = async () => {
     try {
       setHealthLoading(true);
-      
+
       // Calculate date range based on timePeriod using UTC dates (same as Nurse Analytics)
       const today = new Date();
       let startDate, endDate;
-      
-      if (timePeriod === 'all') {
+
+      if (timePeriod === "all") {
         // All time - no date filters
         startDate = null;
         endDate = null;
-      } else if (timePeriod === 'daily') {
+      } else if (timePeriod === "daily") {
         // Today only - use UTC dates to avoid timezone issues
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
         startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
-      } else if (timePeriod === 'weekly') {
+      } else if (timePeriod === "weekly") {
         // Last 7 days (including today) - use UTC dates
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
         startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
-      } else if (timePeriod === 'monthly') {
+      } else if (timePeriod === "monthly") {
         // From 1st of current month to today - use UTC dates
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
@@ -114,94 +114,159 @@ function DashboardMetrics({ onTabChange }) {
         startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       }
-      
-      console.log('📊 Fetching health data for timePeriod:', timePeriod, 'dates:', startDate, 'to', endDate);
-      
+
+      console.log(
+        "📊 Fetching health data for timePeriod:",
+        timePeriod,
+        "dates:",
+        startDate,
+        "to",
+        endDate,
+      );
+
       // Use the same endpoint as Nurse Analytics: /api/v1/conditions/period
-      const params = timePeriod === 'all' ? {} : {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      };
-      
+      const params =
+        timePeriod === "all"
+          ? {}
+          : {
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString(),
+            };
+
       if (selectedCenter !== "all") params.center = selectedCenter;
       if (selectedCondition !== "all") params.condition = selectedCondition;
 
-      console.log('📊 API params:', params);
+      console.log("📊 API params:", params);
 
-      const response = await api.get('/api/v1/conditions/period', { params });
+      const response = await api.get("/api/v1/conditions/period", { params });
 
-      console.log('📊 Health data response:', response.data);
-      
+      console.log("📊 Health data response:", response.data);
+
       const conditions = response.data.data || [];
       const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
-      
+
       // Get total unique patients in the period (from vitals records)
-      const vitalsParams = timePeriod === 'all' ? {} : {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString()
-      };
-      
-      const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
-      
+      const vitalsParams =
+        timePeriod === "all"
+          ? {}
+          : {
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString(),
+            };
+
+      const vitalsRes = await api.get("/api/v1/vitals/all", {
+        params: vitalsParams,
+      });
+
       const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
-      const uniquePatients = new Set(vitalsData.map(v => v.userId).filter(Boolean));
+      const uniquePatients = new Set(
+        vitalsData.map((v) => v.userId).filter(Boolean),
+      );
       const totalPatients = uniquePatients.size;
-      
-      console.log('📊 Total patients in period:', totalPatients);
-      console.log('📊 Health conditions data:', conditions);
-      
-      // Define all conditions with their colors
-      const allConditions = [
-        { key: 'hypertension', label: 'Hypertension', color: '#dc2626' },
-        { key: 'overweight', label: 'Overweight', color: '#f59e0b' },
-        { key: 'obesity', label: 'Obesity', color: '#7c3aed' },
-        { key: 'diabetes', label: 'Diabetes', color: '#2563eb' },
-        { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' },
-        { key: 'normal', label: 'Normal', color: '#10b981' },
+
+      console.log("📊 Total patients in period:", totalPatients);
+      console.log("📊 Health conditions data:", conditions);
+
+      // Define predefined conditions with their colors
+      const predefinedConditions = [
+        { key: "hypertension", label: "Hypertension", color: "#dc2626" },
+        { key: "overweight", label: "Overweight", color: "#f59e0b" },
+        { key: "obesity", label: "Obesity", color: "#7c3aed" },
+        { key: "diabetes", label: "Diabetes", color: "#2563eb" },
+        { key: "heart_respiratory", label: "Heart / Resp.", color: "#ec4899" },
+        { key: "normal", label: "Normal", color: "#10b981" },
       ];
-      
+
       // Create a map of condition counts
       const conditionMap = {};
-      conditions.forEach(c => {
-        const key = c.condition.toLowerCase().replace(/ /g, '_');
-        
+      const customConditions = new Set();
+
+      conditions.forEach((c) => {
+        const key = c.condition.toLowerCase().replace(/ /g, "_");
+
         // Skip "other" condition completely
-        if (key === 'other') {
+        if (key === "other") {
           return;
         }
-        
+
         // Combine heart issues and respiratory issues
-        if (key === 'heart_issues' || key === 'respiratory_issues') {
-          conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
+        if (key === "heart_issues" || key === "respiratory_issues") {
+          conditionMap["heart_respiratory"] =
+            (conditionMap["heart_respiratory"] || 0) + c.count;
         } else {
           conditionMap[key] = (conditionMap[key] || 0) + c.count;
+
+          // Track custom conditions (not in predefined list)
+          const isPredefined = predefinedConditions.some(
+            (pc) => pc.key === key,
+          );
+          if (
+            !isPredefined &&
+            key !== "heart_issues" &&
+            key !== "respiratory_issues"
+          ) {
+            customConditions.add(key);
+          }
         }
       });
-      
-      console.log('📊 Condition map:', conditionMap);
-      
+
+      // Generate colors for custom conditions
+      const customColors = [
+        "#8b5cf6",
+        "#06b6d4",
+        "#84cc16",
+        "#f97316",
+        "#ec4899",
+        "#6366f1",
+      ];
+      const customConditionsList = Array.from(customConditions).map(
+        (key, index) => ({
+          key,
+          label: key
+            .split("_")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" "),
+          color: customColors[index % customColors.length],
+        }),
+      );
+
+      // Combine predefined and custom conditions
+      const allConditions = [...predefinedConditions, ...customConditionsList];
+
+      console.log("📊 Condition map:", conditionMap);
+      console.log("📊 Custom conditions found:", customConditionsList);
+
       // Map counts to conditions and calculate percentages
-      const rankedConditions = allConditions.map(c => ({
-        ...c,
-        count: conditionMap[c.key] || 0,
-        percentage: totalWellnessPlans > 0 
-          ? Math.round((conditionMap[c.key] || 0) / totalWellnessPlans * 100) 
-          : 0,
-        totalPatients: totalPatients
-      })).sort((a, b) => b.count - a.count);
-      
+      const rankedConditions = allConditions
+        .map((c) => ({
+          ...c,
+          count: conditionMap[c.key] || 0,
+          percentage:
+            totalWellnessPlans > 0
+              ? Math.round(
+                  ((conditionMap[c.key] || 0) / totalWellnessPlans) * 100,
+                )
+              : 0,
+          totalPatients: totalPatients,
+        }))
+        .filter((c) => c.count > 0)
+        .sort((a, b) => b.count - a.count);
+
       // Format data for charts
       const processedHealthData = {
         totalPatients: totalPatients,
         totalVitalsRecorded: vitalsData.length,
-        highRiskCount: vitalsData.filter(v => v.riskLevel === 'high' || v.riskLevel === 'critical').length,
-        criticalCount: vitalsData.filter(v => v.riskLevel === 'critical').length,
+        highRiskCount: vitalsData.filter(
+          (v) => v.riskLevel === "high" || v.riskLevel === "critical",
+        ).length,
+        criticalCount: vitalsData.filter((v) => v.riskLevel === "critical")
+          .length,
         patientConditions: rankedConditions,
       };
-      
+
       setHealthData(processedHealthData);
-      
-      console.log('✅ Health data processed:', processedHealthData);
+
+      console.log("✅ Health data processed:", processedHealthData);
     } catch (err) {
       console.error("❌ Failed to load health data:", err);
       setHealthData(null);
@@ -555,40 +620,43 @@ function DashboardMetrics({ onTabChange }) {
           <div className="health-charts-grid">
             {/* Condition Distribution - Pie Chart */}
             {healthData.patientConditions &&
-              healthData.patientConditions.filter(c => c.count > 0).length > 0 && (
+              healthData.patientConditions.filter((c) => c.count > 0).length >
+                0 && (
                 <div className="health-chart-card">
                   <h4>Condition Distribution</h4>
                   <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
                         data={healthData.patientConditions
-                          .filter(c => c.count > 0)
+                          .filter((c) => c.count > 0)
                           .slice(0, 6)
                           .map((item, index) => ({
                             name: item.label,
-                            value: item.count + (index * 0.01), // Add tiny offset to prevent overlap
+                            value: item.count + index * 0.01, // Add tiny offset to prevent overlap
                             color: item.color,
                             originalCount: item.count,
                           }))}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, originalCount }) => `${name}: ${originalCount}`}
+                        label={({ name, originalCount }) =>
+                          `${name}: ${originalCount}`
+                        }
                         outerRadius={70}
                         fill="#8884d8"
                         dataKey="value"
                       >
                         {healthData.patientConditions
-                          .filter(c => c.count > 0)
+                          .filter((c) => c.count > 0)
                           .slice(0, 6)
                           .map((item, index) => (
                             <Cell key={`cell-${index}`} fill={item.color} />
                           ))}
                       </Pie>
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value, name, props) => {
-                          if (name === 'value') {
-                            return [props.payload.originalCount, 'Count'];
+                          if (name === "value") {
+                            return [props.payload.originalCount, "Count"];
                           }
                           return value;
                         }}
@@ -600,17 +668,18 @@ function DashboardMetrics({ onTabChange }) {
 
             {/* Condition Distribution - Area Chart */}
             {healthData.patientConditions &&
-              healthData.patientConditions.filter(c => c.count > 0).length > 0 && (
+              healthData.patientConditions.filter((c) => c.count > 0).length >
+                0 && (
                 <div className="health-chart-card">
                   <h4>Condition Trends</h4>
                   <ResponsiveContainer width="100%" height={250}>
                     <AreaChart
                       data={healthData.patientConditions
-                        .filter(c => c.count > 0)
+                        .filter((c) => c.count > 0)
                         .slice(0, 6)
                         .map((item, index) => ({
                           name: item.label,
-                          value: item.count + (index * 0.01), // Add tiny offset to prevent overlap
+                          value: item.count + index * 0.01, // Add tiny offset to prevent overlap
                           originalCount: item.count,
                           color: item.color,
                         }))}
@@ -648,8 +717,8 @@ function DashboardMetrics({ onTabChange }) {
                         }}
                         cursor={{ strokeDasharray: "3 3" }}
                         formatter={(value, name, props) => {
-                          if (name === 'value') {
-                            return [props.payload.originalCount, 'Count'];
+                          if (name === "value") {
+                            return [props.payload.originalCount, "Count"];
                           }
                           return value;
                         }}
