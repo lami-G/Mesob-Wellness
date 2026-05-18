@@ -59,9 +59,7 @@ function AppRouter() {
         path="/nurse"
         element={
           <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
-            <MainLayout>
-              <NurseDashboard />
-            </MainLayout>
+            <NurseDashboard />
           </RoleBasedRoute>
         }
       />
