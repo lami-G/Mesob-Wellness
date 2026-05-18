@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { settingsService } from "../../services/settingsService";
 import "../../styles/admin-settings.css";
 
@@ -19,16 +19,27 @@ function SystemSettings() {
     databaseSize: "2.4 GB",
     uptime: "99.9%",
   });
+  const successMessageRef = useRef(null);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (saved && successMessageRef.current) {
+      successMessageRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [saved]);
 
   const loadSettings = async () => {
     try {
       setLoading(true);
       const data = await settingsService.getSettings();
       setSettings(data);
+      localStorage.setItem("systemSettings", JSON.stringify(data));
       setError("");
     } catch (err) {
       console.error("Error loading settings:", err);
@@ -53,7 +64,9 @@ function SystemSettings() {
       setLoading(true);
       setError("");
       
-      await settingsService.updateSettings(settings);
+      const updated = await settingsService.updateSettings(settings);
+      setSettings(updated);
+      localStorage.setItem("systemSettings", JSON.stringify(updated));
       
       setSaved(true);
       setTimeout(() => setSaved(false), 5000);
@@ -78,7 +91,11 @@ function SystemSettings() {
         <p>Configure system-wide settings and preferences</p>
       </div>
 
-      {saved && <div className="success-message">✓ Settings saved successfully</div>}
+      {saved && (
+        <div className="success-message" ref={successMessageRef}>
+          ✓ Settings saved successfully
+        </div>
+      )}
       {error && <div className="error-message">✗ {error}</div>}
 
       <div className="settings-container">

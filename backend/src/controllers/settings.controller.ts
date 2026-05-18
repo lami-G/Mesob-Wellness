@@ -45,6 +45,32 @@ export const getSettings = async (
 };
 
 /**
+ * GET /api/v1/settings/public
+ * Public maintenance-mode status
+ */
+export const getPublicSettings = async (
+  _req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const settings = await SettingsService.getSettings();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        maintenanceMode: settings.maintenanceMode,
+      },
+    });
+  } catch (error) {
+    console.error("Get public settings error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve public settings",
+    });
+  }
+};
+
+/**
  * PUT /api/v1/settings
  * Update system settings
  */

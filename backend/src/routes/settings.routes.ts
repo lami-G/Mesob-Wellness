@@ -4,6 +4,12 @@ import { authenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
+/**
+ * GET /api/v1/settings/public
+ * Public maintenance-mode status
+ */
+router.get("/public", SettingsController.getPublicSettings);
+
 // All settings routes require authentication
 router.use(authenticate);
 

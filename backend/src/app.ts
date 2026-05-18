@@ -5,6 +5,7 @@ import express, { Request, Response } from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import prisma from "./config/prisma";
+import maintenanceMiddleware from "./middleware/maintenance.middleware";
 import apiRoutes from "./routes";
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(maintenanceMiddleware);
 
 app.get("/api/health", async (_req: Request, res: Response) => {
   try {

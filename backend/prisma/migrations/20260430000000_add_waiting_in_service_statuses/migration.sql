@@ -5,10 +5,5 @@
 ALTER TYPE "AppointmentStatus" ADD VALUE IF NOT EXISTS 'WAITING';
 ALTER TYPE "AppointmentStatus" ADD VALUE IF NOT EXISTS 'IN_SERVICE';
 
--- Update existing PENDING appointments to WAITING
-UPDATE "appointments" 
-SET status = 'WAITING' 
-WHERE status = 'PENDING';
-
--- Note: PENDING and CONFIRMED are kept for backward compatibility
--- but new appointments will use WAITING as the default status
+-- NOTE: Update existing PENDING appointments to WAITING in a separate step
+-- after this migration is committed.

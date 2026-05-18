@@ -150,8 +150,8 @@ function DashboardMetrics({ onTabChange }) {
       console.log('📊 Total patients in period:', totalPatients);
       console.log('📊 Health conditions data:', conditions);
       
-      // Define all conditions with their colors
-      const allConditions = [
+      // Define predefined conditions with their colors
+      const predefinedConditions = [
         { key: 'hypertension', label: 'Hypertension', color: '#dc2626' },
         { key: 'overweight', label: 'Overweight', color: '#f59e0b' },
         { key: 'obesity', label: 'Obesity', color: '#7c3aed' },
@@ -162,6 +162,8 @@ function DashboardMetrics({ onTabChange }) {
       
       // Create a map of condition counts
       const conditionMap = {};
+      const customConditions = new Set();
+      
       conditions.forEach(c => {
         const key = c.condition.toLowerCase().replace(/ /g, '_');
         
@@ -175,10 +177,28 @@ function DashboardMetrics({ onTabChange }) {
           conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
         } else {
           conditionMap[key] = (conditionMap[key] || 0) + c.count;
+          
+          // Track custom conditions (not in predefined list)
+          const isPredefined = predefinedConditions.some(pc => pc.key === key);
+          if (!isPredefined && key !== 'heart_issues' && key !== 'respiratory_issues') {
+            customConditions.add(key);
+          }
         }
       });
       
+      // Generate colors for custom conditions
+      const customColors = ['#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'];
+      const customConditionsList = Array.from(customConditions).map((key, index) => ({
+        key,
+        label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+        color: customColors[index % customColors.length],
+      }));
+      
+      // Combine predefined and custom conditions
+      const allConditions = [...predefinedConditions, ...customConditionsList];
+      
       console.log('📊 Condition map:', conditionMap);
+      console.log('📊 Custom conditions found:', customConditionsList);
       
       // Map counts to conditions and calculate percentages
       const rankedConditions = allConditions.map(c => ({
@@ -188,7 +208,7 @@ function DashboardMetrics({ onTabChange }) {
           ? Math.round((conditionMap[c.key] || 0) / totalWellnessPlans * 100) 
           : 0,
         totalPatients: totalPatients
-      })).sort((a, b) => b.count - a.count);
+      })).filter(c => c.count > 0).sort((a, b) => b.count - a.count);
       
       // Format data for charts
       const processedHealthData = {

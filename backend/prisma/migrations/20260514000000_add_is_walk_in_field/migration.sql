@@ -1,0 +1,3 @@
+-- Empty migration placeholder.
+-- This migration directory existed without a SQL file.
+-- No schema changes are required here.
