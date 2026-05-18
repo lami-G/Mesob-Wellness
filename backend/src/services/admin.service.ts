@@ -504,7 +504,8 @@ const AdminService = {
       }
       if (filters.search) {
         where.OR = [
-          { userId: { contains: filters.search, mode: "insensitive" } },
+          { user: { fullName: { contains: filters.search, mode: "insensitive" } } },
+          { user: { email: { contains: filters.search, mode: "insensitive" } } },
           { reason: { contains: filters.search, mode: "insensitive" } },
         ];
       }
