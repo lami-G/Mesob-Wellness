@@ -10,6 +10,26 @@ import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Area, AreaChart
 } from 'recharts';
+import {
+  Calendar,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+  Ban,
+  Building2,
+  Users,
+  ClipboardList,
+  TrendingUp,
+  Activity,
+  Clock,
+  MapPin,
+  Phone,
+  Heart,
+  AlertTriangle,
+  AlertCircle,
+  Table,
+  Grid3x3
+} from 'lucide-react';
 import '../styles/admin-layout.css';
 import '../styles/admin-dashboard.css';
 import '../styles/manager-dashboard.css';
@@ -51,7 +71,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
           alignItems: 'center',
           gap: '6px'
         }}>
-          <span style={{ fontSize: '16px' }}>📅</span>
+          <Calendar size={16} />
           {label}
         </div>
 
@@ -65,7 +85,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>📊</span> Total
+              <BarChart3 size={14} /> Total
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#3b82f6' }}>
               {total}
@@ -80,7 +100,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>✅</span> Completed
+              <CheckCircle size={14} /> Completed
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#10b981' }}>
               {completed}
@@ -95,7 +115,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>❌</span> No-Show
+              <XCircle size={14} /> No-Show
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
               {noShow}
@@ -111,7 +131,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
               padding: '6px 0',
             }}>
               <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '14px' }}>⏳</span> Pending
+                <Clock size={14} /> Pending
               </span>
               <span style={{ fontSize: '16px', fontWeight: 700, color: '#8b5cf6' }}>
                 {pending}
@@ -216,7 +236,7 @@ const RegionalDashboard = () => {
     return (
       <div className="dashboard-container">
         <div className="access-denied">
-          <h2>🚫 Access Denied</h2>
+          <h2><Ban size={24} /> Access Denied</h2>
           <p>Regional Office role required to access this dashboard.</p>
         </div>
       </div>
@@ -224,10 +244,10 @@ const RegionalDashboard = () => {
   }
 
   const tabs = [
-    { id: 'overview', label: '📊 Overview' },
-    { id: 'centers', label: `🏥 Centers (${centers.length})` },
-    { id: 'managers', label: '👔 Managers' },
-    { id: 'performance', label: '📈 Analytics' },
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'centers', label: `Centers (${centers.length})`, icon: Building2 },
+    { id: 'managers', label: 'Managers', icon: Users },
+    { id: 'performance', label: 'Analytics', icon: TrendingUp },
   ];
 
   // Filter centers based on selection
@@ -258,7 +278,7 @@ const RegionalDashboard = () => {
         return (
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>📊 Regional Overview</h2>
+              <h2><BarChart3 size={24} /> Regional Overview</h2>
               <div className="center-selector" style={{
                 background: 'rgba(255,255,255,0.1)', 
                 border: '1px solid rgba(255,255,255,0.2)',
@@ -283,10 +303,10 @@ const RegionalDashboard = () => {
                     appearance: 'none',
                   }}
                 >
-                  <option value="all">🏥 All Centers ({centers.length})</option>
+                  <option value="all">All Centers ({centers.length})</option>
                   {centers.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.status === 'ACTIVE' ? '✅' : '⚠️'} {c.name} — {c.city}
+                      {c.status === 'ACTIVE' ? '✓' : '⚠'} {c.name} — {c.city}
                     </option>
                   ))}
                 </select>
@@ -298,21 +318,21 @@ const RegionalDashboard = () => {
       case 'centers':
         return (
           <div className="dashboard-section">
-            <h2>🏥 Center Management</h2>
+            <h2><Building2 size={24} /> Center Management</h2>
             <CentersTab loading={loading} centers={filteredCenters} selectedCenter={selectedCenter} onRefresh={loadDashboardData} />
           </div>
         );
       case 'managers':
         return (
           <div className="dashboard-section">
-            <h2>👔 Manager Oversight</h2>
+            <h2><Users size={24} /> Manager Oversight</h2>
             <ManagersTab loading={loading} centers={centers} onRefresh={loadDashboardData} />
           </div>
         );
       case 'performance':
         return (
           <div className="dashboard-section">
-            <h2>📈 Analytics</h2>
+            <h2><TrendingUp size={24} /> Analytics</h2>
             <PerformanceTab loading={loading} analytics={effectiveAnalytics} trendsData={trendsData} centers={filteredCenters} />
           </div>
         );
@@ -357,13 +377,13 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
   }, { totalStaff: 0, totalCapacity: 0 });
 
   const statCards = [
-    { icon: '🏥', label: 'Centers', value: centers.length, sub: `${centerStats.active} active`, color: '#284394' },
-    { icon: '📅', label: 'Daily Capacity', value: '36 slots', sub: 'appointment slots/day', color: '#284394' },
-    { icon: '👥', label: 'Total Staff', value: centerMetrics.totalStaff, sub: 'across all centers', color: '#2563eb' },
-    { icon: '📋', label: 'Appointments', value: summary?.totalAppointments || 0, sub: 'total bookings', color: '#16a34a' },
-    { icon: '✅', label: 'Completed', value: summary?.completedAppointments || 0, sub: 'appointments', color: '#22c55e' },
-    { icon: '⏳', label: 'Pending', value: summary?.pendingAppointments || 0, sub: 'appointments', color: '#f59e0b' },
-    { icon: '🩺', label: 'Vitals Recorded', value: summary?.totalVitals || 0, sub: 'health records', color: '#7c3aed' },
+    { icon: Building2, label: 'Centers', value: centers.length, sub: `${centerStats.active} active`, color: '#284394' },
+    { icon: Calendar, label: 'Daily Capacity', value: '36 slots', sub: 'appointment slots/day', color: '#284394' },
+    { icon: Users, label: 'Total Staff', value: centerMetrics.totalStaff, sub: 'across all centers', color: '#2563eb' },
+    { icon: ClipboardList, label: 'Appointments', value: summary?.totalAppointments || 0, sub: 'total bookings', color: '#16a34a' },
+    { icon: CheckCircle, label: 'Completed', value: summary?.completedAppointments || 0, sub: 'appointments', color: '#22c55e' },
+    { icon: Clock, label: 'Pending', value: summary?.pendingAppointments || 0, sub: 'appointments', color: '#f59e0b' },
+    { icon: Activity, label: 'Vitals Recorded', value: summary?.totalVitals || 0, sub: 'health records', color: '#7c3aed' },
   ];
 
   // Center breakdown data
@@ -391,15 +411,23 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
           gap: '1rem',
           boxShadow: '0 4px 12px rgba(76, 111, 190, 0.3)'
         }}>
-          <span style={{ fontSize: '2rem' }}>🏥</span>
+          <Building2 size={32} style={{ color: '#FFFFFF', flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>
               {centers[0]?.name}
             </div>
-            <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-              📍 {centers[0]?.city}, {centers[0]?.region} • 
-              👥 {centers[0]?._count?.staff || 0} Staff • 
-              📊 {centers[0]?.capacity || 0} Capacity
+            <div style={{ fontSize: '0.9rem', opacity: 0.9, display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <MapPin size={14} /> {centers[0]?.city}, {centers[0]?.region}
+              </span>
+              <span>•</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Users size={14} /> {centers[0]?._count?.staff || 0} Staff
+              </span>
+              <span>•</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <BarChart3 size={14} /> {centers[0]?.capacity || 0} Capacity
+              </span>
             </div>
           </div>
           <span className={`status ${centers[0]?.status === 'ACTIVE' ? 'active' : 'inactive'}`} style={{
@@ -417,18 +445,21 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
 
       {/* KPI Cards */}
       <div className="dash-kpi-grid">
-        {statCards.map((c) => (
-          <div key={c.label} className="dash-kpi-card">
-            <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
-              {c.icon}
+        {statCards.map((c) => {
+          const IconComponent = c.icon;
+          return (
+            <div key={c.label} className="dash-kpi-card">
+              <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
+                <IconComponent size={24} />
+              </div>
+              <div className="dash-kpi-body">
+                <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
+                <div className="dash-kpi-label">{c.label}</div>
+                <div className="dash-kpi-sub">{c.sub}</div>
+              </div>
             </div>
-            <div className="dash-kpi-body">
-              <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
-              <div className="dash-kpi-label">{c.label}</div>
-              <div className="dash-kpi-sub">{c.sub}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Outstanding Health Analytics Card Section */}
@@ -471,10 +502,9 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.5rem',
               boxShadow: '0 4px 16px rgba(34, 197, 94, 0.3)'
             }}>
-              🏥
+              <Activity size={28} style={{ color: '#FFFFFF' }} />
             </div>
             <div>
               <h3 style={{
@@ -536,7 +566,7 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
         }}>
           {[
             {
-              icon: '👥',
+              icon: Users,
               label: 'Total Employees',
               value: summary.totalEmployees || 0,
               color: '#284394',
@@ -544,7 +574,7 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
               trend: null
             },
             {
-              icon: '💚',
+              icon: Heart,
               label: 'Healthy',
               value: summary.healthyCount || 0,
               percentage: summary.healthyPercentage || 0,
@@ -553,7 +583,7 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
               trend: '+5%'
             },
             {
-              icon: '⚠️',
+              icon: AlertTriangle,
               label: 'At Risk',
               value: summary.atRiskCount || 0,
               percentage: summary.atRiskPercentage || 0,
@@ -562,7 +592,7 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
               trend: '-2%'
             },
             {
-              icon: '🚨',
+              icon: AlertCircle,
               label: 'Critical',
               value: summary.criticalCount || 0,
               percentage: summary.criticalPercentage || 0,
@@ -595,13 +625,12 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
             >
               {/* Icon */}
               <div style={{
-                fontSize: '2rem',
                 marginBottom: '0.75rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-                <span>{metric.icon}</span>
+                {React.createElement(metric.icon, { size: 32, style: { color: metric.color } })}
                 {metric.trend && (
                   <span style={{
                     fontSize: '0.7rem',
@@ -678,13 +707,13 @@ const OverviewTab = ({ loading, analytics, centers, selectedCenter, centerStats 
           justifyContent: 'space-around'
         }}>
           {[
-            { icon: '📊', label: 'Conditions Tracked', value: summary.totalConditions || 0, color: '#6366f1' },
-            { icon: '🩺', label: 'Recent Vitals', value: summary.recentVitals || 0, color: '#8b5cf6' },
-            { icon: '📈', label: 'Health Trend', value: 'Improving', color: '#22c55e' },
-            { icon: '⏱️', label: 'Last Updated', value: 'Just now', color: '#64748b' }
+            { icon: BarChart3, label: 'Conditions Tracked', value: summary.totalConditions || 0, color: '#6366f1' },
+            { icon: Activity, label: 'Recent Vitals', value: summary.recentVitals || 0, color: '#8b5cf6' },
+            { icon: TrendingUp, label: 'Health Trend', value: 'Improving', color: '#22c55e' },
+            { icon: Clock, label: 'Last Updated', value: 'Just now', color: '#64748b' }
           ].map((stat, idx) => (
             <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '1.25rem' }}>{stat.icon}</span>
+              {React.createElement(stat.icon, { size: 20, style: { color: stat.color } })}
               <div>
                 <div style={{
                   fontSize: '1rem',
