@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import MainLayout from "../components/MainLayout";
 import BookingCalendar from "../components/dashboard/BookingCalendar";
 import MyAppointments from "../components/dashboard/MyAppointments";
 import HealthJourney from "../components/dashboard/HealthJourney";
@@ -10,6 +11,7 @@ import RiskScoring from "../components/dashboard/RiskScoring";
 import HealthAlerts from "../components/dashboard/HealthAlerts";
 import FeedbackForm from "../components/dashboard/FeedbackForm";
 import LongitudinalRecords from "../components/dashboard/LongitudinalRecords";
+import "../styles/dashboard.css";
 
 function Dashboard() {
   const { user, logout } = useAuth();
@@ -47,39 +49,43 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Welcome, {user?.fullName}</h1>
-        <p className="dashboard-subtitle">
-          Manage your health and appointments
-        </p>
+    <MainLayout activeTab={activeTab} onTabChange={setActiveTab}>
+      <div className="dashboard-container">
+        <div className="dashboard-header">
+          <div className="dashboard-header-left">
+            <h1>Welcome, {user?.fullName}</h1>
+            <p className="dashboard-subtitle">
+              Manage your health and appointments
+            </p>
+          </div>
+        </div>
+
+        <div className="dashboard-content">
+          {activeTab === "appointments" && (
+            <>
+              <BookingCalendar />
+              <MyAppointments />
+            </>
+          )}
+
+          {activeTab === "health" && (
+            <>
+              <HealthAlerts />
+              <RiskScoring />
+              <HealthJourney />
+            </>
+          )}
+
+          {activeTab === "wellness" && <WellnessPlan />}
+
+          {activeTab === "records" && <LongitudinalRecords />}
+
+          {activeTab === "feedback" && <FeedbackForm />}
+
+          {activeTab === "profile" && <ProfileSection onLogout={logout} />}
+        </div>
       </div>
-
-      <div className="dashboard-content">
-        {activeTab === "appointments" && (
-          <>
-            <BookingCalendar />
-            <MyAppointments />
-          </>
-        )}
-
-        {activeTab === "health" && (
-          <>
-            <HealthAlerts />
-            <RiskScoring />
-            <HealthJourney />
-          </>
-        )}
-
-        {activeTab === "wellness" && <WellnessPlan />}
-
-        {activeTab === "records" && <LongitudinalRecords />}
-
-        {activeTab === "feedback" && <FeedbackForm />}
-
-        {activeTab === "profile" && <ProfileSection onLogout={logout} />}
-      </div>
-    </div>
+    </MainLayout>
   );
 }
 
