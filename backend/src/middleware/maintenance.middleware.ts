@@ -17,7 +17,7 @@ const isPublicPath = (path: string) =>
 const maintenanceMiddleware = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     if (req.method === "OPTIONS" || isPublicPath(req.path)) {

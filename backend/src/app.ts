@@ -21,7 +21,7 @@ app.get("/api/health", async (_req: Request, res: Response) => {
   try {
     // Test database connection with Prisma
     await prisma.$queryRaw`SELECT 1 AS ok`;
-    
+
     return res.status(200).json({
       status: "success",
       data: {
@@ -37,7 +37,8 @@ app.get("/api/health", async (_req: Request, res: Response) => {
       data: {
         service: "Mesob Wellness API",
         database: "disconnected",
-        message: "Database connection failed. Please ensure PostgreSQL is running.",
+        message:
+          "Database connection failed. Please ensure PostgreSQL is running.",
         timestamp: new Date().toISOString(),
       },
     });

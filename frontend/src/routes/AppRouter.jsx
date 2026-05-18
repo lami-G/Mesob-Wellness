@@ -28,7 +28,10 @@ function AppRouter() {
       try {
         return JSON.parse(settings);
       } catch (error) {
-        console.warn("Failed to parse systemSettings from localStorage:", error);
+        console.warn(
+          "Failed to parse systemSettings from localStorage:",
+          error,
+        );
         return {};
       }
     };
@@ -45,7 +48,7 @@ function AppRouter() {
         const current = readLocalSettings();
         localStorage.setItem(
           "systemSettings",
-          JSON.stringify({ ...current, maintenanceMode: isEnabled })
+          JSON.stringify({ ...current, maintenanceMode: isEnabled }),
         );
       } catch (error) {
         const current = readLocalSettings();
@@ -68,8 +71,14 @@ function AppRouter() {
   const isLoginRoute = window.location.pathname === "/login";
   const isRegisterRoute = window.location.pathname === "/register";
   const isAdminRoute = window.location.pathname.startsWith("/admin");
-  
-  if (maintenanceMode && user?.role !== "SYSTEM_ADMIN" && !isLoginRoute && !isRegisterRoute && !isAdminRoute) {
+
+  if (
+    maintenanceMode &&
+    user?.role !== "SYSTEM_ADMIN" &&
+    !isLoginRoute &&
+    !isRegisterRoute &&
+    !isAdminRoute
+  ) {
     return <MaintenanceMode />;
   }
   return (

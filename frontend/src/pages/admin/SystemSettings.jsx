@@ -63,11 +63,11 @@ function SystemSettings() {
     try {
       setLoading(true);
       setError("");
-      
+
       const updated = await settingsService.updateSettings(settings);
       setSettings(updated);
       localStorage.setItem("systemSettings", JSON.stringify(updated));
-      
+
       setSaved(true);
       setTimeout(() => setSaved(false), 5000);
     } catch (err) {
@@ -105,7 +105,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="maxLoginAttempts">Max Login Attempts</label>
-              <p className="setting-description">Maximum failed login attempts before account lockout</p>
+              <p className="setting-description">
+                Maximum failed login attempts before account lockout
+              </p>
             </div>
             <input
               type="number"
@@ -123,7 +125,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="sessionTimeout">Session Timeout (minutes)</label>
-              <p className="setting-description">Automatically logout inactive users after this duration</p>
+              <p className="setting-description">
+                Automatically logout inactive users after this duration
+              </p>
             </div>
             <input
               type="number"
@@ -140,8 +144,12 @@ function SystemSettings() {
 
           <div className="setting-item">
             <div className="setting-label">
-              <label htmlFor="lockoutDuration">Account Lockout Duration (minutes)</label>
-              <p className="setting-description">How long to lock account after max failed attempts</p>
+              <label htmlFor="lockoutDuration">
+                Account Lockout Duration (minutes)
+              </label>
+              <p className="setting-description">
+                How long to lock account after max failed attempts
+              </p>
             </div>
             <input
               type="number"
@@ -163,7 +171,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="maintenanceMode">Maintenance Mode</label>
-              <p className="setting-description">Put system in maintenance mode (users cannot access)</p>
+              <p className="setting-description">
+                Put system in maintenance mode (users cannot access)
+              </p>
             </div>
             <input
               type="checkbox"
@@ -229,15 +239,11 @@ function SystemSettings() {
 
         {/* Action Buttons */}
         <div className="settings-actions">
-          <button 
-            onClick={handleSave} 
-            className="btn-save"
-            disabled={loading}
-          >
+          <button onClick={handleSave} className="btn-save" disabled={loading}>
             {loading ? "⏳ Saving..." : "💾 Save Settings"}
           </button>
-          <button 
-            onClick={handleReset} 
+          <button
+            onClick={handleReset}
             className="btn-reset-settings"
             disabled={loading}
           >
