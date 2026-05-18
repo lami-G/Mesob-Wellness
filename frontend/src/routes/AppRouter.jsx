@@ -11,6 +11,7 @@ import ManagerDashboard from "../pages/ManagerDashboard";
 import RegionalDashboard from "../pages/RegionalDashboard";
 import ManagerDashboardProfile from "../pages/ManagerDashboardProfile";
 import RegionalDashboardProfile from "../pages/RegionalDashboardProfile";
+import FederalDashboard from "../pages/FederalDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -128,15 +129,23 @@ function AppRouter() {
       <Route
         path="/regional"
         element={
-          <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE", "FEDERAL_OFFICE"]}>
+          <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE"]}>
             <RegionalDashboard />
+          </RoleBasedRoute>
+        }
+      />
+      <Route
+        path="/federal"
+        element={
+          <RoleBasedRoute allowedRoles={["FEDERAL_OFFICE"]}>
+            <FederalDashboard />
           </RoleBasedRoute>
         }
       />
       <Route
         path="/regional-profile"
         element={
-          <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE", "FEDERAL_OFFICE"]}>
+          <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE"]}>
             <RegionalDashboardProfile />
           </RoleBasedRoute>
         }

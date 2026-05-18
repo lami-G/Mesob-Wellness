@@ -3,13 +3,14 @@ import { useAuth } from "../context/AuthContext";
 import AdminSidebar from "../components/admin/AdminSidebar";
 import ManagerSidebar from "../components/admin/ManagerSidebar";
 import RegionalSidebar from "../components/admin/RegionalSidebar";
+import FederalSidebar from "../components/admin/FederalSidebar";
 import AdminHeader from "../components/admin/AdminHeader";
 import "../styles/admin-layout.css";
 
-function AdminLayout({ 
-  children, 
-  activeTab, 
-  onTabChange, 
+function AdminLayout({
+  children,
+  activeTab,
+  onTabChange,
   dashboardType = "admin",
   user,
   capacityInfo,
@@ -22,7 +23,7 @@ function AdminLayout({
   error,
   selectedCenter,
   setSelectedCenter,
-  centers
+  centers,
 }) {
   const { user: authUser } = useAuth();
   const currentUser = user || authUser;
@@ -33,13 +34,13 @@ function AdminLayout({
       activeTab,
       onTabChange,
       isOpen: sidebarOpen,
-      user: currentUser
+      user: currentUser,
     };
 
     switch (dashboardType) {
       case "manager":
         return (
-          <ManagerSidebar 
+          <ManagerSidebar
             {...commonProps}
             capacityInfo={capacityInfo}
             staffCount={staffCount}
@@ -49,7 +50,7 @@ function AdminLayout({
         );
       case "regional":
         return (
-          <RegionalSidebar 
+          <RegionalSidebar
             {...commonProps}
             centerStats={centerStats}
             centersCount={centersCount}
@@ -58,6 +59,8 @@ function AdminLayout({
             centers={centers}
           />
         );
+      case "federal":
+        return <FederalSidebar {...commonProps} />;
       default:
         return <AdminSidebar {...commonProps} />;
     }
@@ -69,6 +72,8 @@ function AdminLayout({
         return "MESOB Manager Portal";
       case "regional":
         return "MESOB Regional Portal";
+      case "federal":
+        return "MESOB Federal Portal";
       default:
         return "MESOB Admin Portal";
     }
@@ -77,9 +82,9 @@ function AdminLayout({
   return (
     <div className="admin-layout">
       {renderSidebar()}
-      
+
       <div className="admin-main">
-        <AdminHeader 
+        <AdminHeader
           user={currentUser}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onTabChange={onTabChange}
@@ -93,10 +98,10 @@ function AdminLayout({
           centers={centers}
           activeTab={activeTab}
         />
-        
+
         <main className="admin-content">
           {error && (
-            <div className="alert alert-error" style={{ marginBottom: '1rem' }}>
+            <div className="alert alert-error" style={{ marginBottom: "1rem" }}>
               {error}
             </div>
           )}
