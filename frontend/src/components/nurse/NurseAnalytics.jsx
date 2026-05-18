@@ -58,16 +58,17 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = daysToShow - 1;
         
         for (let i = daysToShow - 1; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          date.setHours(0, 0, 0, 0);
-          const dateEnd = new Date(date);
-          dateEnd.setHours(23, 59, 59, 999);
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth();
+          const date = today.getUTCDate();
           
-          labels.push(i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+          const dateStart = new Date(Date.UTC(year, month, date - i, 0, 0, 0));
+          const dateEnd = new Date(Date.UTC(year, month, date - i, 23, 59, 59));
+          
+          labels.push(i === 0 ? 'Today' : dateStart.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
           
           const params = {
-            startDate: date.toISOString(),
+            startDate: dateStart.toISOString(),
             endDate: dateEnd.toISOString()
           };
           
@@ -79,17 +80,16 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         }
       } else if (period === 'weekly') {
         const weeksToShow = 8;
-        const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
         
-        // Calculate start of current week (Monday)
-        const currentWeekStart = new Date(today);
+        // Calculate start of current week (Monday in UTC)
+        const currentDay = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
         const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
-        currentWeekStart.setDate(today.getDate() - daysToMonday);
-        currentWeekStart.setHours(0, 0, 0, 0);
         
-        // For current week: Monday to today (incomplete week)
-        const currentWeekEnd = new Date(today);
-        currentWeekEnd.setHours(23, 59, 59, 999);
+        const currentWeekStart = new Date(Date.UTC(year, month, date - daysToMonday, 0, 0, 0));
+        const currentWeekEnd = new Date(Date.UTC(year, month, date, 23, 59, 59));
         
         highlightedIndex = weeksToShow - 1;
         
@@ -104,12 +104,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           } else {
             // Past weeks: Monday to Sunday (complete weeks)
             weekStart = new Date(currentWeekStart);
-            weekStart.setDate(currentWeekStart.getDate() - (i * 7));
-            weekStart.setHours(0, 0, 0, 0);
+            weekStart.setUTCDate(currentWeekStart.getUTCDate() - (i * 7));
             
             weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekStart.getDate() + 6);
-            weekEnd.setHours(23, 59, 59, 999);
+            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+            weekEnd.setUTCHours(23, 59, 59, 999);
             
             label = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
           }
@@ -134,9 +133,16 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = monthsToShow - 1;
         
         for (let i = monthsToShow - 1; i >= 0; i--) {
-          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
-          if (i === 0) monthEnd.setTime(today.getTime());
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth() - i;
+          
+          const monthStart = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+          let monthEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
+          
+          // For current month, only go up to today
+          if (i === 0) {
+            monthEnd = new Date(Date.UTC(year, today.getUTCMonth(), today.getUTCDate(), 23, 59, 59));
+          }
           
           labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
           
@@ -156,9 +162,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = -1;
         
         for (let i = monthsToShow - 1; i >= 0; i--) {
-          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
-          if (i === 0) monthEnd.setTime(today.getTime());
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth() - i;
+          
+          const monthStart = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+          const monthEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
           
           labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
           
@@ -235,7 +243,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     try {
       console.log('🔍 Fetching health conditions for period:', period);
       
-      // Calculate date range based on period
+      // Calculate date range based on period using UTC dates
       const today = new Date();
       let startDate, endDate;
       
@@ -244,19 +252,26 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = null;
         endDate = null;
       } else if (period === 'daily') {
-        // Today only
-        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // Today only - use UTC dates to avoid timezone issues
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'weekly') {
-        // Last 7 days (including today)
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // Last 7 days (including today) - use UTC dates
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'monthly') {
-        // From 1st of current month to today
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // From 1st of current month to today - use UTC dates
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       }
       
       console.log('Date range:', startDate, 'to', endDate);

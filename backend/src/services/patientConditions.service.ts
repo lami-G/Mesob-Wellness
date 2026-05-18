@@ -488,20 +488,30 @@ export async function getConditionsByDateRange(
     return [];
   }
 
-  // Get the latest wellness plan for each user
-  const wellnessPlans = await prisma.wellnessPlan.findMany({
-    where: {
-      userId: {
-        in: userIds,
-      },
-      isActive: true,
+  // Get wellness plans created within the date range for each user
+  const wellnessPlanWhereClause: any = {
+    userId: {
+      in: userIds,
     },
+    isActive: true,
+  };
+
+  // Only filter by date range if dates are provided
+  if (startDate && endDate) {
+    wellnessPlanWhereClause.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
+  const wellnessPlans = await prisma.wellnessPlan.findMany({
+    where: wellnessPlanWhereClause,
     select: {
       userId: true,
       conditions: true,
     },
     orderBy: { createdAt: 'desc' },
-    distinct: ['userId'], // Get latest plan per user
+    distinct: ['userId'], // Get latest plan per user in this period
   });
 
   console.log(`[getConditionsByDateRange] Found ${wellnessPlans.length} active wellness plans for these users`);
