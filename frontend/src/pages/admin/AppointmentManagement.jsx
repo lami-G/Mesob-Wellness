@@ -1,22 +1,14 @@
 import React, { useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import AppointmentsList from "../../components/admin/AppointmentsList";
-import EditAppointmentModal from "../../components/admin/EditAppointmentModal";
 import { adminService } from "../../services/adminService";
 
 function AppointmentManagement() {
   const [filters, setFilters] = useState({});
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
-  };
-
-  const handleEdit = (appointment) => {
-    setSelectedAppointment(appointment);
-    setShowEditModal(true);
   };
 
   const handleDelete = async (appointmentId) => {
@@ -29,10 +21,6 @@ function AppointmentManagement() {
         alert("Failed to delete appointment: " + (err.response?.data?.message || err.message));
       }
     }
-  };
-
-  const handleEditSuccess = () => {
-    setRefreshKey((prev) => prev + 1);
   };
 
   return (
@@ -51,15 +39,7 @@ function AppointmentManagement() {
       <AppointmentsList 
         key={refreshKey}
         filters={filters}
-        onEdit={handleEdit}
         onDelete={handleDelete}
-      />
-
-      <EditAppointmentModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        appointment={selectedAppointment}
-        onSuccess={handleEditSuccess}
       />
     </div>
   );

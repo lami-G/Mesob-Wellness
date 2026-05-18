@@ -450,45 +450,113 @@ export async function getConditionTrends(period: string) {
 
 /**
  * Get all nurse-approved conditions within a date range (or all time if dates are null)
- * Now queries wellness plans directly to include ALL patients with wellness plans in the period
+ * Queries vitals records to find patients with vitals in the period,
+ * then gets their latest wellness plans to determine conditions
+ * Returns unique patient count per condition
  */
 export async function getConditionsByDateRange(
   startDate: Date | null,
   endDate: Date | null
 ) {
-  try {
-    console.log('📊 getConditionsByDateRange called with:', { startDate, endDate });
-    
-    // Build where clause conditionally
-    const whereClause: any = {};
-    
-    if (startDate && endDate) {
-      whereClause.createdAt = {
-        gte: startDate,
-        lte: endDate,
-      };
-    }
-    // If no dates, fetch all wellness plans (all time)
-
-    console.log('📊 Where clause:', JSON.stringify(whereClause, null, 2));
-
-    // Get all wellness plans created in the date range (or all time)
-    const wellnessPlans = await prisma.wellnessPlan.findMany({
-      where: whereClause,
-      select: {
-        userId: true,
-        conditions: true,
-      },
-    });
-
-    console.log(`📊 Found ${wellnessPlans.length} wellness plans`);
-
-    // Return conditions from wellness plans (each plan represents one patient)
-    return wellnessPlans.map(plan => ({
-      conditions: plan.conditions as string[],
-    }));
-  } catch (error) {
-    console.error('❌ Error in getConditionsByDateRange:', error);
-    throw error;
+  // Build where clause for vitals records
+  const vitalsWhereClause: any = {};
+  
+  if (startDate && endDate) {
+    vitalsWhereClause.recordedAt = {
+      gte: startDate,
+      lte: endDate,
+    };
   }
+
+  // Get all vitals records in the date range (or all time)
+  const vitalsRecords = await prisma.vitalRecord.findMany({
+    where: vitalsWhereClause,
+    select: {
+      userId: true,
+    },
+    distinct: ['userId'],
+  });
+
+  console.log(`[getConditionsByDateRange] Found ${vitalsRecords.length} unique users with vitals in date range`);
+  console.log(`[getConditionsByDateRange] Date range: ${startDate?.toISOString()} to ${endDate?.toISOString()}`);
+
+  // Get unique user IDs
+  const userIds = vitalsRecords.map(v => v.userId);
+
+  if (userIds.length === 0) {
+    console.log('[getConditionsByDateRange] No users found, returning empty result');
+    return [];
+  }
+
+  // Get wellness plans created within the date range for each user
+  const wellnessPlanWhereClause: any = {
+    userId: {
+      in: userIds,
+    },
+    isActive: true,
+  };
+
+  // Only filter by date range if dates are provided
+  if (startDate && endDate) {
+    wellnessPlanWhereClause.createdAt = {
+      gte: startDate,
+      lte: endDate,
+    };
+  }
+
+  const wellnessPlans = await prisma.wellnessPlan.findMany({
+    where: wellnessPlanWhereClause,
+    select: {
+      userId: true,
+      conditions: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    distinct: ['userId'],
+  });
+
+  console.log(`[getConditionsByDateRange] Found ${wellnessPlans.length} active wellness plans for these users`);
+
+  // Count unique patients per condition
+  const conditionPatientMap: Record<string, Set<string>> = {};
+
+  wellnessPlans.forEach(plan => {
+    const raw: unknown = plan.conditions as unknown;
+    let conditionList: string[] = [];
+
+    if (Array.isArray(raw)) {
+      conditionList = raw.map(String);
+    } else if (typeof raw === 'string' && raw.trim().length > 0) {
+      conditionList = [raw];
+    } else if (raw && typeof raw === 'object') {
+      conditionList = Object.values(raw as Record<string, unknown>).map(String);
+    }
+
+    if (conditionList.length === 0) {
+      if (!conditionPatientMap['normal']) {
+        conditionPatientMap['normal'] = new Set();
+      }
+      conditionPatientMap['normal'].add(plan.userId);
+    } else {
+      conditionList.forEach(condition => {
+        const key = condition.toLowerCase().trim();
+        if (!key) {
+          return;
+        }
+        if (!conditionPatientMap[key]) {
+          conditionPatientMap[key] = new Set();
+        }
+        conditionPatientMap[key].add(plan.userId);
+      });
+    }
+  });
+
+  // Convert to array format with unique patient counts
+  const result = Object.entries(conditionPatientMap).map(([condition, patientSet]) => ({
+    condition,
+    count: patientSet.size,
+  }));
+
+  console.log('[getConditionsByDateRange] Result:', result);
+
+  return result;
 }

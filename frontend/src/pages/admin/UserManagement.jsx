@@ -51,6 +51,7 @@ function UserManagement() {
         onFilterChange={handleFilterChange}
         showRegionFilter={true}
         showCenterFilter={true}
+        showRoleFilter={true}
       />
 
       <UsersList 

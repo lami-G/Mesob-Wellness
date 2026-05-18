@@ -58,16 +58,17 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = daysToShow - 1;
         
         for (let i = daysToShow - 1; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          date.setHours(0, 0, 0, 0);
-          const dateEnd = new Date(date);
-          dateEnd.setHours(23, 59, 59, 999);
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth();
+          const date = today.getUTCDate();
           
-          labels.push(i === 0 ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+          const dateStart = new Date(Date.UTC(year, month, date - i, 0, 0, 0));
+          const dateEnd = new Date(Date.UTC(year, month, date - i, 23, 59, 59));
+          
+          labels.push(i === 0 ? 'Today' : dateStart.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
           
           const params = {
-            startDate: date.toISOString(),
+            startDate: dateStart.toISOString(),
             endDate: dateEnd.toISOString()
           };
           
@@ -79,22 +80,47 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         }
       } else if (period === 'weekly') {
         const weeksToShow = 8;
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        
+        // Calculate start of current week (Monday in UTC)
+        const currentDay = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        
+        const currentWeekStart = new Date(Date.UTC(year, month, date - daysToMonday, 0, 0, 0));
+        const currentWeekEnd = new Date(Date.UTC(year, month, date, 23, 59, 59));
+        
         highlightedIndex = weeksToShow - 1;
         
         for (let i = weeksToShow - 1; i >= 0; i--) {
-          const weekStart = new Date();
-          weekStart.setDate(weekStart.getDate() - (i * 7));
-          weekStart.setHours(0, 0, 0, 0);
-          const weekEnd = new Date(weekStart);
-          weekEnd.setDate(weekStart.getDate() + 6);
-          weekEnd.setHours(23, 59, 59, 999);
+          let weekStart, weekEnd, label;
           
-          labels.push(i === 0 ? 'This week' : `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`);
+          if (i === 0) {
+            // Current week: Monday to today
+            weekStart = new Date(currentWeekStart);
+            weekEnd = new Date(currentWeekEnd);
+            label = 'This week';
+          } else {
+            // Past weeks: Monday to Sunday (complete weeks)
+            weekStart = new Date(currentWeekStart);
+            weekStart.setUTCDate(currentWeekStart.getUTCDate() - (i * 7));
+            
+            weekEnd = new Date(weekStart);
+            weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+            weekEnd.setUTCHours(23, 59, 59, 999);
+            
+            label = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          }
+          
+          labels.push(label);
           
           const params = {
             startDate: weekStart.toISOString(),
             endDate: weekEnd.toISOString()
           };
+          
+          console.log(`[Trend] Week ${i}: ${weekStart.toDateString()} to ${weekEnd.toDateString()}`);
           
           dataPointsPromises.push(
             api.get('/api/v1/conditions/period', { params })
@@ -107,9 +133,16 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = monthsToShow - 1;
         
         for (let i = monthsToShow - 1; i >= 0; i--) {
-          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
-          if (i === 0) monthEnd.setTime(today.getTime());
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth() - i;
+          
+          const monthStart = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+          let monthEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
+          
+          // For current month, only go up to today
+          if (i === 0) {
+            monthEnd = new Date(Date.UTC(year, today.getUTCMonth(), today.getUTCDate(), 23, 59, 59));
+          }
           
           labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
           
@@ -129,9 +162,11 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         highlightedIndex = -1;
         
         for (let i = monthsToShow - 1; i >= 0; i--) {
-          const monthStart = new Date(today.getFullYear(), today.getMonth() - i, 1, 0, 0, 0, 0);
-          const monthEnd = new Date(today.getFullYear(), today.getMonth() - i + 1, 0, 23, 59, 59, 999);
-          if (i === 0) monthEnd.setTime(today.getTime());
+          const year = today.getUTCFullYear();
+          const month = today.getUTCMonth() - i;
+          
+          const monthStart = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+          const monthEnd = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
           
           labels.push(monthStart.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
           
@@ -208,7 +243,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     try {
       console.log('🔍 Fetching health conditions for period:', period);
       
-      // Calculate date range based on period
+      // Calculate date range based on period using UTC dates
       const today = new Date();
       let startDate, endDate;
       
@@ -217,19 +252,26 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = null;
         endDate = null;
       } else if (period === 'daily') {
-        // Today only
-        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // Today only - use UTC dates to avoid timezone issues
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'weekly') {
-        // Last 7 days (including today)
-        startDate = new Date(today);
-        startDate.setDate(today.getDate() - 6);
-        startDate.setHours(0, 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // Last 7 days (including today) - use UTC dates
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'monthly') {
-        // From 1st of current month to today
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0);
-        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        // From 1st of current month to today - use UTC dates
+        const year = today.getUTCFullYear();
+        const month = today.getUTCMonth();
+        const date = today.getUTCDate();
+        startDate = new Date(Date.UTC(year, month, 1, 0, 0, 0));
+        endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       }
       
       console.log('Date range:', startDate, 'to', endDate);
@@ -263,30 +305,55 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       console.log('📊 Total patients in period:', totalPatients);
       console.log('📊 Health conditions data:', conditions);
       
-      // Define all 7 conditions with their colors - distinct and easily distinguishable
-      const allConditions = [
+      // Define predefined conditions with their colors
+      const predefinedConditions = [
         { key: 'hypertension', label: 'Hypertension', color: '#dc2626' },      // Red
         { key: 'overweight', label: 'Overweight', color: '#f59e0b' },          // Amber/Orange
         { key: 'obesity', label: 'Obesity', color: '#7c3aed' },                // Purple
         { key: 'diabetes', label: 'Diabetes', color: '#2563eb' },              // Blue
         { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' }, // Pink
         { key: 'normal', label: 'Normal', color: '#10b981' },                  // Green
-        { key: 'other', label: 'Other', color: '#64748b' },                    // Slate Gray
       ];
       
       // Create a map of condition counts
       const conditionMap = {};
+      const customConditions = new Set();
+      
       conditions.forEach(c => {
         const key = c.condition.toLowerCase().replace(/ /g, '_');
+        
+        // Skip "other" condition completely
+        if (key === 'other') {
+          return;
+        }
+        
         // Combine heart issues and respiratory issues
         if (key === 'heart_issues' || key === 'respiratory_issues') {
           conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
         } else {
           conditionMap[key] = (conditionMap[key] || 0) + c.count;
+          
+          // Track custom conditions (not in predefined list)
+          const isPredefined = predefinedConditions.some(pc => pc.key === key);
+          if (!isPredefined && key !== 'heart_issues' && key !== 'respiratory_issues') {
+            customConditions.add(key);
+          }
         }
       });
       
+      // Generate colors for custom conditions
+      const customColors = ['#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'];
+      const customConditionsList = Array.from(customConditions).map((key, index) => ({
+        key,
+        label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+        color: customColors[index % customColors.length],
+      }));
+      
+      // Combine predefined and custom conditions
+      const allConditions = [...predefinedConditions, ...customConditionsList];
+      
       console.log('📊 Condition map:', conditionMap);
+      console.log('📊 Custom conditions found:', customConditionsList);
       console.log('📊 Total wellness plans for percentage calc:', totalWellnessPlans);
       
       // Map counts to conditions and calculate percentages based on total wellness plans
@@ -297,7 +364,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           ? Math.round((conditionMap[c.key] || 0) / totalWellnessPlans * 100) 
           : 0,
         totalPatients: totalPatients
-      })).sort((a, b) => b.count - a.count);
+      })).filter(c => c.count > 0).sort((a, b) => b.count - a.count); // Only show conditions with count > 0
       
       setHealthConditions(rankedConditions);
       
@@ -388,7 +455,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
       // Fetch appointments from queue endpoint with date parameter
       const appointmentsRes = await api.get('/api/v1/appointments/queue', {
-        params: viewPeriod === 'all' ? {} : { date: selectedDate }
+        params: viewPeriod === 'all' 
+          ? {} 
+          : { 
+              startDate: startDate.toISOString(),
+              endDate: endDate.toISOString()
+            }
       });
       let appointmentsData = appointmentsRes.data.data || [];
 
@@ -437,7 +509,9 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const noShow = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
-      // Walk-ins = number of wellness plans created for patients WITHOUT appointments in the period
+      // Walk-ins = wellness plans created for users WITHOUT appointments on that specific day
+      // For weekly view: sum daily walk-ins (each day checked independently)
+      // For daily view: check that single day
       try {
         console.log('=== COUNTING WALK-INS ===');
         
@@ -461,27 +535,39 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           // For each user with vitals, count their completed wellness plans in the period
           for (const userId of vitalsUserIds) {
             try {
-              // Check if user has appointments in this period
-              const hasAppointment = mappedAppointments.some(apt => apt.customerId === userId);
+              const plansRes = await api.get(`/api/v1/plans/${userId}`);
+              const plansData = plansRes.data?.data || plansRes.data || [];
               
-              // If no appointment, this is a walk-in - count their wellness plans
-              if (!hasAppointment) {
-                const plansRes = await api.get(`/api/v1/plans/${userId}`);
-                const plansData = plansRes.data?.data || plansRes.data || [];
+              if (Array.isArray(plansData)) {
+                // Count wellness plans created in this period (or all time)
+                const periodPlans = viewPeriod === 'all' 
+                  ? plansData 
+                  : plansData.filter(p => {
+                      const pDate = new Date(p.createdAt);
+                      return pDate >= startDate && pDate <= endDate;
+                    });
                 
-                if (Array.isArray(plansData)) {
-                  // Count wellness plans created in this period (or all time)
-                  const periodPlans = viewPeriod === 'all' 
-                    ? plansData 
-                    : plansData.filter(p => {
-                        const pDate = new Date(p.createdAt);
-                        return pDate >= startDate && pDate <= endDate;
-                      });
+                // For each wellness plan, check if user had an appointment on that specific day
+                for (const plan of periodPlans) {
+                  const planDate = new Date(plan.createdAt);
+                  planDate.setHours(0, 0, 0, 0);
                   
-                  walkin += periodPlans.length; // Count each wellness plan
-                  if (periodPlans.length > 0) {
-                    console.log(`✓ Walk-in user ${userId}: ${periodPlans.length} wellness plans`);
+                  // Check if user has appointment on the SAME DAY as the wellness plan
+                  const hasAppointmentOnDay = mappedAppointments.some(apt => {
+                    const aptDate = new Date(apt.scheduledAt);
+                    aptDate.setHours(0, 0, 0, 0);
+                    return apt.customerId === userId && aptDate.getTime() === planDate.getTime();
+                  });
+                  
+                  // Only count as walk-in if NO appointment on that specific day
+                  // This allows staff without appointments on that day to be counted as walk-ins
+                  if (!hasAppointmentOnDay) {
+                    walkin++;
                   }
+                }
+                
+                if (periodPlans.length > 0) {
+                  console.log(`✓ User ${userId}: ${periodPlans.length} wellness plans checked for daily walk-in status`);
                 }
               }
             } catch (err) {
@@ -983,7 +1069,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           </h3>
           <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
             {viewPeriod === 'daily' && 'Condition trends over the last 7 days (today highlighted)'}
-            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks - average daily patients per week (this week highlighted)'}
+            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks (this week highlighted)'}
             {viewPeriod === 'monthly' && 'All 12 months up to now (current month counts data up to today only)'}
             {viewPeriod === 'all' && 'Historical condition trends (up to 12 months)'}
           </p>
@@ -1031,7 +1117,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                         const label = context.dataset.label || '';
                         // Round to remove the tiny offset we added for visibility
                         const value = Math.round(context.parsed.y);
-                        const suffix = viewPeriod === 'weekly' ? ' avg daily' : ' patients';
+                        const isHighlighted = context.dataIndex === chartData.conditionTrends.highlightedIndex;
+                        
+                        // Show "patients" for highlighted (current) period, "total" for historical
+                        const suffix = isHighlighted ? ' patients' : ' patients';
                         return `${label}: ${value}${suffix}`;
                       }
                     }
@@ -1125,7 +1214,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       diabetes: 'Diabetes',
                       heart_respiratory: 'Heart / Resp.',
                       normal: 'Normal',
-                      other: 'Other',
                     };
                     
                     const trendColor = data.trend === 'up' ? '#dc2626' : data.trend === 'down' ? '#10b981' : '#6b7280';

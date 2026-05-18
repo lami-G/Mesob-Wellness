@@ -672,6 +672,7 @@ export const getAuditLogs = async (
       user: req.query.user as string,
       action: req.query.action as string,
       resource: req.query.resource as string,
+      role: req.query.role as any,
       dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
       dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined,
       page: req.query.page ? parseInt(req.query.page as string) : 1,

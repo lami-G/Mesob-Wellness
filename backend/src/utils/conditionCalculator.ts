@@ -71,5 +71,10 @@ export function calculateConditionsFromVitals(vitals: VitalsInput): string[] {
     conditions.push('respiratory_issues');
   }
 
+  // If no conditions detected, mark as normal
+  if (conditions.length === 0) {
+    conditions.push('normal');
+  }
+
   return conditions;
 }

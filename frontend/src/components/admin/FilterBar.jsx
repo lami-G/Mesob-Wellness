@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter = true, showDateFilter = false }) {
+function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter = true, showDateFilter = false, showRoleFilter = false }) {
   const [filters, setFilters] = useState({
     region: "",
     center: "",
     search: "",
     dateFrom: "",
     dateTo: "",
+    role: "",
   });
 
   const [regions, setRegions] = useState([]);
@@ -66,6 +67,7 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
       search: "",
       dateFrom: "",
       dateTo: "",
+      role: "",
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -125,6 +127,28 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
                   {center.name}
                 </option>
               ))}
+            </select>
+          </div>
+        )}
+
+        {/* Role Filter */}
+        {showRoleFilter && (
+          <div className="filter-group">
+            <label htmlFor="role">Role</label>
+            <select
+              id="role"
+              value={filters.role}
+              onChange={(e) => handleFilterChange("role", e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Roles</option>
+              <option value="SYSTEM_ADMIN">System Admin</option>
+              <option value="REGIONAL_MANAGER">Regional Manager</option>
+              <option value="CENTER_MANAGER">Center Manager</option>
+              <option value="NURSE">Nurse</option>
+              <option value="RECEPTIONIST">Receptionist</option>
+              <option value="STAFF">Staff</option>
+              <option value="EXTERNAL_PATIENT">External Patient</option>
             </select>
           </div>
         )}

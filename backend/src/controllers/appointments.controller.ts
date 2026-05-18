@@ -430,3 +430,49 @@ export async function cancelAppointmentHandler(req: AuthRequest, res: Response):
     });
   }
 }
+
+/**
+ * DELETE /api/v1/appointments/:id
+ * Delete an appointment (admin only)
+ */
+export async function deleteAppointmentHandler(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+
+    if (!id || typeof id !== "string") {
+      res.status(400).json({
+        status: "error",
+        message: "Appointment ID is required",
+      });
+      return;
+    }
+
+    const appointment = await prisma.appointment.findUnique({
+      where: { id },
+    });
+
+    if (!appointment) {
+      res.status(404).json({
+        status: "error",
+        message: "Appointment not found",
+      });
+      return;
+    }
+
+    await prisma.appointment.delete({
+      where: { id },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Appointment deleted successfully",
+    });
+  } catch (error) {
+    console.error('Delete appointment error:', error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to delete appointment",
+    });
+  }
+}
+

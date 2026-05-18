@@ -62,6 +62,7 @@ export interface AuditFilters {
   user?: string;
   action?: string;
   resource?: string;
+  role?: UserRole;
   dateFrom?: Date;
   dateTo?: Date;
   page?: number;

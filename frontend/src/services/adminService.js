@@ -216,17 +216,6 @@ export const adminService = {
     }
   },
 
-  // Update appointment
-  updateAppointment: async (appointmentId, appointmentData) => {
-    try {
-      const response = await api.put(`/appointments/${appointmentId}`, appointmentData);
-      return response.data.data;
-    } catch (err) {
-      console.error("Error updating appointment:", err);
-      throw err;
-    }
-  },
-
   // Update user profile (for current user)
   updateProfile: async (profileData) => {
     try {

@@ -23,6 +23,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
   const [conditionsAutoFilled, setConditionsAutoFilled] = useState(false);
   const [conditionsLoading, setConditionsLoading] = useState(false);
   const [newCondition, setNewCondition] = useState('');
+  const [showDownloadButton, setShowDownloadButton] = useState(false);
   const successRef = React.useRef(null);
   const [formData, setFormData] = useState({
     title: '',
@@ -194,9 +195,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
 
       setSuccess('Wellness plan created successfully!');
       setCreatedPlanId(response.data.data.id);
-      
-      // Don't auto-redirect for walk-in users - wait for download button click
-      // For appointment patients, show the buttons and let them decide
+      setShowDownloadButton(false);
       
       // Scroll to success message
       setTimeout(() => {
@@ -208,10 +207,17 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         }
       }, 100);
       
-      // Hide success message after 2 seconds (for staff with appointments)
-      if (appointmentId) {
+      // For walk-in patients: hide success message after 2 seconds, then show download button
+      if (!appointmentId) {
         setTimeout(() => {
           setSuccess('');
+          setShowDownloadButton(true);
+        }, 2000);
+      } else {
+        // For appointment patients: hide success message and show download button immediately
+        setTimeout(() => {
+          setSuccess('');
+          setShowDownloadButton(true);
         }, 2000);
       }
     } catch (err) {
@@ -299,6 +305,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           setSelectedCustomerId('');
           setSelectedCustomerName('');
           setCreatedPlanId(null);
+          setShowDownloadButton(false);
           setConditions([]);
           setConditionsAutoFilled(false);
           setFormData({
@@ -335,71 +342,69 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       <h3>🎯 Create Wellness Plan</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
-      {success && <div ref={successRef} className="alert alert-success">{success}</div>}
       
       {/* PDF Download and Mark as Completed Buttons */}
       {createdPlanId && (
-        <div style={{
-          marginBottom: '1.5rem',
-          padding: '1rem',
-          backgroundColor: '#EFF6FF',
-          border: '2px solid #3550A0',
-          borderRadius: '8px',
-        }}>
-          <p style={{ margin: '0 0 1rem 0', color: '#1E40AF', fontWeight: 600 }}>
-            {appointmentId ? '✓ Wellness plan created!' : '📄 Download report to give to patient'}
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* For walk-in patients: show download button for nurse to give to patient */}
-            {!appointmentId && (
-              <button
-                onClick={handleDownloadPDF}
-                disabled={generatingPDF}
-                className="btn btn-primary"
-                style={{
-                  cursor: generatingPDF ? 'not-allowed' : 'pointer',
-                  opacity: generatingPDF ? 0.6 : 1,
-                  flex: 1,
-                  minWidth: '200px',
-                }}
-              >
-                {generatingPDF ? '📄 Generating PDF...' : '📄 Download Report for Patient'}
-              </button>
-            )}
-            {/* For appointment patients: show download button */}
-            {appointmentId && (
-              <button
-                onClick={handleDownloadPDF}
-                disabled={generatingPDF}
-                className="btn btn-primary"
-                style={{
-                  cursor: generatingPDF ? 'not-allowed' : 'pointer',
-                  opacity: generatingPDF ? 0.6 : 1,
-                  flex: 1,
-                  minWidth: '200px',
-                }}
-              >
-                {generatingPDF ? '📄 Generating PDF...' : '📄 Download Health Report PDF'}
-              </button>
-            )}
-            {/* Only show "Mark as Completed" button for staff with appointments */}
-            {onBackToQueue && appointmentId && (
-              <button
-                onClick={handleMarkAsCompleted}
-                disabled={loading}
-                className="btn btn-secondary"
-                style={{
-                  flex: 1,
-                  minWidth: '150px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.6 : 1,
-                }}
-              >
-                {loading ? '⏳ Processing...' : '✓ Mark as Completed'}
-              </button>
-            )}
-          </div>
-        </div>
+        <>
+          {/* Success Message - shown first, then removed */}
+          {success && <div ref={successRef} className="alert alert-success">{success}</div>}
+          
+          {/* Download Button - shown after success message is removed */}
+          {showDownloadButton && (
+            <div style={{
+              marginBottom: '1.5rem',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '1rem',
+              alignItems: 'center',
+            }}>
+              {/* For walk-in patients: show download button for nurse to give to patient */}
+              {!appointmentId && (
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={generatingPDF}
+                  className="btn btn-primary btn-small"
+                  style={{
+                    cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                    opacity: generatingPDF ? 0.6 : 1,
+                  }}
+                >
+                  {generatingPDF ? '📄 Generating...' : '📄 Download Report'}
+                </button>
+              )}
+              {/* For appointment patients: show download button */}
+              {appointmentId && (
+                <>
+                  <button
+                    onClick={handleDownloadPDF}
+                    disabled={generatingPDF}
+                    className="btn btn-primary btn-small"
+                    style={{
+                      cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                      opacity: generatingPDF ? 0.6 : 1,
+                    }}
+                  >
+                    {generatingPDF ? '📄 Generating...' : '📄 Download Report'}
+                  </button>
+                  {/* Only show "Mark as Completed" button for staff with appointments */}
+                  {onBackToQueue && (
+                    <button
+                      onClick={handleMarkAsCompleted}
+                      disabled={loading}
+                      className="btn btn-secondary btn-small"
+                      style={{
+                        cursor: loading ? 'not-allowed' : 'pointer',
+                        opacity: loading ? 0.6 : 1,
+                      }}
+                    >
+                      {loading ? '⏳ Processing...' : '✓ Completed'}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Latest Vitals Display */}
@@ -563,9 +568,12 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
               </div>
               
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <select
+                <input
+                  type="text"
+                  placeholder="Select or type custom condition..."
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
+                  list="condition-options"
                   style={{
                     flex: 1,
                     padding: '0.5rem',
@@ -573,17 +581,16 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     borderRadius: '4px',
                     fontSize: '0.9rem',
                   }}
-                >
-                  <option value="">Select a condition to add...</option>
-                  <option value="hypertension">Hypertension</option>
-                  <option value="obesity">Obesity</option>
-                  <option value="overweight">Overweight</option>
-                  <option value="diabetes">Diabetes</option>
-                  <option value="heart_issues">Heart Issues</option>
-                  <option value="respiratory_issues">Respiratory Issues</option>
-                  <option value="normal">Normal</option>
-                  <option value="other">Other</option>
-                </select>
+                />
+                <datalist id="condition-options">
+                  <option value="Hypertension" />
+                  <option value="Obesity" />
+                  <option value="Overweight" />
+                  <option value="Diabetes" />
+                  <option value="Heart Issues" />
+                  <option value="Respiratory Issues" />
+                  <option value="Normal" />
+                </datalist>
                 <button
                   type="button"
                   onClick={() => {
@@ -602,6 +609,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     cursor: newCondition && !conditions.includes(newCondition) ? 'pointer' : 'not-allowed',
                     fontSize: '0.9rem',
                     fontWeight: 600,
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   + Add

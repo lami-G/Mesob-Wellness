@@ -13,6 +13,7 @@ function AuditLogs() {
     dateFrom: "",
     dateTo: "",
     search: "",
+    role: "",
   });
 
   useEffect(() => {
@@ -50,6 +51,7 @@ function AuditLogs() {
       dateFrom: "",
       dateTo: "",
       search: "",
+      role: "",
     });
     setPage(1);
   };
@@ -107,6 +109,21 @@ function AuditLogs() {
           <option value="VITAL">Vital</option>
           <option value="FEEDBACK">Feedback</option>
         </select>
+        <select
+          name="role"
+          value={filters.role}
+          onChange={handleFilterChange}
+          className="filter-select"
+        >
+          <option value="">All Roles</option>
+          <option value="SYSTEM_ADMIN">System Admin</option>
+          <option value="REGIONAL_MANAGER">Regional Manager</option>
+          <option value="CENTER_MANAGER">Center Manager</option>
+          <option value="NURSE">Nurse</option>
+          <option value="RECEPTIONIST">Receptionist</option>
+          <option value="STAFF">Staff</option>
+          <option value="EXTERNAL_PATIENT">External Patient</option>
+        </select>
         <input
           type="date"
           name="dateFrom"
@@ -131,6 +148,7 @@ function AuditLogs() {
           <tr>
             <th>Timestamp</th>
             <th>User</th>
+            <th>Role</th>
             <th>Action</th>
             <th>Resource</th>
             <th>Details</th>
@@ -142,6 +160,7 @@ function AuditLogs() {
             <tr key={log.id}>
               <td>{new Date(log.timestamp).toLocaleString()}</td>
               <td>{log.user?.fullName || "System"}</td>
+              <td>{log.user?.role || "-"}</td>
               <td>
                 <span className={`badge badge-action badge-${getActionColor(log.action)}`}>
                   {log.action || "-"}

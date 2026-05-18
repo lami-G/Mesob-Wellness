@@ -249,6 +249,63 @@ export async function getQueueAnalytics(req: Request, res: Response) {
   }
 }
 
+// ─── Daily Queue Metrics (Appointments, Walk-ins, Patients Served) ──────────
+export async function getDailyQueueMetrics(req: Request, res: Response) {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+    // Get all completed appointments today
+    const completedAppointments = await prisma.appointment.findMany({
+      where: {
+        scheduledAt: { gte: startOfDay, lte: endOfDay },
+        status: AppointmentStatus.COMPLETED,
+      },
+      select: { userId: true, id: true },
+    });
+
+    const completedCount = completedAppointments.length;
+    const completedUserIds = new Set(completedAppointments.map(apt => apt.userId));
+
+    // Get all vital records today
+    const vitalsToday = await prisma.vitalRecord.findMany({
+      where: {
+        recordedAt: { gte: startOfDay, lte: endOfDay },
+      },
+      select: { userId: true },
+    });
+
+    // Count walk-ins: vital records for users WITHOUT completed appointments on this day
+    const walkInCount = vitalsToday.filter(v => !completedUserIds.has(v.userId)).length;
+
+    // Get total appointments today (all statuses except CANCELLED)
+    const totalAppointmentsToday = await prisma.appointment.count({
+      where: {
+        scheduledAt: { gte: startOfDay, lte: endOfDay },
+        status: { not: AppointmentStatus.CANCELLED },
+      },
+    });
+
+    // Patients served = completed appointments + walk-ins
+    const patientsServed = completedCount + walkInCount;
+
+    res.json({
+      success: true,
+      data: {
+        appointments: totalAppointmentsToday,
+        walkIns: walkInCount,
+        patientsServed: patientsServed,
+        completedAppointments: completedCount,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching daily queue metrics:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch daily queue metrics" });
+  }
+}
+
 // ─── Health Analytics (real DB) ──────────────────────────────────────────────
 export async function getHealthAnalytics(req: Request, res: Response) {
   try {
@@ -259,9 +316,20 @@ export async function getHealthAnalytics(req: Request, res: Response) {
     if (dateRange && dateRange !== 'all') {
       const days = parseInt(dateRange as string) || 30;
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-      startDate.setHours(0, 0, 0, 0);
-      dateFilter = { gte: startDate };
+      const endDate = new Date();
+      
+      if (days === 0) {
+        // Today only
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        dateFilter = { gte: startDate, lte: endDate };
+      } else {
+        // Last N days
+        startDate.setDate(startDate.getDate() - days);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        dateFilter = { gte: startDate, lte: endDate };
+      }
     }
 
     // Build center filter for queries

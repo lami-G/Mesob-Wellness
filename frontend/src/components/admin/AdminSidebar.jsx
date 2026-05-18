@@ -6,7 +6,6 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard" },
-    { id: "health", label: "Health Analytics" },
     { id: "regions", label: "Regions" },
     { id: "users", label: "Users" },
     { id: "centers", label: "Centers" },
