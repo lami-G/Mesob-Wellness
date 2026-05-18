@@ -6,7 +6,7 @@ import AnimatedWaveBackground from "../components/AnimatedWaveBackground";
 import "../styles/login.css";
 
 // Key for localStorage
-const CACHED_CREDENTIALS_KEY = 'mesob_cached_credentials';
+const CACHED_CREDENTIALS_KEY = "mesob_cached_credentials";
 
 // Default test credentials
 const DEFAULT_CREDENTIALS = {
@@ -42,7 +42,7 @@ function Login() {
         setCachedCredentials(DEFAULT_CREDENTIALS);
       }
     } catch (error) {
-      console.error('Error loading cached credentials:', error);
+      console.error("Error loading cached credentials:", error);
       setCachedCredentials(DEFAULT_CREDENTIALS);
     }
   }, []);
@@ -56,7 +56,7 @@ function Login() {
       localStorage.setItem(CACHED_CREDENTIALS_KEY, JSON.stringify(updated));
       setCachedCredentials({ ...DEFAULT_CREDENTIALS, ...updated });
     } catch (error) {
-      console.error('Error caching credentials:', error);
+      console.error("Error caching credentials:", error);
     }
   };
 
@@ -124,7 +124,7 @@ function Login() {
     if (result.success) {
       // Cache credentials on successful login
       cacheCredentials(formData.email.toLowerCase(), formData.password);
-      
+
       const roleRoutes = {
         EXTERNAL_PATIENT: "/dashboard",
         STAFF: "/dashboard",
@@ -150,15 +150,14 @@ function Login() {
       <div className="mesob-auth-container">
         <div className="mesob-auth-card">
           <div className="mesob-header-image">
-            <img
-              src="/image.png"
-              alt="MESOB Service"
-            />
+            <img src="/image.png" alt="MESOB Service" />
           </div>
 
           <div className="mesob-welcome-section">
             <div className="mesob-welcome">Welcome</div>
-            <div className="mesob-subtitle">Access the Mesob wellness Center System</div>
+            <div className="mesob-subtitle">
+              Access the Mesob wellness Center System
+            </div>
           </div>
 
           {serverError && (
@@ -170,7 +169,10 @@ function Login() {
           <form onSubmit={handleSubmit} className="mesob-form" noValidate>
             <div className="mesob-form-group">
               <div className="mesob-input-wrapper">
-                <User className="mesob-input-icon" style={{ width: '20px', height: '20px' }} />
+                <User
+                  className="mesob-input-icon"
+                  style={{ width: "20px", height: "20px" }}
+                />
                 <input
                   type="email"
                   name="email"
@@ -197,7 +199,10 @@ function Login() {
 
             <div className="mesob-form-group">
               <div className="mesob-input-wrapper mesob-password-wrapper">
-                <Lock className="mesob-input-icon" style={{ width: '20px', height: '20px'}} />
+                <Lock
+                  className="mesob-input-icon"
+                  style={{ width: "20px", height: "20px" }}
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -218,9 +223,9 @@ function Login() {
                   className="mesob-password-toggle"
                 >
                   {showPassword ? (
-                    <EyeOff style={{ width: '20px', height: '20px' }} />
+                    <EyeOff style={{ width: "20px", height: "20px" }} />
                   ) : (
-                    <Eye style={{ width: '20px', height: '20px' }} />
+                    <Eye style={{ width: "20px", height: "20px" }} />
                   )}
                 </button>
               </div>
@@ -240,16 +245,23 @@ function Login() {
 
           <div className="mesob-footer">
             <div className="mesob-footer-brand">Wellness</div>
-            
-            <div style={{ marginTop: '1rem', paddingTop: '0.75rem' }}>
-              <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.875rem' }}>Don't have an account? </span>
-              <a 
-                href="/register" 
-                style={{ 
-                  color: '#f5b224', 
-                  textDecoration: 'none', 
-                  fontWeight: '600',
-                  cursor: 'pointer'
+
+            <div style={{ marginTop: "1rem", paddingTop: "0.75rem" }}>
+              <span
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  fontSize: "0.875rem",
+                }}
+              >
+                Don't have an account?{" "}
+              </span>
+              <a
+                href="/register"
+                style={{
+                  color: "#f5b224",
+                  textDecoration: "none",
+                  fontWeight: "600",
+                  cursor: "pointer",
                 }}
               >
                 Create one here
