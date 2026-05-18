@@ -3,6 +3,7 @@ import FilterBar from "../../components/admin/FilterBar";
 import AppointmentsList from "../../components/admin/AppointmentsList";
 import EditAppointmentModal from "../../components/admin/EditAppointmentModal";
 import { adminService } from "../../services/adminService";
+import { Calendar } from "lucide-react";
 
 function AppointmentManagement() {
   const [filters, setFilters] = useState({});
@@ -38,7 +39,7 @@ function AppointmentManagement() {
   return (
     <div className="management-section">
       <div className="section-header">
-        <h2>📅 Appointment Management</h2>
+        <h2><Calendar size={24} /> Appointment Management</h2>
       </div>
 
       <FilterBar 
