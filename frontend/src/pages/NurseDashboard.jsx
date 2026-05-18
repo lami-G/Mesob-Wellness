@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AdminHeader from "../components/admin/AdminHeader";
 import NurseAnalytics from "../components/nurse/NurseAnalytics";
 import LiveQueuePanel from "../components/nurse/LiveQueuePanel";
 import CapacityTracker from "../components/nurse/CapacityTracker";
@@ -10,6 +11,15 @@ import CallNextControl from "../components/nurse/CallNextControl";
 import WellnessPlanCreation from "../components/nurse/WellnessPlanCreation";
 import CustomerHistoryView from "../components/nurse/CustomerHistoryView";
 import ProfileSection from "../components/dashboard/ProfileSection";
+import { 
+  Activity, 
+  ClipboardList, 
+  Stethoscope, 
+  UserPlus, 
+  Target, 
+  BookOpen, 
+  User 
+} from "lucide-react";
 
 function NurseDashboard() {
   const { user, logout } = useAuth();
@@ -119,10 +129,10 @@ function NurseDashboard() {
   };
 
   return (
-    <div className="nurse-dashboard-layout">
+    <div className="admin-layout">
       <aside className="nurse-sidebar">
         <div className="sidebar-header">
-          <h2>👨‍⚕️ Nurse</h2>
+          <h2><Stethoscope size={20} /> Nurse</h2>
           <p>{user?.fullName}</p>
         </div>
         
@@ -131,7 +141,7 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
           >
-            <span className="nav-icon">📊</span>
+            <Activity size={18} className="nav-icon" />
             <span className="nav-label">Analytics</span>
           </button>
           
@@ -139,7 +149,7 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'queue' ? 'active' : ''}`}
             onClick={() => setActiveTab('queue')}
           >
-            <span className="nav-icon">📋</span>
+            <ClipboardList size={18} className="nav-icon" />
             <span className="nav-label">Queue</span>
           </button>
           
@@ -147,7 +157,7 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'vitals' ? 'active' : ''}`}
             onClick={() => setActiveTab('vitals')}
           >
-            <span className="nav-icon">💉</span>
+            <Stethoscope size={18} className="nav-icon" />
             <span className="nav-label">Vitals</span>
           </button>
           
@@ -155,7 +165,7 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'walkin' ? 'active' : ''}`}
             onClick={() => setActiveTab('walkin')}
           >
-            <span className="nav-icon">🚶</span>
+            <UserPlus size={18} className="nav-icon" />
             <span className="nav-label">Walk-in</span>
           </button>
           
@@ -163,7 +173,7 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'wellness' ? 'active' : ''}`}
             onClick={() => setActiveTab('wellness')}
           >
-            <span className="nav-icon">🎯</span>
+            <Target size={18} className="nav-icon" />
             <span className="nav-label">Wellness</span>
           </button>
           
@@ -171,26 +181,23 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            <span className="nav-icon">📚</span>
+            <BookOpen size={18} className="nav-icon" />
             <span className="nav-label">History</span>
           </button>
         </nav>
       </aside>
 
-      <main className="nurse-main-content">
-        <div className="nurse-content-header">
-          <h1>
-            {activeTab === 'analytics' && '📊 Analytics'}
-            {activeTab === 'queue' && '📋 Queue Management'}
-            {activeTab === 'vitals' && '💉 Record Vitals'}
-            {activeTab === 'walkin' && '🚶 Register Walk-in'}
-            {activeTab === 'wellness' && '🎯 Create Wellness Plan'}
-            {activeTab === 'history' && '📚 Customer History'}
-            {activeTab === 'profile' && '👤 Profile'}
-          </h1>
-        </div>
-
-        <div className="nurse-content-body">
+      <div className="admin-main">
+        <AdminHeader 
+          user={user}
+          onToggleSidebar={() => {}}
+          onTabChange={setActiveTab}
+          title="MESOB Nurse Portal"
+          dashboardType="nurse"
+        />
+        
+        <main className="admin-content">
+          <div className="nurse-content-body">
         {activeTab === "analytics" && (
           <div className="analytics-section">
             <NurseAnalytics refreshTrigger={queueRefreshTrigger} />
@@ -253,7 +260,8 @@ function NurseDashboard() {
           </div>
         )}
         </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
