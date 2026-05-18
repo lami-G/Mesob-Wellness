@@ -9,6 +9,26 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
+import { 
+  Calendar, 
+  BarChart3, 
+  CheckCircle, 
+  XCircle, 
+  Activity, 
+  Users, 
+  Clock, 
+  Building2, 
+  ClipboardList, 
+  TrendingUp, 
+  AlertCircle, 
+  Heart, 
+  AlertTriangle, 
+  Zap, 
+  Lock, 
+  Search, 
+  Settings, 
+  Ban 
+} from 'lucide-react';
 import '../styles/admin-layout.css';
 import '../styles/admin-dashboard.css';
 import '../styles/tooltip-fix.css';
@@ -86,7 +106,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
           alignItems: 'center',
           gap: '6px'
         }}>
-          <span style={{ fontSize: '16px' }}>📅</span>
+          <Calendar size={16} />
           {label}
         </div>
 
@@ -100,7 +120,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>📊</span> Total
+              <BarChart3 size={14} /> Total
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#3b82f6' }}>
               {total}
@@ -115,7 +135,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>✅</span> Completed
+              <CheckCircle size={14} /> Completed
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#10b981' }}>
               {completed}
@@ -130,7 +150,7 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
             padding: '6px 0',
           }}>
             <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>❌</span> No-Show
+              <XCircle size={14} /> No-Show
             </span>
             <span style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
               {noShow}
@@ -252,7 +272,15 @@ const CustomCapacityTooltip = ({ active, payload, label }) => {
             fontWeight: 700,
             color: '#ffffff'
           }}>
-            {entry.dataKey === 'used' ? '🔵' : '🟢'} {entry.dataKey === 'used' ? 'Slots Used' : 'Slots Available'}: <strong>{entry.value} slots</strong>
+            <span style={{ 
+              display: 'inline-block', 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              backgroundColor: entry.dataKey === 'used' ? '#3b82f6' : '#22c55e',
+              marginRight: '6px'
+            }} />
+            {entry.dataKey === 'used' ? 'Slots Used' : 'Slots Available'}: <strong>{entry.value} slots</strong>
           </p>
         ))}
       </div>
@@ -333,7 +361,7 @@ const ManagerDashboard = () => {
     return (
       <div className="dashboard-container">
         <div className="access-denied">
-          <h2>🚫 Access Denied</h2>
+          <h2><Ban size={24} /> Access Denied</h2>
           <p>Center Manager role required to access this dashboard.</p>
         </div>
       </div>
@@ -341,11 +369,11 @@ const ManagerDashboard = () => {
   }
 
   const tabs = [
-    { id: 'overview',  label: '📊 Overview'  },
-    { id: 'analytics', label: '📈 Analytics' },
-    { id: 'users',     label: `👥 Staff (${users.length})`     },
-    { id: 'audit',     label: '🔍 Audit'     },
-    { id: 'settings',  label: '⚙️ Settings'  },
+    { id: 'overview',  label: 'Overview', icon: BarChart3  },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'users',     label: `Staff (${users.length})`, icon: Users     },
+    { id: 'audit',     label: 'Audit', icon: Search     },
+    { id: 'settings',  label: 'Settings', icon: Settings  },
   ];
 
   // Capacity urgency color
@@ -360,7 +388,7 @@ const ManagerDashboard = () => {
         return (
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>📊 Center Overview</h2>
+              <h2><BarChart3 size={24} /> Center Overview</h2>
               <div className="capacity-indicator" style={{
                 background: capacityColor + '20', 
                 border: `1px solid ${capacityColor}60`,
@@ -370,9 +398,13 @@ const ManagerDashboard = () => {
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                <span style={{ fontSize: '1.2rem' }}>
-                  {usedPct > 85 ? '🔴' : usedPct > 60 ? '🟡' : '🟢'}
-                </span>
+                <span style={{ 
+                  display: 'inline-block',
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  backgroundColor: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e'
+                }} />
                 <span style={{ fontWeight: 600, color: capacityColor }}>
                   Capacity {usedPct}%
                 </span>
@@ -384,28 +416,28 @@ const ManagerDashboard = () => {
       case 'analytics':
         return (
           <div className="dashboard-section">
-            <h2>📈 Analytics & Insights</h2>
+            <h2><TrendingUp size={24} /> Analytics & Insights</h2>
             <AnalyticsTab loading={loading} queueData={queueData} healthData={healthData} trendsData={trendsData} />
           </div>
         );
       case 'users':
         return (
           <div className="dashboard-section">
-            <h2>👥 Staff Management</h2>
+            <h2><Users size={24} /> Staff Management</h2>
             <UsersTab loading={loading} users={users} onRefresh={loadDashboardData} />
           </div>
         );
       case 'audit':
         return (
           <div className="dashboard-section">
-            <h2>🔍 Audit & Activity Logs</h2>
+            <h2><Search size={24} /> Audit & Activity Logs</h2>
             <AuditTab loading={loading} logs={auditLogs} />
           </div>
         );
       case 'settings':
         return (
           <div className="dashboard-section">
-            <h2>⚙️ System Settings</h2>
+            <h2><Settings size={24} /> System Settings</h2>
             <SettingsTab systemSettings={systemSettings} setSystemSettings={setSystemSettings} />
           </div>
         );
@@ -457,12 +489,12 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
     : systemDefaultTime;
 
   const statCards = [
-    { icon: '🏥', label: 'Daily Capacity',     value: capacityInfo?.slotsUsed ?? 0,              sub: `of ${capacityInfo?.dailyLimit ?? 36} slots`,  color: '#284394' },
-    { icon: '📋', label: 'Total Appointments', value: bookingStats?.totalAppointments ?? 0,       sub: 'today',                                         color: '#2563eb' },
-    { icon: '✅', label: 'Completed Today',    value: bookingStats?.completedToday ?? 0,           sub: 'appointments',                                  color: '#16a34a' },
-    { icon: '📊', label: 'No-Show Rate',       value: `${bookingStats?.noShowRate ?? 0}%`,         sub: 'this week',                                     color: '#dc2626' },
-    { icon: '⏱️', label: 'Avg Service Time',   value: `${validatedAvgServiceTime}m`, sub: 'per patient',                                   color: '#7c3aed' },
-    { icon: '👥', label: 'Total Users',        value: bookingStats?.totalUsers ?? 0,               sub: `${bookingStats?.activeUsers ?? 0} active`,      color: '#0891b2' },
+    { icon: Building2, label: 'Daily Capacity',     value: capacityInfo?.slotsUsed ?? 0,              sub: `of ${capacityInfo?.dailyLimit ?? 36} slots`,  color: '#284394' },
+    { icon: ClipboardList, label: 'Total Appointments', value: bookingStats?.totalAppointments ?? 0,       sub: 'today',                                         color: '#2563eb' },
+    { icon: CheckCircle, label: 'Completed Today',    value: bookingStats?.completedToday ?? 0,           sub: 'appointments',                                  color: '#16a34a' },
+    { icon: BarChart3, label: 'No-Show Rate',       value: `${bookingStats?.noShowRate ?? 0}%`,         sub: 'this week',                                     color: '#dc2626' },
+    { icon: Clock, label: 'Avg Service Time',   value: `${validatedAvgServiceTime}m`, sub: 'per patient',                                   color: '#7c3aed' },
+    { icon: Users, label: 'Total Users',        value: bookingStats?.totalUsers ?? 0,               sub: `${bookingStats?.activeUsers ?? 0} active`,      color: '#0891b2' },
   ];
 
   const breakdownData = [
@@ -479,18 +511,21 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
     <div className="mgr-overview">
       {/* KPI Cards — Production-Level Design */}
       <div className="dash-kpi-grid">
-        {statCards.map((c) => (
-          <div key={c.label} className="dash-kpi-card">
-            <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
-              {c.icon}
+        {statCards.map((c) => {
+          const IconComponent = c.icon;
+          return (
+            <div key={c.label} className="dash-kpi-card">
+              <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
+                <IconComponent size={24} />
+              </div>
+              <div className="dash-kpi-body">
+                <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
+                <div className="dash-kpi-label">{c.label}</div>
+                <div className="dash-kpi-sub">{c.sub}</div>
+              </div>
             </div>
-            <div className="dash-kpi-body">
-              <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
-              <div className="dash-kpi-label">{c.label}</div>
-              <div className="dash-kpi-sub">{c.sub}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Health Data Section — Employee Health Overview */}
@@ -509,35 +544,37 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
 
             return [
               { 
-                icon: '👥', 
+                icon: Users, 
                 label: 'Total Employees', 
                 value: totalPatients, 
                 sub: 'registered', 
                 color: '#6b7280' 
               },
               { 
-                icon: '💚', 
+                icon: Heart, 
                 label: 'Healthy %', 
                 value: `${healthyPct}%`, 
                 sub: 'Normal BP', 
                 color: '#22c55e' 
               },
               { 
-                icon: '⚠️', 
+                icon: AlertTriangle, 
                 label: 'At-Risk %', 
                 value: `${atRiskPct}%`, 
                 sub: 'Elevated/Stage 1', 
                 color: '#f59e0b' 
               },
               { 
-                icon: '🚨', 
+                icon: AlertCircle, 
                 label: 'Critical %', 
                 value: `${criticalPct}%`, 
                 sub: 'Stage 2/Crisis', 
                 color: '#ef4444' 
               },
             ];
-          })().map((c) => (
+          })().map((c) => {
+            const IconComponent = c.icon;
+            return (
             <div key={c.label} className="dash-kpi-card" style={{
               background: 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)',
               border: '2px solid #e5e7eb',
@@ -558,7 +595,7 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
                 fontSize: '1.5rem',
                 marginBottom: '0.75rem'
               }}>
-                {c.icon}
+                <IconComponent size={24} />
               </div>
               <div className="dash-kpi-body">
                 <div className="dash-kpi-value" style={{ 
@@ -580,7 +617,8 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
                 }}>{c.sub}</div>
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
 
         {/* Health Charts Row */}
@@ -886,7 +924,15 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
             color: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
             border: usedPct > 85 ? '1px solid #ef4444' : usedPct > 60 ? '1px solid #f59e0b' : '1px solid #22c55e'
           }}>
-            {usedPct > 85 ? '🔴 Critical' : usedPct > 60 ? '🟡 Moderate' : '🟢 Normal'}
+            <span style={{ 
+              display: 'inline-block',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
+              marginRight: '6px'
+            }} />
+            {usedPct > 85 ? 'Critical' : usedPct > 60 ? 'Moderate' : 'Normal'}
           </span>
         </div>
         <div className="mgr-capacity-row" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
@@ -940,7 +986,8 @@ const CapacityTab = ({ loading, capacityInfo }) => {
     : 0;
 
   const barColor = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e';
-  const statusLabel = pct > 85 ? '🔴 Critical' : pct > 60 ? '🟡 Moderate' : '🟢 Normal';
+  const statusLabel = pct > 85 ? 'Critical' : pct > 60 ? 'Moderate' : 'Normal';
+  const statusColor = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e';
 
   // Hourly capacity simulation based on real data
   const hours = Array.from({ length: 10 }, (_, i) => {
@@ -955,19 +1002,22 @@ const CapacityTab = ({ loading, capacityInfo }) => {
       {/* Stats Row */}
       <div className="mgr-kpi-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '1.5rem' }}>
         {[
-          { icon: '📊', label: 'Daily Limit',   value: capacityInfo?.dailyLimit    ?? 100, color: '#284394' },
-          { icon: '✅', label: 'Slots Used',    value: capacityInfo?.slotsUsed     ?? 0,   color: '#22c55e' },
-          { icon: '🔓', label: 'Remaining',     value: capacityInfo?.slotsRemaining ?? 0,  color: '#0891b2' },
-          { icon: '📈', label: 'Utilisation',   value: `${pct}%`,                          color: pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e' },
-        ].map(c => (
+          { icon: BarChart3, label: 'Daily Limit',   value: capacityInfo?.dailyLimit    ?? 100, color: '#284394' },
+          { icon: CheckCircle, label: 'Slots Used',    value: capacityInfo?.slotsUsed     ?? 0,   color: '#22c55e' },
+          { icon: Lock, label: 'Remaining',     value: capacityInfo?.slotsRemaining ?? 0,  color: '#0891b2' },
+          { icon: TrendingUp, label: 'Utilisation',   value: `${pct}%`,                          color: pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e' },
+        ].map(c => {
+          const IconComponent = c.icon;
+          return (
           <div key={c.label} className="mgr-kpi-card">
-            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}>{c.icon}</div>
+            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}><IconComponent size={20} /></div>
             <div className="mgr-kpi-body">
               <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
               <div className="mgr-kpi-label">{c.label}</div>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {/* Capacity Bar */}
@@ -1097,21 +1147,21 @@ const CapacityTab = ({ loading, capacityInfo }) => {
         <div className="mgr-chart-footer">
           <div className="mgr-hourly-insights">
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">🕘</div>
+              <div className="mgr-insight-icon"><Clock size={20} /></div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Peak Hours</span>
                 <span className="mgr-insight-value">9:00 - 11:00 AM</span>
               </div>
             </div>
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">📊</div>
+              <div className="mgr-insight-icon"><BarChart3 size={20} /></div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Avg Utilization</span>
                 <span className="mgr-insight-value">{Math.round(hours.reduce((s,h)=>s+h.used,0)/hours.length)} slots/hr</span>
               </div>
             </div>
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">⚡</div>
+              <div className="mgr-insight-icon"><Zap size={20} /></div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Efficiency</span>
                 <span className="mgr-insight-value">{Math.round((hours.reduce((s,h)=>s+h.used,0)/(hours.reduce((s,h)=>s+h.used+h.available,0)))*100)}%</span>
@@ -1259,15 +1309,17 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
       {/* Enhanced KPI Row with Period-based Metrics */}
       <div className="mgr-kpi-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)', marginBottom: '1.5rem' }}>
         {[
-          { icon: '📊', label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
-          { icon: '✅', label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
-          { icon: '❌', label: `No Show (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
-          { icon: '🩺', label: 'Vitals Recorded', value: metrics.totalVitals, color: '#7c3aed', trend: '+15%' },
-          { icon: '👥', label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
-          { icon: '⚡', label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
-        ].map(c => (
+          { icon: BarChart3, label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
+          { icon: CheckCircle, label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
+          { icon: XCircle, label: `No Show (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
+          { icon: Activity, label: 'Vitals Recorded', value: metrics.totalVitals, color: '#7c3aed', trend: '+15%' },
+          { icon: Users, label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
+          { icon: Zap, label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
+        ].map(c => {
+          const IconComponent = c.icon;
+          return (
           <div key={c.label} className="mgr-kpi-card" style={{ position: 'relative', overflow: 'hidden' }}>
-            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}>{c.icon}</div>
+            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}><IconComponent size={20} /></div>
             <div className="mgr-kpi-body">
               <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
               <div className="mgr-kpi-label" style={{ fontSize: '0.75rem' }}>{c.label}</div>
@@ -1291,7 +1343,8 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
               borderRadius: '8px 0 8px 0'
             }} />
           </div>
-        ))}
+        );
+        })}
       </div>
 
       {/* Advanced Control Panel */}
@@ -1332,7 +1385,8 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
                     boxShadow: period === p ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none'
                   }}
                 >
-                  📅 {p}
+                  <Calendar size={14} style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }} />
+                  {p}
                 </button>
               ))}
             </div>
@@ -1358,10 +1412,10 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
                 appearance: 'auto'
               }}
             >
-              <option value="appointments" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>📊 Appointments Overview</option>
-              <option value="vitals" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>🩺 Vitals Tracking</option>
-              <option value="users" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>👥 User Growth</option>
-              <option value="efficiency" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>⚡ Efficiency Metrics</option>
+              <option value="appointments" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Appointments Overview</option>
+              <option value="vitals" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Vitals Tracking</option>
+              <option value="users" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>User Growth</option>
+              <option value="efficiency" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Efficiency Metrics</option>
             </select>
 
             {/* View Mode Toggle */}
@@ -1383,7 +1437,11 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
                     boxShadow: viewMode === mode ? '0 2px 6px rgba(40,67,148,0.35)' : 'none'
                   }}
                 >
-                  {mode === 'chart' ? '📈 Chart' : '📋 Table'}
+                  {mode === 'chart' ? (
+                    <><TrendingUp size={14} style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }} /> Chart</>
+                  ) : (
+                    <><ClipboardList size={14} style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }} /> Table</>
+                  )}
                 </button>
               ))}
             </div>
@@ -1398,7 +1456,8 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1 }}>
               <span className="mgr-live-dot" />
               <span className="mgr-dark-title">
-                📈 {selectedMetric === 'appointments' ? 'Appointments & Completion Trends' :
+                <TrendingUp size={18} style={{ display: 'inline-block', marginRight: '6px', verticalAlign: 'middle' }} />
+                {selectedMetric === 'appointments' ? 'Appointments & Completion Trends' :
                      selectedMetric === 'vitals' ? 'Vitals Recording Trends' :
                      selectedMetric === 'users' ? 'User Registration Trends' :
                      'Efficiency Performance Trends'} — {periodLabel}
@@ -1508,7 +1567,8 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
               fontSize: '0.75rem', fontWeight: 700, color: '#15803d',
               letterSpacing: '0.05em',
             }}>
-              📊 DATA TABLE
+              <BarChart3 size={12} style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }} />
+              DATA TABLE
             </span>
             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1f2937' }}>
               Performance Data — {periodLabel}
