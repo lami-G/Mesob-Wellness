@@ -245,17 +245,17 @@ const AdminService = {
         averageTemperature: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) / vitals.length : 0,
         averageOxygenSaturation: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) / vitals.length : 0,
         byBmiCategory: {
-          UNDERWEIGHT: 0,
-          NORMAL: 0,
-          OVERWEIGHT: 0,
-          OBESITY: 0,
+          UNDERWEIGHT: vitals.filter(v => v.bmiCategory === 'UNDERWEIGHT').length,
+          NORMAL: vitals.filter(v => v.bmiCategory === 'NORMAL').length,
+          OVERWEIGHT: vitals.filter(v => v.bmiCategory === 'OVERWEIGHT').length,
+          OBESITY: vitals.filter(v => v.bmiCategory === 'OBESITY').length,
         },
         byBpCategory: {
-          NORMAL: 0,
-          ELEVATED: 0,
-          HYPERTENSION_STAGE_1: 0,
-          HYPERTENSION_STAGE_2: 0,
-          HYPERTENSIVE_CRISIS: 0,
+          NORMAL: vitals.filter(v => v.bpCategory === 'NORMAL').length,
+          ELEVATED: vitals.filter(v => v.bpCategory === 'ELEVATED').length,
+          HYPERTENSION_STAGE_1: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_1').length,
+          HYPERTENSION_STAGE_2: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_2').length,
+          HYPERTENSIVE_CRISIS: vitals.filter(v => v.bpCategory === 'HYPERTENSIVE_CRISIS').length,
         },
       };
 
@@ -649,6 +649,7 @@ const AdminService = {
       if (filters.user) where.userId = filters.user;
       if (filters.action) where.action = filters.action;
       if (filters.resource) where.resource = filters.resource;
+      if (filters.role) where.user = { role: filters.role };
       if (filters.dateFrom || filters.dateTo) {
         where.timestamp = {};
         if (filters.dateFrom) where.timestamp.gte = filters.dateFrom;
@@ -662,7 +663,7 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true, userId: true } },
+            user: { select: { fullName: true, email: true, userId: true, role: true } },
           },
         }),
         prisma.auditLog.count({ where }),

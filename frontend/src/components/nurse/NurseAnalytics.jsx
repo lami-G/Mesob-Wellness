@@ -305,30 +305,55 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       console.log('📊 Total patients in period:', totalPatients);
       console.log('📊 Health conditions data:', conditions);
       
-      // Define all 7 conditions with their colors - distinct and easily distinguishable
-      const allConditions = [
+      // Define predefined conditions with their colors
+      const predefinedConditions = [
         { key: 'hypertension', label: 'Hypertension', color: '#dc2626' },      // Red
         { key: 'overweight', label: 'Overweight', color: '#f59e0b' },          // Amber/Orange
         { key: 'obesity', label: 'Obesity', color: '#7c3aed' },                // Purple
         { key: 'diabetes', label: 'Diabetes', color: '#2563eb' },              // Blue
         { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' }, // Pink
         { key: 'normal', label: 'Normal', color: '#10b981' },                  // Green
-        { key: 'other', label: 'Other', color: '#64748b' },                    // Slate Gray
       ];
       
       // Create a map of condition counts
       const conditionMap = {};
+      const customConditions = new Set();
+      
       conditions.forEach(c => {
         const key = c.condition.toLowerCase().replace(/ /g, '_');
+        
+        // Skip "other" condition completely
+        if (key === 'other') {
+          return;
+        }
+        
         // Combine heart issues and respiratory issues
         if (key === 'heart_issues' || key === 'respiratory_issues') {
           conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
         } else {
           conditionMap[key] = (conditionMap[key] || 0) + c.count;
+          
+          // Track custom conditions (not in predefined list)
+          const isPredefined = predefinedConditions.some(pc => pc.key === key);
+          if (!isPredefined && key !== 'heart_issues' && key !== 'respiratory_issues') {
+            customConditions.add(key);
+          }
         }
       });
       
+      // Generate colors for custom conditions
+      const customColors = ['#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'];
+      const customConditionsList = Array.from(customConditions).map((key, index) => ({
+        key,
+        label: key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+        color: customColors[index % customColors.length],
+      }));
+      
+      // Combine predefined and custom conditions
+      const allConditions = [...predefinedConditions, ...customConditionsList];
+      
       console.log('📊 Condition map:', conditionMap);
+      console.log('📊 Custom conditions found:', customConditionsList);
       console.log('📊 Total wellness plans for percentage calc:', totalWellnessPlans);
       
       // Map counts to conditions and calculate percentages based on total wellness plans
@@ -339,7 +364,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           ? Math.round((conditionMap[c.key] || 0) / totalWellnessPlans * 100) 
           : 0,
         totalPatients: totalPatients
-      })).sort((a, b) => b.count - a.count);
+      })).filter(c => c.count > 0).sort((a, b) => b.count - a.count); // Only show conditions with count > 0
       
       setHealthConditions(rankedConditions);
       
@@ -1189,7 +1214,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       diabetes: 'Diabetes',
                       heart_respiratory: 'Heart / Resp.',
                       normal: 'Normal',
-                      other: 'Other',
                     };
                     
                     const trendColor = data.trend === 'up' ? '#dc2626' : data.trend === 'down' ? '#10b981' : '#6b7280';

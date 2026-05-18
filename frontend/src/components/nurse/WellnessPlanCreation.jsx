@@ -568,9 +568,12 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
               </div>
               
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <select
+                <input
+                  type="text"
+                  placeholder="Select or type custom condition..."
                   value={newCondition}
                   onChange={(e) => setNewCondition(e.target.value)}
+                  list="condition-options"
                   style={{
                     flex: 1,
                     padding: '0.5rem',
@@ -578,17 +581,16 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     borderRadius: '4px',
                     fontSize: '0.9rem',
                   }}
-                >
-                  <option value="">Select a condition to add...</option>
-                  <option value="hypertension">Hypertension</option>
-                  <option value="obesity">Obesity</option>
-                  <option value="overweight">Overweight</option>
-                  <option value="diabetes">Diabetes</option>
-                  <option value="heart_issues">Heart Issues</option>
-                  <option value="respiratory_issues">Respiratory Issues</option>
-                  <option value="normal">Normal</option>
-                  <option value="other">Other</option>
-                </select>
+                />
+                <datalist id="condition-options">
+                  <option value="Hypertension" />
+                  <option value="Obesity" />
+                  <option value="Overweight" />
+                  <option value="Diabetes" />
+                  <option value="Heart Issues" />
+                  <option value="Respiratory Issues" />
+                  <option value="Normal" />
+                </datalist>
                 <button
                   type="button"
                   onClick={() => {
@@ -607,6 +609,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     cursor: newCondition && !conditions.includes(newCondition) ? 'pointer' : 'not-allowed',
                     fontSize: '0.9rem',
                     fontWeight: 600,
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   + Add

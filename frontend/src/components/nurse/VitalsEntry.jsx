@@ -430,12 +430,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
         color = "red";
         category = "Moderate Hypoxemia";
         description = "Low oxygen saturation";
-      } else if (value >= 90 && value < 95) {
-        level = "Low";
-        color = "orange";
-        category = "Mild Hypoxemia";
-        description = "Below normal oxygen";
-      } else if (value >= 95 && value <= 100) {
+      } else if (value >= 90 && value <= 100) {
         level = "Normal";
         color = "green";
         category = "Normal Range";

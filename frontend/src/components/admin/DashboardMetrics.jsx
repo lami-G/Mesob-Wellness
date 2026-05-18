@@ -158,13 +158,18 @@ function DashboardMetrics({ onTabChange }) {
         { key: 'diabetes', label: 'Diabetes', color: '#2563eb' },
         { key: 'heart_respiratory', label: 'Heart / Resp.', color: '#ec4899' },
         { key: 'normal', label: 'Normal', color: '#10b981' },
-        { key: 'other', label: 'Other', color: '#64748b' },
       ];
       
       // Create a map of condition counts
       const conditionMap = {};
       conditions.forEach(c => {
         const key = c.condition.toLowerCase().replace(/ /g, '_');
+        
+        // Skip "other" condition completely
+        if (key === 'other') {
+          return;
+        }
+        
         // Combine heart issues and respiratory issues
         if (key === 'heart_issues' || key === 'respiratory_issues') {
           conditionMap['heart_respiratory'] = (conditionMap['heart_respiratory'] || 0) + c.count;
