@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { notificationService } from "../../services/notificationService";
 import NotificationPanel from "./NotificationPanel";
+import { 
+  Menu, 
+  Bell, 
+  User, 
+  Settings, 
+  LogOut, 
+  ChevronDown,
+  RefreshCw,
+  Filter,
+  Building2
+} from "lucide-react";
 
 function AdminHeader({ 
   onToggleSidebar, 
@@ -75,20 +86,11 @@ function AdminHeader({
   };
 
   const getHeaderActions = () => {
-    if (dashboardType === "manager" || dashboardType === "regional") {
+    if (dashboardType === "manager" || dashboardType === "regional" || dashboardType === "nurse") {
       return (
-        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'flex-end',
-            color: 'white'
-          }}>
-            <div style={{ 
-              fontSize: '0.95rem', 
-              fontWeight: 700,
-              letterSpacing: '0.02em'
-            }}>
+        <div className="header-actions-modern">
+          <div className="header-date-display">
+            <div className="header-date-text">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'short', 
                 month: 'short', 
@@ -98,13 +100,9 @@ function AdminHeader({
           </div>
 
           {lastUpdated && (
-            <div style={{ 
-              fontSize: '0.75rem', 
-              color: 'rgba(255,255,255,0.7)',
-              textAlign: 'right'
-            }}>
-              <div>Last Updated</div>
-              <div style={{ fontWeight: 600, marginTop: '0.125rem' }}>
+            <div className="header-last-updated">
+              <div className="header-updated-label">Last Updated</div>
+              <div className="header-updated-time">
                 {lastUpdated.toLocaleTimeString('en-US', { 
                   hour: '2-digit', 
                   minute: '2-digit' 
@@ -117,32 +115,9 @@ function AdminHeader({
             <button
               onClick={onRefresh}
               disabled={loading}
-              style={{
-                background: 'rgba(255,255,255,0.15)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: '8px',
-                padding: '0.5rem 1rem',
-                color: 'white',
-                fontSize: '0.875rem',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) {
-                  e.target.style.background = 'rgba(255,255,255,0.25)';
-                  e.target.style.borderColor = 'rgba(255,255,255,0.5)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'rgba(255,255,255,0.15)';
-                e.target.style.borderColor = 'rgba(255,255,255,0.3)';
-              }}
+              className="header-refresh-btn"
             >
-              <span>{loading ? '⏳' : '🔄'}</span>
+              <RefreshCw size={16} className={loading ? "spinning" : ""} />
               <span>{loading ? 'Updating...' : 'Refresh'}</span>
             </button>
           )}
@@ -151,15 +126,15 @@ function AdminHeader({
     }
 
     return (
-      <div className="header-actions">
+      <div className="header-actions-modern">
         <button 
-          className="notification-btn" 
+          className="header-notification-btn" 
           title="Notifications"
           onClick={handleNotificationClick}
         >
-          🔔
+          <Bell size={20} />
           {unreadCount > 0 && (
-            <span className="notification-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+            <span className="notification-badge-modern">{unreadCount > 99 ? "99+" : unreadCount}</span>
           )}
         </button>
       </div>
@@ -171,173 +146,65 @@ function AdminHeader({
       <header className="admin-header">
         <div className="header-left">
           <button 
-            className="sidebar-toggle"
+            className="sidebar-toggle-modern"
             onClick={onToggleSidebar}
             title="Toggle sidebar"
           >
-            ☰
+            <Menu size={24} />
           </button>
-          <h1 className="page-title">{title}</h1>
+          <h1 className="page-title-modern">{title}</h1>
           
           {/* Advanced Filter Centers - Regional Dashboard */}
           {dashboardType === "regional" && selectedCenter !== undefined && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: '2.5rem',
-              paddingLeft: '2.5rem',
-              borderLeft: '2px solid rgba(255,255,255,0.2)',
-              height: '100%'
-            }}>
-              {/* Filter Centers Dropdown */}
-              <div style={{ position: 'relative' }}>
+            <div className="header-center-filter">
+              <div className="center-filter-wrapper">
                 <button
                   onClick={() => setShowCenterFilter(!showCenterFilter)}
-                  style={{
-                    background: 'rgba(255,255,255,0.12)',
-                    border: '1.5px solid rgba(255,255,255,0.3)',
-                    borderRadius: '8px',
-                    padding: '0.65rem 1.3rem',
-                    color: 'white',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.25s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.6rem',
-                    whiteSpace: 'nowrap',
-                    boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.1)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(255,255,255,0.18)';
-                    e.target.style.borderColor = 'rgba(255,255,255,0.5)';
-                    e.target.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.15), 0 4px 12px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(255,255,255,0.12)';
-                    e.target.style.borderColor = 'rgba(255,255,255,0.3)';
-                    e.target.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1)';
-                  }}
+                  className="center-filter-btn"
                 >
-                  <span style={{ fontSize: '1.1rem' }}>🔍</span>
+                  <Filter size={18} />
                   <span>Filter Centers</span>
-                  <span style={{ fontSize: '0.75rem', opacity: 0.9, marginLeft: '0.25rem' }}>▼</span>
+                  <ChevronDown size={14} />
                 </button>
 
-                {/* Advanced Dropdown Menu */}
                 {showCenterFilter && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    marginTop: '0.75rem',
-                    background: '#1e3a8a',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    borderRadius: '8px',
-                    boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
-                    zIndex: 1000,
-                    minWidth: '280px',
-                    maxHeight: '500px',
-                    overflowY: 'auto',
-                    overflow: 'hidden'
-                  }}>
-                    {/* Header Section */}
-                    <div style={{
-                      padding: '1rem',
-                      borderBottom: '1px solid rgba(255,255,255,0.1)',
-                      fontWeight: 700,
-                      fontSize: '0.95rem',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}>
-                      <span style={{ fontSize: '1.2rem' }}>🏥</span>
+                  <div className="center-filter-dropdown">
+                    <div className="filter-dropdown-header">
+                      <Building2 size={18} />
                       <span>All Centers ({centers.length})</span>
                     </div>
 
-                    {/* All Centers Option */}
                     <button
                       onClick={() => {
                         setSelectedCenter('all');
                         setShowCenterFilter(false);
                       }}
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem 1rem',
-                        border: 'none',
-                        background: selectedCenter === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        fontSize: '0.9rem',
-                        color: 'white',
-                        fontWeight: selectedCenter === 'all' ? 600 : 500,
-                        transition: 'all 0.15s ease',
-                        borderBottom: '1px solid rgba(255,255,255,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.6rem'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.background = 'rgba(255,255,255,0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.background = selectedCenter === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent';
-                      }}
+                      className={`filter-dropdown-item ${selectedCenter === 'all' ? 'active' : ''}`}
                     >
-                      <span style={{ fontSize: '1rem' }}>✅</span>
-                      <span style={{ flex: 1 }}>All Centers</span>
-                      {selectedCenter === 'all' && <span style={{ color: '#4ade80', fontWeight: 700 }}>✓</span>}
+                      <span className="filter-item-icon">✓</span>
+                      <span className="filter-item-text">All Centers</span>
+                      {selectedCenter === 'all' && <span className="filter-item-check">✓</span>}
                     </button>
 
-                    {/* Individual Centers */}
-                    {centers && centers.length > 0 && centers.map((center, index) => (
+                    {centers && centers.length > 0 && centers.map((center) => (
                       <button
                         key={center.id}
                         onClick={() => {
                           setSelectedCenter(center.id);
                           setShowCenterFilter(false);
                         }}
-                        style={{
-                          width: '100%',
-                          padding: '0.75rem 1rem',
-                          border: 'none',
-                          background: selectedCenter === center.id ? 'rgba(255,255,255,0.15)' : 'transparent',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          fontSize: '0.9rem',
-                          color: 'white',
-                          fontWeight: selectedCenter === center.id ? 600 : 500,
-                          transition: 'all 0.15s ease',
-                          borderBottom: index < centers.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.6rem'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = 'rgba(255,255,255,0.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = selectedCenter === center.id ? 'rgba(255,255,255,0.15)' : 'transparent';
-                        }}
+                        className={`filter-dropdown-item ${selectedCenter === center.id ? 'active' : ''}`}
                       >
-                        <span style={{ fontSize: '1rem' }}>
-                          {center.status === 'ACTIVE' ? '✅' : '⚠️'}
+                        <span className="filter-item-icon">
+                          {center.status === 'ACTIVE' ? '●' : '○'}
                         </span>
-                        <span style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 500 }}>{center.name}</div>
-                          <div style={{ 
-                            fontSize: '0.7rem', 
-                            opacity: 0.7,
-                            marginTop: '0.1rem'
-                          }}>
-                            {center.status === 'ACTIVE' ? '🟢 Active' : '🟡 Inactive'}
+                        <div className="filter-item-content">
+                          <div className="filter-item-name">{center.name}</div>
+                          <div className="filter-item-status">
+                            {center.status === 'ACTIVE' ? 'Active' : 'Inactive'}
                           </div>
-                        </span>
-                        {selectedCenter === center.id && (
-                          <span style={{ color: '#4ade80', fontWeight: 700 }}>✓</span>
-                        )}
+                        </div>
+                        {selectedCenter === center.id && <span className="filter-item-check">✓</span>}
                       </button>
                     ))}
                   </div>
@@ -350,74 +217,94 @@ function AdminHeader({
         <div className="header-right">
           {getHeaderActions()}
 
-          <div className="user-menu">
+          <div className="user-menu-modern">
             <button 
-              className="user-btn"
+              className="user-btn-modern"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
-              <span className="user-avatar">
+              <div className="user-avatar-modern">
                 {user?.profilePicture ? (
-                  <img src={user.profilePicture} alt={user?.fullName} className="avatar-img" />
+                  <img src={user.profilePicture} alt={user?.fullName} className="avatar-img-modern" />
                 ) : (
-                  <div className="avatar-initials">{getInitials(user?.fullName)}</div>
+                  <div className="avatar-initials-modern">{getInitials(user?.fullName)}</div>
                 )}
-              </span>
-              <span className="user-name">{user?.fullName}</span>
-              <span className="dropdown-arrow">▼</span>
+              </div>
+              <span className="user-name-modern">{user?.fullName}</span>
+              <ChevronDown size={16} className="dropdown-arrow-modern" />
             </button>
 
             {showUserMenu && (
-              <div className="user-dropdown">
+              <div className="user-dropdown-modern">
                 {dashboardType === "admin" && (
                   <>
                     <button 
-                      className="dropdown-item"
+                      className="dropdown-item-modern"
                       onClick={handleProfileClick}
                     >
-                      👤 Profile
+                      <User size={16} />
+                      <span>Profile</span>
                     </button>
                     <button 
-                      className="dropdown-item"
+                      className="dropdown-item-modern"
                       onClick={handleSettingsClick}
                     >
-                      ⚙️ Settings
+                      <Settings size={16} />
+                      <span>Settings</span>
                     </button>
-                    <hr className="dropdown-divider" />
+                    <hr className="dropdown-divider-modern" />
                   </>
                 )}
                 {dashboardType === "manager" && (
                   <>
                     <button 
-                      className="dropdown-item"
+                      className="dropdown-item-modern"
                       onClick={() => {
                         setShowUserMenu(false);
                         navigate("/manager-profile");
                       }}
                     >
-                      👤 Profile
+                      <User size={16} />
+                      <span>Profile</span>
                     </button>
-                    <hr className="dropdown-divider" />
+                    <hr className="dropdown-divider-modern" />
+                  </>
+                )}
+                {dashboardType === "nurse" && (
+                  <>
+                    <button 
+                      className="dropdown-item-modern"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onTabChange("profile");
+                      }}
+                    >
+                      <User size={16} />
+                      <span>Profile</span>
+                    </button>
+                    <hr className="dropdown-divider-modern" />
                   </>
                 )}
                 {dashboardType === "regional" && (
                   <>
                     <button 
-                      className="dropdown-item"
+                      className="dropdown-item-modern"
                       onClick={() => {
                         setShowUserMenu(false);
                         navigate("/regional-profile");
                       }}
                     >
-                      👤 Profile
+                      <User size={16} />
+                      <span>Profile</span>
                     </button>
-                    <hr className="dropdown-divider" />
+                    <hr className="dropdown-divider-modern" />
                   </>
                 )}
                 <button 
-                  className="dropdown-item logout"
+                  className="dropdown-item-modern logout-modern"
                   onClick={handleLogout}
                 >
-                  🚪 Logout
+                  <LogOut size={16} />
+                  <span>Logout</span>
                 </button>
               </div>
             )}
