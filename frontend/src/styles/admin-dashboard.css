@@ -22,7 +22,7 @@
 }
 
 .static-total-card {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
@@ -30,7 +30,7 @@
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   cursor: pointer;
   font-family: inherit;
   text-align: center;
@@ -56,7 +56,7 @@
 .static-icon-centered {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -69,14 +69,14 @@
 .static-value-centered {
   font-size: 2rem;
   font-weight: 800;
-  color: #1F2937;
+  color: #1f2937;
   line-height: 1;
 }
 
 .static-label-centered {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6B7280;
+  color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -94,7 +94,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
   font-size: 0.875rem;
 }
 
@@ -103,12 +103,12 @@
 }
 
 .breakdown-label-centered {
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
 }
 
 .breakdown-value-centered {
-  color: #1F2937;
+  color: #1f2937;
   font-weight: 700;
 }
 
@@ -658,8 +658,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Chart containers */
@@ -754,15 +758,15 @@
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .mgr-kpi-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .chart-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .chart-container {
     height: 250px;
   }
@@ -773,16 +777,16 @@
     margin: 0 -1rem;
     border-radius: 0;
   }
-  
+
   .section-header,
   .mgr-overview {
     padding: 1rem;
   }
-  
+
   .mgr-kpi-card {
     padding: 1rem;
   }
-  
+
   .chart-card {
     padding: 1rem;
   }
@@ -898,9 +902,11 @@
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
   border-radius: 16px;
   padding: 1.75rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
-  border: 2px solid rgba(0,0,0,0.08);
-  border-top: 2px solid rgba(59,130,246,0.15);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-top: 2px solid rgba(59, 130, 246, 0.15);
   position: relative;
   overflow: hidden;
 }
@@ -927,19 +933,19 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
-  
+
   .mgr-kpi-card {
     padding: 1rem;
   }
-  
+
   .mgr-kpi-value {
     font-size: 1.5rem;
   }
-  
+
   .mgr-dark-card {
     padding: 1rem;
   }
-  
+
   .mgr-dark-header {
     flex-direction: column;
     align-items: flex-start;
@@ -951,12 +957,12 @@
   .mgr-kpi-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .mgr-period-switcher {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .mgr-period-btn {
     text-align: center;
   }
@@ -1013,13 +1019,17 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 /* Enhanced Dropdown Visibility for Performance Metrics */
 .performance-metric-selector {
-  background: rgba(255,255,255,0.1) !important;
-  border: 1px solid rgba(255,255,255,0.2) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   border-radius: 8px !important;
   padding: 0.5rem 1rem !important;
   color: #ffffff !important;
@@ -1068,7 +1078,7 @@ select.performance-metric-selector {
 }
 
 /* WebKit specific fixes */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
   .performance-metric-selector option {
     background: #1e293b !important;
     color: #ffffff !important;
@@ -1197,18 +1207,17 @@ select.performance-metric-selector {
   }
 }
 
-
 /* Health Analytics Section */
 .health-analytics-section {
   margin-top: 3rem;
   padding: 2rem;
-  background: #F9FAFB;
+  background: #f9fafb;
   border-radius: 12px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
 }
 
 .health-analytics-section h3 {
-  color: #1F2937;
+  color: #1f2937;
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
   font-weight: 600;
@@ -1221,9 +1230,9 @@ select.performance-metric-selector {
   gap: 1rem;
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
 }
 
 .filter-group {
@@ -1240,23 +1249,23 @@ select.performance-metric-selector {
 
 .filter-group select {
   padding: 0.625rem 0.75rem;
-  border: 1px solid #D1D5DB;
+  border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #1F2937;
-  background: #FFFFFF;
+  color: #1f2937;
+  background: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filter-group select:hover {
-  border-color: #9CA3AF;
+  border-color: #9ca3af;
 }
 
 .filter-group select:focus {
   outline: none;
-  border-color: #3B82F6;
+  border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -1279,8 +1288,8 @@ select.performance-metric-selector {
 }
 
 .health-score-card {
-  background: linear-gradient(135deg, #3550A0 0%, #2D4A8C 100%);
-  color: #FFFFFF;
+  background: linear-gradient(135deg, #3550a0 0%, #2d4a8c 100%);
+  color: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(53, 80, 160, 0.15);
@@ -1309,10 +1318,10 @@ select.performance-metric-selector {
 }
 
 .health-stat-card {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -1323,7 +1332,7 @@ select.performance-metric-selector {
 
 .health-stat-card .stat-label {
   font-size: 0.875rem;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -1331,7 +1340,7 @@ select.performance-metric-selector {
 .health-stat-card .stat-value {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 .health-stats-expanded-grid {
@@ -1343,10 +1352,10 @@ select.performance-metric-selector {
 }
 
 .health-stat-expanded-card {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -1357,7 +1366,7 @@ select.performance-metric-selector {
 
 .health-stat-expanded-card .stat-label {
   font-size: 0.875rem;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
@@ -1365,12 +1374,12 @@ select.performance-metric-selector {
 .health-stat-expanded-card .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #1F2937;
+  color: #1f2937;
 }
 
 .health-stat-expanded-card .stat-sublabel {
   font-size: 0.75rem;
-  color: #9CA3AF;
+  color: #9ca3af;
   font-weight: 500;
   margin-top: 0.25rem;
 }
@@ -1383,15 +1392,15 @@ select.performance-metric-selector {
 }
 
 .health-chart-card {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .health-chart-card h4 {
-  color: #1F2937;
+  color: #1f2937;
   margin: 0 0 1rem 0;
   font-size: 0.95rem;
   font-weight: 600;
