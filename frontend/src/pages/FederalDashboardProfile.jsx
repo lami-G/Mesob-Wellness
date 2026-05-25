@@ -10,7 +10,9 @@ function FederalDashboardProfile() {
   const { user, updateUser } = useAuth();
   const fileInputRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [profilePicture, setProfilePicture] = useState(user?.profilePicture || null);
+  const [profilePicture, setProfilePicture] = useState(
+    user?.profilePicture || null,
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -103,7 +105,9 @@ function FederalDashboardProfile() {
           alignItems: "center",
         }}
       >
-        <h1 style={{ margin: 0, fontSize: "1.5rem" }}>Federal Office Profile</h1>
+        <h1 style={{ margin: 0, fontSize: "1.5rem" }}>
+          Federal Office Profile
+        </h1>
         <button
           onClick={() => navigate(-1)}
           style={{
@@ -120,7 +124,9 @@ function FederalDashboardProfile() {
         </button>
       </div>
 
-      <div style={{ maxWidth: "900px", margin: "2rem auto", padding: "0 1rem" }}>
+      <div
+        style={{ maxWidth: "900px", margin: "2rem auto", padding: "0 1rem" }}
+      >
         <div
           style={{
             background: "white",
@@ -130,7 +136,9 @@ function FederalDashboardProfile() {
             boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
         >
-          <div style={{ display: "flex", gap: "2rem", alignItems: "flex-start" }}>
+          <div
+            style={{ display: "flex", gap: "2rem", alignItems: "flex-start" }}
+          >
             <div style={{ position: "relative" }}>
               <div
                 style={{
@@ -151,7 +159,11 @@ function FederalDashboardProfile() {
                   <img
                     src={profilePicture}
                     alt={formData.fullName}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                   />
                 ) : (
                   getInitials(formData.fullName)
@@ -189,7 +201,13 @@ function FederalDashboardProfile() {
               <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1.5rem" }}>
                 {formData.fullName || "Federal Office"}
               </h2>
-              <p style={{ margin: "0.25rem 0", color: "#666", fontSize: "0.9rem" }}>
+              <p
+                style={{
+                  margin: "0.25rem 0",
+                  color: "#666",
+                  fontSize: "0.9rem",
+                }}
+              >
                 <span
                   style={{
                     background: "#4f46e5",
@@ -202,10 +220,22 @@ function FederalDashboardProfile() {
                   {formData.role}
                 </span>
               </p>
-              <p style={{ margin: "0.5rem 0 0 0", color: "#999", fontSize: "0.9rem" }}>
+              <p
+                style={{
+                  margin: "0.5rem 0 0 0",
+                  color: "#999",
+                  fontSize: "0.9rem",
+                }}
+              >
                 {formData.email}
               </p>
-              <p style={{ margin: "0.25rem 0 0 0", color: "#999", fontSize: "0.9rem" }}>
+              <p
+                style={{
+                  margin: "0.25rem 0 0 0",
+                  color: "#999",
+                  fontSize: "0.9rem",
+                }}
+              >
                 Region: {formData.region || "Nationwide"}
               </p>
             </div>
@@ -231,7 +261,9 @@ function FederalDashboardProfile() {
               paddingBottom: "1rem",
             }}
           >
-            <h3 style={{ margin: 0, fontSize: "1.1rem" }}>Profile Information</h3>
+            <h3 style={{ margin: 0, fontSize: "1.1rem" }}>
+              Profile Information
+            </h3>
             <button
               onClick={() => setIsEditing(!isEditing)}
               style={{
@@ -248,7 +280,13 @@ function FederalDashboardProfile() {
             </button>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1.5rem",
+            }}
+          >
             <div>
               <label
                 style={{

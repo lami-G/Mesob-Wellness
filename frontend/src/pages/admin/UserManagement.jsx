@@ -32,7 +32,10 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
         alert("User deleted successfully");
         setRefreshKey((prev) => prev + 1);
       } catch (err) {
-        alert("Failed to delete user: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete user: " +
+            (err.response?.data?.message || err.message),
+        );
       }
     }
   };
@@ -59,7 +62,7 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
         initialFilters={baseFilters}
       />
 
-      <UsersList 
+      <UsersList
         key={refreshKey}
         filters={filters}
         onEdit={handleEdit}

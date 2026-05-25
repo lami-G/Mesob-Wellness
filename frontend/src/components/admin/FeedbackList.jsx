@@ -76,8 +76,11 @@ function FeedbackList({ baseFilters = {} }) {
 
   return (
     <div className="feedback-list">
-      <FeedbackModal feedback={selectedFeedback} onClose={() => setSelectedFeedback(null)} />
-      
+      <FeedbackModal
+        feedback={selectedFeedback}
+        onClose={() => setSelectedFeedback(null)}
+      />
+
       <div className="list-header">
         <h2>Customer Feedback</h2>
         <button className="btn-export">Export</button>
@@ -152,7 +155,9 @@ function FeedbackList({ baseFilters = {} }) {
             <tr key={item.id}>
               <td>{item.user?.fullName || "N/A"}</td>
               <td>
-                <span className={`badge badge-nps badge-${getNPSColor(item.npsScore)}`}>
+                <span
+                  className={`badge badge-nps badge-${getNPSColor(item.npsScore)}`}
+                >
                   {item.npsScore || "-"}/10
                 </span>
               </td>
@@ -171,7 +176,12 @@ function FeedbackList({ baseFilters = {} }) {
               <td>{item.feedbackType || "-"}</td>
               <td>{new Date(item.createdAt).toLocaleDateString()}</td>
               <td>
-                <button className="btn-view" onClick={() => setSelectedFeedback(item)}>View</button>
+                <button
+                  className="btn-view"
+                  onClick={() => setSelectedFeedback(item)}
+                >
+                  View
+                </button>
               </td>
             </tr>
           ))}

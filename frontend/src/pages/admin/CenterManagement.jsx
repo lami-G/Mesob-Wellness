@@ -46,7 +46,10 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
         alert("Center deleted successfully");
         setRefreshKey((prev) => prev + 1);
       } catch (err) {
-        alert("Failed to delete center: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete center: " +
+            (err.response?.data?.message || err.message),
+        );
       }
     }
   };
@@ -64,10 +67,7 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     <div className="management-section">
       <div className="section-header">
         <h2>🏥 Center Management</h2>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowAddModal(true)}
-        >
+        <button className="btn-primary" onClick={() => setShowAddModal(true)}>
           + Add Center
         </button>
       </div>

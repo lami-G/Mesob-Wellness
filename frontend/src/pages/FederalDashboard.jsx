@@ -173,7 +173,9 @@ function FederalDashboard() {
       setGlobalFilters((prev) => ({ ...prev, status: "" }));
       return;
     }
-    if (!statusOptions.find((option) => option.value === globalFilters.status)) {
+    if (
+      !statusOptions.find((option) => option.value === globalFilters.status)
+    ) {
       setGlobalFilters((prev) => ({ ...prev, status: "" }));
     }
   }, [statusOptions, globalFilters.status]);
@@ -212,7 +214,9 @@ function FederalDashboard() {
 
   const summary = analytics?.summary || {};
   const completionRate = summary.totalAppointments
-    ? Math.round((summary.completedAppointments / summary.totalAppointments) * 100)
+    ? Math.round(
+        (summary.completedAppointments / summary.totalAppointments) * 100,
+      )
     : 0;
 
   const regionStats = (analytics?.regions || []).map((region) => ({
@@ -225,8 +229,9 @@ function FederalDashboard() {
   const regionSummary =
     selectedRegion === "all"
       ? null
-      : analytics?.regions?.find((region) => region.region === selectedRegion) ||
-        null;
+      : analytics?.regions?.find(
+          (region) => region.region === selectedRegion,
+        ) || null;
 
   const getRegionStatus = (regionCenters) => {
     if (!regionCenters.length) return "INACTIVE";
@@ -240,13 +245,22 @@ function FederalDashboard() {
   };
 
   const regionRows = regions.map((region) => {
-    const regionCenters = allCenters.filter((center) => center.region === region);
+    const regionCenters = allCenters.filter(
+      (center) => center.region === region,
+    );
     const status = getRegionStatus(regionCenters);
-    const activeCenters = regionCenters.filter((center) => center.status === "ACTIVE").length;
-    const maintenanceCenters = regionCenters.filter((center) => center.status === "MAINTENANCE").length;
-    const inactiveCenters = regionCenters.filter((center) => center.status === "INACTIVE").length;
+    const activeCenters = regionCenters.filter(
+      (center) => center.status === "ACTIVE",
+    ).length;
+    const maintenanceCenters = regionCenters.filter(
+      (center) => center.status === "MAINTENANCE",
+    ).length;
+    const inactiveCenters = regionCenters.filter(
+      (center) => center.status === "INACTIVE",
+    ).length;
     const analyticsSummary =
-      analytics?.regions?.find((entry) => entry.region === region)?.summary || {};
+      analytics?.regions?.find((entry) => entry.region === region)?.summary ||
+      {};
     const completion = analyticsSummary.totalAppointments
       ? Math.round(
           (analyticsSummary.completedAppointments /
@@ -274,7 +288,9 @@ function FederalDashboard() {
 
   const availableCenters = useMemo(() => {
     if (globalFilters.region && globalFilters.region !== "all") {
-      return allCenters.filter((center) => center.region === globalFilters.region);
+      return allCenters.filter(
+        (center) => center.region === globalFilters.region,
+      );
     }
     return allCenters;
   }, [allCenters, globalFilters.region]);
@@ -372,7 +388,10 @@ function FederalDashboard() {
           <p className="metrics-subtitle">Nationwide performance snapshot</p>
         </div>
         <div className="metrics-controls">
-          <div className="time-period-select" style={{ padding: "0.4rem 0.75rem" }}>
+          <div
+            className="time-period-select"
+            style={{ padding: "0.4rem 0.75rem" }}
+          >
             {globalFilters.region === "all" || !globalFilters.region
               ? "Nationwide"
               : globalFilters.region}
@@ -489,13 +508,19 @@ function FederalDashboard() {
         </select>
       </div>
 
-      <div className="card" style={{ padding: "1.5rem", marginBottom: "1.5rem" }}>
+      <div
+        className="card"
+        style={{ padding: "1.5rem", marginBottom: "1.5rem" }}
+      >
         <h4 style={{ marginBottom: "0.5rem" }}>Create New Region</h4>
         <p style={{ color: "#6b7280", marginBottom: "1rem" }}>
           This creates a regional placeholder center to register the region.
         </p>
         {regionError && (
-          <div className="alert alert-error" style={{ marginBottom: "0.75rem" }}>
+          <div
+            className="alert alert-error"
+            style={{ marginBottom: "0.75rem" }}
+          >
             {regionError}
           </div>
         )}
@@ -534,7 +559,11 @@ function FederalDashboard() {
                 setRegionError("");
                 setRegionSuccess("");
 
-                const codePrefix = trimmed.replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 3) || "REG";
+                const codePrefix =
+                  trimmed
+                    .replace(/[^A-Za-z]/g, "")
+                    .toUpperCase()
+                    .slice(0, 3) || "REG";
                 await regionalService.createCenter({
                   name: `${trimmed} Regional Center`,
                   code: `${codePrefix}-001`,
@@ -563,7 +592,10 @@ function FederalDashboard() {
       </div>
 
       {regionSummary && (
-        <div className="analytics-cards-grid" style={{ marginBottom: "1.5rem" }}>
+        <div
+          className="analytics-cards-grid"
+          style={{ marginBottom: "1.5rem" }}
+        >
           <div className="analytics-card">
             <div className="card-icon">🏥</div>
             <div className="card-content">
@@ -575,28 +607,36 @@ function FederalDashboard() {
             <div className="card-icon">👥</div>
             <div className="card-content">
               <p className="card-label">Total Staff</p>
-              <p className="card-value">{regionSummary.summary?.totalStaff || 0}</p>
+              <p className="card-value">
+                {regionSummary.summary?.totalStaff || 0}
+              </p>
             </div>
           </div>
           <div className="analytics-card">
             <div className="card-icon">📋</div>
             <div className="card-content">
               <p className="card-label">Appointments</p>
-              <p className="card-value">{regionSummary.summary?.totalAppointments || 0}</p>
+              <p className="card-value">
+                {regionSummary.summary?.totalAppointments || 0}
+              </p>
             </div>
           </div>
           <div className="analytics-card">
             <div className="card-icon">✅</div>
             <div className="card-content">
               <p className="card-label">Completed</p>
-              <p className="card-value">{regionSummary.summary?.completedAppointments || 0}</p>
+              <p className="card-value">
+                {regionSummary.summary?.completedAppointments || 0}
+              </p>
             </div>
           </div>
           <div className="analytics-card">
             <div className="card-icon">🩺</div>
             <div className="card-content">
               <p className="card-label">Vitals</p>
-              <p className="card-value">{regionSummary.summary?.totalVitals || 0}</p>
+              <p className="card-value">
+                {regionSummary.summary?.totalVitals || 0}
+              </p>
             </div>
           </div>
           <div className="analytics-card">
@@ -645,7 +685,9 @@ function FederalDashboard() {
                 <tr key={row.region}>
                   <td>{row.region}</td>
                   <td>
-                    <span className={`status ${row.status === "ACTIVE" ? "active" : row.status === "MAINTENANCE" ? "maintenance" : "inactive"}`}>
+                    <span
+                      className={`status ${row.status === "ACTIVE" ? "active" : row.status === "MAINTENANCE" ? "maintenance" : "inactive"}`}
+                    >
                       {row.status}
                     </span>
                   </td>
@@ -655,7 +697,14 @@ function FederalDashboard() {
                   <td>{row.completion}%</td>
                   <td>
                     {editingRegion === row.region ? (
-                      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
                         <input
                           className="form-input"
                           value={regionDraftName}
@@ -680,15 +729,24 @@ function FederalDashboard() {
                               (center) => center.region === row.region,
                             );
                             if (!trimmed) {
-                              setRegionActionError("Region name cannot be empty.");
+                              setRegionActionError(
+                                "Region name cannot be empty.",
+                              );
                               return;
                             }
-                            if (regions.includes(trimmed) && trimmed !== row.region) {
-                              setRegionActionError("Region name already exists.");
+                            if (
+                              regions.includes(trimmed) &&
+                              trimmed !== row.region
+                            ) {
+                              setRegionActionError(
+                                "Region name already exists.",
+                              );
                               return;
                             }
                             if (regionCenters.length === 0) {
-                              setRegionActionError("No centers found for this region.");
+                              setRegionActionError(
+                                "No centers found for this region.",
+                              );
                               return;
                             }
                             try {
@@ -734,7 +792,13 @@ function FederalDashboard() {
                         </button>
                       </div>
                     ) : (
-                      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          flexWrap: "wrap",
+                        }}
+                      >
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
@@ -753,7 +817,9 @@ function FederalDashboard() {
                               (center) => center.region === row.region,
                             );
                             if (regionCenters.length === 0) {
-                              setRegionActionError("No centers found for this region.");
+                              setRegionActionError(
+                                "No centers found for this region.",
+                              );
                               return;
                             }
                             try {
@@ -791,7 +857,9 @@ function FederalDashboard() {
                               (center) => center.region === row.region,
                             );
                             if (regionCenters.length === 0) {
-                              setRegionActionError("No centers found for this region.");
+                              setRegionActionError(
+                                "No centers found for this region.",
+                              );
                               return;
                             }
                             const confirmed = window.confirm(
@@ -834,7 +902,10 @@ function FederalDashboard() {
       ) : (
         <div className="card metrics-card" style={{ padding: "1.5rem" }}>
           <h3 style={{ marginBottom: "1rem" }}>{selectedRegion} Summary</h3>
-          <div className="analytics-cards-grid" style={{ marginBottom: "1rem" }}>
+          <div
+            className="analytics-cards-grid"
+            style={{ marginBottom: "1rem" }}
+          >
             <div className="analytics-card">
               <div className="card-icon">🏥</div>
               <div className="card-content">
@@ -857,7 +928,9 @@ function FederalDashboard() {
               </div>
             </div>
           </div>
-          <p style={{ color: "#6b7280" }}>Centers shown below are active only.</p>
+          <p style={{ color: "#6b7280" }}>
+            Centers shown below are active only.
+          </p>
         </div>
       )}
     </div>
@@ -873,13 +946,26 @@ function FederalDashboard() {
       ) : (
         <div className="card" style={{ padding: "1.5rem" }}>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={regionStats} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+            <BarChart
+              data={regionStats}
+              margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" stroke="#6B7280" />
               <YAxis stroke="#6B7280" />
               <Tooltip />
-              <Bar dataKey="appointments" name="Appointments" fill="#2563eb" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="completed" name="Completed" fill="#10b981" radius={[6, 6, 0, 0]} />
+              <Bar
+                dataKey="appointments"
+                name="Appointments"
+                fill="#2563eb"
+                radius={[6, 6, 0, 0]}
+              />
+              <Bar
+                dataKey="completed"
+                name="Completed"
+                fill="#10b981"
+                radius={[6, 6, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -906,12 +992,31 @@ function FederalDashboard() {
                 layout="vertical"
                 margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" horizontal={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#E5E7EB"
+                  horizontal={false}
+                />
                 <XAxis type="number" stroke="#6B7280" />
-                <YAxis type="category" dataKey="name" width={160} stroke="#6B7280" />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={160}
+                  stroke="#6B7280"
+                />
                 <Tooltip />
-                <Bar dataKey="staff" name="Staff" fill="#2563eb" radius={[0, 6, 6, 0]} />
-                <Bar dataKey="capacity" name="Capacity" fill="#10b981" radius={[0, 6, 6, 0]} />
+                <Bar
+                  dataKey="staff"
+                  name="Staff"
+                  fill="#2563eb"
+                  radius={[0, 6, 6, 0]}
+                />
+                <Bar
+                  dataKey="capacity"
+                  name="Capacity"
+                  fill="#10b981"
+                  radius={[0, 6, 6, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -923,20 +1028,41 @@ function FederalDashboard() {
         {loading ? (
           <div className="metrics-loading">Loading trends...</div>
         ) : !trendsData || timePeriod === "all" ? (
-          <div className="metrics-empty">No trends available for this period.</div>
-        ) : !Array.isArray(trendsData?.[timePeriod]) || trendsData[timePeriod].length === 0 ? (
+          <div className="metrics-empty">
+            No trends available for this period.
+          </div>
+        ) : !Array.isArray(trendsData?.[timePeriod]) ||
+          trendsData[timePeriod].length === 0 ? (
           <div className="metrics-empty">No trend data returned.</div>
         ) : (
           <div className="card" style={{ padding: "1.5rem" }}>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={trendsData[timePeriod]} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <BarChart
+                data={trendsData[timePeriod]}
+                margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="label" stroke="#6B7280" />
                 <YAxis stroke="#6B7280" />
                 <Tooltip />
-                <Bar dataKey="appointments" name="Appointments" fill="#2563eb" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="completed" name="Completed" fill="#10b981" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="noShow" name="No Show" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                <Bar
+                  dataKey="appointments"
+                  name="Appointments"
+                  fill="#2563eb"
+                  radius={[6, 6, 0, 0]}
+                />
+                <Bar
+                  dataKey="completed"
+                  name="Completed"
+                  fill="#10b981"
+                  radius={[6, 6, 0, 0]}
+                />
+                <Bar
+                  dataKey="noShow"
+                  name="No Show"
+                  fill="#f59e0b"
+                  radius={[6, 6, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -957,12 +1083,23 @@ function FederalDashboard() {
         return (
           <UserManagement
             baseFilters={userBaseFilters}
-            allowedRoles={["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE"]}
+            allowedRoles={[
+              "STAFF",
+              "NURSE_OFFICER",
+              "MANAGER",
+              "REGIONAL_OFFICE",
+              "FEDERAL_OFFICE",
+            ]}
             disallowEditRoles={["SYSTEM_ADMIN"]}
           />
         );
       case "centers":
-        return <CenterManagement baseFilters={centerBaseFilters} allowDelete={false} />;
+        return (
+          <CenterManagement
+            baseFilters={centerBaseFilters}
+            allowDelete={false}
+          />
+        );
       case "appointments":
         return <AppointmentManagement baseFilters={appointmentBaseFilters} />;
       case "feedback":
@@ -982,9 +1119,24 @@ function FederalDashboard() {
       error={error}
     >
       <div className="card" style={{ padding: "1rem", marginBottom: "1rem" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-end" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1rem",
+            alignItems: "flex-end",
+          }}
+        >
           <div style={{ minWidth: "180px" }}>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: "0.25rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: "#6b7280",
+                marginBottom: "0.25rem",
+              }}
+            >
               Region
             </label>
             <select
@@ -1007,7 +1159,15 @@ function FederalDashboard() {
             </select>
           </div>
           <div style={{ minWidth: "220px" }}>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: "0.25rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: "#6b7280",
+                marginBottom: "0.25rem",
+              }}
+            >
               Center
             </label>
             <select
@@ -1030,7 +1190,15 @@ function FederalDashboard() {
             </select>
           </div>
           <div style={{ minWidth: "200px" }}>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: "0.25rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: "#6b7280",
+                marginBottom: "0.25rem",
+              }}
+            >
               Time Period
             </label>
             <select
@@ -1057,7 +1225,15 @@ function FederalDashboard() {
           </div>
           {statusOptions.length > 0 && (
             <div style={{ minWidth: "200px" }}>
-              <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: "0.25rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  color: "#6b7280",
+                  marginBottom: "0.25rem",
+                }}
+              >
                 {statusLabel}
               </label>
               <select

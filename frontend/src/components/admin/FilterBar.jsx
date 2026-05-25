@@ -198,10 +198,7 @@ function FilterBar({
 
         {/* Action Buttons */}
         <div className="filter-actions">
-          <button 
-            className="btn-reset"
-            onClick={handleReset}
-          >
+          <button className="btn-reset" onClick={handleReset}>
             Reset
           </button>
         </div>

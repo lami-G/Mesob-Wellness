@@ -46,9 +46,7 @@ function DashboardMetrics({
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timePeriod, setTimePeriod] = useState(
-    externalTimePeriod || "daily",
-  );
+  const [timePeriod, setTimePeriod] = useState(externalTimePeriod || "daily");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [healthData, setHealthData] = useState(null);
   const [, setVitalsTrends] = useState(null);

@@ -5,7 +5,12 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
 
   useEffect(() => {
     fetchCenters();
@@ -14,7 +19,11 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
   const fetchCenters = async () => {
     try {
       setLoading(true);
-      const result = await adminService.getCenters({ ...filters, page: pagination.page, limit: pagination.limit });
+      const result = await adminService.getCenters({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       setCenters(result.data || []);
       setPagination(result.pagination || {});
       setError(null);
@@ -55,7 +64,9 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
         <tbody>
           {centers.length === 0 ? (
             <tr>
-              <td colSpan="7" className="table-empty">No centers found</td>
+              <td colSpan="7" className="table-empty">
+                No centers found
+              </td>
             </tr>
           ) : (
             centers.map((center) => (
@@ -71,7 +82,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
                 </td>
                 <td className="cell-count">{center._count?.staff || 0}</td>
                 <td className="cell-actions">
-                  <button 
+                  <button
                     className="btn-icon edit"
                     onClick={() => onEdit(center)}
                     title="Edit"
@@ -79,7 +90,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
                     ✎
                   </button>
                   {allowDelete && (
-                    <button 
+                    <button
                       className="btn-icon delete"
                       onClick={() => onDelete(center.id)}
                       title="Delete"
@@ -96,7 +107,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
 
       {pagination.pages > 1 && (
         <div className="pagination">
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page - 1)}
             disabled={pagination.page === 1}
             className="btn-pagination"
@@ -106,7 +117,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
           <span className="pagination-info">
             Page {pagination.page} of {pagination.pages}
           </span>
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={pagination.page === pagination.pages}
             className="btn-pagination"

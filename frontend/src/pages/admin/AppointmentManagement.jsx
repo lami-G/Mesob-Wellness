@@ -22,7 +22,10 @@ function AppointmentManagement({ baseFilters = {} }) {
         alert("Appointment deleted successfully");
         setRefreshKey((prev) => prev + 1);
       } catch (err) {
-        alert("Failed to delete appointment: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete appointment: " +
+            (err.response?.data?.message || err.message),
+        );
       }
     }
   };
@@ -41,7 +44,7 @@ function AppointmentManagement({ baseFilters = {} }) {
         initialFilters={baseFilters}
       />
 
-      <AppointmentsList 
+      <AppointmentsList
         key={refreshKey}
         filters={filters}
         onDelete={handleDelete}
