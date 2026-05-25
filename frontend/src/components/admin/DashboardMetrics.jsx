@@ -37,11 +37,18 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-function DashboardMetrics({ onTabChange }) {
+function DashboardMetrics({
+  onTabChange,
+  timePeriod: externalTimePeriod,
+  onTimePeriodChange,
+  showControls = true,
+}) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timePeriod, setTimePeriod] = useState("daily");
+  const [timePeriod, setTimePeriod] = useState(
+    externalTimePeriod || "daily",
+  );
   const [lastUpdated, setLastUpdated] = useState(null);
   const [healthData, setHealthData] = useState(null);
   const [, setVitalsTrends] = useState(null);
@@ -51,6 +58,14 @@ function DashboardMetrics({ onTabChange }) {
   const [selectedCondition, setSelectedCondition] = useState("all");
   const [centers, setCenters] = useState([]);
 
+  const effectivePeriod = externalTimePeriod || timePeriod;
+
+  useEffect(() => {
+    if (externalTimePeriod) {
+      setTimePeriod(externalTimePeriod);
+    }
+  }, [externalTimePeriod]);
+
   useEffect(() => {
     fetchMetrics();
     fetchCenters();
@@ -59,16 +74,16 @@ function DashboardMetrics({ onTabChange }) {
       fetchMetrics();
     }, 60000); // Refresh every minute
     return () => clearInterval(interval);
-  }, [timePeriod]);
+  }, [effectivePeriod]);
 
   useEffect(() => {
     fetchHealthData();
-  }, [timePeriod, selectedCenter, selectedCondition]);
+  }, [effectivePeriod, selectedCenter, selectedCondition]);
 
   const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getDashboardMetrics(timePeriod);
+      const data = await adminService.getDashboardMetrics(effectivePeriod);
       setMetrics(data);
       setLastUpdated(new Date());
       setError(null);
@@ -88,25 +103,25 @@ function DashboardMetrics({ onTabChange }) {
       const today = new Date();
       let startDate, endDate;
 
-      if (timePeriod === "all") {
+      if (effectivePeriod === "all") {
         // All time - no date filters
         startDate = null;
         endDate = null;
-      } else if (timePeriod === "daily") {
+      } else if (effectivePeriod === "daily") {
         // Today only - use UTC dates to avoid timezone issues
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
         startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
-      } else if (timePeriod === "weekly") {
+      } else if (effectivePeriod === "weekly") {
         // Last 7 days (including today) - use UTC dates
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
         startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
-      } else if (timePeriod === "monthly") {
+      } else if (effectivePeriod === "monthly") {
         // From 1st of current month to today - use UTC dates
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
@@ -117,7 +132,7 @@ function DashboardMetrics({ onTabChange }) {
 
       console.log(
         "📊 Fetching health data for timePeriod:",
-        timePeriod,
+        effectivePeriod,
         "dates:",
         startDate,
         "to",
@@ -126,7 +141,7 @@ function DashboardMetrics({ onTabChange }) {
 
       // Use the same endpoint as Nurse Analytics: /api/v1/conditions/period
       const params =
-        timePeriod === "all"
+        effectivePeriod === "all"
           ? {}
           : {
               startDate: startDate.toISOString(),
@@ -147,7 +162,7 @@ function DashboardMetrics({ onTabChange }) {
 
       // Get total unique patients in the period (from vitals records)
       const vitalsParams =
-        timePeriod === "all"
+        effectivePeriod === "all"
           ? {}
           : {
               startDate: startDate.toISOString(),
@@ -296,7 +311,7 @@ function DashboardMetrics({ onTabChange }) {
 
   // Get time period label for health analytics
   const getHealthTimePeriodLabel = () => {
-    switch (timePeriod) {
+    switch (effectivePeriod) {
       case "daily":
         return "Today";
       case "weekly":
@@ -387,33 +402,39 @@ function DashboardMetrics({ onTabChange }) {
       </div>
 
       {/* Header with Controls */}
-      <div className="metrics-header">
-        <div className="metrics-title">
-          <h3>Performance Metrics</h3>
-          <p className="metrics-subtitle">Filter by time period</p>
-        </div>
+      {showControls && (
+        <div className="metrics-header">
+          <div className="metrics-title">
+            <h3>Performance Metrics</h3>
+            <p className="metrics-subtitle">Filter by time period</p>
+          </div>
 
-        <div className="metrics-controls">
-          <select
-            value={timePeriod}
-            onChange={(e) => setTimePeriod(e.target.value)}
-            className="time-period-select"
-          >
-            <option value="all">All</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-          <button
-            onClick={fetchMetrics}
-            className="refresh-btn"
-            title="Refresh metrics"
-          >
-            🔄
-          </button>
-          <span className="last-updated">Updated: {formatLastUpdated()}</span>
+          <div className="metrics-controls">
+            <select
+              value={effectivePeriod}
+              onChange={(e) => {
+                const next = e.target.value;
+                if (onTimePeriodChange) onTimePeriodChange(next);
+                if (!externalTimePeriod) setTimePeriod(next);
+              }}
+              className="time-period-select"
+            >
+              <option value="all">All</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <button
+              onClick={fetchMetrics}
+              className="refresh-btn"
+              title="Refresh metrics"
+            >
+              🔄
+            </button>
+            <span className="last-updated">Updated: {formatLastUpdated()}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Filtered Metrics Grid - 4 cards */}
       <div className="metrics-grid">
@@ -427,11 +448,11 @@ function DashboardMetrics({ onTabChange }) {
             <div className="metric-main">
               <span className="metric-value">{totalAppointments}</span>
               <span className="metric-label">
-                {timePeriod === "daily"
+                {effectivePeriod === "daily"
                   ? "Today"
-                  : timePeriod === "weekly"
+                  : effectivePeriod === "weekly"
                     ? "This Week"
-                    : timePeriod === "monthly"
+                    : effectivePeriod === "monthly"
                       ? "This Month"
                       : "All Time"}
               </span>
@@ -449,11 +470,11 @@ function DashboardMetrics({ onTabChange }) {
             <div className="metric-main">
               <span className="metric-value">{totalWalkIns}</span>
               <span className="metric-label">
-                {timePeriod === "daily"
+                {effectivePeriod === "daily"
                   ? "Today"
-                  : timePeriod === "weekly"
+                  : effectivePeriod === "weekly"
                     ? "This Week"
-                    : timePeriod === "monthly"
+                    : effectivePeriod === "monthly"
                       ? "This Month"
                       : "All Time"}
               </span>
@@ -471,11 +492,11 @@ function DashboardMetrics({ onTabChange }) {
             <div className="metric-main">
               <span className="metric-value">{totalFeedback}</span>
               <span className="metric-label">
-                {timePeriod === "daily"
+                {effectivePeriod === "daily"
                   ? "Today"
-                  : timePeriod === "weekly"
+                  : effectivePeriod === "weekly"
                     ? "This Week"
-                    : timePeriod === "monthly"
+                    : effectivePeriod === "monthly"
                       ? "This Month"
                       : "All Time"}
               </span>
@@ -493,11 +514,11 @@ function DashboardMetrics({ onTabChange }) {
             <div className="metric-main">
               <span className="metric-value">{totalPatientsServed}</span>
               <span className="metric-label">
-                {timePeriod === "daily"
+                {effectivePeriod === "daily"
                   ? "Today"
-                  : timePeriod === "weekly"
+                  : effectivePeriod === "weekly"
                     ? "This Week"
-                    : timePeriod === "monthly"
+                    : effectivePeriod === "monthly"
                       ? "This Month"
                       : "All Time"}
               </span>

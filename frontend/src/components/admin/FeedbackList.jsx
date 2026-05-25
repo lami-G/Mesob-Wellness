@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import FeedbackModal from "./FeedbackModal";
 
-function FeedbackList() {
+function FeedbackList({ baseFilters = {} }) {
   const [feedback, setFeedback] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,11 +16,16 @@ function FeedbackList() {
     dateFrom: "",
     dateTo: "",
     search: "",
+    ...baseFilters,
   });
 
   useEffect(() => {
     fetchFeedback();
   }, [page, filters]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [baseFilters]);
 
   const fetchFeedback = async () => {
     try {
@@ -55,6 +60,7 @@ function FeedbackList() {
       dateFrom: "",
       dateTo: "",
       search: "",
+      ...baseFilters,
     });
     setPage(1);
   };

@@ -2,23 +2,30 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import "../../styles/admin-audit.css";
 
-function AuditLogs() {
+function AuditLogs({ baseFilters = {} }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
+    region: "",
+    center: "",
     action: "",
     resource: "",
     dateFrom: "",
     dateTo: "",
     search: "",
     role: "",
+    ...baseFilters,
   });
 
   useEffect(() => {
     fetchLogs();
   }, [page, filters]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [baseFilters]);
 
   const fetchLogs = async () => {
     try {
@@ -46,12 +53,15 @@ function AuditLogs() {
 
   const handleResetFilters = () => {
     setFilters({
+      region: "",
+      center: "",
       action: "",
       resource: "",
       dateFrom: "",
       dateTo: "",
       search: "",
       role: "",
+      ...baseFilters,
     });
     setPage(1);
   };

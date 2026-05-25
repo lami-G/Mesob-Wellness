@@ -17,7 +17,7 @@ import '../styles/regional-dashboard-responsive.css';
 import '../styles/dashboard-tokens.css';
 
 // ─── Role guard ───────────────────────────────────────────────────────────────
-const REGIONAL_ROLES = ['REGIONAL_OFFICE', 'FEDERAL_OFFICE', 'SYSTEM_ADMIN'];
+const REGIONAL_ROLES = ['REGIONAL_OFFICE', 'SYSTEM_ADMIN'];
 
 // ─── Custom Tooltip for Performance Trends ───────────────────────────────────
 const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {

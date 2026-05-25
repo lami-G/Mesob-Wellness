@@ -8,6 +8,11 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
     { id: "overview", label: "Overview" },
     { id: "regions", label: "Regions" },
     { id: "analytics", label: "Analytics" },
+    { id: "users", label: "Users" },
+    { id: "centers", label: "Centers" },
+    { id: "appointments", label: "Appointments" },
+    { id: "feedback", label: "Feedback" },
+    { id: "audit", label: "Audit" },
   ];
 
   return (

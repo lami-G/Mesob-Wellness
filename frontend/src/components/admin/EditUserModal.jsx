@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function EditUserModal({ isOpen, onClose, user, onSuccess }) {
+function EditUserModal({ isOpen, onClose, user, onSuccess, allowedRoles, disallowEditRoles }) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -17,7 +17,12 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
 
-  const roles = ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
+  const defaultRoles = ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
+  const roles = allowedRoles && allowedRoles.length ? allowedRoles : defaultRoles;
+  const isRestrictedRole = disallowEditRoles?.includes(formData.role);
+  const displayRoles = roles.includes(formData.role)
+    ? roles
+    : [formData.role, ...roles].filter(Boolean);
 
   useEffect(() => {
     if (user && isOpen) {
@@ -77,6 +82,11 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
 
     if (!formData.fullName || !formData.email || !formData.role) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    if (isRestrictedRole) {
+      setError("You cannot edit users with this role.");
       return;
     }
 
@@ -154,6 +164,12 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
             />
           </div>
 
+          {isRestrictedRole && (
+            <div className="error-message">
+              You cannot modify users with this role.
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="role">Role *</label>
             <select
@@ -162,10 +178,15 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
               value={formData.role}
               onChange={handleChange}
               required
+              disabled={isRestrictedRole}
             >
               <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role} value={role}>
+              {displayRoles.map((role) => (
+                <option
+                  key={role}
+                  value={role}
+                  disabled={!roles.includes(role)}
+                >
                   {role}
                 </option>
               ))}

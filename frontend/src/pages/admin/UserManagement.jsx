@@ -1,19 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import UsersList from "../../components/admin/UsersList";
 import EditUserModal from "../../components/admin/EditUserModal";
 import CreateUserModal from "../../components/admin/CreateUserModal";
 import { adminService } from "../../services/adminService";
 
-function UserManagement() {
-  const [filters, setFilters] = useState({});
+function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
+  const [filters, setFilters] = useState({ ...baseFilters });
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [baseFilters]);
+
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({ ...baseFilters, ...newFilters });
   };
 
   const handleEdit = (user) => {
@@ -47,11 +51,12 @@ function UserManagement() {
         <h2>👥 User Management</h2>
       </div>
 
-      <FilterBar 
+      <FilterBar
         onFilterChange={handleFilterChange}
         showRegionFilter={true}
         showCenterFilter={true}
         showRoleFilter={true}
+        initialFilters={baseFilters}
       />
 
       <UsersList 
@@ -67,12 +72,15 @@ function UserManagement() {
         onClose={() => setShowEditModal(false)}
         user={selectedUser}
         onSuccess={handleEditSuccess}
+        allowedRoles={allowedRoles}
+        disallowEditRoles={disallowEditRoles}
       />
 
       <CreateUserModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleCreateSuccess}
+        allowedRoles={allowedRoles}
       />
     </div>
   );

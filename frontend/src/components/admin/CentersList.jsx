@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 
-function CentersList({ filters, onEdit, onDelete }) {
+function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -78,13 +78,15 @@ function CentersList({ filters, onEdit, onDelete }) {
                   >
                     ✎
                   </button>
-                  <button 
-                    className="btn-icon delete"
-                    onClick={() => onDelete(center.id)}
-                    title="Delete"
-                  >
-                    🗑
-                  </button>
+                  {allowDelete && (
+                    <button 
+                      className="btn-icon delete"
+                      onClick={() => onDelete(center.id)}
+                      title="Delete"
+                    >
+                      🗑
+                    </button>
+                  )}
                 </td>
               </tr>
             ))

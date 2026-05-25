@@ -413,6 +413,20 @@ function AdminHeader({
                     <hr className="dropdown-divider" />
                   </>
                 )}
+                {dashboardType === "federal" && (
+                  <>
+                    <button 
+                      className="dropdown-item"
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        navigate("/federal-profile");
+                      }}
+                    >
+                      👤 Profile
+                    </button>
+                    <hr className="dropdown-divider" />
+                  </>
+                )}
                 <button 
                   className="dropdown-item logout"
                   onClick={handleLogout}

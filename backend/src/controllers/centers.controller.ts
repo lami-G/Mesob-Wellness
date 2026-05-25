@@ -231,10 +231,11 @@ export const deleteCenter = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    if (req.user.role !== UserRole.SYSTEM_ADMIN) {
+    const allowedRoles: UserRole[] = [UserRole.SYSTEM_ADMIN, UserRole.FEDERAL_OFFICE];
+    if (!allowedRoles.includes(req.user.role)) {
       res.status(403).json({
         status: "error",
-        message: "Only SYSTEM_ADMIN can delete centers",
+        message: "Only SYSTEM_ADMIN and FEDERAL_OFFICE can delete centers",
       });
       return;
     }

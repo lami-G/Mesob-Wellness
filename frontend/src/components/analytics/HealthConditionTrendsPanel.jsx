@@ -41,7 +41,11 @@ function buildConditionMap(rows) {
 /**
  * Nurse-dashboard parity: period condition breakdown + multi-line trends from /api/v1/conditions/period.
  */
-export default function HealthConditionTrendsPanel({ periodSwitcherClassName = 'mgr-period-switcher' }) {
+export default function HealthConditionTrendsPanel({
+  periodSwitcherClassName = 'mgr-period-switcher',
+  viewPeriod: externalPeriod,
+  showPeriodSwitcher = true,
+}) {
   const [viewPeriod, setViewPeriod] = useState('daily');
   const [healthConditions, setHealthConditions] = useState([]);
   const [conditionTrends, setConditionTrends] = useState(null);
@@ -144,7 +148,10 @@ export default function HealthConditionTrendsPanel({ periodSwitcherClassName = '
         let startDate;
         let endDate;
 
-        if (period === 'daily') {
+        if (period === 'all') {
+          startDate = null;
+          endDate = null;
+        } else if (period === 'daily') {
           startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
           endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
         } else if (period === 'weekly') {
@@ -157,7 +164,10 @@ export default function HealthConditionTrendsPanel({ periodSwitcherClassName = '
           endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
         }
 
-        const params = { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
+        const params =
+          period === 'all'
+            ? {}
+            : { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
         const response = await api.get('/api/v1/conditions/period', { params });
         const conditions = response.data.data || [];
         const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
@@ -177,7 +187,8 @@ export default function HealthConditionTrendsPanel({ periodSwitcherClassName = '
         })).sort((a, b) => b.count - a.count);
 
         setHealthConditions(rankedConditions);
-        await generateDynamicLineChart(period, rankedConditions);
+        const trendPeriod = period === 'all' ? 'monthly' : period;
+        await generateDynamicLineChart(trendPeriod, rankedConditions);
       } catch {
         setHealthConditions(
           ALL_CONDITIONS.map((c) => ({ ...c, count: 0, percentage: 0, totalPatients: 0 }))
@@ -188,40 +199,48 @@ export default function HealthConditionTrendsPanel({ periodSwitcherClassName = '
     [generateDynamicLineChart]
   );
 
+  const effectivePeriod = externalPeriod || viewPeriod;
+
   useEffect(() => {
-    fetchHealthConditions(viewPeriod);
-  }, [viewPeriod, fetchHealthConditions]);
+    fetchHealthConditions(effectivePeriod);
+  }, [effectivePeriod, fetchHealthConditions]);
 
   const periodSubtitle =
-    viewPeriod === 'daily'
+    effectivePeriod === 'all'
+      ? 'All time condition totals'
+      : effectivePeriod === 'daily'
       ? 'Patients with each condition recorded today'
-      : viewPeriod === 'weekly'
+      : effectivePeriod === 'weekly'
         ? `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`
         : `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
 
   const trendSubtitle =
-    viewPeriod === 'daily'
+    effectivePeriod === 'all'
+      ? 'All time overview (12-month trend)'
+      : effectivePeriod === 'daily'
       ? 'Condition trends over the last 7 days (today highlighted)'
-      : viewPeriod === 'weekly'
+      : effectivePeriod === 'weekly'
         ? 'Condition trends over the last 8 weeks — this week highlighted'
         : 'All 12 months up to now (current month to date)';
 
   return (
     <div className="health-condition-trends-panel" style={{ marginTop: '1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
-        <div className={periodSwitcherClassName}>
-          {['daily', 'weekly', 'monthly'].map((p) => (
-            <button
-              key={p}
-              type="button"
-              className={`mgr-period-btn ${viewPeriod === p ? 'active' : ''}`}
-              onClick={() => setViewPeriod(p)}
-            >
-              {p.charAt(0).toUpperCase() + p.slice(1)}
-            </button>
-          ))}
+      {showPeriodSwitcher && !externalPeriod && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+          <div className={periodSwitcherClassName}>
+            {['daily', 'weekly', 'monthly'].map((p) => (
+              <button
+                key={p}
+                type="button"
+                className={`mgr-period-btn ${viewPeriod === p ? 'active' : ''}`}
+                onClick={() => setViewPeriod(p)}
+              >
+                {p.charAt(0).toUpperCase() + p.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="card" style={{ padding: '2rem', marginBottom: '1.5rem' }}>
         <div style={{ marginBottom: '2rem' }}>

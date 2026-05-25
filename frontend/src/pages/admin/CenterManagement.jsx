@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import CentersList from "../../components/admin/CentersList";
 import AddCenterModal from "../../components/admin/AddCenterModal";
 import EditCenterModal from "../../components/admin/EditCenterModal";
 import { adminService } from "../../services/adminService";
 
-function CenterManagement() {
-  const [filters, setFilters] = useState({});
+function CenterManagement({ baseFilters = {}, allowDelete = true }) {
+  const [filters, setFilters] = useState({ ...baseFilters });
   const [selectedCenter, setSelectedCenter] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -26,8 +26,12 @@ function CenterManagement() {
     }
   };
 
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [baseFilters]);
+
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({ ...baseFilters, ...newFilters });
   };
 
   const handleEdit = (center) => {
@@ -68,17 +72,19 @@ function CenterManagement() {
         </button>
       </div>
 
-      <FilterBar 
+      <FilterBar
         onFilterChange={handleFilterChange}
         showRegionFilter={true}
         showCenterFilter={false}
+        initialFilters={baseFilters}
       />
 
-      <CentersList 
+      <CentersList
         key={refreshKey}
         filters={filters}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        allowDelete={allowDelete}
       />
 
       <AddCenterModal

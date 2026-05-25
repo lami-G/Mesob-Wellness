@@ -389,6 +389,11 @@
   transition: all 0.2s ease;
 }
 
+.btn.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(40, 67, 148, 0.4);

@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import AppointmentsList from "../../components/admin/AppointmentsList";
 import { adminService } from "../../services/adminService";
 
-function AppointmentManagement() {
-  const [filters, setFilters] = useState({});
+function AppointmentManagement({ baseFilters = {} }) {
+  const [filters, setFilters] = useState({ ...baseFilters });
   const [refreshKey, setRefreshKey] = useState(0);
 
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [baseFilters]);
+
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({ ...baseFilters, ...newFilters });
   };
 
   const handleDelete = async (appointmentId) => {
@@ -29,11 +33,12 @@ function AppointmentManagement() {
         <h2>📅 Appointment Management</h2>
       </div>
 
-      <FilterBar 
+      <FilterBar
         onFilterChange={handleFilterChange}
         showRegionFilter={true}
         showCenterFilter={true}
         showDateFilter={true}
+        initialFilters={baseFilters}
       />
 
       <AppointmentsList 

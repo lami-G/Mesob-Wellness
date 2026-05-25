@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter = true, showDateFilter = false, showRoleFilter = false }) {
+function FilterBar({
+  onFilterChange,
+  showRegionFilter = true,
+  showCenterFilter = true,
+  showDateFilter = false,
+  showRoleFilter = false,
+  initialFilters = {},
+}) {
   const [filters, setFilters] = useState({
     region: "",
     center: "",
@@ -9,6 +16,7 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
     dateFrom: "",
     dateTo: "",
     role: "",
+    ...initialFilters,
   });
 
   const [regions, setRegions] = useState([]);
@@ -29,6 +37,14 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
       setCenters([]);
     }
   }, [filters.region]);
+
+  useEffect(() => {
+    if (!initialFilters) return;
+    setFilters((prev) => ({
+      ...prev,
+      ...initialFilters,
+    }));
+  }, [initialFilters]);
 
   const loadRegions = async () => {
     try {

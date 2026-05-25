@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function CreateUserModal({ isOpen, onClose, onSuccess }) {
+function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -21,14 +21,19 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
   const [regionsLoading, setRegionsLoading] = useState(false);
   const [centersLoading, setCentersLoading] = useState(false);
 
-  const roles = ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
+  const roles = allowedRoles && allowedRoles.length
+    ? allowedRoles
+    : ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
 
   // Fetch regions when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchRegions();
+      if (allowedRoles && allowedRoles.length && !allowedRoles.includes(formData.role)) {
+        setFormData((prev) => ({ ...prev, role: allowedRoles[0] }));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, allowedRoles, formData.role]);
 
   // Fetch centers when region changes
   useEffect(() => {
