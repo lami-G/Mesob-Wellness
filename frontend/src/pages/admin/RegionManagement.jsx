@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 import AddCenterModal from "../../components/admin/AddCenterModal";
+import RegionManagerModal from "../../components/admin/RegionManagerModal";
 import "../../styles/admin-regions.css";
 
 function RegionManagement() {
@@ -12,6 +13,9 @@ function RegionManagement() {
   const [regionStats, setRegionStats] = useState({});
   const [showAddCenterModal, setShowAddCenterModal] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState(null);
+  const [showRegionManagerModal, setShowRegionManagerModal] = useState(false);
+  const [selectedRegionForManager, setSelectedRegionForManager] = useState(null);
+  const [regionManagers, setRegionManagers] = useState({});
 
   useEffect(() => {
     loadRegions();
@@ -87,6 +91,23 @@ function RegionManagement() {
     await loadRegions();
   };
 
+  const handleEditRegionManager = (region) => {
+    setSelectedRegionForManager(region);
+    setShowRegionManagerModal(true);
+  };
+
+  const handleSaveRegionManager = async (data) => {
+    // Store region manager data in local state (frontend only)
+    setRegionManagers((prev) => ({
+      ...prev,
+      [data.region]: {
+        managerEmail: data.managerEmail,
+        managerPassword: data.managerPassword,
+      },
+    }));
+    setSuccess(`Region manager for ${data.region} updated successfully!`);
+  };
+
   return (
     <div className="management-section">
       <div className="section-header">
@@ -158,6 +179,12 @@ function RegionManagement() {
                     >
                       + Add Center
                     </button>
+                    <button 
+                      className="btn-secondary"
+                      onClick={() => handleEditRegionManager(region)}
+                    >
+                      👤 Manager
+                    </button>
                   </div>
                 </div>
               ))}
@@ -177,6 +204,16 @@ function RegionManagement() {
           onSuccess={handleCenterAdded}
         />
       )}
+
+      <RegionManagerModal
+        isOpen={showRegionManagerModal}
+        onClose={() => {
+          setShowRegionManagerModal(false);
+          setSelectedRegionForManager(null);
+        }}
+        region={selectedRegionForManager}
+        onSave={handleSaveRegionManager}
+      />
     </div>
   );
 }

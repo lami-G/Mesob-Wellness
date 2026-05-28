@@ -5,18 +5,42 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
+
+  useEffect(() => {
+    setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
+  }, [filters]);
 
   useEffect(() => {
     fetchUsers();
-  }, [filters]);
+  }, [filters, pagination.page, pagination.limit]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const result = await adminService.getUsers({ ...filters, page: pagination.page, limit: pagination.limit });
+      const result = await adminService.getUsers({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       setUsers(result.data || []);
-      setPagination(result.pagination || {});
+      const nextPagination = result.pagination || {};
+      setPagination((prev) => {
+        if (
+          prev.page === nextPagination.page &&
+          prev.limit === nextPagination.limit &&
+          prev.total === nextPagination.total &&
+          prev.pages === nextPagination.pages
+        ) {
+          return prev;
+        }
+        return { ...prev, ...nextPagination };
+      });
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load users");
@@ -27,16 +51,19 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
   };
 
   const handlePageChange = (newPage) => {
-    setPagination({ ...pagination, page: newPage });
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   const handleDelete = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await adminService.deleteUser(userId);
-        setUsers(users.filter(u => u.id !== userId));
+        setUsers(users.filter((u) => u.id !== userId));
       } catch (err) {
-        alert("Failed to delete user: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete user: " +
+            (err.response?.data?.message || err.message),
+        );
       }
     }
   };
@@ -72,7 +99,9 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
         <tbody>
           {users.length === 0 ? (
             <tr>
-              <td colSpan="7" className="table-empty">No users found</td>
+              <td colSpan="7" className="table-empty">
+                No users found
+              </td>
             </tr>
           ) : (
             users.map((user) => (
@@ -86,24 +115,28 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
                   </span>
                 </td>
                 <td className="cell-status">
-                  <span className={`status ${user.isActive ? "active" : "inactive"}`}>
+                  <span
+                    className={`status ${user.isActive ? "active" : "inactive"}`}
+                  >
                     {user.isActive ? "Active" : "Inactive"}
                   </span>
                 </td>
                 <td className="cell-verified">
-                  <span className={`badge ${user.isVerified ? "verified" : "unverified"}`}>
+                  <span
+                    className={`badge ${user.isVerified ? "verified" : "unverified"}`}
+                  >
                     {user.isVerified ? "✓" : "✗"}
                   </span>
                 </td>
                 <td className="cell-actions">
-                  <button 
+                  <button
                     className="btn-icon edit"
                     onClick={() => onEdit(user)}
                     title="Edit user"
                   >
                     ✎
                   </button>
-                  <button 
+                  <button
                     className="btn-icon delete"
                     onClick={() => handleDelete(user.id)}
                     title="Delete user"
@@ -119,7 +152,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
 
       {pagination.pages > 1 && (
         <div className="pagination">
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page - 1)}
             disabled={pagination.page === 1}
             className="btn-pagination"
@@ -129,7 +162,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
           <span className="pagination-info">
             Page {pagination.page} of {pagination.pages}
           </span>
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={pagination.page === pagination.pages}
             className="btn-pagination"

@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import AppointmentsList from "../../components/admin/AppointmentsList";
 import { adminService } from "../../services/adminService";
 
-function AppointmentManagement() {
-  const [filters, setFilters] = useState({});
+function AppointmentManagement({ baseFilters = {} }) {
+  const [filters, setFilters] = useState({ ...baseFilters });
   const [refreshKey, setRefreshKey] = useState(0);
 
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [JSON.stringify(baseFilters)]);
+
   const handleFilterChange = (newFilters) => {
-    setFilters(newFilters);
+    setFilters({ ...baseFilters, ...newFilters });
   };
 
   const handleDelete = async (appointmentId) => {
@@ -18,7 +22,10 @@ function AppointmentManagement() {
         alert("Appointment deleted successfully");
         setRefreshKey((prev) => prev + 1);
       } catch (err) {
-        alert("Failed to delete appointment: " + (err.response?.data?.message || err.message));
+        alert(
+          "Failed to delete appointment: " +
+            (err.response?.data?.message || err.message),
+        );
       }
     }
   };
@@ -29,14 +36,15 @@ function AppointmentManagement() {
         <h2>📅 Appointment Management</h2>
       </div>
 
-      <FilterBar 
+      <FilterBar
         onFilterChange={handleFilterChange}
         showRegionFilter={true}
         showCenterFilter={true}
         showDateFilter={true}
+        initialFilters={baseFilters}
       />
 
-      <AppointmentsList 
+      <AppointmentsList
         key={refreshKey}
         filters={filters}
         onDelete={handleDelete}

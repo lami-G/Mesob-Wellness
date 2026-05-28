@@ -4,7 +4,6 @@ import { env } from "../config/env";
 
 export interface CreateCenterInput {
   name: string;
-  code: string;
   region: string;
   city: string;
   address: string;
@@ -35,18 +34,18 @@ export async function getAllCenters(filters?: {
   status?: CenterStatus;
 }) {
   const where: any = {};
-  
+
   if (filters?.region) {
     where.region = filters.region;
   }
-  
+
   if (filters?.status) {
     where.status = filters.status;
   }
 
   return prisma.center.findMany({
     where,
-    orderBy: { name: 'asc' },
+    orderBy: { name: "asc" },
     include: {
       _count: {
         select: {
@@ -118,7 +117,7 @@ export async function getCenterAnalytics(centerId: string) {
         user: {
           centerId,
         },
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
     }),
     prisma.appointment.count({
@@ -126,7 +125,7 @@ export async function getCenterAnalytics(centerId: string) {
         user: {
           centerId,
         },
-        status: 'PENDING',
+        status: "PENDING",
       },
     }),
     prisma.vitalRecord.count({
@@ -159,6 +158,70 @@ export async function getCenterAnalytics(centerId: string) {
   };
 }
 
+const normalizeConditionKey = (raw: string) => {
+  const key = String(raw || "")
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+  if (key === "heart_issues" || key === "respiratory_issues")
+    return "heart_respiratory";
+  if (key === "prediabetes" || key === "hyperglycemia") return "diabetes";
+  if (
+    [
+      "hypertension",
+      "overweight",
+      "obesity",
+      "diabetes",
+      "heart_respiratory",
+      "normal",
+    ].includes(key)
+  ) {
+    return key;
+  }
+  return "other";
+};
+
+const countConditionRecords = (records: Array<{ conditions: unknown }>) => {
+  const counts: Record<string, number> = {
+    hypertension: 0,
+    overweight: 0,
+    obesity: 0,
+    diabetes: 0,
+    heart_respiratory: 0,
+    normal: 0,
+    other: 0,
+  };
+
+  records.forEach((record) => {
+    const raw = record.conditions as unknown;
+    let conditionList: string[] = [];
+
+    if (Array.isArray(raw)) {
+      conditionList = raw.map((value) => String(value));
+    } else if (typeof raw === "string" && raw.trim().length > 0) {
+      conditionList = [raw];
+    } else if (raw && typeof raw === "object") {
+      const rawObject = raw as Record<string, unknown>;
+      if (Array.isArray(rawObject.conditions)) {
+        conditionList = rawObject.conditions.map((value) => String(value));
+      } else {
+        conditionList = Object.values(rawObject).map((value) => String(value));
+      }
+    }
+
+    if (conditionList.length === 0) {
+      counts.normal += 1;
+      return;
+    }
+
+    conditionList.forEach((condition) => {
+      const key = normalizeConditionKey(String(condition).trim());
+      counts[key] = (counts[key] || 0) + 1;
+    });
+  });
+
+  return counts;
+};
+
 export async function getRegionalAnalytics(region: string) {
   const centers = await prisma.center.findMany({
     where: { region },
@@ -171,14 +234,30 @@ export async function getRegionalAnalytics(region: string) {
     },
   });
 
-  const analyticsPromises = centers.map((center: any) => getCenterAnalytics(center.id));
+  const regionConditions = await prisma.wellnessPlan.findMany({
+    where: {
+      user: {
+        center: {
+          region,
+        },
+      },
+    },
+    select: {
+      conditions: true,
+    },
+  });
+
+  const analyticsPromises = centers.map((center: any) =>
+    getCenterAnalytics(center.id),
+  );
   const centerAnalytics = await Promise.all(analyticsPromises);
 
   const totalStats = centerAnalytics.reduce(
     (acc: any, curr: any) => ({
       totalStaff: acc.totalStaff + curr.totalStaff,
       totalAppointments: acc.totalAppointments + curr.totalAppointments,
-      completedAppointments: acc.completedAppointments + curr.completedAppointments,
+      completedAppointments:
+        acc.completedAppointments + curr.completedAppointments,
       pendingAppointments: acc.pendingAppointments + curr.pendingAppointments,
       totalVitals: acc.totalVitals + curr.totalVitals,
       totalFeedback: acc.totalFeedback + (curr.averageFeedback > 0 ? 1 : 0),
@@ -192,8 +271,10 @@ export async function getRegionalAnalytics(region: string) {
       totalVitals: 0,
       totalFeedback: 0,
       sumFeedback: 0,
-    }
+    },
   );
+
+  const conditionCounts = countConditionRecords(regionConditions);
 
   return {
     region,
@@ -201,9 +282,11 @@ export async function getRegionalAnalytics(region: string) {
     centers: centerAnalytics,
     summary: {
       ...totalStats,
-      averageFeedback: totalStats.totalFeedback > 0 
-        ? totalStats.sumFeedback / totalStats.totalFeedback 
-        : 0,
+      averageFeedback:
+        totalStats.totalFeedback > 0
+          ? totalStats.sumFeedback / totalStats.totalFeedback
+          : 0,
+      conditionCounts,
     },
   };
 }
@@ -219,19 +302,22 @@ export async function getAllAnalytics() {
     },
   });
 
-  const analyticsPromises = centers.map((center: any) => getCenterAnalytics(center.id));
+  const analyticsPromises = centers.map((center: any) =>
+    getCenterAnalytics(center.id),
+  );
   const centerAnalytics = await Promise.all(analyticsPromises);
 
   const regions = [...new Set(centers.map((c: any) => c.region))];
   const regionalStats = await Promise.all(
-    regions.map((region: string) => getRegionalAnalytics(region))
+    regions.map((region: string) => getRegionalAnalytics(region)),
   );
 
   const totalStats = centerAnalytics.reduce(
     (acc: any, curr: any) => ({
       totalStaff: acc.totalStaff + curr.totalStaff,
       totalAppointments: acc.totalAppointments + curr.totalAppointments,
-      completedAppointments: acc.completedAppointments + curr.completedAppointments,
+      completedAppointments:
+        acc.completedAppointments + curr.completedAppointments,
       pendingAppointments: acc.pendingAppointments + curr.pendingAppointments,
       totalVitals: acc.totalVitals + curr.totalVitals,
       totalFeedback: acc.totalFeedback + (curr.averageFeedback > 0 ? 1 : 0),
@@ -245,7 +331,7 @@ export async function getAllAnalytics() {
       totalVitals: 0,
       totalFeedback: 0,
       sumFeedback: 0,
-    }
+    },
   );
 
   return {
@@ -254,9 +340,10 @@ export async function getAllAnalytics() {
     regions: regionalStats,
     summary: {
       ...totalStats,
-      averageFeedback: totalStats.totalFeedback > 0 
-        ? totalStats.sumFeedback / totalStats.totalFeedback 
-        : 0,
+      averageFeedback:
+        totalStats.totalFeedback > 0
+          ? totalStats.sumFeedback / totalStats.totalFeedback
+          : 0,
     },
   };
 }

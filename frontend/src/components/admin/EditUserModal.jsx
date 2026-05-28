@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function EditUserModal({ isOpen, onClose, user, onSuccess }) {
+function EditUserModal({
+  isOpen,
+  onClose,
+  user,
+  onSuccess,
+  allowedRoles,
+  disallowEditRoles,
+}) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -17,7 +24,20 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
 
-  const roles = ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
+  const defaultRoles = [
+    "STAFF",
+    "NURSE_OFFICER",
+    "MANAGER",
+    "REGIONAL_OFFICE",
+    "FEDERAL_OFFICE",
+    "SYSTEM_ADMIN",
+  ];
+  const roles =
+    allowedRoles && allowedRoles.length ? allowedRoles : defaultRoles;
+  const isRestrictedRole = disallowEditRoles?.includes(formData.role);
+  const displayRoles = roles.includes(formData.role)
+    ? roles
+    : [formData.role, ...roles].filter(Boolean);
 
   useEffect(() => {
     if (user && isOpen) {
@@ -35,7 +55,7 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
@@ -43,28 +63,31 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
 
   const generateTempPassword = () => {
     // Ensure password meets all requirements: uppercase, lowercase, number, special char
-    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    const numbers = '0123456789';
-    const special = '!@#$%^&*';
-    
-    let password = '';
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const numbers = "0123456789";
+    const special = "!@#$%^&*";
+
+    let password = "";
     password += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
     password += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
     password += numbers.charAt(Math.floor(Math.random() * numbers.length));
     password += special.charAt(Math.floor(Math.random() * special.length));
-    
+
     // Fill remaining 8 characters with random mix
     const allChars = uppercase + lowercase + numbers + special;
     for (let i = 0; i < 8; i++) {
       password += allChars.charAt(Math.floor(Math.random() * allChars.length));
     }
-    
+
     // Shuffle the password
-    password = password.split('').sort(() => Math.random() - 0.5).join('');
-    
+    password = password
+      .split("")
+      .sort(() => Math.random() - 0.5)
+      .join("");
+
     setTempPassword(password);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       newPassword: password,
       confirmPassword: password,
@@ -77,6 +100,11 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
 
     if (!formData.fullName || !formData.email || !formData.role) {
       setError("Please fill in all required fields");
+      return;
+    }
+
+    if (isRestrictedRole) {
+      setError("You cannot edit users with this role.");
       return;
     }
 
@@ -124,7 +152,9 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Edit User</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -154,6 +184,12 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
             />
           </div>
 
+          {isRestrictedRole && (
+            <div className="error-message">
+              You cannot modify users with this role.
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="role">Role *</label>
             <select
@@ -162,10 +198,15 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
               value={formData.role}
               onChange={handleChange}
               required
+              disabled={isRestrictedRole}
             >
               <option value="">Select Role</option>
-              {roles.map((role) => (
-                <option key={role} value={role}>
+              {displayRoles.map((role) => (
+                <option
+                  key={role}
+                  value={role}
+                  disabled={!roles.includes(role)}
+                >
                   {role}
                 </option>
               ))}
@@ -220,7 +261,9 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
               )}
             </div>
             {showPassword && user?.password && (
-              <small style={{ color: "#666", marginTop: "5px", display: "block" }}>
+              <small
+                style={{ color: "#666", marginTop: "5px", display: "block" }}
+              >
                 Current password visible
               </small>
             )}
@@ -243,7 +286,9 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  title={showConfirmPassword ? "Hide password" : "Show password"}
+                  title={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                   style={{
                     position: "absolute",
                     right: "10px",
@@ -267,9 +312,9 @@ function EditUserModal({ isOpen, onClose, user, onSuccess }) {
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button 
-              type="button" 
-              className="btn-secondary" 
+            <button
+              type="button"
+              className="btn-secondary"
               onClick={generateTempPassword}
               title="Generate a temporary password for the user"
             >

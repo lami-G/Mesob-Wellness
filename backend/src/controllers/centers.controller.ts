@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { UserRole } from "../generated/prisma";
 import * as CentersService from "../services/centers.service";
+import prisma from "../config/prisma";
 
 export const createCenter = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -23,19 +24,18 @@ export const createCenter = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    const { name, code, region, city, address, phone, email, capacity } = req.body;
+    const { name, region, city, address, phone, email, capacity } = req.body;
 
-    if (!name || !code || !region || !city || !address) {
+    if (!name || !region || !city || !address) {
       res.status(400).json({
         status: "error",
-        message: "name, code, region, city, and address are required",
+        message: "name, region, city, and address are required",
       });
       return;
     }
 
     const center = await CentersService.createCenter({
       name,
-      code,
       region,
       city,
       address,
@@ -49,13 +49,6 @@ export const createCenter = async (req: AuthRequest, res: Response): Promise<voi
       data: center,
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
-      res.status(400).json({
-        status: "error",
-        message: "Center code already exists",
-      });
-      return;
-    }
     console.error("Create center error:", error);
     res.status(500).json({
       status: "error",
@@ -194,7 +187,7 @@ export const updateCenter = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    const { name, region, city, address, phone, email, status, capacity } = req.body;
+    const { name, region, city, address, phone, email, status, capacity, managerEmail, managerPassword } = req.body;
 
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
@@ -205,6 +198,64 @@ export const updateCenter = async (req: AuthRequest, res: Response): Promise<voi
     if (email !== undefined) updateData.email = email;
     if (status !== undefined) updateData.status = status;
     if (capacity !== undefined) updateData.capacity = capacity;
+
+    // Get existing center to check for manager
+    const existingCenter = await prisma.center.findUnique({
+      where: { id },
+    });
+
+    if (!existingCenter) {
+      res.status(404).json({
+        status: "error",
+        message: "Center not found",
+      });
+      return;
+    }
+
+    // Handle manager updates
+    if (managerEmail) {
+      updateData.managerEmail = managerEmail;
+
+      if (managerPassword) {
+        const bcrypt = await import("bcryptjs");
+        const hashedPassword = await bcrypt.default.hash(managerPassword, 10);
+
+        if (existingCenter.managerId) {
+          // Update existing manager
+          await prisma.user.update({
+            where: { id: existingCenter.managerId },
+            data: {
+              email: managerEmail,
+              password: hashedPassword,
+            },
+          });
+        } else {
+          // Create new manager
+          const { generateNextDisplayId } = await import("../utils/sequentialId.js");
+          const displayId = await generateNextDisplayId();
+
+          const manager = await prisma.user.create({
+            data: {
+              fullName: `${name || existingCenter.name} Admin`,
+              email: managerEmail,
+              password: hashedPassword,
+              role: "MANAGER" as any,
+              userId: displayId,
+              isActive: true,
+              isVerified: true,
+            },
+          });
+
+          updateData.managerId = manager.id;
+        }
+      } else if (existingCenter.managerId) {
+        // Update email only
+        await prisma.user.update({
+          where: { id: existingCenter.managerId },
+          data: { email: managerEmail },
+        });
+      }
+    }
 
     const center = await CentersService.updateCenter(id, updateData);
 
@@ -231,10 +282,11 @@ export const deleteCenter = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    if (req.user.role !== UserRole.SYSTEM_ADMIN) {
+    const allowedRoles: UserRole[] = [UserRole.SYSTEM_ADMIN, UserRole.FEDERAL_OFFICE];
+    if (!allowedRoles.includes(req.user.role)) {
       res.status(403).json({
         status: "error",
-        message: "Only SYSTEM_ADMIN can delete centers",
+        message: "Only SYSTEM_ADMIN and FEDERAL_OFFICE can delete centers",
       });
       return;
     }

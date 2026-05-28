@@ -72,7 +72,7 @@ function PostVitalsActions({ vitals, appointmentId, onSuccess, onStartNewRecord,
           className="btn btn-primary"
           style={{ flex: 1, minWidth: '200px' }}
         >
-          📋 Create Wellness Plan
+          Create Wellness Plan
         </button>
         <button
           onClick={() => {
@@ -551,7 +551,7 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
 
   return (
     <div className="card vitals-entry">
-      <h3>💉 Record Vitals</h3>
+      <h3>Record Vitals</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}

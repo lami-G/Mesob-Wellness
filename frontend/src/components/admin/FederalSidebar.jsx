@@ -7,22 +7,22 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
   const menuItems = [
     { id: "overview", label: "Overview" },
     { id: "regions", label: "Regions" },
-    { id: "analytics", label: "Analytics" },
+    { id: "centers", label: "Centers" },
+    { id: "admin-users", label: "Admin Users" },
+    { id: "appointments", label: "Appointments" },
+    { id: "feedback", label: "Feedback" },
+    { id: "audit", label: "Audit" },
   ];
 
   return (
-    <aside className={`admin-sidebar ${isOpen ? "open" : "closed"}`}>
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <span className="logo-icon">🏛️</span>
-          <span className="logo-text">MESOB Federal</span>
-        </div>
-        <div className="user-info">
-          <p className="user-name">{user?.fullName}</p>
-          <p className="user-role">Federal Office</p>
-        </div>
+    <aside className={`admin-sidebar federal-sidebar ${isOpen ? "open" : "closed"}`}>
+      {/* Logo Section */}
+      <div className="sidebar-logo-section">
+        <div className="sidebar-logo-icon">M</div>
+        <span className="sidebar-logo-text">MESOB Federal</span>
       </div>
 
+      {/* Navigation Menu */}
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
           <button
@@ -36,6 +36,7 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
         ))}
       </nav>
 
+      {/* Version Footer */}
       <div className="sidebar-footer">
         <p className="version">v1.0.0</p>
       </div>

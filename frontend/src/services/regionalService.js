@@ -29,6 +29,11 @@ export const regionalService = {
     return response.data;
   },
 
+  async createCenter(centerData) {
+    const response = await api.post("/api/v1/centers", centerData);
+    return response.data;
+  },
+
   // ─── Center Management ──────────────────────────────────────────────────────
   async createCenter(centerData) {
     const response = await api.post('/api/v1/centers', centerData);

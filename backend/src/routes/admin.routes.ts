@@ -17,6 +17,8 @@ router.get("/dashboard/metrics", AdminController.getDashboardMetrics);
  */
 router.get("/regions", AdminController.getRegions);
 router.get("/regions/:region/centers", AdminController.getCentersByRegion);
+router.post("/regions/:region/admin", AdminController.upsertRegionAdmin);
+router.get("/regions/:region/admin", AdminController.getRegionAdmin);
 
 /**
  * Users Management

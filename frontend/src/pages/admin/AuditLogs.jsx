@@ -2,23 +2,30 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import "../../styles/admin-audit.css";
 
-function AuditLogs() {
+function AuditLogs({ baseFilters = {} }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
+    region: "",
+    center: "",
     action: "",
     resource: "",
     dateFrom: "",
     dateTo: "",
     search: "",
     role: "",
+    ...baseFilters,
   });
 
   useEffect(() => {
     fetchLogs();
-  }, [page, filters]);
+  }, [page, JSON.stringify(filters)]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [JSON.stringify(baseFilters)]);
 
   const fetchLogs = async () => {
     try {
@@ -46,12 +53,15 @@ function AuditLogs() {
 
   const handleResetFilters = () => {
     setFilters({
+      region: "",
+      center: "",
       action: "",
       resource: "",
       dateFrom: "",
       dateTo: "",
       search: "",
       role: "",
+      ...baseFilters,
     });
     setPage(1);
   };
@@ -162,12 +172,19 @@ function AuditLogs() {
               <td>{log.user?.fullName || "System"}</td>
               <td>{log.user?.role || "-"}</td>
               <td>
-                <span className={`badge badge-action badge-${getActionColor(log.action)}`}>
+                <span
+                  className={`badge badge-action badge-${getActionColor(log.action)}`}
+                >
                   {log.action || "-"}
                 </span>
               </td>
               <td>{log.resource || "-"}</td>
-              <td className="truncate">{log.details ? JSON.stringify(log.details).substring(0, 50) : "-"}...</td>
+              <td className="truncate">
+                {log.details
+                  ? JSON.stringify(log.details).substring(0, 50)
+                  : "-"}
+                ...
+              </td>
               <td className="monospace">{log.ipAddress || "-"}</td>
             </tr>
           ))}

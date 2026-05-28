@@ -88,7 +88,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
   };
 
   const getAppointmentType = (type) => {
-    return type === 'ONLINE' ? '📅 Online' : '🚶 Walk-in';
+    return type === 'ONLINE' ? 'Online' : 'Walk-in';
   };
 
   const handleSendEmail = async (appointmentId, customerName, customerEmail) => {
@@ -122,7 +122,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
 
   return (
     <div className="card live-queue-panel">
-      <h2>📋 Live Queue</h2>
+      <h2>Live Queue</h2>
 
       {error && <div className="alert alert-error">{error}</div>}
 
@@ -217,7 +217,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
                       onClick={() => handleViewDetails(item.customerId, item.customerName)}
                       title="View patient history"
                     >
-                      📋 View History
+                      View History
                     </button>
                   </>
                 )}

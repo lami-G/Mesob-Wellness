@@ -30,19 +30,42 @@ export const createCenter = async (
       return;
     }
 
-    const { name, code, region, city, address, phone, email, capacity } = req.body;
+    const { name, region, city, address, phone, email, capacity, managerEmail, managerPassword } = req.body;
 
-    if (!name || !code || !region || !city || !address) {
+    if (!name || !region || !city || !address) {
       res.status(400).json({
         status: "error",
-        message: "name, code, region, city, and address are required",
+        message: "name, region, city, and address are required",
       });
       return;
     }
 
+    let managerId: string | undefined;
+
+    // Create center manager if email and password provided
+    if (managerEmail && managerPassword) {
+      const bcrypt = await import("bcryptjs");
+      const hashedPassword = await bcrypt.default.hash(managerPassword, 10);
+      const { generateNextDisplayId } = await import("../utils/sequentialId.js");
+      const displayId = await generateNextDisplayId();
+
+      const manager = await prisma.user.create({
+        data: {
+          fullName: `${name} Admin`,
+          email: managerEmail,
+          password: hashedPassword,
+          role: "MANAGER" as any,
+          userId: displayId,
+          isActive: true,
+          isVerified: true,
+        },
+      });
+
+      managerId = manager.id;
+    }
+
     const center = await AdminService.createCenter({
       name,
-      code,
       region,
       city,
       address,
@@ -50,6 +73,8 @@ export const createCenter = async (
       email,
       capacity,
       status: "ACTIVE",
+      managerId,
+      managerEmail,
     });
 
     res.status(201).json({
@@ -57,13 +82,6 @@ export const createCenter = async (
       data: center,
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
-      res.status(400).json({
-        status: "error",
-        message: "Center code already exists",
-      });
-      return;
-    }
     console.error("Create center error:", error);
     res.status(500).json({
       status: "error",
@@ -385,6 +403,15 @@ export const deleteUser = async (
       res.status(401).json({
         status: "error",
         message: "Authentication required",
+      });
+      return;
+    }
+
+    const allowedRoles = ["SYSTEM_ADMIN", "FEDERAL_OFFICE"];
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        status: "error",
+        message: "Only SYSTEM_ADMIN and FEDERAL_OFFICE can delete users",
       });
       return;
     }
@@ -756,6 +783,167 @@ export const unlockUser = async (
     res.status(500).json({
       status: "error",
       message: "Failed to unlock user account",
+    });
+  }
+};
+
+/**
+ * POST /api/v1/admin/regions/:region/admin
+ * Create or update region admin
+ */
+export const upsertRegionAdmin = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const { region } = req.params;
+    const regionStr = Array.isArray(region) ? region[0] : region;
+    const { email, password } = req.body;
+
+    if (!regionStr) {
+      res.status(400).json({
+        status: "error",
+        message: "Region is required",
+      });
+      return;
+    }
+
+    if (!email) {
+      res.status(400).json({
+        status: "error",
+        message: "Email is required",
+      });
+      return;
+    }
+
+    // Check if region admin already exists
+    const existingRegionAdmin = await prisma.regionAdmin.findUnique({
+      where: { region: regionStr },
+    });
+
+    let adminId: string | undefined = existingRegionAdmin?.adminId || undefined;
+
+    // If adminId exists, verify the user still exists
+    if (adminId) {
+      const userExists = await prisma.user.findUnique({
+        where: { id: adminId },
+      });
+      if (!userExists) {
+        // User was deleted, clear the adminId
+        adminId = undefined;
+      }
+    }
+
+    // If password provided, create or update the user
+    if (password) {
+      const bcrypt = await import("bcryptjs");
+      const hashedPassword = await bcrypt.default.hash(password, 10);
+
+      if (adminId) {
+        // Update existing admin user
+        await prisma.user.update({
+          where: { id: adminId },
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        });
+      } else {
+        // Create new admin user
+        const { generateNextDisplayId } = await import("../utils/sequentialId.js");
+        const displayId = await generateNextDisplayId();
+
+        const admin = await prisma.user.create({
+          data: {
+            fullName: `${regionStr} Admin`,
+            email,
+            password: hashedPassword,
+            role: "REGIONAL_OFFICE" as any,
+            userId: displayId,
+            isActive: true,
+            isVerified: true,
+          },
+        });
+
+        adminId = admin.id;
+      }
+    } else if (adminId) {
+      // Update email only
+      await prisma.user.update({
+        where: { id: adminId },
+        data: { email },
+      });
+    }
+
+    // Upsert region admin record
+    const regionAdmin = await prisma.regionAdmin.upsert({
+      where: { region: regionStr },
+      create: {
+        region: regionStr,
+        adminId,
+        email,
+      },
+      update: {
+        adminId,
+        email,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: regionAdmin,
+      message: "Region admin updated successfully",
+    });
+  } catch (error: any) {
+    console.error("Upsert region admin error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update region admin",
+    });
+  }
+};
+
+/**
+ * GET /api/v1/admin/regions/:region/admin
+ * Get region admin
+ */
+export const getRegionAdmin = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const { region } = req.params;
+    const regionStr = Array.isArray(region) ? region[0] : region;
+
+    const regionAdmin = await prisma.regionAdmin.findUnique({
+      where: { region: regionStr },
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: regionAdmin,
+    });
+  } catch (error) {
+    console.error("Get region admin error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve region admin",
     });
   }
 };

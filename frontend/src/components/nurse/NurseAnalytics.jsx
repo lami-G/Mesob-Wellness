@@ -803,7 +803,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
   return (
     <div className="analytics-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <h2 style={{ margin: 0 }}>📊 Nurse Analytics</h2>
+        <h2 style={{ margin: 0 }}>Nurse Analytics</h2>
         
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <select
@@ -819,10 +819,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
               cursor: 'pointer',
             }}
           >
-            <option value="daily">📅 Daily</option>
-            <option value="weekly">📊 Weekly</option>
-            <option value="monthly">📈 Monthly</option>
-            <option value="all">🌐 All Time</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="all">All Time</option>
           </select>
 
           {viewPeriod === 'daily' && (
@@ -853,7 +853,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       {/* Overview Cards */}
       <div className="analytics-cards-grid">
         <div className="analytics-card">
-          <div className="card-icon">📋</div>
           <div className="card-content">
             <p className="card-label">Total Appointments</p>
             <p className="card-value">{analytics.totalAppointments}</p>
@@ -861,7 +860,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
 
         <div className="analytics-card">
-          <div className="card-icon">👥</div>
           <div className="card-content">
             <p className="card-label">{viewPeriod === 'all' ? 'Patients Total' : 'Patients Today'}</p>
             <p className="card-value">{analytics.totalPatientsToday}</p>
@@ -869,7 +867,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
 
         <div className="analytics-card">
-          <div className="card-icon">🚶</div>
           <div className="card-content">
             <p className="card-label">Walk-in Completed</p>
             <p className="card-value">{analytics.walkinAppointments}</p>
@@ -883,12 +880,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           <h3>Appointment Breakdown</h3>
           
           <div className="breakdown-item">
-            <span>✅ Completed</span>
+            <span>Completed</span>
             <span className="breakdown-value">{analytics.completedAppointments}</span>
           </div>
 
           <div className="breakdown-item">
-            <span>❌ No-Show</span>
+            <span>No-Show</span>
             <span className="breakdown-value" title="Patient didn't show up for scheduled appointment">{analytics.noShowAppointments}</span>
           </div>
         </div>
@@ -897,12 +894,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           <h3>{viewPeriod === 'all' ? 'Activity Summary' : "Today's Activity Summary"}</h3>
           
           <div className="breakdown-item">
-            <span>💉 Vitals Recorded</span>
+            <span>Vitals Recorded</span>
             <span className="breakdown-value">{analytics.vitalsRecorded}</span>
           </div>
 
           <div className="breakdown-item">
-            <span>🎯 Wellness Plans</span>
+            <span>Wellness Plans</span>
             <span className="breakdown-value">{analytics.wellnessPlansCreated}</span>
           </div>
         </div>

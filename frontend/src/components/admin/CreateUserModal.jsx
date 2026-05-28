@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 
-function CreateUserModal({ isOpen, onClose, onSuccess }) {
+function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -14,21 +14,38 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  
+
   // Regions and centers state
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
   const [regionsLoading, setRegionsLoading] = useState(false);
   const [centersLoading, setCentersLoading] = useState(false);
 
-  const roles = ["STAFF", "NURSE_OFFICER", "MANAGER", "REGIONAL_OFFICE", "FEDERAL_OFFICE", "SYSTEM_ADMIN"];
+  const roles =
+    allowedRoles && allowedRoles.length
+      ? allowedRoles
+      : [
+          "STAFF",
+          "NURSE_OFFICER",
+          "MANAGER",
+          "REGIONAL_OFFICE",
+          "FEDERAL_OFFICE",
+          "SYSTEM_ADMIN",
+        ];
 
   // Fetch regions when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchRegions();
+      if (
+        allowedRoles &&
+        allowedRoles.length &&
+        !allowedRoles.includes(formData.role)
+      ) {
+        setFormData((prev) => ({ ...prev, role: allowedRoles[0] }));
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, allowedRoles, formData.role]);
 
   // Fetch centers when region changes
   useEffect(() => {
@@ -36,7 +53,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
       fetchCenters(formData.region);
     } else {
       setCenters([]);
-      setFormData(prev => ({ ...prev, centerId: "" }));
+      setFormData((prev) => ({ ...prev, centerId: "" }));
     }
   }, [formData.region]);
 
@@ -49,7 +66,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
       if (data.status === "success" && Array.isArray(data.data)) {
         setRegions(data.data);
       } else {
-        console.error('Invalid regions response format:', data);
+        console.error("Invalid regions response format:", data);
       }
     } catch (error) {
       console.error("Error fetching regions:", error);
@@ -67,7 +84,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
       if (data.status === "success" && Array.isArray(data.data)) {
         setCenters(data.data);
       } else {
-        console.error('Invalid centers response format:', data);
+        console.error("Invalid centers response format:", data);
         setCenters([]);
       }
     } catch (error) {
@@ -90,7 +107,12 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     setError("");
 
-    if (!formData.fullName || !formData.email || !formData.password || !formData.role) {
+    if (
+      !formData.fullName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.role
+    ) {
       setError("Please fill in all required fields");
       return;
     }
@@ -119,12 +141,12 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
         password: formData.password,
         role: formData.role,
       };
-      
+
       // Only include centerId if it's provided
       if (formData.centerId) {
         userData.centerId = formData.centerId;
       }
-      
+
       await adminService.createUser(userData);
       onSuccess?.();
       onClose();
@@ -152,7 +174,9 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Create New User</h3>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -262,10 +286,10 @@ function CreateUserModal({ isOpen, onClose, onSuccess }) {
                 {!formData.region
                   ? "Select region first"
                   : centersLoading
-                  ? "Loading centers..."
-                  : centers.length === 0
-                  ? "No centers available"
-                  : "Select Center"}
+                    ? "Loading centers..."
+                    : centers.length === 0
+                      ? "No centers available"
+                      : "Select Center"}
               </option>
               {centers.map((center) => (
                 <option key={center.id} value={center.id}>

@@ -67,7 +67,7 @@ function WellnessPlanTemplates({ onSelectTemplate, onClose }) {
       <div className="modal-overlay" onClick={onClose}></div>
       <div className="modal-content">
         <div className="modal-header">
-          <h3>📋 Wellness Plan Templates</h3>
+          <h3>Wellness Plan Templates</h3>
           <button className="btn-close" onClick={onClose} type="button">✕</button>
         </div>
 

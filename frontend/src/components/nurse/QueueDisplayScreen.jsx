@@ -63,7 +63,7 @@ function QueueDisplayScreen() {
   return (
     <div className="queue-display-screen">
       <div className="display-header">
-        <h1>🏥 MESOB Wellness Center</h1>
+        <h1>MESOB Wellness Center</h1>
         <div className="current-time">
           {currentTime.toLocaleTimeString('en-US', { 
             hour: '2-digit', 
@@ -80,7 +80,7 @@ function QueueDisplayScreen() {
             <div className="token-number">{currentServing.appointmentId}</div>
             <div className="customer-name">{currentServing.customerName}</div>
             <div className="service-type">
-              {currentServing.type === 'ONLINE' ? '📅 Online Appointment' : '🚶 Walk-in'}
+              {currentServing.type === 'ONLINE' ? 'Online Appointment' : 'Walk-in'}
             </div>
           </div>
         ) : (
@@ -101,7 +101,7 @@ function QueueDisplayScreen() {
                 <div className="waiting-token">{item.appointmentId}</div>
                 <div className="waiting-info">
                   <div className="waiting-type">
-                    {item.type === 'ONLINE' ? '📅' : '🚶'}
+                    {item.type === 'ONLINE' ? 'Online' : 'Walk-in'}
                   </div>
                   <div className="estimated-wait">
                     {getEstimatedWaitTime(idx + 1)}
