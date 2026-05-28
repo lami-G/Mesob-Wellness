@@ -181,25 +181,37 @@ model Feedback {
 }
 
 model Center {
-  id        String       @id @default(uuid()) @db.Uuid
-  name      String
-  code      String       @unique
-  region    String
-  city      String
-  address   String
-  phone     String?
-  email     String?
-  status    CenterStatus @default(ACTIVE)
-  capacity  Int?
-  createdAt DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime     @updatedAt @db.Timestamptz(3)
-  staff     User[]
+  id           String       @id @default(uuid()) @db.Uuid
+  name         String
+  region       String
+  city         String
+  address      String
+  phone        String?
+  email        String?
+  status       CenterStatus @default(ACTIVE)
+  capacity     Int?
+  managerId    String?      @db.Uuid
+  managerEmail String?
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+  staff        User[]
 
   @@index([region])
   @@index([status])
-  @@index([code])
   @@index([region, status])
   @@map("centers")
+}
+
+model RegionAdmin {
+  id        String   @id @default(uuid()) @db.Uuid
+  region    String   @unique
+  adminId   String?  @db.Uuid
+  email     String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([region])
+  @@map("region_admins")
 }
 
 model Notification {

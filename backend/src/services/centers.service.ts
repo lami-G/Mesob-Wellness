@@ -4,7 +4,6 @@ import { env } from "../config/env";
 
 export interface CreateCenterInput {
   name: string;
-  code: string;
   region: string;
   city: string;
   address: string;

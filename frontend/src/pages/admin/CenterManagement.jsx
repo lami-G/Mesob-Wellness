@@ -15,7 +15,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
   const [formError, setFormError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    code: "",
     region: "",
     city: "",
     address: "",
@@ -54,7 +53,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
   const resetForm = () => {
     setFormData({
       name: "",
-      code: "",
       region: "",
       city: "",
       address: "",
@@ -79,7 +77,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     setSelectedCenter(center);
     setFormData({
       name: center.name || "",
-      code: center.code || "",
       region: center.region || "",
       city: center.city || "",
       address: center.address || "",
@@ -115,12 +112,11 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
 
     if (
       !formData.name ||
-      !formData.code ||
       !formData.region ||
       !formData.city ||
       !formData.address
     ) {
-      setFormError("Name, code, region, city, and address are required.");
+      setFormError("Name, region, city, and address are required.");
       return;
     }
 
@@ -128,7 +124,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     try {
       const centerPayload = {
         name: formData.name,
-        code: formData.code,
         region: formData.region,
         city: formData.city,
         address: formData.address,

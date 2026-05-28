@@ -158,6 +158,7 @@ function FederalDashboard() {
   const [regionActionLoading, setRegionActionLoading] = useState(false);
   const [regionActionError, setRegionActionError] = useState("");
   const [regionActionSuccess, setRegionActionSuccess] = useState("");
+  const [regionAdmins, setRegionAdmins] = useState({});
   const [timePeriod, setTimePeriod] = useState("daily");
   const [trendsData, setTrendsData] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -186,7 +187,24 @@ function FederalDashboard() {
         ]);
 
       if (regionsRes.status === "fulfilled") {
-        setRegions(regionsRes.value?.data || regionsRes.value || []);
+        const regionsList = regionsRes.value?.data || regionsRes.value || [];
+        setRegions(regionsList);
+        
+        // Load region admins for all regions
+        const adminsMap = {};
+        await Promise.all(
+          regionsList.map(async (region) => {
+            try {
+              const adminData = await adminService.getRegionAdmin(region);
+              if (adminData) {
+                adminsMap[region] = adminData;
+              }
+            } catch (err) {
+              // Region admin doesn't exist, that's okay
+            }
+          })
+        );
+        setRegionAdmins(adminsMap);
       }
 
       if (centersRes.status === "fulfilled") {
@@ -229,6 +247,25 @@ function FederalDashboard() {
     setRegionActionSuccess("");
     loadFederalData();
   }, [loadFederalData, selectedRegion]);
+
+  // Auto-hide success messages after 3 seconds
+  useEffect(() => {
+    if (regionActionSuccess) {
+      const timer = setTimeout(() => {
+        setRegionActionSuccess("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [regionActionSuccess]);
+
+  useEffect(() => {
+    if (regionSuccess) {
+      const timer = setTimeout(() => {
+        setRegionSuccess("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [regionSuccess]);
 
   useEffect(() => {
     setSelectedRegion(globalFilters.region || "all");
@@ -713,19 +750,21 @@ function FederalDashboard() {
                       setRegionError("");
                       setRegionSuccess("");
 
-                      const codePrefix =
-                        trimmed
-                          .replace(/[^A-Za-z]/g, "")
-                          .toUpperCase()
-                          .slice(0, 3) || "REG";
                       await regionalService.createCenter({
                         name: `${trimmed} Regional Center`,
-                        code: `${codePrefix}-001`,
                         region: trimmed,
                         city: trimmed,
                         address: "To be updated",
                         status: "ACTIVE",
                       });
+
+                      // Create region admin if email and password provided
+                      if (regionAccountEmail && regionAccountPassword) {
+                        await adminService.upsertRegionAdmin(trimmed, {
+                          email: regionAccountEmail,
+                          password: regionAccountPassword,
+                        });
+                      }
 
                       setRegionSuccess(
                         `Region "${trimmed}" created successfully.`,
@@ -849,6 +888,7 @@ function FederalDashboard() {
               <tr>
                 <th>Region</th>
                 <th>Status</th>
+                <th>Admin Email</th>
                 <th>Centers</th>
                 <th>Active</th>
                 <th>Appointments</th>
@@ -867,6 +907,7 @@ function FederalDashboard() {
                       {row.status}
                     </span>
                   </td>
+                  <td>{regionAdmins[row.region]?.email || "-"}</td>
                   <td>{row.totalCenters}</td>
                   <td>{row.activeCenters}</td>
                   <td>{row.totalAppointments}</td>

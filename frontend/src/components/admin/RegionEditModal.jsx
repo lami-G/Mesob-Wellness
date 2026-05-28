@@ -11,9 +11,12 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen && region) {
+      // Load existing region admin data
+      loadRegionAdmin();
       setFormData({
         name: region,
         status: regionStatus || "ACTIVE",
@@ -21,8 +24,24 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
         managerPassword: "",
       });
       setError("");
+      setShowPassword(false);
     }
   }, [isOpen, region, regionStatus]);
+
+  const loadRegionAdmin = async () => {
+    try {
+      const regionAdmin = await adminService.getRegionAdmin(region);
+      if (regionAdmin && regionAdmin.email) {
+        setFormData(prev => ({
+          ...prev,
+          managerEmail: regionAdmin.email,
+        }));
+      }
+    } catch (err) {
+      // Region admin doesn't exist yet, that's okay
+      console.log("No existing region admin");
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,6 +70,8 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
 
     try {
       setLoading(true);
+      
+      // Update all centers in the region
       await Promise.all(
         regionCenters.map((center) =>
           adminService.updateCenter(center.id, {
@@ -59,6 +80,16 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
           })
         )
       );
+
+      // Update region admin if email provided
+      if (formData.managerEmail) {
+        const adminData = { email: formData.managerEmail };
+        if (formData.managerPassword) {
+          adminData.password = formData.managerPassword;
+        }
+        await adminService.upsertRegionAdmin(trimmed, adminData);
+      }
+
       onSuccess?.();
       onClose();
     } catch (err) {
@@ -125,14 +156,36 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
 
             <div className="form-group">
               <label htmlFor="managerPassword">Region Admin Password</label>
-              <input
-                id="managerPassword"
-                type="password"
-                name="managerPassword"
-                value={formData.managerPassword}
-                onChange={handleChange}
-                placeholder="Leave empty to keep current password"
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  id="managerPassword"
+                  type={showPassword ? "text" : "password"}
+                  name="managerPassword"
+                  value={formData.managerPassword}
+                  onChange={handleChange}
+                  placeholder="Leave empty to keep current password"
+                  style={{ paddingRight: "40px" }}
+                />
+                {formData.managerPassword && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "18px",
+                      color: "#6b7280",
+                    }}
+                  >
+                    {showPassword ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                )}
+              </div>
               <small style={{ color: "#6b7280", marginTop: "0.25rem", fontSize: "12px" }}>
                 Only fill if you want to change the password
               </small>

@@ -53,9 +53,9 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Code</th>
             <th>Region</th>
             <th>City</th>
+            <th>Admin Email</th>
             <th>Status</th>
             <th>Staff</th>
             <th>Actions</th>
@@ -72,9 +72,9 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
             centers.map((center) => (
               <tr key={center.id}>
                 <td className="cell-name">{center.name}</td>
-                <td className="cell-code">{center.code}</td>
                 <td className="cell-region">{center.region}</td>
                 <td className="cell-city">{center.city}</td>
+                <td className="cell-email">{center.managerEmail || "-"}</td>
                 <td className="cell-status">
                   <span className={`status ${center.status.toLowerCase()}`}>
                     {center.status}

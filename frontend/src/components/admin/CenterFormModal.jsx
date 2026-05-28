@@ -52,14 +52,14 @@ function CenterFormModal({
               placeholder="Addis Ababa Main Center"
             />
             <Input
-              label="Center Code *"
-              name="code"
-              value={formData.code}
+              label="City *"
+              name="city"
+              value={formData.city}
               onChange={(e) =>
-                setFormData({ ...formData, code: e.target.value })
+                setFormData({ ...formData, city: e.target.value })
               }
               required
-              placeholder="AAC-001"
+              placeholder="Addis Ababa"
             />
           </div>
 
@@ -122,16 +122,6 @@ function CenterFormModal({
                 </div>
               )}
             </div>
-            <Input
-              label="City *"
-              name="city"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-              required
-              placeholder="Addis Ababa"
-            />
           </div>
 
           <Input
