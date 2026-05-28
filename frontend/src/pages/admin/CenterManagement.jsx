@@ -134,7 +134,9 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
         address: formData.address,
         phone: formData.phone || undefined,
         email: formData.email || undefined,
-        capacity: formData.capacity ? parseInt(formData.capacity, 10) : undefined,
+        capacity: formData.capacity
+          ? parseInt(formData.capacity, 10)
+          : undefined,
         status: formData.status,
       };
 
@@ -149,9 +151,7 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
       setRefreshKey((prev) => prev + 1);
       loadRegions();
     } catch (err) {
-      setFormError(
-        err?.response?.data?.message || "Failed to save center.",
-      );
+      setFormError(err?.response?.data?.message || "Failed to save center.");
       console.error("Center save error:", err);
     } finally {
       setSaving(false);

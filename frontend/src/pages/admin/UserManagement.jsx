@@ -32,12 +32,16 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
 
   useEffect(() => {
     const nextFilters = normalizeFilters(baseFilters);
-    setFilters((prev) => (areFiltersEqual(prev, nextFilters) ? prev : nextFilters));
+    setFilters((prev) =>
+      areFiltersEqual(prev, nextFilters) ? prev : nextFilters,
+    );
   }, [baseFilters]);
 
   const handleFilterChange = (newFilters) => {
     const nextFilters = { ...normalizeFilters(baseFilters), ...newFilters };
-    setFilters((prev) => (areFiltersEqual(prev, nextFilters) ? prev : nextFilters));
+    setFilters((prev) =>
+      areFiltersEqual(prev, nextFilters) ? prev : nextFilters,
+    );
   };
 
   const handleEdit = (user) => {

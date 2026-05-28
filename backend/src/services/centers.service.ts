@@ -35,18 +35,18 @@ export async function getAllCenters(filters?: {
   status?: CenterStatus;
 }) {
   const where: any = {};
-  
+
   if (filters?.region) {
     where.region = filters.region;
   }
-  
+
   if (filters?.status) {
     where.status = filters.status;
   }
 
   return prisma.center.findMany({
     where,
-    orderBy: { name: 'asc' },
+    orderBy: { name: "asc" },
     include: {
       _count: {
         select: {
@@ -118,7 +118,7 @@ export async function getCenterAnalytics(centerId: string) {
         user: {
           centerId,
         },
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
     }),
     prisma.appointment.count({
@@ -126,7 +126,7 @@ export async function getCenterAnalytics(centerId: string) {
         user: {
           centerId,
         },
-        status: 'PENDING',
+        status: "PENDING",
       },
     }),
     prisma.vitalRecord.count({
@@ -160,10 +160,22 @@ export async function getCenterAnalytics(centerId: string) {
 }
 
 const normalizeConditionKey = (raw: string) => {
-  const key = String(raw || "").toLowerCase().replace(/\s+/g, "_");
-  if (key === "heart_issues" || key === "respiratory_issues") return "heart_respiratory";
+  const key = String(raw || "")
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+  if (key === "heart_issues" || key === "respiratory_issues")
+    return "heart_respiratory";
   if (key === "prediabetes" || key === "hyperglycemia") return "diabetes";
-  if (["hypertension", "overweight", "obesity", "diabetes", "heart_respiratory", "normal"].includes(key)) {
+  if (
+    [
+      "hypertension",
+      "overweight",
+      "obesity",
+      "diabetes",
+      "heart_respiratory",
+      "normal",
+    ].includes(key)
+  ) {
     return key;
   }
   return "other";
@@ -236,14 +248,17 @@ export async function getRegionalAnalytics(region: string) {
     },
   });
 
-  const analyticsPromises = centers.map((center: any) => getCenterAnalytics(center.id));
+  const analyticsPromises = centers.map((center: any) =>
+    getCenterAnalytics(center.id),
+  );
   const centerAnalytics = await Promise.all(analyticsPromises);
 
   const totalStats = centerAnalytics.reduce(
     (acc: any, curr: any) => ({
       totalStaff: acc.totalStaff + curr.totalStaff,
       totalAppointments: acc.totalAppointments + curr.totalAppointments,
-      completedAppointments: acc.completedAppointments + curr.completedAppointments,
+      completedAppointments:
+        acc.completedAppointments + curr.completedAppointments,
       pendingAppointments: acc.pendingAppointments + curr.pendingAppointments,
       totalVitals: acc.totalVitals + curr.totalVitals,
       totalFeedback: acc.totalFeedback + (curr.averageFeedback > 0 ? 1 : 0),
@@ -257,7 +272,7 @@ export async function getRegionalAnalytics(region: string) {
       totalVitals: 0,
       totalFeedback: 0,
       sumFeedback: 0,
-    }
+    },
   );
 
   const conditionCounts = countConditionRecords(regionConditions);
@@ -268,9 +283,10 @@ export async function getRegionalAnalytics(region: string) {
     centers: centerAnalytics,
     summary: {
       ...totalStats,
-      averageFeedback: totalStats.totalFeedback > 0 
-        ? totalStats.sumFeedback / totalStats.totalFeedback 
-        : 0,
+      averageFeedback:
+        totalStats.totalFeedback > 0
+          ? totalStats.sumFeedback / totalStats.totalFeedback
+          : 0,
       conditionCounts,
     },
   };
@@ -287,19 +303,22 @@ export async function getAllAnalytics() {
     },
   });
 
-  const analyticsPromises = centers.map((center: any) => getCenterAnalytics(center.id));
+  const analyticsPromises = centers.map((center: any) =>
+    getCenterAnalytics(center.id),
+  );
   const centerAnalytics = await Promise.all(analyticsPromises);
 
   const regions = [...new Set(centers.map((c: any) => c.region))];
   const regionalStats = await Promise.all(
-    regions.map((region: string) => getRegionalAnalytics(region))
+    regions.map((region: string) => getRegionalAnalytics(region)),
   );
 
   const totalStats = centerAnalytics.reduce(
     (acc: any, curr: any) => ({
       totalStaff: acc.totalStaff + curr.totalStaff,
       totalAppointments: acc.totalAppointments + curr.totalAppointments,
-      completedAppointments: acc.completedAppointments + curr.completedAppointments,
+      completedAppointments:
+        acc.completedAppointments + curr.completedAppointments,
       pendingAppointments: acc.pendingAppointments + curr.pendingAppointments,
       totalVitals: acc.totalVitals + curr.totalVitals,
       totalFeedback: acc.totalFeedback + (curr.averageFeedback > 0 ? 1 : 0),
@@ -313,7 +332,7 @@ export async function getAllAnalytics() {
       totalVitals: 0,
       totalFeedback: 0,
       sumFeedback: 0,
-    }
+    },
   );
 
   return {
@@ -322,9 +341,10 @@ export async function getAllAnalytics() {
     regions: regionalStats,
     summary: {
       ...totalStats,
-      averageFeedback: totalStats.totalFeedback > 0 
-        ? totalStats.sumFeedback / totalStats.totalFeedback 
-        : 0,
+      averageFeedback:
+        totalStats.totalFeedback > 0
+          ? totalStats.sumFeedback / totalStats.totalFeedback
+          : 0,
     },
   };
 }

@@ -74,7 +74,9 @@ const FederalAnalyticsTooltip = ({ active, payload, label }) => {
               color: "#374151",
             }}
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span
+              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
+            >
               <span
                 style={{
                   width: "10px",
@@ -86,7 +88,9 @@ const FederalAnalyticsTooltip = ({ active, payload, label }) => {
               />
               {item.name}
             </span>
-            <span style={{ fontWeight: 700, color: "#111827" }}>{item.value}</span>
+            <span style={{ fontWeight: 700, color: "#111827" }}>
+              {item.value}
+            </span>
           </div>
         ))}
       </div>
@@ -100,7 +104,9 @@ const FederalAnalyticsTooltip = ({ active, payload, label }) => {
             gap: "0.3rem",
           }}
         >
-          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6b7280" }}>
+          <div
+            style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6b7280" }}
+          >
             Conditions
           </div>
           {conditionEntries.map(([key, value]) => (
