@@ -20,10 +20,10 @@ const CustomTooltip = ({ active, payload }) => {
     return (
       <div style={{
         backgroundColor: "#FFFFFF",
-        border: "2px solid #1a2b5e",
+        border: "2px solid #213D8D",
         borderRadius: "8px",
         padding: "10px 15px",
-        color: "#1a2b5e",
+        color: "#213D8D",
         fontWeight: "600",
         fontSize: "14px",
       }}>
@@ -40,6 +40,8 @@ function DashboardMetrics({
   onTimePeriodChange,
   showControls = true,
   selectedCenter: externalSelectedCenter,
+  selectedRegion: externalSelectedRegion,
+  dateRange: externalDateRange,
 }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +57,8 @@ function DashboardMetrics({
 
   const effectivePeriod = externalTimePeriod || timePeriod;
   const effectiveCenter = externalSelectedCenter !== undefined ? externalSelectedCenter : "all";
+  const effectiveRegion = externalSelectedRegion !== undefined ? externalSelectedRegion : "all";
+  const effectiveDateRange = externalDateRange || { start: "", end: "" };
 
   useEffect(() => {
     if (externalTimePeriod) setTimePeriod(externalTimePeriod);
@@ -68,7 +72,7 @@ function DashboardMetrics({
     return () => clearInterval(interval);
   }, [effectivePeriod]);
 
-  useEffect(() => { fetchHealthData(); }, [effectivePeriod, effectiveCenter, selectedCondition]);
+  useEffect(() => { fetchHealthData(); }, [effectivePeriod, effectiveCenter, effectiveRegion, effectiveDateRange.start, effectiveDateRange.end, selectedCondition]);
 
   const fetchMetrics = async () => {
     try {
@@ -89,7 +93,14 @@ function DashboardMetrics({
       setHealthLoading(true);
       const today = new Date();
       let startDate, endDate;
-      if (effectivePeriod === "all") {
+      
+      // Use custom date range if provided, otherwise use period
+      if (effectiveDateRange.start && effectiveDateRange.end) {
+        startDate = new Date(effectiveDateRange.start);
+        endDate = new Date(effectiveDateRange.end);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+      } else if (effectivePeriod === "all") {
         startDate = null; endDate = null;
       } else if (effectivePeriod === "daily") {
         const y = today.getUTCFullYear(), m = today.getUTCMonth(), d = today.getUTCDate();
@@ -104,8 +115,10 @@ function DashboardMetrics({
         startDate = new Date(Date.UTC(y, m, 1, 0, 0, 0));
         endDate = new Date(Date.UTC(y, m, d, 23, 59, 59));
       }
-      const params = effectivePeriod === "all" ? {} : { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
+      
+      const params = effectivePeriod === "all" && !effectiveDateRange.start ? {} : { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
       if (effectiveCenter !== "all") params.center = effectiveCenter;
+      if (effectiveRegion !== "all") params.region = effectiveRegion;
       if (selectedCondition !== "all") params.condition = selectedCondition;
       const response = await api.get("/api/v1/conditions/period", { params });
       const conditions = response.data.data || [];
@@ -356,12 +369,12 @@ function DashboardMetrics({
                 <h4>Condition Trends</h4>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item,i) => ({ name: item.label, value: item.count + i * 0.01, originalCount: item.count, color: item.color }))}>
-                    <defs><linearGradient id="colorCondition" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#1a2b5e" stopOpacity={0.8}/><stop offset="95%" stopColor="#1a2b5e" stopOpacity={0}/></linearGradient></defs>
+                    <defs><linearGradient id="colorCondition" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#213D8D" stopOpacity={0.8}/><stop offset="95%" stopColor="#213D8D" stopOpacity={0}/></linearGradient></defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB"/>
                     <XAxis dataKey="name" stroke="#6B7280"/>
                     <YAxis stroke="#6B7280"/>
-                    <Tooltip contentStyle={{ backgroundColor:"#fff", border:"2px solid #1a2b5e", borderRadius:"8px" }} formatter={(value, name, props) => [props.payload.originalCount, "Count"]}/>
-                    <Area type="monotone" dataKey="value" stroke="#1a2b5e" strokeWidth={2} fillOpacity={1} fill="url(#colorCondition)" dot={{ fill:"#f5a623", r:5 }} activeDot={{ r:7 }}/>
+                    <Tooltip contentStyle={{ backgroundColor:"#fff", border:"2px solid #213D8D", borderRadius:"8px" }} formatter={(value, name, props) => [props.payload.originalCount, "Count"]}/>
+                    <Area type="monotone" dataKey="value" stroke="#213D8D" strokeWidth={2} fillOpacity={1} fill="url(#colorCondition)" dot={{ fill:"#f5a623", r:5 }} activeDot={{ r:7 }}/>
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

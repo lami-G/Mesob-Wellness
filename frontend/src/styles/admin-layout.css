@@ -23,7 +23,7 @@
 /* Sidebar */
 .admin-sidebar {
   width: 280px;
-  background: #1a2b5e;
+  background: #213D8D;
   color: white;
   display: flex;
   flex-direction: column;
@@ -102,7 +102,7 @@
   align-items: center;
   justify-content: center;
   background: #f5a623;
-  color: #1a2b5e;
+  color: #213D8D;
   font-size: 0.875rem;
   font-weight: 700;
 }
@@ -222,7 +222,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: #1a2b5e;
+  background: #213D8D;
   border-bottom: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -337,7 +337,7 @@
   justify-content: center;
   font-size: 0.625rem;
   font-weight: 600;
-  border: 2px solid #1a2b5e;
+  border: 2px solid #213D8D;
 }
 
 /* User Menu */
@@ -390,7 +390,7 @@
   align-items: center;
   justify-content: center;
   background: #f5a623;
-  color: #1a2b5e;
+  color: #213D8D;
   font-size: 0.875rem;
   font-weight: 700;
 }
@@ -438,7 +438,7 @@
 
 .dropdown-item:hover {
   background-color: #f7fafc;
-  color: #1a2b5e;
+  color: #213D8D;
 }
 
 .dropdown-item.logout {
