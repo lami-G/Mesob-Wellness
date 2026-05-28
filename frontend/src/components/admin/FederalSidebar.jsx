@@ -15,18 +15,14 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
   ];
 
   return (
-    <aside className={`admin-sidebar ${isOpen ? "open" : "closed"}`}>
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <span className="logo-icon">🏛️</span>
-          <span className="logo-text">MESOB Federal</span>
-        </div>
-        <div className="user-info">
-          <p className="user-name">{user?.fullName}</p>
-          <p className="user-role">Federal Office</p>
-        </div>
+    <aside className={`admin-sidebar federal-sidebar ${isOpen ? "open" : "closed"}`}>
+      {/* Logo Section */}
+      <div className="sidebar-logo-section">
+        <div className="sidebar-logo-icon">📋</div>
+        <span className="sidebar-logo-text">MESOB Federal</span>
       </div>
 
+      {/* Navigation Menu */}
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
           <button
@@ -40,8 +36,12 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
         ))}
       </nav>
 
+      {/* Version Footer */}
       <div className="sidebar-footer">
         <p className="version">v1.0.0</p>
+        <button className="sidebar-logout-btn" title="Logout">
+          <span>🚪</span>
+        </button>
       </div>
     </aside>
   );
