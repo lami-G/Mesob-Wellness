@@ -389,6 +389,15 @@ export const deleteUser = async (
       return;
     }
 
+    const allowedRoles = ["SYSTEM_ADMIN", "FEDERAL_OFFICE"];
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        status: "error",
+        message: "Only SYSTEM_ADMIN and FEDERAL_OFFICE can delete users",
+      });
+      return;
+    }
+
     const userId = req.params.id as string;
 
     if (!userId) {

@@ -9,6 +9,7 @@ import FeedbackQuality from "./admin/FeedbackQuality";
 import AuditLogs from "./admin/AuditLogs";
 import DashboardMetrics from "../components/admin/DashboardMetrics";
 import HealthConditionTrendsPanel from "../components/analytics/HealthConditionTrendsPanel";
+import RegionEditModal from "../components/admin/RegionEditModal";
 import "../styles/admin-layout.css";
 import "../styles/admin-dashboard.css";
 import "../styles/admin-filters.css";
@@ -149,6 +150,9 @@ function FederalDashboard() {
   const [regionAccountPassword, setRegionAccountPassword] = useState("");
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [editingRegion, setEditingRegion] = useState(null);
+  const [showRegionEditModal, setShowRegionEditModal] = useState(false);
+  const [selectedRegionForEdit, setSelectedRegionForEdit] = useState(null);
+  const [selectedRegionStatus, setSelectedRegionStatus] = useState("ACTIVE");
   const [regionDraftName, setRegionDraftName] = useState("");
   const [regionDraftStatus, setRegionDraftStatus] = useState("ACTIVE");
   const [regionActionLoading, setRegionActionLoading] = useState(false);
@@ -679,14 +683,14 @@ function FederalDashboard() {
                 <input
                   type="email"
                   className="form-input"
-                  placeholder="Regional office email"
+                  placeholder="Region admin email"
                   value={regionAccountEmail}
                   onChange={(e) => setRegionAccountEmail(e.target.value)}
                 />
                 <input
                   type="password"
                   className="form-input"
-                  placeholder="Regional office password"
+                  placeholder="Region admin password"
                   value={regionAccountPassword}
                   onChange={(e) => setRegionAccountPassword(e.target.value)}
                 />
@@ -873,48 +877,26 @@ function FederalDashboard() {
                         style={{
                           display: "flex",
                           gap: "0.5rem",
-                          alignItems: "center",
                           flexWrap: "wrap",
                         }}
                       >
-                        <input
-                          className="form-input"
-                          value={regionDraftName}
-                          onChange={(e) => setRegionDraftName(e.target.value)}
-                          style={{ minWidth: "140px" }}
-                        />
-                        <select
-                          className="form-input"
-                          value={regionDraftStatus}
-                          onChange={(e) => setRegionDraftStatus(e.target.value)}
-                        >
-                          <option value="ACTIVE">Active</option>
-                          <option value="MAINTENANCE">Maintenance</option>
-                          <option value="INACTIVE">Inactive</option>
-                        </select>
                         <button
                           className="btn btn-secondary"
+                          onClick={() => {
+                            setSelectedRegionForEdit(row.region);
+                            setSelectedRegionStatus(row.status);
+                            setShowRegionEditModal(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-reset"
                           disabled={regionActionLoading}
                           onClick={async () => {
-                            const trimmed = regionDraftName.trim();
                             const regionCenters = allCenters.filter(
                               (center) => center.region === row.region,
                             );
-                            if (!trimmed) {
-                              setRegionActionError(
-                                "Region name cannot be empty.",
-                              );
-                              return;
-                            }
-                            if (
-                              regions.includes(trimmed) &&
-                              trimmed !== row.region
-                            ) {
-                              setRegionActionError(
-                                "Region name already exists.",
-                              );
-                              return;
-                            }
                             if (regionCenters.length === 0) {
                               setRegionActionError(
                                 "No centers found for this region.",
@@ -925,42 +907,70 @@ function FederalDashboard() {
                               setRegionActionLoading(true);
                               setRegionActionError("");
                               setRegionActionSuccess("");
-
                               await Promise.all(
                                 regionCenters.map((center) =>
                                   adminService.updateCenter(center.id, {
-                                    region: trimmed,
-                                    status: regionDraftStatus,
+                                    status: "INACTIVE",
                                   }),
                                 ),
                               );
-
                               setRegionActionSuccess(
-                                `Region "${row.region}" updated successfully.`,
+                                `Region "${row.region}" archived.`,
                               );
-                              setEditingRegion(null);
-                              setRegionDraftName("");
                               await loadFederalData();
                             } catch (err) {
                               const message =
                                 err.response?.data?.message ||
-                                "Failed to update region.";
+                                "Failed to archive region.";
                               setRegionActionError(message);
                             } finally {
                               setRegionActionLoading(false);
                             }
                           }}
                         >
-                          {regionActionLoading ? "Saving..." : "Save"}
+                          Archive
                         </button>
                         <button
-                          className="btn btn-reset"
-                          onClick={() => {
-                            setEditingRegion(null);
-                            setRegionDraftName("");
+                          className="btn btn-danger"
+                          disabled={regionActionLoading}
+                          onClick={async () => {
+                            const regionCenters = allCenters.filter(
+                              (center) => center.region === row.region,
+                            );
+                            if (regionCenters.length === 0) {
+                              setRegionActionError(
+                                "No centers found for this region.",
+                              );
+                              return;
+                            }
+                            const confirmed = window.confirm(
+                              `Delete region "${row.region}" and ${regionCenters.length} centers? This cannot be undone.`,
+                            );
+                            if (!confirmed) return;
+                            try {
+                              setRegionActionLoading(true);
+                              setRegionActionError("");
+                              setRegionActionSuccess("");
+                              await Promise.all(
+                                regionCenters.map((center) =>
+                                  adminService.deleteCenter(center.id),
+                                ),
+                              );
+                              setRegionActionSuccess(
+                                `Region "${row.region}" deleted.`,
+                              );
+                              await loadFederalData();
+                            } catch (err) {
+                              const message =
+                                err.response?.data?.message ||
+                                "Failed to delete region.";
+                              setRegionActionError(message);
+                            } finally {
+                              setRegionActionLoading(false);
+                            }
                           }}
                         >
-                          Cancel
+                          Delete
                         </button>
                       </div>
                     ) : (
@@ -974,9 +984,9 @@ function FederalDashboard() {
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
-                            setEditingRegion(row.region);
-                            setRegionDraftName(row.region);
-                            setRegionDraftStatus(row.status);
+                            setSelectedRegionForEdit(row.region);
+                            setSelectedRegionStatus(row.status);
+                            setShowRegionEditModal(true);
                           }}
                         >
                           Edit
@@ -1118,7 +1128,7 @@ function FederalDashboard() {
         return (
           <CenterManagement
             baseFilters={centerBaseFilters}
-            allowDelete={false}
+            allowDelete={true}
           />
         );
       case "appointments":
@@ -1296,6 +1306,23 @@ function FederalDashboard() {
         </div>
       </div>
       {renderContent()}
+      
+      <RegionEditModal
+        isOpen={showRegionEditModal}
+        onClose={() => {
+          setShowRegionEditModal(false);
+          setSelectedRegionForEdit(null);
+        }}
+        region={selectedRegionForEdit}
+        regionStatus={selectedRegionStatus}
+        allCenters={allCenters}
+        onSuccess={async () => {
+          setShowRegionEditModal(false);
+          setSelectedRegionForEdit(null);
+          setRegionActionSuccess(`Region updated successfully.`);
+          await loadFederalData();
+        }}
+      />
     </AdminLayout>
   );
 }

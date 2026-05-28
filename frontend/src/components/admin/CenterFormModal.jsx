@@ -219,17 +219,17 @@ function CenterFormModal({
               }}
             >
               <Input
-                label="Center Manager Email"
+                label="Center Admin Email"
                 name="managerEmail"
                 type="email"
                 value={formData.managerEmail}
                 onChange={(e) =>
                   setFormData({ ...formData, managerEmail: e.target.value })
                 }
-                placeholder="manager@mesob.et"
+                placeholder="admin@mesob.et"
               />
               <Input
-                label="Center Manager Password"
+                label="Center Admin Password"
                 name="managerPassword"
                 type="password"
                 value={formData.managerPassword}
