@@ -21,11 +21,11 @@ function AuditLogs({ baseFilters = {} }) {
 
   useEffect(() => {
     fetchLogs();
-  }, [page, filters]);
+  }, [page, JSON.stringify(filters)]);
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, ...baseFilters }));
-  }, [baseFilters]);
+  }, [JSON.stringify(baseFilters)]);
 
   const fetchLogs = async () => {
     try {

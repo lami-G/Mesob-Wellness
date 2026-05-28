@@ -9,7 +9,7 @@ function AppointmentManagement({ baseFilters = {} }) {
 
   useEffect(() => {
     setFilters((prev) => ({ ...prev, ...baseFilters }));
-  }, [baseFilters]);
+  }, [JSON.stringify(baseFilters)]);
 
   const handleFilterChange = (newFilters) => {
     setFilters({ ...baseFilters, ...newFilters });
