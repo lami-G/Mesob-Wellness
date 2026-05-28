@@ -122,7 +122,7 @@ function NurseDashboard() {
     <div className="nurse-dashboard-layout">
       <aside className="nurse-sidebar">
         <div className="sidebar-header">
-          <h2>👨‍⚕️ Nurse</h2>
+          <h2>Nurse</h2>
           <p>{user?.fullName}</p>
         </div>
         
@@ -131,7 +131,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
             onClick={() => setActiveTab('analytics')}
           >
-            <span className="nav-icon">📊</span>
             <span className="nav-label">Analytics</span>
           </button>
           
@@ -139,7 +138,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'queue' ? 'active' : ''}`}
             onClick={() => setActiveTab('queue')}
           >
-            <span className="nav-icon">📋</span>
             <span className="nav-label">Queue</span>
           </button>
           
@@ -147,7 +145,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'vitals' ? 'active' : ''}`}
             onClick={() => setActiveTab('vitals')}
           >
-            <span className="nav-icon">💉</span>
             <span className="nav-label">Vitals</span>
           </button>
           
@@ -155,7 +152,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'walkin' ? 'active' : ''}`}
             onClick={() => setActiveTab('walkin')}
           >
-            <span className="nav-icon">🚶</span>
             <span className="nav-label">Walk-in</span>
           </button>
           
@@ -163,7 +159,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'wellness' ? 'active' : ''}`}
             onClick={() => setActiveTab('wellness')}
           >
-            <span className="nav-icon">🎯</span>
             <span className="nav-label">Wellness</span>
           </button>
           
@@ -171,7 +166,6 @@ function NurseDashboard() {
             className={`sidebar-nav-item ${activeTab === 'history' ? 'active' : ''}`}
             onClick={() => setActiveTab('history')}
           >
-            <span className="nav-icon">📚</span>
             <span className="nav-label">History</span>
           </button>
         </nav>
@@ -180,13 +174,13 @@ function NurseDashboard() {
       <main className="nurse-main-content">
         <div className="nurse-content-header">
           <h1>
-            {activeTab === 'analytics' && '📊 Analytics'}
-            {activeTab === 'queue' && '📋 Queue Management'}
-            {activeTab === 'vitals' && '💉 Record Vitals'}
-            {activeTab === 'walkin' && '🚶 Register Walk-in'}
-            {activeTab === 'wellness' && '🎯 Create Wellness Plan'}
-            {activeTab === 'history' && '📚 Customer History'}
-            {activeTab === 'profile' && '👤 Profile'}
+            {activeTab === 'analytics' && 'Analytics'}
+            {activeTab === 'queue' && 'Queue Management'}
+            {activeTab === 'vitals' && 'Record Vitals'}
+            {activeTab === 'walkin' && 'Register Walk-in'}
+            {activeTab === 'wellness' && 'Create Wellness Plan'}
+            {activeTab === 'history' && 'Customer History'}
+            {activeTab === 'profile' && 'Profile'}
           </h1>
         </div>
 

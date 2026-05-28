@@ -131,10 +131,10 @@ function AdminDashboard() {
                 cursor: 'pointer',
               }}
             >
-              <option value="all">🌐 All Time</option>
-              <option value="daily">📅 Daily</option>
-              <option value="weekly">📊 Weekly</option>
-              <option value="monthly">📈 Monthly</option>
+              <option value="all">All Time</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
             </select>
 
             <select
@@ -150,7 +150,7 @@ function AdminDashboard() {
                 cursor: 'pointer',
               }}
             >
-              <option value="all">🏥 All Centers</option>
+              <option value="all">All Centers</option>
               {centers.map((center) => (
                 <option key={center.id} value={center.id}>
                   {center.name}
@@ -172,7 +172,7 @@ function AdminDashboard() {
               }}
               className="region-select"
             >
-              <option value="all" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>🗺️ All Regions</option>
+              <option value="all" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>All Regions</option>
               {regions.map((region) => (
                 <option key={region.id} value={region.id} style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
                   {region.name}

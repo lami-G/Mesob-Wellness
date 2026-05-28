@@ -18,7 +18,7 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
     <aside className={`admin-sidebar federal-sidebar ${isOpen ? "open" : "closed"}`}>
       {/* Logo Section */}
       <div className="sidebar-logo-section">
-        <div className="sidebar-logo-icon">📋</div>
+        <div className="sidebar-logo-icon">M</div>
         <span className="sidebar-logo-text">MESOB Federal</span>
       </div>
 

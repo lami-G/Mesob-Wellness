@@ -51,13 +51,13 @@ function QuickHistoryModal({ customerId, customerName, onClose, onViewDetails })
             className={`tab-btn ${activeTab === 'vitals' ? 'active' : ''}`}
             onClick={() => setActiveTab('vitals')}
           >
-            💉 Latest Vitals ({vitalsHistory.length})
+            Latest Vitals ({vitalsHistory.length})
           </button>
           <button
             className={`tab-btn ${activeTab === 'plans' ? 'active' : ''}`}
             onClick={() => setActiveTab('plans')}
           >
-            🎯 Recent Plans ({wellnessPlans.length})
+            Recent Plans ({wellnessPlans.length})
           </button>
         </div>
 
@@ -138,7 +138,7 @@ function QuickHistoryModal({ customerId, customerName, onClose, onViewDetails })
               onClose();
             }}
           >
-            📋 View Full Details
+            View Full Details
           </button>
         </div>
       </div>

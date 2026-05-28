@@ -637,7 +637,7 @@ export default function HealthConditionTrendsPanel({
               color: "#111",
             }}
           >
-            📈 Health Condition Trends
+            Health Condition Trends
           </h3>
           <p
             style={{

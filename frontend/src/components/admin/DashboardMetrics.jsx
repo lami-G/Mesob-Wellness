@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import api from "../../services/api";
+import HealthConditionTrendsPanel from "../analytics/HealthConditionTrendsPanel";
 import {
   PieChart,
   Pie,
@@ -312,76 +313,92 @@ function DashboardMetrics({
       </div>
 
       {/* ── HEALTH ANALYTICS ── */}
-      {healthData && (
-        <div className="health-analytics-section">
-          <h3>🏥 Workplace Health Analytics</h3>
-          <div className="health-filters">
-            <div className="filter-group">
-              <label>Condition type</label>
-              <select value={selectedCondition} onChange={(e) => setSelectedCondition(e.target.value)}>
-                <option value="all">All Conditions</option>
-                <option value="hypertension">Hypertension</option>
-                <option value="obesity">Obesity</option>
-                <option value="diabetes">Diabetes</option>
-                <option value="heart_issues">Heart Issues</option>
-                <option value="respiratory_issues">Respiratory Issues</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="health-score-only">
-            <div className="health-score-card">
-              <h4>Overall Health Score</h4>
-              <div className="score-display">
-                <div className="score-value">
-                  {Math.round(healthData.totalVitalsRecorded > 0
-                    ? ((healthData.totalVitalsRecorded - healthData.highRiskCount) / healthData.totalVitalsRecorded) * 100
-                    : 0)}
-                </div>
-                <div className="score-label">/100</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="health-stats-expanded-grid">
-            <div className="health-stat-expanded-card"><div className="stat-label">Total Employees</div><div className="stat-value">{healthData.totalPatients}</div></div>
-            <div className="health-stat-expanded-card"><div className="stat-label">Healthy %</div><div className="stat-value" style={{color:"#10B981"}}>{healthData.totalVitalsRecorded > 0 ? Math.round(((healthData.totalVitalsRecorded - healthData.highRiskCount - healthData.criticalCount) / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
-            <div className="health-stat-expanded-card"><div className="stat-label">At-Risk %</div><div className="stat-value" style={{color:"#F59E0B"}}>{healthData.totalVitalsRecorded > 0 ? Math.round((healthData.highRiskCount / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
-            <div className="health-stat-expanded-card"><div className="stat-label">Critical %</div><div className="stat-value" style={{color:"#EF5350"}}>{healthData.totalVitalsRecorded > 0 ? Math.round((healthData.criticalCount / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
-          </div>
-
-          <div className="health-charts-grid">
-            {healthData.patientConditions?.filter((c) => c.count > 0).length > 0 && (
-              <div className="health-chart-card">
-                <h4>Condition Distribution</h4>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie data={healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item,i) => ({ name: item.label, value: item.count + i * 0.01, color: item.color, originalCount: item.count }))} cx="50%" cy="50%" labelLine={false} label={({ name, originalCount }) => `${name}: ${originalCount}`} outerRadius={70} dataKey="value">
-                      {healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item, i) => <Cell key={`cell-${i}`} fill={item.color} />)}
-                    </Pie>
-                    <Tooltip formatter={(value, name, props) => [props.payload.originalCount, "Count"]} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            )}
-            {healthData.patientConditions?.filter((c) => c.count > 0).length > 0 && (
-              <div className="health-chart-card">
-                <h4>Condition Trends</h4>
-                <ResponsiveContainer width="100%" height={250}>
-                  <AreaChart data={healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item,i) => ({ name: item.label, value: item.count + i * 0.01, originalCount: item.count, color: item.color }))}>
-                    <defs><linearGradient id="colorCondition" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#213D8D" stopOpacity={0.8}/><stop offset="95%" stopColor="#213D8D" stopOpacity={0}/></linearGradient></defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB"/>
-                    <XAxis dataKey="name" stroke="#6B7280"/>
-                    <YAxis stroke="#6B7280"/>
-                    <Tooltip contentStyle={{ backgroundColor:"#fff", border:"2px solid #213D8D", borderRadius:"8px" }} formatter={(value, name, props) => [props.payload.originalCount, "Count"]}/>
-                    <Area type="monotone" dataKey="value" stroke="#213D8D" strokeWidth={2} fillOpacity={1} fill="url(#colorCondition)" dot={{ fill:"#f5a623", r:5 }} activeDot={{ r:7 }}/>
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+      <div className="health-analytics-section">
+        <h3>Workplace Health Analytics</h3>
+        <div className="health-filters">
+          <div className="filter-group">
+            <label>Condition type</label>
+            <select value={selectedCondition} onChange={(e) => setSelectedCondition(e.target.value)}>
+              <option value="all">All Conditions</option>
+              <option value="hypertension">Hypertension</option>
+              <option value="obesity">Obesity</option>
+              <option value="diabetes">Diabetes</option>
+              <option value="heart_issues">Heart Issues</option>
+              <option value="respiratory_issues">Respiratory Issues</option>
+            </select>
           </div>
         </div>
-      )}
+
+        {healthLoading ? (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+            Loading health data...
+          </div>
+        ) : healthData ? (
+          <>
+            <div className="health-score-only">
+              <div className="health-score-card">
+                <h4>Overall Health Score</h4>
+                <div className="score-display">
+                  <div className="score-value">
+                    {Math.round(healthData.totalVitalsRecorded > 0
+                      ? ((healthData.totalVitalsRecorded - healthData.highRiskCount) / healthData.totalVitalsRecorded) * 100
+                      : 0)}
+                  </div>
+                  <div className="score-label">/100</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="health-stats-expanded-grid">
+              <div className="health-stat-expanded-card"><div className="stat-label">Total Employees</div><div className="stat-value">{healthData.totalPatients}</div></div>
+              <div className="health-stat-expanded-card"><div className="stat-label">Healthy %</div><div className="stat-value" style={{color:"#10B981"}}>{healthData.totalVitalsRecorded > 0 ? Math.round(((healthData.totalVitalsRecorded - healthData.highRiskCount - healthData.criticalCount) / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
+              <div className="health-stat-expanded-card"><div className="stat-label">At-Risk %</div><div className="stat-value" style={{color:"#F59E0B"}}>{healthData.totalVitalsRecorded > 0 ? Math.round((healthData.highRiskCount / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
+              <div className="health-stat-expanded-card"><div className="stat-label">Critical %</div><div className="stat-value" style={{color:"#EF5350"}}>{healthData.totalVitalsRecorded > 0 ? Math.round((healthData.criticalCount / healthData.totalVitalsRecorded) * 100) : 0}%</div><div className="stat-sublabel">{getPeriodLabel()}</div></div>
+            </div>
+
+            <div className="health-charts-grid">
+              {healthData.patientConditions?.filter((c) => c.count > 0).length > 0 && (
+                <div className="health-chart-card">
+                  <h4>Condition Distribution</h4>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie data={healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item,i) => ({ name: item.label, value: item.count + i * 0.01, color: item.color, originalCount: item.count }))} cx="50%" cy="50%" labelLine={false} label={({ name, originalCount }) => `${name}: ${originalCount}`} outerRadius={70} dataKey="value">
+                        {healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item, i) => <Cell key={`cell-${i}`} fill={item.color} />)}
+                      </Pie>
+                      <Tooltip formatter={(value, name, props) => [props.payload.originalCount, "Count"]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              {healthData.patientConditions?.filter((c) => c.count > 0).length > 0 && (
+                <div className="health-chart-card">
+                  <h4>Condition Trends</h4>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={healthData.patientConditions.filter((c) => c.count > 0).slice(0,6).map((item,i) => ({ name: item.label, value: item.count + i * 0.01, originalCount: item.count, color: item.color }))}>
+                      <defs><linearGradient id="colorCondition" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#213D8D" stopOpacity={0.8}/><stop offset="95%" stopColor="#213D8D" stopOpacity={0}/></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB"/>
+                      <XAxis dataKey="name" stroke="#6B7280"/>
+                      <YAxis stroke="#6B7280"/>
+                      <Tooltip contentStyle={{ backgroundColor:"#fff", border:"2px solid #213D8D", borderRadius:"8px" }} formatter={(value, name, props) => [props.payload.originalCount, "Count"]}/>
+                      <Area type="monotone" dataKey="value" stroke="#213D8D" strokeWidth={2} fillOpacity={1} fill="url(#colorCondition)" dot={{ fill:"#f5a623", r:5 }} activeDot={{ r:7 }}/>
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+            No health data available for the selected period.
+          </div>
+        )}
+      </div>
+
+      {/* ── HEALTH CONDITION TRENDS (BAR CHART + LINE CHART) ── */}
+      <HealthConditionTrendsPanel 
+        viewPeriod={effectivePeriod}
+        showPeriodSwitcher={false}
+      />
     </div>
   );
 }

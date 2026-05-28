@@ -339,7 +339,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
 
   return (
     <div className="card wellness-plan-creation">
-      <h3>🎯 Create Wellness Plan</h3>
+      <h3>Create Wellness Plan</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
       
@@ -418,7 +418,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h4 style={{ margin: 0, color: '#3550A0', fontSize: '1rem', fontWeight: 600 }}>
-              📊 Latest Vitals
+              Latest Vitals
             </h4>
             <button
               type="button"
@@ -510,7 +510,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           borderRadius: '8px',
         }}>
           <h4 style={{ margin: '0 0 0.5rem 0', color: '#92400E', fontSize: '1rem', fontWeight: 600 }}>
-            🏥 Health Conditions
+            Health Conditions
           </h4>
           
           {conditionsAutoFilled && (
@@ -699,7 +699,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           onClick={() => setShowTemplates(true)}
           disabled={!selectedCustomerId}
         >
-          📋 Use Template
+          Use Template
         </button>
       </div>
 
