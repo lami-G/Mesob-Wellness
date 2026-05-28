@@ -12,12 +12,32 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
+  const normalizeFilters = (values = {}) => ({
+    region: values.region || "",
+    center: values.center || "",
+    search: values.search || "",
+    dateFrom: values.dateFrom || "",
+    dateTo: values.dateTo || "",
+    role: values.role || "",
+    status: values.status || "",
+  });
+
+  const areFiltersEqual = (left = {}, right = {}) => {
+    const leftNormalized = normalizeFilters(left);
+    const rightNormalized = normalizeFilters(right);
+    return Object.keys(leftNormalized).every(
+      (key) => leftNormalized[key] === rightNormalized[key],
+    );
+  };
+
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, ...baseFilters }));
+    const nextFilters = normalizeFilters(baseFilters);
+    setFilters((prev) => (areFiltersEqual(prev, nextFilters) ? prev : nextFilters));
   }, [baseFilters]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters({ ...baseFilters, ...newFilters });
+    const nextFilters = { ...normalizeFilters(baseFilters), ...newFilters };
+    setFilters((prev) => (areFiltersEqual(prev, nextFilters) ? prev : nextFilters));
   };
 
   const handleEdit = (user) => {

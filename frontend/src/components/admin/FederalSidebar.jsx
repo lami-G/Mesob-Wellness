@@ -7,8 +7,6 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
   const menuItems = [
     { id: "overview", label: "Overview" },
     { id: "regions", label: "Regions" },
-    { id: "analytics", label: "Analytics" },
-    { id: "users", label: "Users" },
     { id: "centers", label: "Centers" },
     { id: "appointments", label: "Appointments" },
     { id: "feedback", label: "Feedback" },

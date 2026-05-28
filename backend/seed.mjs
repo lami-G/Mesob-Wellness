@@ -28,27 +28,32 @@ async function main() {
   console.log('🌱 Seeding test users...');
   console.log('   Connecting to:', process.env.DATABASE_URL);
 
-  const password = await hash('password123');
-
   const users = [
-    { email: 'admin@mesob.et',    fullName: 'System Admin',     role: 'SYSTEM_ADMIN'    },
-    { email: 'federal@mesob.et',  fullName: 'Federal Officer',  role: 'FEDERAL_OFFICE'  },
-    { email: 'regional@mesob.et', fullName: 'Regional Officer', role: 'REGIONAL_OFFICE' },
-    { email: 'manager@mesob.et',  fullName: 'Center Manager',   role: 'MANAGER'         },
-    { email: 'nurse@mesob.et',    fullName: 'Nurse Officer',    role: 'NURSE_OFFICER'   },
-    { email: 'staff@mesob.et',    fullName: 'Staff Member',     role: 'STAFF'           },
+    { email: 'admin@mesob.et',    fullName: 'System Admin',     role: 'SYSTEM_ADMIN',   password: 'Admin123!'    },
+    { email: 'federal@mesob.et',  fullName: 'Federal Officer',  role: 'FEDERAL_OFFICE', password: 'Federal123!'  },
+    { email: 'regional@mesob.et', fullName: 'Regional Officer', role: 'REGIONAL_OFFICE', password: 'Regional123!' },
+    { email: 'manager@mesob.et',  fullName: 'Center Manager',   role: 'MANAGER',         password: 'Manager123!'  },
+    { email: 'nurse@mesob.et',    fullName: 'Nurse Officer',    role: 'NURSE_OFFICER',   password: 'Nurse123!'    },
+    { email: 'staff@mesob.et',    fullName: 'Staff Member',     role: 'STAFF',           password: 'Staff123!'    },
   ];
 
   for (const u of users) {
+    const hashedPassword = await hash(u.password);
     await pool.query(`
       INSERT INTO users (id, email, password, "fullName", role, "isActive", "isVerified", "createdAt", "updatedAt")
       VALUES (gen_random_uuid(), $1, $2, $3, $4::\"UserRole\", true, true, NOW(), NOW())
-      ON CONFLICT (email) DO NOTHING
-    `, [u.email, password, u.fullName, u.role]);
+      ON CONFLICT (email) DO UPDATE SET
+        password = EXCLUDED.password,
+        "fullName" = EXCLUDED."fullName",
+        role = EXCLUDED.role,
+        "isActive" = true,
+        "isVerified" = true,
+        "updatedAt" = NOW()
+    `, [u.email, hashedPassword, u.fullName, u.role]);
     console.log(`  ✅ ${u.role.padEnd(16)} → ${u.email}`);
   }
 
-  console.log('\n✅ Done! All users use password: password123');
+  console.log('\n✅ Done! Test users updated with role passwords.');
   await pool.end();
 }
 

@@ -159,6 +159,58 @@ export async function getCenterAnalytics(centerId: string) {
   };
 }
 
+const normalizeConditionKey = (raw: string) => {
+  const key = String(raw || "").toLowerCase().replace(/\s+/g, "_");
+  if (key === "heart_issues" || key === "respiratory_issues") return "heart_respiratory";
+  if (key === "prediabetes" || key === "hyperglycemia") return "diabetes";
+  if (["hypertension", "overweight", "obesity", "diabetes", "heart_respiratory", "normal"].includes(key)) {
+    return key;
+  }
+  return "other";
+};
+
+const countConditionRecords = (records: Array<{ conditions: unknown }>) => {
+  const counts: Record<string, number> = {
+    hypertension: 0,
+    overweight: 0,
+    obesity: 0,
+    diabetes: 0,
+    heart_respiratory: 0,
+    normal: 0,
+    other: 0,
+  };
+
+  records.forEach((record) => {
+    const raw = record.conditions as unknown;
+    let conditionList: string[] = [];
+
+    if (Array.isArray(raw)) {
+      conditionList = raw.map((value) => String(value));
+    } else if (typeof raw === "string" && raw.trim().length > 0) {
+      conditionList = [raw];
+    } else if (raw && typeof raw === "object") {
+      const rawObject = raw as Record<string, unknown>;
+      if (Array.isArray(rawObject.conditions)) {
+        conditionList = rawObject.conditions.map((value) => String(value));
+      } else {
+        conditionList = Object.values(rawObject).map((value) => String(value));
+      }
+    }
+
+    if (conditionList.length === 0) {
+      counts.normal += 1;
+      return;
+    }
+
+    conditionList.forEach((condition) => {
+      const key = normalizeConditionKey(String(condition).trim());
+      counts[key] = (counts[key] || 0) + 1;
+    });
+  });
+
+  return counts;
+};
+
 export async function getRegionalAnalytics(region: string) {
   const centers = await prisma.center.findMany({
     where: { region },
@@ -168,6 +220,19 @@ export async function getRegionalAnalytics(region: string) {
           staff: true,
         },
       },
+    },
+  });
+
+  const regionConditions = await prisma.wellnessPlan.findMany({
+    where: {
+      user: {
+        center: {
+          region,
+        },
+      },
+    },
+    select: {
+      conditions: true,
     },
   });
 
@@ -195,6 +260,8 @@ export async function getRegionalAnalytics(region: string) {
     }
   );
 
+  const conditionCounts = countConditionRecords(regionConditions);
+
   return {
     region,
     totalCenters: centers.length,
@@ -204,6 +271,7 @@ export async function getRegionalAnalytics(region: string) {
       averageFeedback: totalStats.totalFeedback > 0 
         ? totalStats.sumFeedback / totalStats.totalFeedback 
         : 0,
+      conditionCounts,
     },
   };
 }

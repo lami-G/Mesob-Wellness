@@ -5,6 +5,7 @@ import { analyticsService } from '../services/analyticsService';
 import AdminLayout from '../layouts/AdminLayout';
 import Button from '../components/forms/Button';
 import Input from '../components/forms/Input';
+import CenterFormModal from '../components/admin/CenterFormModal';
 import HealthConditionTrendsPanel from '../components/analytics/HealthConditionTrendsPanel';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
@@ -921,6 +922,8 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
     capacity: '',
     phone: '',
     email: '',
+    managerEmail: '',
+    managerPassword: '',
     status: 'ACTIVE',
   });
 
@@ -992,6 +995,8 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
       capacity: '',
       phone: '',
       email: '',
+      managerEmail: '',
+      managerPassword: '',
       status: 'ACTIVE',
     });
     loadRegions(); // Load regions when opening modal
@@ -1009,6 +1014,8 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
       capacity: center.capacity || '',
       phone: center.phone || '',
       email: center.email || '',
+      managerEmail: '',
+      managerPassword: '',
       status: center.status || 'ACTIVE',
     });
     loadRegions(); // Load regions when opening modal
@@ -1086,6 +1093,8 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
       capacity: '',
       phone: '',
       email: '',
+      managerEmail: '',
+      managerPassword: '',
       status: 'ACTIVE',
     });
     setFormError('');
@@ -1308,143 +1317,21 @@ const CentersTab = ({ loading, centers, selectedCenter, onRefresh }) => {
         </div>
       )}
 
-      {/* Create/Edit Modal */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: '700px' }}>
-            <div className="modal-header">
-              <h3>{editingCenter ? '✏️ Edit Center' : '➕ Create New Center'}</h3>
-              <button onClick={handleCloseModal}>×</button>
-            </div>
-            <form onSubmit={handleSubmit}>
-              {formError && (
-                <div className="alert alert-error" style={{ marginBottom: '1rem' }}>
-                  {formError}
-                </div>
-              )}
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Center Name *"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  placeholder="Addis Ababa Main Center"
-                />
-                <Input
-                  label="Center Code *"
-                  value={formData.code}
-                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  required
-                  placeholder="AAC-001"
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className="form-group">
-                  <label>Region *</label>
-                  {loadingRegions ? (
-                    <div style={{ padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', color: '#6b7280' }}>
-                      Loading regions...
-                    </div>
-                  ) : (
-                    <select
-                      value={formData.region}
-                      onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                      className="form-input"
-                      required
-                      style={{
-                        padding: '0.75rem',
-                        border: '1px solid #d1d5db',
-                        borderRadius: '6px',
-                        fontSize: '0.875rem',
-                        backgroundColor: '#ffffff',
-                        color: '#374151',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <option value="">Select a region...</option>
-                      {availableRegions.map((region) => (
-                        <option key={region} value={region}>
-                          {region}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  {availableRegions.length === 0 && !loadingRegions && (
-                    <div style={{ fontSize: '0.75rem', color: '#ef4444', marginTop: '0.25rem' }}>
-                      No regions available. Please contact an admin to create regions first.
-                    </div>
-                  )}
-                </div>
-                <Input
-                  label="City *"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  required
-                  placeholder="Addis Ababa"
-                />
-              </div>
-
-              <Input
-                label="Address *"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                required
-                placeholder="Bole Road, Near Edna Mall"
-              />
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Daily Capacity"
-                  type="number"
-                  value={formData.capacity}
-                  onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                  placeholder="100"
-                />
-                <div className="form-group">
-                  <label>Status *</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="form-input"
-                    required
-                  >
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <Input
-                  label="Phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+251911234567"
-                />
-                <Input
-                  label="Email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="center@mesob.et"
-                />
-              </div>
-
-              <div className="modal-actions" style={{ marginTop: '1.5rem' }}>
-                <Button type="submit" disabled={saving}>
-                  {saving ? 'Saving…' : editingCenter ? '💾 Update Center' : '➕ Create Center'}
-                </Button>
-                <Button type="button" onClick={handleCloseModal}>
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <CenterFormModal
+        isOpen={showModal}
+        title={editingCenter ? "✏️ Edit Center" : "➕ Create New Center"}
+        submitLabel={editingCenter ? "💾 Update Center" : "➕ Create Center"}
+        formData={formData}
+        setFormData={setFormData}
+        formError={formError}
+        saving={saving}
+        availableRegions={availableRegions}
+        loadingRegions={loadingRegions}
+        statusOptions={["ACTIVE", "INACTIVE"]}
+        showManagerFields={!editingCenter}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

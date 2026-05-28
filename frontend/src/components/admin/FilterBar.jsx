@@ -1,5 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { adminService } from "../../services/adminService";
+
+const normalizeFilters = (filters = {}) => ({
+  region: filters.region || "",
+  center: filters.center || "",
+  search: filters.search || "",
+  dateFrom: filters.dateFrom || "",
+  dateTo: filters.dateTo || "",
+  role: filters.role || "",
+});
+
+const areFiltersEqual = (left = {}, right = {}) => {
+  const leftNormalized = normalizeFilters(left);
+  const rightNormalized = normalizeFilters(right);
+  return Object.keys(leftNormalized).every(
+    (key) => leftNormalized[key] === rightNormalized[key],
+  );
+};
 
 function FilterBar({
   onFilterChange,
@@ -10,14 +27,10 @@ function FilterBar({
   initialFilters = {},
 }) {
   const [filters, setFilters] = useState({
-    region: "",
-    center: "",
-    search: "",
-    dateFrom: "",
-    dateTo: "",
-    role: "",
-    ...initialFilters,
+    ...normalizeFilters(initialFilters),
   });
+
+  const lastInitialFilters = useRef(normalizeFilters(initialFilters));
 
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
@@ -39,10 +52,12 @@ function FilterBar({
   }, [filters.region]);
 
   useEffect(() => {
-    if (!initialFilters) return;
+    const nextFilters = normalizeFilters(initialFilters);
+    if (areFiltersEqual(lastInitialFilters.current, nextFilters)) return;
+    lastInitialFilters.current = nextFilters;
     setFilters((prev) => ({
       ...prev,
-      ...initialFilters,
+      ...nextFilters,
     }));
   }, [initialFilters]);
 

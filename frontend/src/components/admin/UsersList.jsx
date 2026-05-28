@@ -8,15 +8,34 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
 
   useEffect(() => {
-    fetchUsers();
+    setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
   }, [filters]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [filters, pagination.page, pagination.limit]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const result = await adminService.getUsers({ ...filters, page: pagination.page, limit: pagination.limit });
+      const result = await adminService.getUsers({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       setUsers(result.data || []);
-      setPagination(result.pagination || {});
+      const nextPagination = result.pagination || {};
+      setPagination((prev) => {
+        if (
+          prev.page === nextPagination.page &&
+          prev.limit === nextPagination.limit &&
+          prev.total === nextPagination.total &&
+          prev.pages === nextPagination.pages
+        ) {
+          return prev;
+        }
+        return { ...prev, ...nextPagination };
+      });
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load users");
@@ -27,7 +46,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
   };
 
   const handlePageChange = (newPage) => {
-    setPagination({ ...pagination, page: newPage });
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
 
   const handleDelete = async (userId) => {

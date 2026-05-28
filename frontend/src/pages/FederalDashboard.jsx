@@ -1,18 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 import AdminLayout from "../layouts/AdminLayout";
 import { regionalService } from "../services/regionalService";
 import { adminService } from "../services/adminService";
 import { analyticsService } from "../services/analyticsService";
-import UserManagement from "./admin/UserManagement";
 import CenterManagement from "./admin/CenterManagement";
 import AppointmentManagement from "./admin/AppointmentManagement";
 import FeedbackQuality from "./admin/FeedbackQuality";
@@ -30,6 +20,111 @@ import "../styles/admin-regions.css";
 import "../styles/admin-analytics.css";
 import "../styles/admin-modals.css";
 
+const FederalAnalyticsTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+
+  const conditionCounts = payload[0]?.payload?.conditionCounts || null;
+  const conditionLabels = {
+    hypertension: "Hypertension",
+    overweight: "Overweight",
+    obesity: "Obesity",
+    diabetes: "Diabetes",
+    heart_respiratory: "Heart / Resp.",
+    normal: "Normal",
+    other: "Other",
+  };
+
+  const conditionEntries = Object.keys(conditionLabels)
+    .map((key) => [key, conditionCounts?.[key] ?? 0])
+    .sort((a, b) => Number(b[1]) - Number(a[1]));
+
+  return (
+    <div
+      style={{
+        background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+        border: "1px solid rgba(0,0,0,0.15)",
+        borderRadius: "12px",
+        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+        color: "#1f2937",
+        padding: "0.75rem 1rem",
+        minWidth: "180px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "0.9rem",
+          fontWeight: 700,
+          color: "#111827",
+          marginBottom: "0.5rem",
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ display: "grid", gap: "0.35rem" }}>
+        {payload.map((item) => (
+          <div
+            key={item.dataKey}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.75rem",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              color: "#374151",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  borderRadius: "50%",
+                  background: item.color,
+                  boxShadow: `0 0 6px ${item.color}55`,
+                }}
+              />
+              {item.name}
+            </span>
+            <span style={{ fontWeight: 700, color: "#111827" }}>{item.value}</span>
+          </div>
+        ))}
+      </div>
+      {conditionEntries.length > 0 && (
+        <div
+          style={{
+            marginTop: "0.75rem",
+            paddingTop: "0.6rem",
+            borderTop: "1px solid rgba(0,0,0,0.08)",
+            display: "grid",
+            gap: "0.3rem",
+          }}
+        >
+          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6b7280" }}>
+            Conditions
+          </div>
+          {conditionEntries.map(([key, value]) => (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.75rem",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                color: "#374151",
+              }}
+            >
+              <span>{conditionLabels[key] || key}</span>
+              <span style={{ fontWeight: 700, color: "#111827" }}>{value}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 function FederalDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
@@ -44,6 +139,9 @@ function FederalDashboard() {
   const [regionError, setRegionError] = useState("");
   const [regionSuccess, setRegionSuccess] = useState("");
   const [creatingRegion, setCreatingRegion] = useState(false);
+  const [regionAccountEmail, setRegionAccountEmail] = useState("");
+  const [regionAccountPassword, setRegionAccountPassword] = useState("");
+  const [showRegionModal, setShowRegionModal] = useState(false);
   const [editingRegion, setEditingRegion] = useState(null);
   const [regionDraftName, setRegionDraftName] = useState("");
   const [regionDraftStatus, setRegionDraftStatus] = useState("ACTIVE");
@@ -128,11 +226,6 @@ function FederalDashboard() {
 
   const statusOptions = useMemo(() => {
     switch (activeTab) {
-      case "users":
-        return [
-          { value: "active", label: "Active" },
-          { value: "inactive", label: "Inactive" },
-        ];
       case "centers":
         return [
           { value: "ACTIVE", label: "Active" },
@@ -157,8 +250,6 @@ function FederalDashboard() {
 
   const statusLabel = useMemo(() => {
     switch (activeTab) {
-      case "users":
-        return "User Status";
       case "centers":
         return "Center Status";
       case "appointments":
@@ -221,10 +312,28 @@ function FederalDashboard() {
 
   const regionStats = (analytics?.regions || []).map((region) => ({
     name: region.region,
-    appointments: region.summary?.totalAppointments || 0,
-    completed: region.summary?.completedAppointments || 0,
-    vitals: region.summary?.totalVitals || 0,
+    totalPatients: region.summary?.totalStaff || 0,
+    averageFeedback: region.summary?.averageFeedback || 0,
+    conditionCounts: region.summary?.conditionCounts || null,
   }));
+
+  const centerNameLookup = useMemo(
+    () => new Map(allCenters.map((center) => [center.id, center.name])),
+    [allCenters],
+  );
+
+  const centerHealthStats = useMemo(() => {
+    const centersFromAnalytics = analytics?.regions?.flatMap((region) =>
+      (region.centers || []).map((center) => ({
+        centerId: center.centerId,
+        name: centerNameLookup.get(center.centerId) || center.centerId,
+        totalPatients: center.totalStaff || 0,
+        averageFeedback: center.averageFeedback || 0,
+      })),
+    );
+
+    return centersFromAnalytics || [];
+  }, [analytics, centerNameLookup]);
 
   const regionSummary =
     selectedRegion === "all"
@@ -295,11 +404,6 @@ function FederalDashboard() {
     return allCenters;
   }, [allCenters, globalFilters.region]);
 
-  const mapUserStatus = (status) => {
-    if (status === "active" || status === "inactive") return status;
-    return "";
-  };
-
   const mapCenterStatus = (status) => {
     if (!status) return "";
     if (status !== status.toUpperCase()) return "";
@@ -326,17 +430,6 @@ function FederalDashboard() {
     }
     return "";
   };
-
-  const userBaseFilters = useMemo(
-    () => ({
-      region: globalFilters.region === "all" ? "" : globalFilters.region,
-      center: globalFilters.center || "",
-      dateFrom: globalFilters.dateFrom || "",
-      dateTo: globalFilters.dateTo || "",
-      status: mapUserStatus(globalFilters.status),
-    }),
-    [globalFilters],
-  );
 
   const centerBaseFilters = useMemo(
     () => ({
@@ -516,80 +609,153 @@ function FederalDashboard() {
         <p style={{ color: "#6b7280", marginBottom: "1rem" }}>
           This creates a regional placeholder center to register the region.
         </p>
-        {regionError && (
-          <div
-            className="alert alert-error"
-            style={{ marginBottom: "0.75rem" }}
-          >
-            {regionError}
-          </div>
-        )}
-        {regionSuccess && (
-          <div className="success-message" style={{ marginBottom: "0.75rem" }}>
-            {regionSuccess}
-          </div>
-        )}
-        <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Region name (e.g., Oromia)"
-            value={newRegion}
-            onChange={(e) => {
-              setNewRegion(e.target.value);
-              setRegionError("");
-              setRegionSuccess("");
-            }}
-            style={{ minWidth: "240px" }}
-          />
-          <button
-            className="btn btn-primary"
-            onClick={async () => {
-              const trimmed = newRegion.trim();
-              if (!trimmed) {
-                setRegionError("Please enter a region name.");
-                return;
-              }
-              if (regions.includes(trimmed)) {
-                setRegionError("This region already exists.");
-                return;
-              }
-              try {
-                setCreatingRegion(true);
-                setRegionError("");
-                setRegionSuccess("");
-
-                const codePrefix =
-                  trimmed
-                    .replace(/[^A-Za-z]/g, "")
-                    .toUpperCase()
-                    .slice(0, 3) || "REG";
-                await regionalService.createCenter({
-                  name: `${trimmed} Regional Center`,
-                  code: `${codePrefix}-001`,
-                  region: trimmed,
-                  city: trimmed,
-                  address: "To be updated",
-                  status: "ACTIVE",
-                });
-
-                setRegionSuccess(`Region "${trimmed}" created successfully.`);
-                setNewRegion("");
-                await loadFederalData();
-              } catch (err) {
-                const message =
-                  err.response?.data?.message || "Failed to create region.";
-                setRegionError(message);
-              } finally {
-                setCreatingRegion(false);
-              }
-            }}
-            disabled={creatingRegion}
-          >
-            {creatingRegion ? "Creating..." : "Create Region"}
-          </button>
-        </div>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowRegionModal(true)}
+        >
+          + Create Region
+        </button>
       </div>
+
+      {showRegionModal && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: "640px" }}>
+            <div className="modal-header">
+              <h3>Create New Region</h3>
+              <button
+                onClick={() => {
+                  setShowRegionModal(false);
+                  setNewRegion("");
+                  setRegionAccountEmail("");
+                  setRegionAccountPassword("");
+                  setRegionError("");
+                  setRegionSuccess("");
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div>
+              {regionError && (
+                <div
+                  className="alert alert-error"
+                  style={{ marginBottom: "0.75rem" }}
+                >
+                  {regionError}
+                </div>
+              )}
+              {regionSuccess && (
+                <div
+                  className="success-message"
+                  style={{ marginBottom: "0.75rem" }}
+                >
+                  {regionSuccess}
+                </div>
+              )}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "1rem",
+                }}
+              >
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Region name (e.g., Oromia)"
+                  value={newRegion}
+                  onChange={(e) => {
+                    setNewRegion(e.target.value);
+                    setRegionError("");
+                    setRegionSuccess("");
+                  }}
+                />
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="Regional office email"
+                  value={regionAccountEmail}
+                  onChange={(e) => setRegionAccountEmail(e.target.value)}
+                />
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="Regional office password"
+                  value={regionAccountPassword}
+                  onChange={(e) => setRegionAccountPassword(e.target.value)}
+                />
+              </div>
+              <div className="modal-actions" style={{ marginTop: "1.5rem" }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    const trimmed = newRegion.trim();
+                    if (!trimmed) {
+                      setRegionError("Please enter a region name.");
+                      return;
+                    }
+                    if (regions.includes(trimmed)) {
+                      setRegionError("This region already exists.");
+                      return;
+                    }
+                    try {
+                      setCreatingRegion(true);
+                      setRegionError("");
+                      setRegionSuccess("");
+
+                      const codePrefix =
+                        trimmed
+                          .replace(/[^A-Za-z]/g, "")
+                          .toUpperCase()
+                          .slice(0, 3) || "REG";
+                      await regionalService.createCenter({
+                        name: `${trimmed} Regional Center`,
+                        code: `${codePrefix}-001`,
+                        region: trimmed,
+                        city: trimmed,
+                        address: "To be updated",
+                        status: "ACTIVE",
+                      });
+
+                      setRegionSuccess(
+                        `Region "${trimmed}" created successfully.`,
+                      );
+                      setNewRegion("");
+                      setRegionAccountEmail("");
+                      setRegionAccountPassword("");
+                      setShowRegionModal(false);
+                      await loadFederalData();
+                    } catch (err) {
+                      const message =
+                        err.response?.data?.message ||
+                        "Failed to create region.";
+                      setRegionError(message);
+                    } finally {
+                      setCreatingRegion(false);
+                    }
+                  }}
+                  disabled={creatingRegion}
+                >
+                  {creatingRegion ? "Creating..." : "Create Region"}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setShowRegionModal(false);
+                    setNewRegion("");
+                    setRegionAccountEmail("");
+                    setRegionAccountPassword("");
+                    setRegionError("");
+                    setRegionSuccess("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {regionSummary && (
         <div
@@ -936,163 +1102,12 @@ function FederalDashboard() {
     </div>
   );
 
-  const renderAnalytics = () => (
-    <div className="dashboard-section">
-      <h3 style={{ marginBottom: "1rem" }}>Regional Performance</h3>
-      {loading ? (
-        <div className="metrics-loading">Loading analytics...</div>
-      ) : regionStats.length === 0 ? (
-        <div className="metrics-empty">No analytics data available.</div>
-      ) : (
-        <div className="card" style={{ padding: "1.5rem" }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={regionStats}
-              margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="name" stroke="#6B7280" />
-              <YAxis stroke="#6B7280" />
-              <Tooltip />
-              <Bar
-                dataKey="appointments"
-                name="Appointments"
-                fill="#2563eb"
-                radius={[6, 6, 0, 0]}
-              />
-              <Bar
-                dataKey="completed"
-                name="Completed"
-                fill="#10b981"
-                radius={[6, 6, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>Center Comparison</h3>
-        {loading ? (
-          <div className="metrics-loading">Loading centers...</div>
-        ) : centers.length === 0 ? (
-          <div className="metrics-empty">No centers available.</div>
-        ) : (
-          <div className="card" style={{ padding: "1.5rem" }}>
-            <ResponsiveContainer width="100%" height={320}>
-              <BarChart
-                data={[...centers]
-                  .map((center) => ({
-                    name: center.name,
-                    staff: center._count?.staff || 0,
-                    capacity: center.capacity || 0,
-                  }))
-                  .sort((a, b) => b.staff - a.staff)
-                  .slice(0, 10)}
-                layout="vertical"
-                margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#E5E7EB"
-                  horizontal={false}
-                />
-                <XAxis type="number" stroke="#6B7280" />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={160}
-                  stroke="#6B7280"
-                />
-                <Tooltip />
-                <Bar
-                  dataKey="staff"
-                  name="Staff"
-                  fill="#2563eb"
-                  radius={[0, 6, 6, 0]}
-                />
-                <Bar
-                  dataKey="capacity"
-                  name="Capacity"
-                  fill="#10b981"
-                  radius={[0, 6, 6, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>Trend Performance</h3>
-        {loading ? (
-          <div className="metrics-loading">Loading trends...</div>
-        ) : !trendsData || timePeriod === "all" ? (
-          <div className="metrics-empty">
-            No trends available for this period.
-          </div>
-        ) : !Array.isArray(trendsData?.[timePeriod]) ||
-          trendsData[timePeriod].length === 0 ? (
-          <div className="metrics-empty">No trend data returned.</div>
-        ) : (
-          <div className="card" style={{ padding: "1.5rem" }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={trendsData[timePeriod]}
-                margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis dataKey="label" stroke="#6B7280" />
-                <YAxis stroke="#6B7280" />
-                <Tooltip />
-                <Bar
-                  dataKey="appointments"
-                  name="Appointments"
-                  fill="#2563eb"
-                  radius={[6, 6, 0, 0]}
-                />
-                <Bar
-                  dataKey="completed"
-                  name="Completed"
-                  fill="#10b981"
-                  radius={[6, 6, 0, 0]}
-                />
-                <Bar
-                  dataKey="noShow"
-                  name="No Show"
-                  fill="#f59e0b"
-                  radius={[6, 6, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
         return renderOverview();
       case "regions":
         return renderRegions();
-      case "analytics":
-        return renderAnalytics();
-      case "users":
-        return (
-          <UserManagement
-            baseFilters={userBaseFilters}
-            allowedRoles={[
-              "STAFF",
-              "NURSE_OFFICER",
-              "MANAGER",
-              "REGIONAL_OFFICE",
-              "FEDERAL_OFFICE",
-            ]}
-            disallowEditRoles={["SYSTEM_ADMIN"]}
-          />
-        );
       case "centers":
         return (
           <CenterManagement

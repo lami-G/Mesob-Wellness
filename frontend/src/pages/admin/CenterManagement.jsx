@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from "react";
 import FilterBar from "../../components/admin/FilterBar";
 import CentersList from "../../components/admin/CentersList";
-import AddCenterModal from "../../components/admin/AddCenterModal";
-import EditCenterModal from "../../components/admin/EditCenterModal";
+import CenterFormModal from "../../components/admin/CenterFormModal";
 import { adminService } from "../../services/adminService";
 
 function CenterManagement({ baseFilters = {}, allowDelete = true }) {
   const [filters, setFilters] = useState({ ...baseFilters });
   const [selectedCenter, setSelectedCenter] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [regions, setRegions] = useState([]);
+  const [loadingRegions, setLoadingRegions] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    code: "",
+    region: "",
+    city: "",
+    address: "",
+    capacity: "",
+    phone: "",
+    email: "",
+    managerEmail: "",
+    managerPassword: "",
+    status: "ACTIVE",
+  });
 
   useEffect(() => {
     loadRegions();
@@ -19,10 +33,13 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
 
   const loadRegions = async () => {
     try {
+      setLoadingRegions(true);
       const data = await adminService.getRegions();
       setRegions(data || []);
     } catch (err) {
       console.error("Error loading regions:", err);
+    } finally {
+      setLoadingRegions(false);
     }
   };
 
@@ -34,9 +51,47 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     setFilters({ ...baseFilters, ...newFilters });
   };
 
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      code: "",
+      region: "",
+      city: "",
+      address: "",
+      capacity: "",
+      phone: "",
+      email: "",
+      managerEmail: "",
+      managerPassword: "",
+      status: "ACTIVE",
+    });
+    setFormError("");
+  };
+
+  const handleCreate = () => {
+    setSelectedCenter(null);
+    resetForm();
+    loadRegions();
+    setShowModal(true);
+  };
+
   const handleEdit = (center) => {
     setSelectedCenter(center);
-    setShowEditModal(true);
+    setFormData({
+      name: center.name || "",
+      code: center.code || "",
+      region: center.region || "",
+      city: center.city || "",
+      address: center.address || "",
+      capacity: center.capacity || "",
+      phone: center.phone || "",
+      email: center.email || "",
+      managerEmail: "",
+      managerPassword: "",
+      status: center.status || "ACTIVE",
+    });
+    loadRegions();
+    setShowModal(true);
   };
 
   const handleDelete = async (centerId) => {
@@ -54,20 +109,66 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     }
   };
 
-  const handleAddSuccess = () => {
-    setRefreshKey((prev) => prev + 1);
-    loadRegions();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormError("");
+
+    if (
+      !formData.name ||
+      !formData.code ||
+      !formData.region ||
+      !formData.city ||
+      !formData.address
+    ) {
+      setFormError("Name, code, region, city, and address are required.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const centerPayload = {
+        name: formData.name,
+        code: formData.code,
+        region: formData.region,
+        city: formData.city,
+        address: formData.address,
+        phone: formData.phone || undefined,
+        email: formData.email || undefined,
+        capacity: formData.capacity ? parseInt(formData.capacity, 10) : undefined,
+        status: formData.status,
+      };
+
+      if (selectedCenter) {
+        await adminService.updateCenter(selectedCenter.id, centerPayload);
+      } else {
+        await adminService.createCenter(centerPayload);
+      }
+
+      setShowModal(false);
+      resetForm();
+      setRefreshKey((prev) => prev + 1);
+      loadRegions();
+    } catch (err) {
+      setFormError(
+        err?.response?.data?.message || "Failed to save center.",
+      );
+      console.error("Center save error:", err);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleEditSuccess = () => {
-    setRefreshKey((prev) => prev + 1);
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedCenter(null);
+    resetForm();
   };
 
   return (
     <div className="management-section">
       <div className="section-header">
         <h2>🏥 Center Management</h2>
-        <button className="btn-primary" onClick={() => setShowAddModal(true)}>
+        <button className="btn-primary" onClick={handleCreate}>
           + Add Center
         </button>
       </div>
@@ -87,19 +188,20 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
         allowDelete={allowDelete}
       />
 
-      <AddCenterModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSuccess={handleAddSuccess}
-        regions={regions}
-      />
-
-      <EditCenterModal
-        isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)}
-        center={selectedCenter}
-        onSuccess={handleEditSuccess}
-        regions={regions}
+      <CenterFormModal
+        isOpen={showModal}
+        title={selectedCenter ? "✏️ Edit Center" : "➕ Create New Center"}
+        submitLabel={selectedCenter ? "💾 Update Center" : "➕ Create Center"}
+        formData={formData}
+        setFormData={setFormData}
+        formError={formError}
+        saving={saving}
+        availableRegions={regions}
+        loadingRegions={loadingRegions}
+        statusOptions={["ACTIVE", "INACTIVE", "MAINTENANCE"]}
+        showManagerFields={!selectedCenter}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
       />
     </div>
   );
