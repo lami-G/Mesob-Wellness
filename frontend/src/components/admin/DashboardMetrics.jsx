@@ -422,13 +422,13 @@ function DashboardMetrics({
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
-            <button
+            {/* <button
               onClick={fetchMetrics}
               className="refresh-btn"
               title="Refresh metrics"
             >
               🔄
-            </button>
+            </button> */}
             <span className="last-updated">Updated: {formatLastUpdated()}</span>
           </div>
         </div>

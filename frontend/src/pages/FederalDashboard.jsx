@@ -7,6 +7,7 @@ import CenterManagement from "./admin/CenterManagement";
 import AppointmentManagement from "./admin/AppointmentManagement";
 import FeedbackQuality from "./admin/FeedbackQuality";
 import AuditLogs from "./admin/AuditLogs";
+import AdminUsers from "./admin/AdminUsers";
 import DashboardMetrics from "../components/admin/DashboardMetrics";
 import HealthConditionTrendsPanel from "../components/analytics/HealthConditionTrendsPanel";
 import RegionEditModal from "../components/admin/RegionEditModal";
@@ -522,77 +523,9 @@ function FederalDashboard() {
 
   const renderOverview = () => (
     <div className="dashboard-section">
-      <div className="metrics-header" style={{ marginBottom: "1.5rem" }}>
-        <div className="metrics-title">
-          <h3>Federal Overview</h3>
-          <p className="metrics-subtitle">Nationwide performance snapshot</p>
-        </div>
-        <div className="metrics-controls">
-          <div
-            className="time-period-select"
-            style={{ padding: "0.4rem 0.75rem" }}
-          >
-            {globalFilters.region === "all" || !globalFilters.region
-              ? "Nationwide"
-              : globalFilters.region}
-          </div>
-          <button onClick={loadFederalData} className="refresh-btn">
-            🔄
-          </button>
-        </div>
-      </div>
-
       {loading ? (
         <div className="metrics-loading">Loading federal overview...</div>
-      ) : (
-        <div className="metrics-grid">
-          <div className="metric-card appointments-card">
-            <div className="metric-header">
-              <h3>Regions</h3>
-            </div>
-            <div className="metric-body">
-              <span className="metric-value">
-                {analytics?.totalRegions || regions.length}
-              </span>
-              <span className="metric-label">Total Regions</span>
-            </div>
-          </div>
-
-          <div className="metric-card walkin-card">
-            <div className="metric-header">
-              <h3>Centers</h3>
-            </div>
-            <div className="metric-body">
-              <span className="metric-value">
-                {analytics?.totalCenters || centers.length}
-              </span>
-              <span className="metric-label">Active Centers</span>
-            </div>
-          </div>
-
-          <div className="metric-card feedback-card">
-            <div className="metric-header">
-              <h3>Appointments</h3>
-            </div>
-            <div className="metric-body">
-              <span className="metric-value">
-                {summary.totalAppointments || 0}
-              </span>
-              <span className="metric-label">Total Bookings</span>
-            </div>
-          </div>
-
-          <div className="metric-card patients-served-card">
-            <div className="metric-header">
-              <h3>Completion</h3>
-            </div>
-            <div className="metric-body">
-              <span className="metric-value">{completionRate}%</span>
-              <span className="metric-label">Completion Rate</span>
-            </div>
-          </div>
-        </div>
-      )}
+      ) : null}
 
       <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
         <h3 style={{ marginBottom: "1rem" }}>System KPIs</h3>
@@ -1172,6 +1105,8 @@ function FederalDashboard() {
             allowDelete={true}
           />
         );
+      case "admin-users":
+        return <AdminUsers />;
       case "appointments":
         return <AppointmentManagement baseFilters={appointmentBaseFilters} />;
       case "feedback":
@@ -1190,7 +1125,9 @@ function FederalDashboard() {
       dashboardType="federal"
       error={error}
     >
-      <div className="card" style={{ padding: "1rem", marginBottom: "1rem" }}>
+      {/* Show filters for overview, feedback and audit tabs */}
+      {(activeTab === "overview" || activeTab === "feedback" || activeTab === "audit") && (
+        <div className="card" style={{ padding: "1rem", marginBottom: "1rem" }}>
         <div
           style={{
             display: "flex",
@@ -1284,17 +1221,6 @@ function FederalDashboard() {
               <option value="monthly">Monthly</option>
             </select>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <button
-              onClick={loadFederalData}
-              className="refresh-btn"
-              title="Refresh metrics"
-              disabled={loading}
-            >
-              🔄
-            </button>
-            <span className="last-updated">Updated: {formatLastUpdated()}</span>
-          </div>
           {statusOptions.length > 0 && (
             <div style={{ minWidth: "200px" }}>
               <label
@@ -1327,25 +1253,9 @@ function FederalDashboard() {
               </select>
             </div>
           )}
-          <div>
-            <button
-              className="btn btn-reset"
-              onClick={() => {
-                setTimePeriod("daily");
-                setGlobalFilters({
-                  region: "all",
-                  center: "",
-                  dateFrom: "",
-                  dateTo: "",
-                  status: "",
-                });
-              }}
-            >
-              Reset
-            </button>
-          </div>
         </div>
       </div>
+      )}
       {renderContent()}
       
       <RegionEditModal
