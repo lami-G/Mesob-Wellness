@@ -39,9 +39,6 @@ function FederalSidebar({ activeTab, onTabChange, isOpen }) {
       {/* Version Footer */}
       <div className="sidebar-footer">
         <p className="version">v1.0.0</p>
-        <button className="sidebar-logout-btn" title="Logout">
-          <span>🚪</span>
-        </button>
       </div>
     </aside>
   );

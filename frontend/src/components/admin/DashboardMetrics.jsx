@@ -39,6 +39,7 @@ function DashboardMetrics({
   timePeriod: externalTimePeriod,
   onTimePeriodChange,
   showControls = true,
+  selectedCenter: externalSelectedCenter,
 }) {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,11 +50,11 @@ function DashboardMetrics({
   const [, setVitalsTrends] = useState(null);
   const [, setCenterData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(false);
-  const [selectedCenter, setSelectedCenter] = useState("all");
   const [selectedCondition, setSelectedCondition] = useState("all");
   const [centers, setCenters] = useState([]);
 
   const effectivePeriod = externalTimePeriod || timePeriod;
+  const effectiveCenter = externalSelectedCenter !== undefined ? externalSelectedCenter : "all";
 
   useEffect(() => {
     if (externalTimePeriod) setTimePeriod(externalTimePeriod);
@@ -67,7 +68,7 @@ function DashboardMetrics({
     return () => clearInterval(interval);
   }, [effectivePeriod]);
 
-  useEffect(() => { fetchHealthData(); }, [effectivePeriod, selectedCenter, selectedCondition]);
+  useEffect(() => { fetchHealthData(); }, [effectivePeriod, effectiveCenter, selectedCondition]);
 
   const fetchMetrics = async () => {
     try {
@@ -104,7 +105,7 @@ function DashboardMetrics({
         endDate = new Date(Date.UTC(y, m, d, 23, 59, 59));
       }
       const params = effectivePeriod === "all" ? {} : { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
-      if (selectedCenter !== "all") params.center = selectedCenter;
+      if (effectiveCenter !== "all") params.center = effectiveCenter;
       if (selectedCondition !== "all") params.condition = selectedCondition;
       const response = await api.get("/api/v1/conditions/period", { params });
       const conditions = response.data.data || [];
@@ -302,13 +303,6 @@ function DashboardMetrics({
         <div className="health-analytics-section">
           <h3>🏥 Workplace Health Analytics</h3>
           <div className="health-filters">
-            <div className="filter-group">
-              <label>Center / Department</label>
-              <select value={selectedCenter} onChange={(e) => setSelectedCenter(e.target.value)}>
-                <option value="all">All Centers</option>
-                {centers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            </div>
             <div className="filter-group">
               <label>Condition type</label>
               <select value={selectedCondition} onChange={(e) => setSelectedCondition(e.target.value)}>

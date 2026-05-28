@@ -201,7 +201,7 @@
 .metric-value {
   font-size: 2rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #ffffff !important;
   line-height: 1;
   margin-bottom: auto;
 }
@@ -247,8 +247,7 @@
 }
 
 .health-filters {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 1.25rem;
@@ -256,7 +255,7 @@
   border-radius: 10px;
 }
 
-.filter-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.filter-group { display: flex; flex-direction: column; gap: 0.4rem; max-width: 250px; }
 .filter-group label { font-size: 0.8rem; font-weight: 600; color: #1a2b5e; }
 .filter-group select {
   padding: 0.5rem 0.75rem;
@@ -282,8 +281,8 @@
 
 .health-score-card h4 { margin: 0 0 1rem 0; font-size: 0.9rem; font-weight: 600; color: #f5a623; }
 .score-display { display: flex; align-items: baseline; gap: 0.5rem; }
-.score-value { font-size: 2.5rem; font-weight: 700; color: #ffffff; }
-.score-label { font-size: 1rem; color: rgba(255,255,255,0.7); }
+.score-value { font-size: 2.5rem; font-weight: 700; color: #ffffff !important; }
+.score-label { font-size: 1rem; color: rgba(255,255,255,0.7) !important; }
 
 .health-stats-expanded-grid {
   display: grid;

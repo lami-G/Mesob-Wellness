@@ -203,7 +203,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .version {
@@ -212,23 +212,7 @@
   margin: 0;
 }
 
-.sidebar-logout-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 1.125rem;
-  cursor: pointer;
-  padding: 0.25rem;
-  transition: all 0.2s ease;
-}
-
-.sidebar-logout-btn:hover {
-  color: #f5a623;
-}
-
 .admin-sidebar.closed .sidebar-footer {
-  flex-direction: column;
-  gap: 0.5rem;
   padding: 1rem 0.5rem;
 }
 

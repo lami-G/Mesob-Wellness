@@ -533,6 +533,7 @@ function FederalDashboard() {
           onTabChange={setActiveTab}
           timePeriod={timePeriod}
           showControls={false}
+          selectedCenter={globalFilters.center || "all"}
         />
       </div>
 
