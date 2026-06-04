@@ -879,6 +879,11 @@ export const upsertRegionAdmin = async (
       }
     }
 
+    // Check if a user with this email already exists (for creating/updating)
+    const existingUserByEmail = await prisma.user.findUnique({
+      where: { email },
+    });
+
     // If password provided, create or update the user
     if (password) {
       const bcrypt = await import("bcryptjs");
@@ -893,10 +898,21 @@ export const upsertRegionAdmin = async (
             password: hashedPassword,
           },
         });
+      } else if (existingUserByEmail) {
+        // Email exists but not linked to this region - use existing user
+        // Update password and ensure correct role
+        await prisma.user.update({
+          where: { email },
+          data: {
+            password: hashedPassword,
+            role: "REGIONAL_OFFICE" as any,
+            isActive: true,
+            isVerified: true,
+          },
+        });
+        adminId = existingUserByEmail.id;
       } else {
         // Create new admin user
-        const { generateNextDisplayId } =
-          await import("../utils/sequentialId.js");
         const displayId = await generateNextDisplayId();
 
         const admin = await prisma.user.create({
@@ -914,11 +930,37 @@ export const upsertRegionAdmin = async (
         adminId = admin.id;
       }
     } else if (adminId) {
-      // Update email only
+      // Update email only if admin exists
+      // Check if new email is already in use by another user
+      if (existingUserByEmail && existingUserByEmail.id !== adminId) {
+        res.status(400).json({
+          status: "error",
+          message: "Email is already in use by another user",
+        });
+        return;
+      }
       await prisma.user.update({
         where: { id: adminId },
         data: { email },
       });
+    } else if (existingUserByEmail) {
+      // Email exists but no password provided - link existing user to region
+      await prisma.user.update({
+        where: { email },
+        data: {
+          role: "REGIONAL_OFFICE" as any,
+          isActive: true,
+          isVerified: true,
+        },
+      });
+      adminId = existingUserByEmail.id;
+    } else if (!password && !adminId) {
+      // Cannot create admin without password
+      res.status(400).json({
+        status: "error",
+        message: "Password is required when creating a new region admin",
+      });
+      return;
     }
 
     // Upsert region admin record
@@ -926,11 +968,11 @@ export const upsertRegionAdmin = async (
       where: { region: regionStr },
       create: {
         region: regionStr,
-        adminId,
+        adminId: adminId || null,
         email,
       },
       update: {
-        adminId,
+        adminId: adminId || null,
         email,
       },
     });
@@ -942,9 +984,14 @@ export const upsertRegionAdmin = async (
     });
   } catch (error: any) {
     console.error("Upsert region admin error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      code: error.code,
+    });
     res.status(500).json({
       status: "error",
-      message: "Failed to update region admin",
+      message: error.message || "Failed to update region admin",
     });
   }
 };

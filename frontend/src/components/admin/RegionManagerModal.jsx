@@ -51,7 +51,8 @@ function RegionManagerModal({ isOpen, onClose, region, onSave }) {
         onClose();
       }, 1500);
     } catch (err) {
-      setError(err.message || "Failed to update region manager");
+      const errorMsg = err.response?.data?.message || err.message || "Failed to update region manager";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
