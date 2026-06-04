@@ -17,7 +17,11 @@ import {
  * @param startDate Start date for calculation
  * @param endDate End date for calculation
  */
-async function calculateQueueMetrics(startDate: Date, endDate: Date) {
+async function calculateQueueMetrics(
+  startDate: Date,
+  endDate: Date,
+  userWhere?: any,
+) {
   try {
     const appointmentStatuses: AppointmentStatus[] = [
       AppointmentStatus.WAITING,
@@ -34,6 +38,7 @@ async function calculateQueueMetrics(startDate: Date, endDate: Date) {
       where: {
         scheduledAt: { gte: startDate, lte: endDate },
         status: { in: appointmentStatuses },
+        ...(userWhere ? { user: userWhere } : {}),
       },
       select: { userId: true, status: true, scheduledAt: true },
     });
@@ -56,6 +61,7 @@ async function calculateQueueMetrics(startDate: Date, endDate: Date) {
     const wellnessPlans = await prisma.wellnessPlan.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
+        ...(userWhere ? { user: userWhere } : {}),
       },
       select: { userId: true, createdAt: true },
     });
@@ -139,8 +145,26 @@ const AdminService = {
   /**
    * Get system-wide dashboard metrics
    */
-  async getDashboardMetrics(timePeriod?: string): Promise<DashboardMetrics> {
+  async getDashboardMetrics(
+    timePeriod?: string,
+    filters?: { region?: string; center?: string },
+  ): Promise<DashboardMetrics> {
     try {
+      const regionFilter = filters?.region;
+      const centerFilter = filters?.center;
+      const centerWhere: any = {};
+      if (regionFilter) centerWhere.region = regionFilter;
+      if (centerFilter) centerWhere.id = centerFilter;
+
+      const userWhere: any = {};
+      if (centerFilter) userWhere.centerId = centerFilter;
+      if (regionFilter) userWhere.center = { region: regionFilter };
+      const hasUserFilter = Object.keys(userWhere).length > 0;
+
+      const baseUserWhere = hasUserFilter ? userWhere : {};
+      const baseCenterWhere = Object.keys(centerWhere).length > 0 ? centerWhere : undefined;
+      const baseCenterWhereSpread = baseCenterWhere || {};
+
       // Calculate date range based on time period
       const now = new Date();
       let dateFrom: Date | undefined;
@@ -156,17 +180,18 @@ const AdminService = {
       // Get user stats (not filtered by date)
       const users = await prisma.user.groupBy({
         by: ["role"],
+        where: baseUserWhere,
         _count: true,
       });
 
       const userStats = {
-        total: await prisma.user.count(),
-        active: await prisma.user.count({ where: { isActive: true } }),
-        inactive: await prisma.user.count({ where: { isActive: false } }),
-        verified: await prisma.user.count({ where: { isVerified: true } }),
-        unverified: await prisma.user.count({ where: { isVerified: false } }),
-        externalPatients: await prisma.user.count({ where: { role: "EXTERNAL_PATIENT" } }),
-        staff: await prisma.user.count({ where: { role: "STAFF" } }),
+        total: await prisma.user.count({ where: baseUserWhere }),
+        active: await prisma.user.count({ where: { ...baseUserWhere, isActive: true } }),
+        inactive: await prisma.user.count({ where: { ...baseUserWhere, isActive: false } }),
+        verified: await prisma.user.count({ where: { ...baseUserWhere, isVerified: true } }),
+        unverified: await prisma.user.count({ where: { ...baseUserWhere, isVerified: false } }),
+        externalPatients: await prisma.user.count({ where: { ...baseUserWhere, role: "EXTERNAL_PATIENT" } }),
+        staff: await prisma.user.count({ where: { ...baseUserWhere, role: "STAFF" } }),
         byRole: users.reduce((acc: any, u: any) => {
           acc[u.role] = u._count;
           return acc;
@@ -177,14 +202,15 @@ const AdminService = {
       // Get center stats (not filtered by date)
       const centers = await prisma.center.groupBy({
         by: ["region"],
+        where: baseCenterWhere,
         _count: true,
       });
 
       const centerStats = {
-        total: await prisma.center.count(),
-        active: await prisma.center.count({ where: { status: "ACTIVE" } }),
-        inactive: await prisma.center.count({ where: { status: "INACTIVE" } }),
-        maintenance: await prisma.center.count({ where: { status: "MAINTENANCE" } }),
+        total: await prisma.center.count({ where: baseCenterWhere }),
+        active: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "ACTIVE" } }),
+        inactive: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "INACTIVE" } }),
+        maintenance: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "MAINTENANCE" } }),
         byRegion: centers.reduce((acc: any, c: any) => {
           acc[c.region] = c._count;
           return acc;
@@ -192,9 +218,10 @@ const AdminService = {
       };
 
       // Get appointment stats with date filter
-      const appointmentWhere: any = dateFrom ? { 
-        scheduledAt: { gte: dateFrom } 
+      const appointmentWhere: any = dateFrom ? {
+        scheduledAt: { gte: dateFrom },
       } : {};
+      if (hasUserFilter) appointmentWhere.user = userWhere;
 
       const appointments = await prisma.appointment.groupBy({
         by: ["status"],
@@ -218,9 +245,10 @@ const AdminService = {
       };
 
       // Get vital stats with date filter
-      const vitalWhere: any = dateFrom ? { 
-        recordedAt: { gte: dateFrom } 
+      const vitalWhere: any = dateFrom ? {
+        recordedAt: { gte: dateFrom },
       } : {};
+      if (hasUserFilter) vitalWhere.user = userWhere;
 
       const vitals = await prisma.vitalRecord.findMany({
         where: vitalWhere,
@@ -260,9 +288,10 @@ const AdminService = {
       };
 
       // Get feedback stats with date filter
-      const feedbackWhere: any = dateFrom ? { 
-        createdAt: { gte: dateFrom } 
+      const feedbackWhere: any = dateFrom ? {
+        createdAt: { gte: dateFrom },
       } : {};
+      if (hasUserFilter) feedbackWhere.user = userWhere;
 
       const feedback = await prisma.feedback.findMany({
         where: feedbackWhere,
@@ -290,6 +319,7 @@ const AdminService = {
       const regions = await prisma.center.findMany({
         select: { region: true },
         distinct: ["region"],
+        where: baseCenterWhere,
       });
 
       const regionStats = {
@@ -301,6 +331,7 @@ const AdminService = {
       const patientStats = {
         total: await prisma.user.count({
           where: {
+            ...baseUserWhere,
             role: { in: ["STAFF", "EXTERNAL_PATIENT"] },
           },
         }),
@@ -332,7 +363,11 @@ const AdminService = {
         queueEndDate = new Date(now);
       }
 
-      const queueMetrics = await calculateQueueMetrics(queueStartDate, queueEndDate);
+      const queueMetrics = await calculateQueueMetrics(
+        queueStartDate,
+        queueEndDate,
+        hasUserFilter ? userWhere : undefined,
+      );
 
       const walkInStats = { total: queueMetrics.walkIns };
       const patientsServedStats = { total: queueMetrics.patientsServed };
@@ -342,9 +377,10 @@ const AdminService = {
       appointmentStats.completed = queueMetrics.completedAppointments;
 
       // Get wellness plans stats with date filter
-      const wellnessWhere: any = dateFrom ? { 
-        createdAt: { gte: dateFrom } 
+      const wellnessWhere: any = dateFrom ? {
+        createdAt: { gte: dateFrom },
       } : {};
+      if (hasUserFilter) wellnessWhere.user = userWhere;
 
       const wellnessStats = {
         total: await prisma.wellnessPlan.count({ where: wellnessWhere }),

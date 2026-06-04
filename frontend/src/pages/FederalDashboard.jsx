@@ -272,6 +272,28 @@ function FederalDashboard() {
     setSelectedRegion(globalFilters.region || "all");
   }, [globalFilters.region]);
 
+  const availableCenters = useMemo(() => {
+    if (globalFilters.region && globalFilters.region !== "all") {
+      if (centers.length > 0) {
+        return centers;
+      }
+      return allCenters.filter(
+        (center) => center.region === globalFilters.region,
+      );
+    }
+    return allCenters;
+  }, [allCenters, centers, globalFilters.region]);
+
+  useEffect(() => {
+    if (!globalFilters.center) return;
+    const centerExists = availableCenters.some(
+      (center) => center.id === globalFilters.center,
+    );
+    if (!centerExists) {
+      setGlobalFilters((prev) => ({ ...prev, center: "" }));
+    }
+  }, [availableCenters, globalFilters.center]);
+
   const statusOptions = useMemo(() => {
     switch (activeTab) {
       case "centers":
@@ -443,15 +465,6 @@ function FederalDashboard() {
     regionStatusFilter === "all" ? true : row.status === regionStatusFilter,
   );
 
-  const availableCenters = useMemo(() => {
-    if (globalFilters.region && globalFilters.region !== "all") {
-      return allCenters.filter(
-        (center) => center.region === globalFilters.region,
-      );
-    }
-    return allCenters;
-  }, [allCenters, globalFilters.region]);
-
   const mapCenterStatus = (status) => {
     if (!status) return "";
     if (status !== status.toUpperCase()) return "";
@@ -534,16 +547,10 @@ function FederalDashboard() {
           timePeriod={timePeriod}
           showControls={false}
           selectedCenter={globalFilters.center || "all"}
+          selectedRegion={globalFilters.region || "all"}
         />
       </div>
 
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>Health Condition Trends</h3>
-        <HealthConditionTrendsPanel
-          viewPeriod={timePeriod}
-          showPeriodSwitcher={false}
-        />
-      </div>
     </div>
   );
 

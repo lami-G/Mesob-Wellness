@@ -173,7 +173,12 @@ export const getDashboardMetrics = async (
     }
 
     const timePeriod = req.query.timePeriod as string | undefined;
-    const metrics = await AdminService.getDashboardMetrics(timePeriod);
+    const region = req.query.region as string | undefined;
+    const center = req.query.center as string | undefined;
+    const metrics = await AdminService.getDashboardMetrics(timePeriod, {
+      region,
+      center,
+    });
 
     res.status(200).json({
       status: "success",

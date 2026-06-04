@@ -40,7 +40,7 @@
 .static-icon-wrap {
   width: 36px;
   height: 36px;
-  background: #213D8D;
+  background: #213d8d;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -53,7 +53,7 @@
 .static-value {
   font-size: 2.25rem;
   font-weight: 600;
-  color: #213D8D;
+  color: #213d8d;
   line-height: 1;
   margin-bottom: 0.375rem;
 }
@@ -94,7 +94,7 @@
 
 .bd-value {
   font-size: 0.8125rem;
-  color: #213D8D;
+  color: #213d8d;
   font-weight: 700;
 }
 
@@ -113,7 +113,7 @@
 .metrics-title h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #213D8D;
+  color: #213d8d;
   margin: 0 0 2px;
 }
 
@@ -135,7 +135,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #213D8D;
+  color: #213d8d;
   background: white;
   cursor: pointer;
   outline: none;
@@ -156,7 +156,7 @@
 }
 
 .metric-card {
-  background: #213D8D;
+  background: #213d8d;
   border-radius: 14px;
   padding: 1.5rem;
   min-height: 155px;
@@ -165,7 +165,9 @@
   position: relative;
   overflow: hidden;
   border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .metric-card:hover {
@@ -240,7 +242,7 @@
 }
 
 .health-analytics-section h3 {
-  color: #213D8D;
+  color: #213d8d;
   margin: 0 0 1.5rem 0;
   font-size: 1.1rem;
   font-weight: 600;
@@ -255,34 +257,68 @@
   border-radius: 10px;
 }
 
-.filter-group { display: flex; flex-direction: column; gap: 0.4rem; max-width: 250px; }
-.filter-group label { font-size: 0.8rem; font-weight: 600; color: #213D8D; }
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 250px;
+}
+.filter-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #213d8d;
+}
 .filter-group select {
   padding: 0.5rem 0.75rem;
   border: 1.5px solid #d0d7ea;
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #213D8D;
+  color: #213d8d;
   background: white;
   outline: none;
 }
-.filter-group select:focus { border-color: #f5a623; }
+.filter-group select:focus {
+  border-color: #f5a623;
+}
 
-.health-score-only { display: flex; justify-content: center; margin-bottom: 1.5rem; }
-.health-score-only .health-score-card { width: 100%; max-width: 280px; }
+.health-score-only {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.health-score-only .health-score-card {
+  width: 100%;
+  max-width: 280px;
+}
 
 .health-score-card {
-  background: #213D8D;
+  background: #213d8d;
   color: #ffffff;
   padding: 1.5rem;
   border-radius: 12px;
   border: 2px solid #f5a623;
 }
 
-.health-score-card h4 { margin: 0 0 1rem 0; font-size: 0.9rem; font-weight: 600; color: #f5a623; }
-.score-display { display: flex; align-items: baseline; gap: 0.5rem; }
-.score-value { font-size: 2.5rem; font-weight: 700; color: #ffffff !important; }
-.score-label { font-size: 1rem; color: rgba(255,255,255,0.7) !important; }
+.health-score-card h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #f5a623;
+}
+.score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.score-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff !important;
+}
+.score-label {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
 
 .health-stats-expanded-grid {
   display: grid;
@@ -302,9 +338,22 @@
   text-align: center;
 }
 
-.health-stat-expanded-card .stat-label { font-size: 0.8rem; color: #6b7a99; font-weight: 500; margin-bottom: 0.4rem; }
-.health-stat-expanded-card .stat-value { font-size: 1.75rem; font-weight: 700; color: #213D8D; }
-.health-stat-expanded-card .stat-sublabel { font-size: 0.72rem; color: #9ca3af; margin-top: 0.25rem; }
+.health-stat-expanded-card .stat-label {
+  font-size: 0.8rem;
+  color: #6b7a99;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.health-stat-expanded-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #213d8d;
+}
+.health-stat-expanded-card .stat-sublabel {
+  font-size: 0.72rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
 
 .health-charts-grid {
   display: grid;
@@ -319,7 +368,12 @@
   border: 0.5px solid #d0d7ea;
 }
 
-.health-chart-card h4 { color: #213D8D; margin: 0 0 1rem 0; font-size: 0.9rem; font-weight: 600; }
+.health-chart-card h4 {
+  color: #213d8d;
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
 
 /* ── SECTION HEADER (shared) ── */
 .section-header {
@@ -335,12 +389,12 @@
   margin: 0;
   font-size: 1.4rem;
   font-weight: 600;
-  color: #213D8D;
+  color: #213d8d;
 }
 
 .btn-primary {
   padding: 0.65rem 1.4rem;
-  background: #213D8D;
+  background: #213d8d;
   color: white;
   border: none;
   border-radius: 8px;
@@ -352,52 +406,167 @@
 
 .btn-primary:hover {
   background: #f5a623;
-  color: #213D8D;
+  color: #213d8d;
   transform: translateY(-1px);
 }
 
-.btn.btn-danger { background: #dc2626; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
+.btn.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
 
 /* ── MANAGER KPI CARDS ── */
-.mgr-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; }
-.mgr-kpi-card { background: white; border: 0.5px solid #d0d7ea; border-top: 3px solid #f5a623; border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; transition: all 0.2s ease; }
-.mgr-kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(245, 166, 35, 0.2); }
-.mgr-kpi-icon { width: 48px; height: 48px; background: #213D8D; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
-.mgr-kpi-value { font-size: 1.75rem; font-weight: 700; color: #213D8D; line-height: 1; margin-bottom: 0.25rem; }
-.mgr-kpi-label { font-size: 0.875rem; font-weight: 600; color: #6b7a99; }
-.mgr-kpi-sub { font-size: 0.75rem; color: #9ca3af; }
+.mgr-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.mgr-kpi-card {
+  background: white;
+  border: 0.5px solid #d0d7ea;
+  border-top: 3px solid #f5a623;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+.mgr-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.2);
+}
+.mgr-kpi-icon {
+  width: 48px;
+  height: 48px;
+  background: #213d8d;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.mgr-kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #213d8d;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+.mgr-kpi-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7a99;
+}
+.mgr-kpi-sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
 
 /* ── LOADING SPINNER ── */
-.mgr-loading { display: flex; align-items: center; justify-content: center; padding: 3rem; color: #213D8D; font-weight: 600; }
-.mgr-spinner { width: 24px; height: 24px; border: 3px solid #d0d7ea; border-top: 3px solid #213D8D; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.75rem; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.mgr-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #213d8d;
+  font-weight: 600;
+}
+.mgr-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #d0d7ea;
+  border-top: 3px solid #213d8d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.75rem;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ── ALERTS ── */
-.alert { padding: 1rem 1.25rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
-.alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-.alert-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
-.alert-warning { background: #fffbeb; color: #d97706; border: 1px solid #fed7aa; }
-.alert-info { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.alert {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.alert-error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+.alert-success {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+.alert-warning {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fed7aa;
+}
+.alert-info {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
-  .static-totals-row { grid-template-columns: repeat(2, 1fr); }
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .health-stats-expanded-grid { grid-template-columns: repeat(2, 1fr); }
-  .health-filters { grid-template-columns: 1fr; }
-  .health-charts-grid { grid-template-columns: 1fr; }
+  .static-totals-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .health-stats-expanded-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .health-filters {
+    grid-template-columns: 1fr;
+  }
+  .health-charts-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .static-totals-row { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .metrics-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .static-value { font-size: 2.5rem; }
+  .static-totals-row {
+    grid-template-columns: 1fr;
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .metrics-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .static-value {
+    font-size: 2.5rem;
+  }
 }
 
 @media (max-width: 480px) {
-  .metrics-grid { grid-template-columns: 1fr; }
-  .health-stats-expanded-grid { grid-template-columns: repeat(2, 1fr); }
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  .health-stats-expanded-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ── FIX SELECT DROPDOWN OPTION TEXT COLOR ── */
@@ -431,7 +600,6 @@ select > option:hover {
   background-color: #f3f4f6 !important;
   color: #1f2937 !important;
 }
-
 
 /* Specific fix for region select dropdown */
 .region-select option {

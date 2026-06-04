@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
-import AddCenterModal from "../../components/admin/AddCenterModal";
+import CenterFormModal from "../../components/admin/CenterFormModal";
 import RegionManagerModal from "../../components/admin/RegionManagerModal";
 import "../../styles/admin-regions.css";
 
@@ -16,6 +16,20 @@ function RegionManagement() {
   const [showRegionManagerModal, setShowRegionManagerModal] = useState(false);
   const [selectedRegionForManager, setSelectedRegionForManager] = useState(null);
   const [regionManagers, setRegionManagers] = useState({});
+  const [centerFormData, setCenterFormData] = useState({
+    name: "",
+    region: "",
+    city: "",
+    address: "",
+    capacity: "",
+    phone: "",
+    email: "",
+    managerEmail: "",
+    managerPassword: "",
+    status: "ACTIVE",
+  });
+  const [centerFormError, setCenterFormError] = useState("");
+  const [centerSaving, setCenterSaving] = useState(false);
 
   useEffect(() => {
     loadRegions();
@@ -82,13 +96,78 @@ function RegionManagement() {
 
   const handleAddCenterClick = (region) => {
     setSelectedRegion(region);
+    setCenterFormData((prev) => ({
+      ...prev,
+      region,
+    }));
+    setCenterFormError("");
     setShowAddCenterModal(true);
   };
 
-  const handleCenterAdded = async () => {
-    setShowAddCenterModal(false);
-    setSelectedRegion(null);
-    await loadRegions();
+  const resetCenterForm = () => {
+    setCenterFormData({
+      name: "",
+      region: selectedRegion || "",
+      city: "",
+      address: "",
+      capacity: "",
+      phone: "",
+      email: "",
+      managerEmail: "",
+      managerPassword: "",
+      status: "ACTIVE",
+    });
+    setCenterFormError("");
+  };
+
+  const handleCenterSubmit = async (e) => {
+    e.preventDefault();
+    setCenterFormError("");
+
+    if (
+      !centerFormData.name ||
+      !centerFormData.region ||
+      !centerFormData.city ||
+      !centerFormData.address
+    ) {
+      setCenterFormError("Name, region, city, and address are required.");
+      return;
+    }
+
+    setCenterSaving(true);
+    try {
+      const centerPayload = {
+        name: centerFormData.name,
+        region: centerFormData.region,
+        city: centerFormData.city,
+        address: centerFormData.address,
+        phone: centerFormData.phone || undefined,
+        email: centerFormData.email || undefined,
+        capacity: centerFormData.capacity
+          ? parseInt(centerFormData.capacity, 10)
+          : undefined,
+        status: centerFormData.status,
+      };
+
+      if (centerFormData.managerEmail) {
+        centerPayload.managerEmail = centerFormData.managerEmail;
+      }
+      if (centerFormData.managerPassword) {
+        centerPayload.managerPassword = centerFormData.managerPassword;
+      }
+
+      await adminService.createCenter(centerPayload);
+      setShowAddCenterModal(false);
+      setSelectedRegion(null);
+      resetCenterForm();
+      await loadRegions();
+    } catch (err) {
+      setCenterFormError(
+        err?.response?.data?.message || "Failed to create center.",
+      );
+    } finally {
+      setCenterSaving(false);
+    }
   };
 
   const handleEditRegionManager = (region) => {
@@ -194,14 +273,24 @@ function RegionManagement() {
       </div>
 
       {selectedRegion && (
-        <AddCenterModal
+        <CenterFormModal
           isOpen={showAddCenterModal}
+          title="➕ Create New Center"
+          submitLabel="➕ Create Center"
+          formData={centerFormData}
+          setFormData={setCenterFormData}
+          formError={centerFormError}
+          saving={centerSaving}
+          availableRegions={regions}
+          loadingRegions={loading}
+          statusOptions={["ACTIVE", "INACTIVE", "MAINTENANCE"]}
+          showManagerFields={true}
           onClose={() => {
             setShowAddCenterModal(false);
             setSelectedRegion(null);
+            resetCenterForm();
           }}
-          region={selectedRegion}
-          onSuccess={handleCenterAdded}
+          onSubmit={handleCenterSubmit}
         />
       )}
 

@@ -71,14 +71,17 @@ function DashboardMetrics({
     fetchHealthData();
     const interval = setInterval(() => { fetchMetrics(); }, 60000);
     return () => clearInterval(interval);
-  }, [effectivePeriod]);
+  }, [effectivePeriod, effectiveCenter, effectiveRegion]);
 
   useEffect(() => { fetchHealthData(); }, [effectivePeriod, effectiveCenter, effectiveRegion, effectiveDateRange.start, effectiveDateRange.end, selectedCondition]);
 
   const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getDashboardMetrics(effectivePeriod);
+      const data = await adminService.getDashboardMetrics(effectivePeriod, {
+        region: effectiveRegion !== "all" ? effectiveRegion : undefined,
+        center: effectiveCenter !== "all" ? effectiveCenter : undefined,
+      });
       setMetrics(data);
       setLastUpdated(new Date());
       setError(null);
