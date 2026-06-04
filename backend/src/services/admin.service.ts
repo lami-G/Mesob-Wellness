@@ -45,12 +45,12 @@ async function calculateQueueMetrics(
 
     const totalAppointments = appointments.length;
     const completedAppointmentsCount = appointments.filter(
-      apt => apt.status === "COMPLETED"
+      (apt) => apt.status === "COMPLETED",
     ).length;
 
     // Map of userId -> set of appointment dates (YYYY-MM-DD) in range
     const appointmentDateMap = new Map<string, Set<string>>();
-    appointments.forEach(apt => {
+    appointments.forEach((apt) => {
       const dayKey = apt.scheduledAt.toISOString().split("T")[0];
       const existing = appointmentDateMap.get(apt.userId) || new Set<string>();
       existing.add(dayKey);
@@ -67,7 +67,7 @@ async function calculateQueueMetrics(
     });
 
     let walkInCount = 0;
-    wellnessPlans.forEach(plan => {
+    wellnessPlans.forEach((plan) => {
       const planDayKey = plan.createdAt.toISOString().split("T")[0];
       const userAppointments = appointmentDateMap.get(plan.userId);
       if (!userAppointments || !userAppointments.has(planDayKey)) {
@@ -114,7 +114,7 @@ const AdminService = {
         select: { region: true },
         distinct: ["region"],
       });
-      return centers.map(c => c.region).sort();
+      return centers.map((c) => c.region).sort();
     } catch (error) {
       console.error("Error getting regions:", error);
       throw error;
@@ -162,18 +162,26 @@ const AdminService = {
       const hasUserFilter = Object.keys(userWhere).length > 0;
 
       const baseUserWhere = hasUserFilter ? userWhere : {};
-      const baseCenterWhere = Object.keys(centerWhere).length > 0 ? centerWhere : undefined;
+      const baseCenterWhere =
+        Object.keys(centerWhere).length > 0 ? centerWhere : undefined;
       const baseCenterWhereSpread = baseCenterWhere || {};
 
       // Calculate date range based on time period
       const now = new Date();
       let dateFrom: Date | undefined;
-      
-      if (timePeriod === 'daily') {
-        dateFrom = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-      } else if (timePeriod === 'weekly') {
+
+      if (timePeriod === "daily") {
+        dateFrom = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+      } else if (timePeriod === "weekly") {
         dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      } else if (timePeriod === 'monthly') {
+      } else if (timePeriod === "monthly") {
         dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
       }
 
@@ -186,12 +194,24 @@ const AdminService = {
 
       const userStats = {
         total: await prisma.user.count({ where: baseUserWhere }),
-        active: await prisma.user.count({ where: { ...baseUserWhere, isActive: true } }),
-        inactive: await prisma.user.count({ where: { ...baseUserWhere, isActive: false } }),
-        verified: await prisma.user.count({ where: { ...baseUserWhere, isVerified: true } }),
-        unverified: await prisma.user.count({ where: { ...baseUserWhere, isVerified: false } }),
-        externalPatients: await prisma.user.count({ where: { ...baseUserWhere, role: "EXTERNAL_PATIENT" } }),
-        staff: await prisma.user.count({ where: { ...baseUserWhere, role: "STAFF" } }),
+        active: await prisma.user.count({
+          where: { ...baseUserWhere, isActive: true },
+        }),
+        inactive: await prisma.user.count({
+          where: { ...baseUserWhere, isActive: false },
+        }),
+        verified: await prisma.user.count({
+          where: { ...baseUserWhere, isVerified: true },
+        }),
+        unverified: await prisma.user.count({
+          where: { ...baseUserWhere, isVerified: false },
+        }),
+        externalPatients: await prisma.user.count({
+          where: { ...baseUserWhere, role: "EXTERNAL_PATIENT" },
+        }),
+        staff: await prisma.user.count({
+          where: { ...baseUserWhere, role: "STAFF" },
+        }),
         byRole: users.reduce((acc: any, u: any) => {
           acc[u.role] = u._count;
           return acc;
@@ -208,9 +228,15 @@ const AdminService = {
 
       const centerStats = {
         total: await prisma.center.count({ where: baseCenterWhere }),
-        active: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "ACTIVE" } }),
-        inactive: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "INACTIVE" } }),
-        maintenance: await prisma.center.count({ where: { ...baseCenterWhereSpread, status: "MAINTENANCE" } }),
+        active: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "ACTIVE" },
+        }),
+        inactive: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "INACTIVE" },
+        }),
+        maintenance: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "MAINTENANCE" },
+        }),
         byRegion: centers.reduce((acc: any, c: any) => {
           acc[c.region] = c._count;
           return acc;
@@ -218,9 +244,11 @@ const AdminService = {
       };
 
       // Get appointment stats with date filter
-      const appointmentWhere: any = dateFrom ? {
-        scheduledAt: { gte: dateFrom },
-      } : {};
+      const appointmentWhere: any = dateFrom
+        ? {
+            scheduledAt: { gte: dateFrom },
+          }
+        : {};
       if (hasUserFilter) appointmentWhere.user = userWhere;
 
       const appointments = await prisma.appointment.groupBy({
@@ -231,12 +259,24 @@ const AdminService = {
 
       const appointmentStats = {
         total: await prisma.appointment.count({ where: appointmentWhere }),
-        waiting: await prisma.appointment.count({ where: { ...appointmentWhere, status: "WAITING" } }),
-        inProgress: await prisma.appointment.count({ where: { ...appointmentWhere, status: "IN_PROGRESS" } }),
-        inService: await prisma.appointment.count({ where: { ...appointmentWhere, status: "IN_SERVICE" } }),
-        completed: await prisma.appointment.count({ where: { ...appointmentWhere, status: "COMPLETED" } }),
-        cancelled: await prisma.appointment.count({ where: { ...appointmentWhere, status: "CANCELLED" } }),
-        noShow: await prisma.appointment.count({ where: { ...appointmentWhere, status: "NO_SHOW" } }),
+        waiting: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "WAITING" },
+        }),
+        inProgress: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "IN_PROGRESS" },
+        }),
+        inService: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "IN_SERVICE" },
+        }),
+        completed: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "COMPLETED" },
+        }),
+        cancelled: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "CANCELLED" },
+        }),
+        noShow: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "NO_SHOW" },
+        }),
         byRegion: {},
         byStatus: appointments.reduce((acc: any, a: any) => {
           acc[a.status] = a._count;
@@ -245,9 +285,11 @@ const AdminService = {
       };
 
       // Get vital stats with date filter
-      const vitalWhere: any = dateFrom ? {
-        recordedAt: { gte: dateFrom },
-      } : {};
+      const vitalWhere: any = dateFrom
+        ? {
+            recordedAt: { gte: dateFrom },
+          }
+        : {};
       if (hasUserFilter) vitalWhere.user = userWhere;
 
       const vitals = await prisma.vitalRecord.findMany({
@@ -266,31 +308,64 @@ const AdminService = {
 
       const vitalStats = {
         total: vitals.length,
-        averageBMI: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.bmi || 0), 0) / vitals.length : 0,
-        averageSystolic: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.systolic || 0), 0) / vitals.length : 0,
-        averageDiastolic: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.diastolic || 0), 0) / vitals.length : 0,
-        averageHeartRate: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.heartRate || 0), 0) / vitals.length : 0,
-        averageTemperature: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) / vitals.length : 0,
-        averageOxygenSaturation: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) / vitals.length : 0,
+        averageBMI:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.bmi || 0), 0) / vitals.length
+            : 0,
+        averageSystolic:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.systolic || 0), 0) /
+              vitals.length
+            : 0,
+        averageDiastolic:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.diastolic || 0), 0) /
+              vitals.length
+            : 0,
+        averageHeartRate:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.heartRate || 0), 0) /
+              vitals.length
+            : 0,
+        averageTemperature:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) /
+              vitals.length
+            : 0,
+        averageOxygenSaturation:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) /
+              vitals.length
+            : 0,
         byBmiCategory: {
-          UNDERWEIGHT: vitals.filter(v => v.bmiCategory === 'UNDERWEIGHT').length,
-          NORMAL: vitals.filter(v => v.bmiCategory === 'NORMAL').length,
-          OVERWEIGHT: vitals.filter(v => v.bmiCategory === 'OVERWEIGHT').length,
-          OBESITY: vitals.filter(v => v.bmiCategory === 'OBESITY').length,
+          UNDERWEIGHT: vitals.filter((v) => v.bmiCategory === "UNDERWEIGHT")
+            .length,
+          NORMAL: vitals.filter((v) => v.bmiCategory === "NORMAL").length,
+          OVERWEIGHT: vitals.filter((v) => v.bmiCategory === "OVERWEIGHT")
+            .length,
+          OBESITY: vitals.filter((v) => v.bmiCategory === "OBESITY").length,
         },
         byBpCategory: {
-          NORMAL: vitals.filter(v => v.bpCategory === 'NORMAL').length,
-          ELEVATED: vitals.filter(v => v.bpCategory === 'ELEVATED').length,
-          HYPERTENSION_STAGE_1: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_1').length,
-          HYPERTENSION_STAGE_2: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_2').length,
-          HYPERTENSIVE_CRISIS: vitals.filter(v => v.bpCategory === 'HYPERTENSIVE_CRISIS').length,
+          NORMAL: vitals.filter((v) => v.bpCategory === "NORMAL").length,
+          ELEVATED: vitals.filter((v) => v.bpCategory === "ELEVATED").length,
+          HYPERTENSION_STAGE_1: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSION_STAGE_1",
+          ).length,
+          HYPERTENSION_STAGE_2: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSION_STAGE_2",
+          ).length,
+          HYPERTENSIVE_CRISIS: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSIVE_CRISIS",
+          ).length,
         },
       };
 
       // Get feedback stats with date filter
-      const feedbackWhere: any = dateFrom ? {
-        createdAt: { gte: dateFrom },
-      } : {};
+      const feedbackWhere: any = dateFrom
+        ? {
+            createdAt: { gte: dateFrom },
+          }
+        : {};
       if (hasUserFilter) feedbackWhere.user = userWhere;
 
       const feedback = await prisma.feedback.findMany({
@@ -306,11 +381,31 @@ const AdminService = {
 
       const feedbackStats = {
         total: feedback.length,
-        averageNPS: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.npsScore || 0), 0) / feedback.length : 0,
-        averageServiceQuality: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.serviceQuality || 0), 0) / feedback.length : 0,
-        averageStaffBehavior: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.staffBehavior || 0), 0) / feedback.length : 0,
-        averageCleanliness: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.cleanliness || 0), 0) / feedback.length : 0,
-        averageWaitTime: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.waitTime || 0), 0) / feedback.length : 0,
+        averageNPS:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.npsScore || 0), 0) /
+              feedback.length
+            : 0,
+        averageServiceQuality:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.serviceQuality || 0), 0) /
+              feedback.length
+            : 0,
+        averageStaffBehavior:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.staffBehavior || 0), 0) /
+              feedback.length
+            : 0,
+        averageCleanliness:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.cleanliness || 0), 0) /
+              feedback.length
+            : 0,
+        averageWaitTime:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.waitTime || 0), 0) /
+              feedback.length
+            : 0,
         npsDistribution: {},
         byRegion: {},
       };
@@ -324,7 +419,7 @@ const AdminService = {
 
       const regionStats = {
         total: regions.length,
-        regions: regions.map(r => r.region),
+        regions: regions.map((r) => r.region),
       };
 
       // Get patients (users with STAFF or EXTERNAL_PATIENT role) - not filtered by date
@@ -342,10 +437,25 @@ const AdminService = {
       let queueStartDate: Date;
       let queueEndDate = new Date();
 
-      if (timePeriod === 'daily') {
-        queueStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-        queueEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-      } else if (timePeriod === 'weekly') {
+      if (timePeriod === "daily") {
+        queueStartDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+        queueEndDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          23,
+          59,
+          59,
+          999,
+        );
+      } else if (timePeriod === "weekly") {
         const day = now.getDay();
         const diff = now.getDate() - day + (day === 0 ? -6 : 1);
         queueStartDate = new Date(now);
@@ -354,12 +464,28 @@ const AdminService = {
         queueEndDate = new Date(queueStartDate);
         queueEndDate.setDate(queueStartDate.getDate() + 6);
         queueEndDate.setHours(23, 59, 59, 999);
-      } else if (timePeriod === 'monthly') {
-        queueStartDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        queueEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      } else if (timePeriod === "monthly") {
+        queueStartDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+          0,
+          0,
+          0,
+          0,
+        );
+        queueEndDate = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0,
+          23,
+          59,
+          59,
+          999,
+        );
       } else {
         // all time
-        queueStartDate = new Date('2020-01-01');
+        queueStartDate = new Date("2020-01-01");
         queueEndDate = new Date(now);
       }
 
@@ -377,15 +503,21 @@ const AdminService = {
       appointmentStats.completed = queueMetrics.completedAppointments;
 
       // Get wellness plans stats with date filter
-      const wellnessWhere: any = dateFrom ? {
-        createdAt: { gte: dateFrom },
-      } : {};
+      const wellnessWhere: any = dateFrom
+        ? {
+            createdAt: { gte: dateFrom },
+          }
+        : {};
       if (hasUserFilter) wellnessWhere.user = userWhere;
 
       const wellnessStats = {
         total: await prisma.wellnessPlan.count({ where: wellnessWhere }),
-        active: await prisma.wellnessPlan.count({ where: { ...wellnessWhere, isActive: true } }),
-        inactive: await prisma.wellnessPlan.count({ where: { ...wellnessWhere, isActive: false } }),
+        active: await prisma.wellnessPlan.count({
+          where: { ...wellnessWhere, isActive: true },
+        }),
+        inactive: await prisma.wellnessPlan.count({
+          where: { ...wellnessWhere, isActive: false },
+        }),
       };
 
       return {
@@ -418,8 +550,9 @@ const AdminService = {
       const where: any = {};
 
       if (filters.role) where.role = filters.role;
-      if (filters.status) where.isActive = filters.status === 'active';
-      if (filters.verification) where.isVerified = filters.verification === 'verified';
+      if (filters.status) where.isActive = filters.status === "active";
+      if (filters.verification)
+        where.isVerified = filters.verification === "verified";
       if (filters.region) {
         where.center = {
           region: filters.region,
@@ -529,7 +662,9 @@ const AdminService = {
   /**
    * Get all appointments with filters
    */
-  async getAllAppointments(filters: AppointmentFilters): Promise<PaginatedResponse<any>> {
+  async getAllAppointments(
+    filters: AppointmentFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
@@ -546,8 +681,14 @@ const AdminService = {
       }
       if (filters.search) {
         where.OR = [
-          { user: { fullName: { contains: filters.search, mode: "insensitive" } } },
-          { user: { email: { contains: filters.search, mode: "insensitive" } } },
+          {
+            user: {
+              fullName: { contains: filters.search, mode: "insensitive" },
+            },
+          },
+          {
+            user: { email: { contains: filters.search, mode: "insensitive" } },
+          },
           { reason: { contains: filters.search, mode: "insensitive" } },
         ];
       }
@@ -634,7 +775,9 @@ const AdminService = {
   /**
    * Get all feedback with filters
    */
-  async getAllFeedback(filters: FeedbackFilters): Promise<PaginatedResponse<any>> {
+  async getAllFeedback(
+    filters: FeedbackFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
@@ -681,7 +824,9 @@ const AdminService = {
   /**
    * Get all audit logs with filters
    */
-  async getAllAuditLogs(filters: AuditFilters): Promise<PaginatedResponse<any>> {
+  async getAllAuditLogs(
+    filters: AuditFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
@@ -705,7 +850,9 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true, userId: true, role: true } },
+            user: {
+              select: { fullName: true, email: true, userId: true, role: true },
+            },
           },
         }),
         prisma.auditLog.count({ where }),

@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1` : "http://localhost:5000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/v1`
+  : "http://localhost:5000/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -41,7 +43,8 @@ export const adminService = {
     if (filters.region) params.append("region", filters.region);
     if (filters.center) params.append("center", filters.center);
     if (filters.status) params.append("status", filters.status);
-    if (filters.verification) params.append("verification", filters.verification);
+    if (filters.verification)
+      params.append("verification", filters.verification);
     if (filters.search) params.append("search", filters.search);
     if (filters.page) params.append("page", filters.page);
     if (filters.limit) params.append("limit", filters.limit);
@@ -102,10 +105,12 @@ export const adminService = {
     const params = new URLSearchParams();
     if (filters.region) params.append("region", filters.region);
     if (filters.center) params.append("center", filters.center);
-    if (filters.npsScore !== undefined) params.append("npsScore", filters.npsScore);
+    if (filters.npsScore !== undefined)
+      params.append("npsScore", filters.npsScore);
     if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
     if (filters.dateTo) params.append("dateTo", filters.dateTo);
-    if (filters.feedbackType) params.append("feedbackType", filters.feedbackType);
+    if (filters.feedbackType)
+      params.append("feedbackType", filters.feedbackType);
     if (filters.page) params.append("page", filters.page);
     if (filters.limit) params.append("limit", filters.limit);
 

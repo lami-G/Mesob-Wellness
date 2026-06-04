@@ -190,7 +190,7 @@ function FederalDashboard() {
       if (regionsRes.status === "fulfilled") {
         const regionsList = regionsRes.value?.data || regionsRes.value || [];
         setRegions(regionsList);
-        
+
         // Load region admins for all regions
         const adminsMap = {};
         await Promise.all(
@@ -203,7 +203,7 @@ function FederalDashboard() {
             } catch (err) {
               // Region admin doesn't exist, that's okay
             }
-          })
+          }),
         );
         setRegionAdmins(adminsMap);
       }
@@ -550,7 +550,6 @@ function FederalDashboard() {
           selectedRegion={globalFilters.region || "all"}
         />
       </div>
-
     </div>
   );
 
@@ -1134,102 +1133,80 @@ function FederalDashboard() {
       error={error}
     >
       {/* Show filters for overview, feedback and audit tabs */}
-      {(activeTab === "overview" || activeTab === "feedback" || activeTab === "audit") && (
+      {(activeTab === "overview" ||
+        activeTab === "feedback" ||
+        activeTab === "audit") && (
         <div className="card" style={{ padding: "1rem", marginBottom: "1rem" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "1rem",
-            alignItems: "flex-end",
-          }}
-        >
-          <div style={{ minWidth: "180px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                color: "#6b7280",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Region
-            </label>
-            <select
-              value={globalFilters.region}
-              onChange={(e) =>
-                setGlobalFilters((prev) => ({
-                  ...prev,
-                  region: e.target.value,
-                  center: "",
-                }))
-              }
-              className="form-input"
-            >
-              <option value="all">All Regions</option>
-              {regions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={{ minWidth: "220px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                color: "#6b7280",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Center
-            </label>
-            <select
-              value={globalFilters.center}
-              onChange={(e) =>
-                setGlobalFilters((prev) => ({
-                  ...prev,
-                  center: e.target.value,
-                }))
-              }
-              className="form-input"
-              disabled={availableCenters.length === 0}
-            >
-              <option value="">All Centers</option>
-              {availableCenters.map((center) => (
-                <option key={center.id} value={center.id}>
-                  {center.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={{ minWidth: "200px" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                color: "#6b7280",
-                marginBottom: "0.25rem",
-              }}
-            >
-              Time Period
-            </label>
-            <select
-              value={timePeriod}
-              onChange={(e) => setTimePeriod(e.target.value)}
-              className="time-period-select"
-            >
-              <option value="all">All</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-          {statusOptions.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "1rem",
+              alignItems: "flex-end",
+            }}
+          >
+            <div style={{ minWidth: "180px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  color: "#6b7280",
+                  marginBottom: "0.25rem",
+                }}
+              >
+                Region
+              </label>
+              <select
+                value={globalFilters.region}
+                onChange={(e) =>
+                  setGlobalFilters((prev) => ({
+                    ...prev,
+                    region: e.target.value,
+                    center: "",
+                  }))
+                }
+                className="form-input"
+              >
+                <option value="all">All Regions</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ minWidth: "220px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  color: "#6b7280",
+                  marginBottom: "0.25rem",
+                }}
+              >
+                Center
+              </label>
+              <select
+                value={globalFilters.center}
+                onChange={(e) =>
+                  setGlobalFilters((prev) => ({
+                    ...prev,
+                    center: e.target.value,
+                  }))
+                }
+                className="form-input"
+                disabled={availableCenters.length === 0}
+              >
+                <option value="">All Centers</option>
+                {availableCenters.map((center) => (
+                  <option key={center.id} value={center.id}>
+                    {center.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div style={{ minWidth: "200px" }}>
               <label
                 style={{
@@ -1240,32 +1217,56 @@ function FederalDashboard() {
                   marginBottom: "0.25rem",
                 }}
               >
-                {statusLabel}
+                Time Period
               </label>
               <select
-                value={globalFilters.status}
-                onChange={(e) =>
-                  setGlobalFilters((prev) => ({
-                    ...prev,
-                    status: e.target.value,
-                  }))
-                }
-                className="form-input"
+                value={timePeriod}
+                onChange={(e) => setTimePeriod(e.target.value)}
+                className="time-period-select"
               >
-                <option value="">All Status</option>
-                {statusOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <option value="all">All</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
               </select>
             </div>
-          )}
+            {statusOptions.length > 0 && (
+              <div style={{ minWidth: "200px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "#6b7280",
+                    marginBottom: "0.25rem",
+                  }}
+                >
+                  {statusLabel}
+                </label>
+                <select
+                  value={globalFilters.status}
+                  onChange={(e) =>
+                    setGlobalFilters((prev) => ({
+                      ...prev,
+                      status: e.target.value,
+                    }))
+                  }
+                  className="form-input"
+                >
+                  <option value="">All Status</option>
+                  {statusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
       )}
       {renderContent()}
-      
+
       <RegionEditModal
         isOpen={showRegionEditModal}
         onClose={() => {
