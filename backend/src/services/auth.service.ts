@@ -278,14 +278,20 @@ export class AuthService {
       );
     }
 
+    // Reset lockout if expired
     if (user.lockoutUntil && user.lockoutUntil <= new Date()) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          failedLoginAttempts: 0,
-          lockoutUntil: null,
-        },
-      });
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: 0,
+            lockoutUntil: null,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to reset lockout:", error);
+        // Continue with login attempt even if reset fails
+      }
     }
 
     if (!user.isActive) {
@@ -310,41 +316,46 @@ export class AuthService {
       const maxAttempts = settings.maxLoginAttempts || 2;
       const lockoutMinutes = settings.lockoutDuration || 30;
 
-      const updated = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          failedLoginAttempts: { increment: 1 },
-        },
-        select: {
-          failedLoginAttempts: true,
-        },
-      });
-
-      console.log(
-        "[LOGIN-LOCKOUT]",
-        "email=",
-        user.email,
-        "attempts=",
-        updated.failedLoginAttempts,
-        "max=",
-        maxAttempts,
-        "lockoutMinutes=",
-        lockoutMinutes,
-      );
-
-      if (updated.failedLoginAttempts >= maxAttempts) {
-        const lockoutUntil = new Date(Date.now() + lockoutMinutes * 60 * 1000);
-        await prisma.user.update({
+      try {
+        const updated = await prisma.user.update({
           where: { id: user.id },
           data: {
-            failedLoginAttempts: 0,
-            lockoutUntil,
+            failedLoginAttempts: { increment: 1 },
+          },
+          select: {
+            failedLoginAttempts: true,
           },
         });
 
-        throw new Error(
-          `Account locked. Try again in ${lockoutMinutes} minute${lockoutMinutes === 1 ? "" : "s"}.`,
+        console.log(
+          "[LOGIN-LOCKOUT]",
+          "email=",
+          user.email,
+          "attempts=",
+          updated.failedLoginAttempts,
+          "max=",
+          maxAttempts,
+          "lockoutMinutes=",
+          lockoutMinutes,
         );
+
+        if (updated.failedLoginAttempts >= maxAttempts) {
+          const lockoutUntil = new Date(Date.now() + lockoutMinutes * 60 * 1000);
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              failedLoginAttempts: 0,
+              lockoutUntil,
+            },
+          });
+
+          throw new Error(
+            `Account locked. Try again in ${lockoutMinutes} minute${lockoutMinutes === 1 ? "" : "s"}.`,
+          );
+        }
+      } catch (updateError) {
+        console.error("Failed to update login attempts:", updateError);
+        // Continue to throw invalid password error
       }
 
       throw new Error("Invalid email or password");
@@ -358,29 +369,34 @@ export class AuthService {
     );
 
     // Update last login timestamp and create audit log
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          lastLoginAt: new Date(),
-          failedLoginAttempts: 0,
-          lockoutUntil: null,
-        },
-      }),
-      prisma.auditLog.create({
-        data: {
-          userId: user.id,
-          action: "LOGIN",
-          resource: "USER",
-          details: {
-            role: user.role,
-            loginMethod: "email",
+    try {
+      await prisma.$transaction([
+        prisma.user.update({
+          where: { id: user.id },
+          data: {
+            lastLoginAt: new Date(),
+            failedLoginAttempts: 0,
+            lockoutUntil: null,
           },
-          ipAddress: auditContext?.ipAddress,
-          userAgent: auditContext?.userAgent,
-        },
-      }),
-    ]);
+        }),
+        prisma.auditLog.create({
+          data: {
+            userId: user.id,
+            action: "LOGIN",
+            resource: "USER",
+            details: {
+              role: user.role,
+              loginMethod: "email",
+            },
+            ipAddress: auditContext?.ipAddress,
+            userAgent: auditContext?.userAgent,
+          },
+        }),
+      ]);
+    } catch (error) {
+      console.error("Failed to update login metadata:", error);
+      // Continue with successful login even if metadata update fails
+    }
 
     // Performance check (must be < 2 seconds)
     const duration = Date.now() - startTime;

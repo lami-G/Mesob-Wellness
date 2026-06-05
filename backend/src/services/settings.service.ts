@@ -12,25 +12,22 @@ class SettingsService {
 
   static async getSettings(): Promise<SystemSettings> {
     try {
-      // Try to get settings from database
-      let setting = await prisma.setting.findUnique({
-        where: { key: this.SETTINGS_ID },
-      });
+      const defaultSettings = {
+        maxLoginAttempts: 2,
+        sessionTimeout: 30,
+        maintenanceMode: false,
+        lockoutDuration: 30,
+      };
 
-      // If not found, create default settings
-      if (!setting) {
-        setting = await prisma.setting.create({
-          data: {
-            key: this.SETTINGS_ID,
-            value: JSON.stringify({
-              maxLoginAttempts: 2,
-              sessionTimeout: 30,
-              maintenanceMode: false,
-              lockoutDuration: 30,
-            }),
-          },
-        });
-      }
+      // Use upsert to avoid race conditions
+      const setting = await prisma.setting.upsert({
+        where: { key: this.SETTINGS_ID },
+        update: {}, // Don't update if it exists
+        create: {
+          key: this.SETTINGS_ID,
+          value: JSON.stringify(defaultSettings),
+        },
+      });
 
       const value = JSON.parse(setting.value);
       return {
@@ -41,6 +38,7 @@ class SettingsService {
       };
     } catch (error) {
       console.error("Error getting settings:", error);
+      // Return default settings if database operation fails
       return {
         maxLoginAttempts: 2,
         sessionTimeout: 30,
