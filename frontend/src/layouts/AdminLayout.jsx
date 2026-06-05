@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import Sidebar from "../components/shared/Sidebar";
-import { adminSidebarConfig } from "../config/sidebar";
-import AdminHeader from "../components/admin/AdminHeader";
-// All styles imported through main.jsx - no additional imports needed
+import React from "react";
+import AppShell from "../components/layout/AppShell";
 
+/**
+ * Admin Layout - Using AppShell
+ * Simplified layout that delegates to AppShell
+ */
 function AdminLayout({
   children,
   activeTab,
@@ -13,41 +13,20 @@ function AdminLayout({
   lastUpdated,
   error,
 }) {
-  const { user: authUser } = useAuth();
-  const currentUser = user || authUser;
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
   return (
-    <div className="admin-layout">
-      <Sidebar
-        config={adminSidebarConfig}
-        activeTab={activeTab}
-        onTabChange={onTabChange}
-        isOpen={sidebarOpen}
-        extras={{ user: currentUser }}
-      />
-
-      <div className="admin-main">
-        <AdminHeader
-          user={currentUser}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          onTabChange={onTabChange}
-          title="MESOB Admin Portal"
-          dashboardType="admin"
-          lastUpdated={lastUpdated}
-          activeTab={activeTab}
-        />
-
-        <main className="admin-content">
-          {error && (
-            <div className="alert alert-error" style={{ marginBottom: "1rem" }}>
-              {error}
-            </div>
-          )}
-          {children}
-        </main>
-      </div>
-    </div>
+    <AppShell
+      role="admin"
+      activeTab={activeTab}
+      onTabChange={onTabChange}
+      title="MESOB Admin Portal"
+      error={error}
+      extras={{
+        user,
+        lastUpdated
+      }}
+    >
+      {children}
+    </AppShell>
   );
 }
 

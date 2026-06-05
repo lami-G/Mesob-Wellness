@@ -230,10 +230,63 @@ export const regionalSidebarConfig = {
   }
 };
 
+// ─── Nurse Configuration ──────────────────────────────────────────────────────
+export const nurseSidebarConfig = {
+  type: 'nurse',
+  logo: {
+    src: '/Mesob-short-png.png',
+    alt: 'MESOB',
+    title: 'FDRE MESOB',
+    subtitle: 'Nurse Portal'
+  },
+  sections: [
+    {
+      label: 'PATIENT CARE',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', icon: NAV_ICONS.dashboard },
+        { id: 'appointments', label: 'Appointments', icon: NAV_ICONS.appointments },
+        { id: 'vitals', label: 'Record Vitals', icon: NAV_ICONS.vitals }
+      ]
+    }
+  ],
+  footer: {
+    items: [
+      { id: 'settings', label: 'Settings', icon: NAV_ICONS.settings }
+    ],
+    version: 'v1.0.0'
+  }
+};
+
+// ─── Patient Configuration ────────────────────────────────────────────────────
+export const patientSidebarConfig = {
+  type: 'patient',
+  logo: {
+    src: '/Mesob-short-png.png',
+    alt: 'MESOB',
+    title: 'FDRE MESOB',
+    subtitle: 'My Health'
+  },
+  sections: [
+    {
+      label: 'MY HEALTH',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', icon: NAV_ICONS.dashboard },
+        { id: 'appointments', label: 'My Appointments', icon: NAV_ICONS.appointments },
+        { id: 'vitals', label: 'Health Data', icon: NAV_ICONS.vitals },
+        { id: 'feedback', label: 'Feedback', icon: NAV_ICONS.feedback }
+      ]
+    }
+  ],
+  footer: {
+    items: [],
+    version: 'v1.0.0'
+  }
+};
+
 // ─── Configuration Selector ───────────────────────────────────────────────────
 /**
  * Get sidebar configuration by type
- * @param {string} type - Dashboard type: 'admin' | 'federal' | 'manager' | 'regional'
+ * @param {string} type - Dashboard type: 'admin' | 'federal' | 'manager' | 'regional' | 'nurse' | 'patient'
  * @returns {object} Sidebar configuration
  */
 export const getSidebarConfig = (type) => {
@@ -241,7 +294,9 @@ export const getSidebarConfig = (type) => {
     admin: adminSidebarConfig,
     federal: federalSidebarConfig,
     manager: managerSidebarConfig,
-    regional: regionalSidebarConfig
+    regional: regionalSidebarConfig,
+    nurse: nurseSidebarConfig,
+    patient: patientSidebarConfig
   };
   return configs[type] || adminSidebarConfig;
 };
@@ -251,5 +306,7 @@ export const sidebarConfig = {
   admin: adminSidebarConfig,
   federal: federalSidebarConfig,
   manager: managerSidebarConfig,
-  regional: regionalSidebarConfig
+  regional: regionalSidebarConfig,
+  nurse: nurseSidebarConfig,
+  patient: patientSidebarConfig
 };
