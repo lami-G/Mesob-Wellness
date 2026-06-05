@@ -1,0 +1,374 @@
+/* ========================================
+   MESOB WELLNESS SYSTEM - LAYOUT STYLES
+   Application shell and layout patterns
+   ======================================== */
+
+/* ========================================
+   APP SHELL
+   ======================================== */
+.app-shell {
+  @apply min-h-screen flex flex-col;
+  @apply bg-gray-50;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+.app-header {
+  @apply sticky top-0 z-40;
+  @apply bg-white border-b border-gray-200;
+  @apply shadow-sm;
+}
+
+.app-header-container {
+  @apply flex items-center justify-between;
+  @apply px-6 py-4;
+  @apply max-w-[1920px] mx-auto;
+}
+
+.app-header-left {
+  @apply flex items-center gap-4;
+}
+
+.app-header-logo {
+  @apply flex items-center gap-3;
+}
+
+.app-header-logo-img {
+  @apply h-10 w-auto;
+}
+
+.app-header-title {
+  @apply flex flex-col;
+}
+
+.app-header-main-title {
+  @apply text-lg font-bold text-gray-900;
+  @apply leading-tight;
+}
+
+.app-header-subtitle {
+  @apply text-xs text-gray-600;
+  @apply leading-tight;
+}
+
+.app-header-right {
+  @apply flex items-center gap-4;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+.app-sidebar {
+  @apply fixed left-0 top-0 bottom-0;
+  @apply w-64 bg-sidebar;
+  @apply border-r border-sidebar-dark;
+  @apply flex flex-col;
+  @apply z-30;
+  @apply transition-transform duration-300;
+}
+
+.app-sidebar.collapsed {
+  @apply -translate-x-full lg:translate-x-0 lg:w-20;
+}
+
+.sidebar-header {
+  @apply flex items-center gap-3;
+  @apply px-6 py-5;
+  @apply border-b border-sidebar-dark;
+}
+
+.sidebar-logo {
+  @apply h-8 w-auto;
+}
+
+.sidebar-title {
+  @apply text-white font-bold text-lg;
+}
+
+.sidebar-nav {
+  @apply flex-1 overflow-y-auto;
+  @apply py-4;
+}
+
+.sidebar-section {
+  @apply mb-6;
+}
+
+.sidebar-section-title {
+  @apply px-6 mb-2;
+  @apply text-xs font-semibold text-sidebar-text-muted uppercase tracking-wider;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3;
+  @apply px-6 py-3;
+  @apply text-sm font-medium text-sidebar-text;
+  @apply transition-colors duration-200;
+  @apply hover:bg-sidebar-hover;
+}
+
+.sidebar-link.active {
+  @apply bg-sidebar-active;
+  @apply border-l-4 border-gold-500;
+  @apply pl-[calc(1.5rem-4px)];
+}
+
+.sidebar-link-icon {
+  @apply w-5 h-5 flex-shrink-0;
+}
+
+.sidebar-link-text {
+  @apply truncate;
+}
+
+.sidebar-footer {
+  @apply px-6 py-4;
+  @apply border-t border-sidebar-dark;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+.app-main {
+  @apply flex-1;
+  @apply ml-0 lg:ml-64;
+  @apply transition-all duration-300;
+}
+
+.app-main.sidebar-collapsed {
+  @apply lg:ml-20;
+}
+
+.app-container {
+  @apply max-w-[1920px] mx-auto;
+  @apply px-6 py-6;
+}
+
+.app-container-narrow {
+  @apply max-w-7xl mx-auto;
+  @apply px-6 py-6;
+}
+
+/* ========================================
+   PAGE HEADER
+   ======================================== */
+.page-header {
+  @apply mb-6;
+}
+
+.page-header-top {
+  @apply flex items-center justify-between;
+  @apply mb-2;
+}
+
+.page-title {
+  @apply text-2xl font-bold text-gray-900;
+}
+
+.page-subtitle {
+  @apply text-sm text-gray-600;
+}
+
+.page-actions {
+  @apply flex items-center gap-3;
+}
+
+/* ========================================
+   BREADCRUMBS
+   ======================================== */
+.breadcrumbs {
+  @apply flex items-center gap-2;
+  @apply text-sm text-gray-600;
+  @apply mb-4;
+}
+
+.breadcrumb-item {
+  @apply flex items-center gap-2;
+}
+
+.breadcrumb-link {
+  @apply hover:text-primary-600;
+  @apply transition-colors duration-200;
+}
+
+.breadcrumb-separator {
+  @apply text-gray-400;
+}
+
+.breadcrumb-current {
+  @apply text-gray-900 font-medium;
+}
+
+/* ========================================
+   CONTENT SECTIONS
+   ======================================== */
+.content-section {
+  @apply mb-8;
+}
+
+.section-header {
+  @apply flex items-center justify-between;
+  @apply mb-4;
+}
+
+.section-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.section-subtitle {
+  @apply text-sm text-gray-600 mt-1;
+}
+
+.section-actions {
+  @apply flex items-center gap-3;
+}
+
+/* ========================================
+   GRID LAYOUTS
+   ======================================== */
+.grid-1 {
+  @apply grid grid-cols-1 gap-6;
+}
+
+.grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.grid-4 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+.grid-auto {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+}
+
+/* ========================================
+   DASHBOARD LAYOUTS
+   ======================================== */
+.dashboard-grid {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-6;
+}
+
+.dashboard-main {
+  @apply lg:col-span-8;
+}
+
+.dashboard-sidebar {
+  @apply lg:col-span-4;
+}
+
+/* ========================================
+   SPLIT LAYOUTS
+   ======================================== */
+.split-layout {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+}
+
+.split-layout-left {
+  @apply lg:col-span-1;
+}
+
+.split-layout-right {
+  @apply lg:col-span-1;
+}
+
+/* ========================================
+   RESPONSIVE UTILITIES
+   ======================================== */
+.mobile-only {
+  @apply block lg:hidden;
+}
+
+.desktop-only {
+  @apply hidden lg:block;
+}
+
+.tablet-up {
+  @apply hidden md:block;
+}
+
+/* ========================================
+   MOBILE MENU
+   ======================================== */
+.mobile-menu-button {
+  @apply lg:hidden;
+  @apply p-2 rounded-lg;
+  @apply text-gray-600 hover:bg-gray-100;
+}
+
+.mobile-menu-overlay {
+  @apply fixed inset-0 bg-black/50;
+  @apply lg:hidden z-40;
+}
+
+.mobile-menu {
+  @apply fixed inset-y-0 left-0;
+  @apply w-64 bg-white;
+  @apply shadow-xl;
+  @apply lg:hidden z-50;
+  @apply transform transition-transform duration-300;
+}
+
+.mobile-menu.closed {
+  @apply -translate-x-full;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+.app-footer {
+  @apply bg-white border-t border-gray-200;
+  @apply py-6 px-6;
+  @apply mt-auto;
+}
+
+.app-footer-content {
+  @apply max-w-[1920px] mx-auto;
+  @apply flex flex-col md:flex-row items-center justify-between;
+  @apply gap-4 text-sm text-gray-600;
+}
+
+.app-footer-links {
+  @apply flex items-center gap-6;
+}
+
+.app-footer-link {
+  @apply hover:text-primary-600;
+  @apply transition-colors duration-200;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+@media (max-width: 1024px) {
+  .app-sidebar {
+    @apply -translate-x-full;
+  }
+  
+  .app-sidebar.open {
+    @apply translate-x-0;
+  }
+  
+  .app-main {
+    @apply ml-0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header-container {
+    @apply px-4 py-3;
+  }
+  
+  .app-container {
+    @apply px-4 py-4;
+  }
+  
+  .page-title {
+    @apply text-xl;
+  }
+}

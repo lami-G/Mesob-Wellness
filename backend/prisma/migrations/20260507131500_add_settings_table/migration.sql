@@ -1,5 +1,5 @@
 -- CreateTable "settings"
-CREATE TABLE "settings" (
+CREATE TABLE IF NOT EXISTS "settings" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "key" TEXT NOT NULL,
     "value" TEXT NOT NULL,
@@ -10,7 +10,8 @@ CREATE TABLE "settings" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "settings_key_key" ON "settings"("key");
+CREATE UNIQUE INDEX IF NOT EXISTS "settings_key_key" ON "settings"("key");
 
 -- CreateIndex
-CREATE INDEX "settings_key_idx" ON "settings"("key");
+CREATE INDEX IF NOT EXISTS "settings_key_idx" ON "settings"("key");
+

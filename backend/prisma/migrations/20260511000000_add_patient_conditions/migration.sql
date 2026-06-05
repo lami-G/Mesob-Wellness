@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "patient_conditions" (
+CREATE TABLE IF NOT EXISTS "patient_conditions" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "patient_id" UUID NOT NULL,
     "conditions" JSONB NOT NULL,
@@ -14,22 +14,39 @@ CREATE TABLE "patient_conditions" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "patient_conditions_patient_id_key" ON "patient_conditions"("patient_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "patient_conditions_patient_id_key" ON "patient_conditions"("patient_id");
 
 -- CreateIndex
-CREATE INDEX "patient_conditions_patient_id_idx" ON "patient_conditions"("patient_id");
+CREATE INDEX IF NOT EXISTS "patient_conditions_patient_id_idx" ON "patient_conditions"("patient_id");
 
 -- CreateIndex
-CREATE INDEX "patient_conditions_is_nurse_approved_idx" ON "patient_conditions"("is_nurse_approved");
+CREATE INDEX IF NOT EXISTS "patient_conditions_is_nurse_approved_idx" ON "patient_conditions"("is_nurse_approved");
 
 -- CreateIndex
-CREATE INDEX "patient_conditions_approved_at_idx" ON "patient_conditions"("approved_at");
+CREATE INDEX IF NOT EXISTS "patient_conditions_approved_at_idx" ON "patient_conditions"("approved_at");
 
 -- AddForeignKey
-ALTER TABLE "patient_conditions" ADD CONSTRAINT "patient_conditions_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'patient_conditions_patient_id_fkey'
+    ) THEN
+        ALTER TABLE "patient_conditions" ADD CONSTRAINT "patient_conditions_patient_id_fkey" FOREIGN KEY ("patient_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "patient_conditions" ADD CONSTRAINT "patient_conditions_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'patient_conditions_approved_by_fkey'
+    ) THEN
+        ALTER TABLE "patient_conditions" ADD CONSTRAINT "patient_conditions_approved_by_fkey" FOREIGN KEY ("approved_by") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+    END IF;
+END $$;
 
 -- AlterTable
-ALTER TABLE "wellness_plans" ADD COLUMN "conditions" JSONB;
+ALTER TABLE "wellness_plans" ADD COLUMN IF NOT EXISTS "conditions" JSONB;
+

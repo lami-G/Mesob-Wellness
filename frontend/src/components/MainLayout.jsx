@@ -25,6 +25,7 @@ function MainLayout({ children }) {
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [displayUser, setDisplayUser] = useState(user);
+  const [announcement, setAnnouncement] = useState("");
   const userMenuRef = useRef(null);
   const dashboardTab =
     new URLSearchParams(location.search).get("tab") || "appointments";
@@ -57,6 +58,17 @@ function MainLayout({ children }) {
     setDisplayUser(user);
   }, [user]);
 
+  // Announce route changes to screen readers
+  useEffect(() => {
+    const pathName = location.pathname.split('/').pop() || 'home';
+    const formattedPath = pathName.charAt(0).toUpperCase() + pathName.slice(1).replace(/-/g, ' ');
+    setAnnouncement(`Navigated to ${formattedPath} page`);
+    
+    // Clear announcement after it's been read
+    const timer = setTimeout(() => setAnnouncement(""), 1000);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
   // Check if user has manager access
   const hasManagerAccess = () => {
     return (
@@ -83,7 +95,65 @@ function MainLayout({ children }) {
 
   return (
     <div className="layout-shell">
-      <header className="app-header">
+      {/* Skip Navigation Links for Accessibility */}
+      <a 
+        href="#main-content" 
+        className="skip-link"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          zIndex: 9999,
+          padding: '1rem',
+          backgroundColor: '#2347A6',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '0.25rem',
+        }}
+        onFocus={(e) => {
+          e.target.style.left = '1rem';
+          e.target.style.top = '1rem';
+        }}
+        onBlur={(e) => {
+          e.target.style.left = '-9999px';
+        }}
+      >
+        Skip to main content
+      </a>
+      <a 
+        href="#navigation" 
+        className="skip-link"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          zIndex: 9999,
+          padding: '1rem',
+          backgroundColor: '#2347A6',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '0.25rem',
+        }}
+        onFocus={(e) => {
+          e.target.style.left = '1rem';
+          e.target.style.top = '4rem';
+        }}
+        onBlur={(e) => {
+          e.target.style.left = '-9999px';
+        }}
+      >
+        Skip to navigation
+      </a>
+
+      {/* Screen Reader Announcements */}
+      <div 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {announcement}
+      </div>
+
+      <header className="app-header" role="banner">
         <div className="app-header-left">
           <img
             src="/Mesob-short-png.png"
@@ -97,13 +167,20 @@ function MainLayout({ children }) {
         </div>
         
         <div className="app-header-right">
-          <button className="notification-btn-modern" title="Notifications">
-            <Bell size={20} />
+          <button 
+            className="notification-btn-modern" 
+            title="Notifications"
+            aria-label="View notifications"
+          >
+            <Bell size={20} aria-hidden="true" />
           </button>
           
           <div className="language-selector-modern">
-            <Globe size={18} />
-            <select className="language-select">
+            <Globe size={18} aria-hidden="true" />
+            <select 
+              className="language-select"
+              aria-label="Select language"
+            >
               <option value="en">EN</option>
               <option value="am">አማ</option>
             </select>
@@ -115,34 +192,43 @@ function MainLayout({ children }) {
                 type="button"
                 className="user-btn-header"
                 onClick={() => setShowUserMenu(!showUserMenu)}
+                aria-label={`User menu for ${displayUser?.fullName || 'user'}`}
+                aria-expanded={showUserMenu}
+                aria-haspopup="true"
               >
                 <div className="user-avatar-header">
                   {displayUser?.profilePicture ? (
-                    <img src={displayUser.profilePicture} alt={displayUser?.fullName} className="avatar-img-header" />
+                    <img src={displayUser.profilePicture} alt="" className="avatar-img-header" />
                   ) : (
-                    <div className="avatar-initials-header">
+                    <div className="avatar-initials-header" aria-hidden="true">
                       {getInitials(displayUser?.fullName)}
                     </div>
                   )}
                 </div>
-                <ChevronDown size={16} className="dropdown-arrow-header" />
+                <ChevronDown size={16} className="dropdown-arrow-header" aria-hidden="true" />
               </button>
 
               {showUserMenu && (
-                <div className="user-dropdown-header">
+                <div 
+                  className="user-dropdown-header"
+                  role="menu"
+                  aria-label="User menu"
+                >
                   <button 
                     className="dropdown-item-header"
                     onClick={handleProfileClick}
+                    role="menuitem"
                   >
-                    <User size={16} />
+                    <User size={16} aria-hidden="true" />
                     <span>Profile</span>
                   </button>
-                  <hr className="dropdown-divider-header" />
+                  <hr className="dropdown-divider-header" role="separator" />
                   <button 
                     className="dropdown-item-header logout-header"
                     onClick={handleLogout}
+                    role="menuitem"
                   >
-                    <LogOut size={16} />
+                    <LogOut size={16} aria-hidden="true" />
                     <span>Logout</span>
                   </button>
                 </div>
@@ -153,8 +239,8 @@ function MainLayout({ children }) {
       </header>
 
       <div className="layout-body">
-        <aside className="app-sidebar">
-          <nav className="sidebar-nav-main">
+        <aside className="app-sidebar" role="complementary" id="navigation">
+          <nav className="sidebar-nav-main" aria-label="Main navigation">
             {location.pathname === "/nurse" ? (
               <Link className="sidebar-link active" to="/nurse">
                 <Stethoscope size={20} />
@@ -269,7 +355,9 @@ function MainLayout({ children }) {
           </div>
         </aside>
 
-        <main className="app-main">{children}</main>
+        <main className="app-main" id="main-content" role="main" tabIndex="-1">
+          {children}
+        </main>
       </div>
     </div>
   );

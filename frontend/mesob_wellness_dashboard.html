@@ -1,0 +1,878 @@
+
+<style>
+:root {
+  --nav: #1A237E;
+  --nav-mid: #283593;
+  --nav-light: #3949AB;
+  --sidebar: #162060;
+  --sidebar-active: #1E2FA6;
+  --teal: #00897B;
+  --teal-light: #4DB6AC;
+  --success: #2E7D32;
+  --warning: #F57F17;
+  --danger: #C62828;
+  --bg: #F5F6FA;
+  --card: #ffffff;
+  --text-primary: #1A237E;
+  --text-body: #333;
+  --text-muted: #757575;
+  --gold: #F9A825;
+  --shadow: 0 2px 10px rgba(0,0,0,0.08);
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body, .mesob-system { font-family: 'Trebuchet MS', system-ui, sans-serif; background: var(--bg); }
+
+.mesob-system { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+.gov-header {
+  background: var(--nav);
+  color: white;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 3px solid var(--gold);
+}
+.header-logo { display: flex; align-items: center; gap: 12px; }
+.logo-circle {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--gold);
+  background: rgba(249,168,37,0.1);
+}
+.header-org { line-height: 1.3; }
+.header-org .amharic { font-size: 10px; color: rgba(255,255,255,0.7); }
+.header-org .english { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+.header-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.role-badge {
+  background: var(--gold); color: #1A237E;
+  padding: 4px 12px; border-radius: 4px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.icon-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: white; font-size: 14px;
+}
+
+/* ROLE SELECTOR */
+.role-selector {
+  background: var(--nav-mid);
+  padding: 8px 24px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.role-selector span { color: rgba(255,255,255,0.6); font-size: 11px; margin-right: 8px; }
+.role-tab {
+  padding: 5px 14px; border-radius: 4px; cursor: pointer;
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.7); background: transparent;
+  border: 1px solid transparent; transition: all 0.15s;
+}
+.role-tab.active { background: var(--gold); color: #1A237E; border-color: var(--gold); }
+.role-tab:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+
+/* LAYOUT */
+.main-layout { display: flex; flex: 1; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px; min-height: calc(100vh - 88px);
+  background: var(--sidebar);
+  flex-shrink: 0; padding: 16px 0;
+  display: flex; flex-direction: column;
+}
+.sidebar-section { padding: 0 12px; margin-bottom: 8px; }
+.sidebar-section-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: rgba(255,255,255,0.4);
+  padding: 0 8px; margin-bottom: 4px; margin-top: 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 6px; cursor: pointer;
+  color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600;
+  transition: all 0.15s; position: relative;
+}
+.nav-item.active {
+  background: var(--sidebar-active); color: white;
+  border-left: 3px solid var(--gold);
+  padding-left: 9px;
+}
+.nav-item:hover:not(.active) { background: rgba(255,255,255,0.08); color: white; }
+.nav-item i { font-size: 16px; width: 18px; text-align: center; }
+.nav-badge {
+  margin-left: auto; background: var(--teal);
+  color: white; font-size: 9px; font-weight: 700;
+  padding: 2px 6px; border-radius: 10px; min-width: 18px;
+  text-align: center;
+}
+.sidebar-spacer { flex: 1; }
+.sidebar-status {
+  margin: 0 12px; padding: 10px 12px;
+  background: rgba(255,255,255,0.06); border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4CAF50; display: inline-block; margin-right: 6px; }
+.status-text { font-size: 10px; color: rgba(255,255,255,0.6); }
+
+/* MAIN CONTENT */
+.main-content { flex: 1; padding: 20px 24px; overflow: auto; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom: 20px; }
+.page-breadcrumb { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+.page-breadcrumb span { color: var(--nav-light); }
+.page-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.page-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* STAT CARDS */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow);
+  border-top: 4px solid var(--nav);
+  position: relative; overflow: hidden;
+}
+.stat-card.teal { border-top-color: var(--teal); }
+.stat-card.success { border-top-color: var(--success); }
+.stat-card.warning { border-top-color: var(--warning); }
+.stat-card.danger { border-top-color: var(--danger); }
+.stat-card .stat-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #E8EAF6; display: flex; align-items: center;
+  justify-content: center; margin-bottom: 10px;
+  color: var(--nav); font-size: 16px;
+}
+.stat-card.teal .stat-icon { background: #E0F2F1; color: var(--teal); }
+.stat-card.success .stat-icon { background: #E8F5E9; color: var(--success); }
+.stat-card.warning .stat-icon { background: #FFF3E0; color: var(--warning); }
+.stat-card.danger .stat-icon { background: #FFEBEE; color: var(--danger); }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+.stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+.stat-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.stat-trend { font-size: 11px; font-weight: 600; margin-top: 4px; }
+.stat-trend.up { color: var(--success); }
+.stat-trend.down { color: var(--danger); }
+
+/* CARDS */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.card-full { grid-column: 1 / -1; }
+.card {
+  background: var(--card); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.card-header {
+  padding: 14px 18px; border-bottom: 1px solid rgba(0,0,0,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.card-body { padding: 16px 18px; }
+.live-dot {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700;
+  color: var(--danger); text-transform: uppercase;
+}
+.live-dot::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--danger); animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  text-align: left; padding: 8px 12px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-muted);
+  background: var(--bg); border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.data-table td {
+  padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.04);
+  color: var(--text-body); font-family: Calibri, system-ui;
+}
+.data-table tr:hover td { background: #F0F4FF; }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* BADGES */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-active { background: #E8F5E9; color: #1B5E20; }
+.badge-pending { background: #FFF3E0; color: #E65100; }
+.badge-critical { background: #FFEBEE; color: #B71C1C; }
+.badge-completed { background: #E3F2FD; color: #0D47A1; }
+.badge-high { background: #FFEBEE; color: #C62828; }
+.badge-medium { background: #FFF8E1; color: #F57F17; }
+.badge-low { background: #E8F5E9; color: #2E7D32; }
+
+/* CHART AREA */
+.chart-area { height: 140px; background: var(--bg); border-radius: 6px; position: relative; overflow: hidden; }
+.chart-bars { display: flex; align-items: flex-end; gap: 4px; padding: 10px; height: 100%; }
+.bar { flex: 1; background: var(--nav-light); border-radius: 3px 3px 0 0; opacity: 0.7; min-height: 4px; }
+.bar.highlight { background: var(--gold); opacity: 1; }
+.bar.teal { background: var(--teal); }
+
+/* ROLE DASHBOARD PANELS */
+.dash-panel { display: none; }
+.dash-panel.visible { display: block; }
+
+/* MINI CHART LINE */
+.mini-chart { display: flex; align-items: flex-end; gap: 2px; height: 40px; }
+.mini-bar { width: 6px; border-radius: 2px 2px 0 0; background: var(--nav-light); opacity: 0.5; }
+.mini-bar.peak { opacity: 1; background: var(--teal); }
+
+/* INFO ROW */
+.info-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.info-row:last-child { border-bottom: none; }
+.info-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #E8EAF6; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700;
+  color: var(--nav); flex-shrink: 0;
+}
+.info-name { font-size: 12px; font-weight: 600; color: var(--text-body); }
+.info-meta { font-size: 11px; color: var(--text-muted); }
+.info-right { margin-left: auto; text-align: right; }
+
+/* PROGRESS BAR */
+.progress-wrap { background: var(--bg); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; background: var(--nav-light); }
+.progress-fill.teal { background: var(--teal); }
+.progress-fill.success { background: var(--success); }
+.progress-fill.warning { background: var(--warning); }
+
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; display: block; }
+.form-input {
+  width: 100%; padding: 8px 12px; border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.15); font-size: 13px;
+  color: var(--text-body); font-family: Calibri, system-ui;
+  background: white; outline: none;
+}
+.form-input:focus { border-color: var(--nav-light); box-shadow: 0 0 0 3px rgba(57,73,171,0.1); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn-primary {
+  background: var(--nav); color: white; border: none;
+  padding: 9px 20px; border-radius: 6px; cursor: pointer;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+  text-transform: uppercase; transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--nav-mid); }
+.btn-secondary {
+  background: white; color: var(--nav); border: 1px solid var(--nav);
+  padding: 9px 20px; border-radius: 6px; cursor: pointer;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+/* FOOTER */
+.gov-footer {
+  background: var(--nav);
+  color: white;
+  padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 56px; border-top: 3px solid var(--gold);
+}
+.footer-left { font-size: 11px; color: rgba(255,255,255,0.6); }
+.footer-left strong { color: white; display: block; font-size: 12px; }
+.footer-center { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.footer-logo-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700; color: var(--gold); text-align: center;
+  background: rgba(249,168,37,0.08); line-height: 1.2;
+}
+.footer-amharic { font-size: 11px; color: rgba(255,255,255,0.8); }
+.footer-english { font-size: 10px; color: rgba(255,255,255,0.5); }
+.footer-right { text-align: right; }
+.footer-visit-btn {
+  background: var(--gold); color: #1A237E;
+  padding: 6px 16px; border-radius: 4px; font-size: 11px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  cursor: pointer; border: none; margin-bottom: 4px; display: block;
+  margin-left: auto;
+}
+.footer-service { font-size: 10px; color: rgba(255,255,255,0.5); text-align: right; }
+.footer-number { font-size: 18px; font-weight: 700; color: white; }
+
+/* NOTIFICATION */
+.notif-item {
+  display: flex; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 12px;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.notif-text { color: var(--text-body); line-height: 1.4; }
+.notif-time { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+
+/* SYSTEM STATUS */
+.sys-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 12px; }
+.sys-row:last-child { border-bottom: none; }
+.sys-label { color: var(--text-muted); }
+.sys-status { display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 11px; }
+.dot-green { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+.dot-orange { width: 7px; height: 7px; border-radius: 50%; background: var(--warning); }
+.dot-gray { width: 7px; height: 7px; border-radius: 50%; background: #aaa; }
+</style>
+
+<h2 class="sr-only">MESOB Wellness National Health Management System - Role-Based Dashboard</h2>
+
+<div class="mesob-system">
+
+  <!-- HEADER -->
+  <header class="gov-header">
+    <div class="header-logo">
+      <div class="logo-circle">M</div>
+      <div class="header-org">
+        <div class="amharic">በኢትዮጵያ ፌደራላዊ ዲሞክራሲያዊ ሪፐብሊክ</div>
+        <div class="english">FDRE MESOB Wellness Service</div>
+      </div>
+    </div>
+    <div class="header-title">MESOB Wellness — National Health Management System</div>
+    <div class="header-actions">
+      <div class="role-badge" id="active-role-label">Manager</div>
+      <div class="icon-btn"><i class="ti ti-bell" aria-hidden="true"></i></div>
+      <div class="icon-btn"><i class="ti ti-user" aria-hidden="true"></i></div>
+    </div>
+  </header>
+
+  <!-- ROLE TABS -->
+  <nav class="role-selector" role="navigation" aria-label="Role switcher">
+    <span>View as:</span>
+    <button class="role-tab" onclick="switchRole('patient')">Patient</button>
+    <button class="role-tab" onclick="switchRole('staff')">Staff</button>
+    <button class="role-tab" onclick="switchRole('nurse')">Nurse Officer</button>
+    <button class="role-tab active" onclick="switchRole('manager')">Manager</button>
+    <button class="role-tab" onclick="switchRole('regional')">Regional Officer</button>
+    <button class="role-tab" onclick="switchRole('federal')">Federal Office</button>
+    <button class="role-tab" onclick="switchRole('admin')">System Admin</button>
+  </nav>
+
+  <div class="main-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div id="sidebar-nav"></div>
+      <div class="sidebar-spacer"></div>
+      <div style="padding: 0 12px; margin-bottom: 12px;">
+        <div class="sidebar-status">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span class="status-dot"></span>
+            <span class="status-text" style="color:rgba(255,255,255,0.8);font-weight:600;">System Online</span>
+          </div>
+          <div class="status-text">API · DB · Auth — Active</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content" id="main-content">
+
+      <!-- MANAGER DASHBOARD (default) -->
+      <div class="dash-panel visible" id="panel-manager">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>Manager Dashboard</span></div>
+          <div class="page-title">Today's Center Overview</div>
+          <div class="page-subtitle">Live data from Addis Ababa Health Center · Last updated 2 min ago</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="ti ti-users" aria-hidden="true"></i></div>
+            <div class="stat-value">18</div>
+            <div class="stat-label">Patients Today</div>
+            <div class="stat-trend up"><i class="ti ti-arrow-up-right" aria-hidden="true"></i> +3 vs yesterday</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon"><i class="ti ti-calendar-check" aria-hidden="true"></i></div>
+            <div class="stat-value">94%</div>
+            <div class="stat-label">Fill Rate</div>
+            <div class="stat-sub">Target: 90%</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Staff On Duty</div>
+            <div class="stat-sub">All present</div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-icon"><i class="ti ti-alert-circle" aria-hidden="true"></i></div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Urgent Cases</div>
+            <div class="stat-sub">Requires attention</div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon"><i class="ti ti-star" aria-hidden="true"></i></div>
+            <div class="stat-value">4.6</div>
+            <div class="stat-label">Avg Rating</div>
+            <div class="stat-sub">NPS: 72 · 48 reviews</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Completed Today</div>
+            <div class="stat-trend up"><i class="ti ti-arrow-up-right" aria-hidden="true"></i> On track</div>
+          </div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Staff On Duty</div><div class="card-subtitle">Current shift</div></div>
+              <div class="live-dot">Live</div>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <div class="info-avatar">TH</div>
+                <div><div class="info-name">Nurse Tigist H.</div><div class="info-meta">Nurse Officer</div></div>
+                <div class="info-right"><span class="badge badge-active">On Duty</span></div>
+              </div>
+              <div class="info-row">
+                <div class="info-avatar">LA</div>
+                <div><div class="info-name">Dr. Lemma A.</div><div class="info-meta">Staff Physician</div></div>
+                <div class="info-right"><span class="badge badge-completed">In Service</span></div>
+              </div>
+              <div class="info-row">
+                <div class="info-avatar">HG</div>
+                <div><div class="info-name">Habtamu G.</div><div class="info-meta">Receptionist</div></div>
+                <div class="info-right"><span class="badge badge-active">On Duty</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div><div class="card-title">Daily Service Volume</div><div class="card-subtitle">This month</div></div>
+              <div class="live-dot">Live</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-area">
+                <div class="chart-bars">
+                  <div class="bar" style="height:45%"></div><div class="bar" style="height:60%"></div>
+                  <div class="bar" style="height:55%"></div><div class="bar" style="height:70%"></div>
+                  <div class="bar" style="height:65%"></div><div class="bar" style="height:80%"></div>
+                  <div class="bar" style="height:72%"></div><div class="bar" style="height:85%"></div>
+                  <div class="bar" style="height:78%"></div><div class="bar teal" style="height:90%"></div>
+                  <div class="bar" style="height:82%"></div><div class="bar" style="height:88%"></div>
+                  <div class="bar highlight" style="height:95%"></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--text-muted);">
+                <span>May 1</span><span>May 14</span><span>Today</span>
+              </div>
+            </div>
+          </div>
+          <div class="card card-full">
+            <div class="card-header">
+              <div><div class="card-title">Recent Appointments</div><div class="card-subtitle">Today's schedule</div></div>
+              <button class="btn-secondary" style="font-size:11px;padding:5px 12px;">View All</button>
+            </div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table">
+                <thead><tr><th>Patient</th><th>Time</th><th>Service</th><th>Staff</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td>Worke Tadesse</td><td>08:00</td><td>Vitals Check</td><td>Nurse Tigist</td><td><span class="badge badge-completed">Completed</span></td><td style="color:var(--nav-light);cursor:pointer;font-weight:600">View</td></tr>
+                  <tr><td>Selam Bekele</td><td>09:30</td><td>Wellness Consult</td><td>Dr. Lemma</td><td><span class="badge badge-active">In Progress</span></td><td style="color:var(--nav-light);cursor:pointer;font-weight:600">View</td></tr>
+                  <tr><td>Girma Ayana</td><td>10:00</td><td>Follow-Up</td><td>Dr. Lemma</td><td><span class="badge badge-pending">Waiting</span></td><td style="color:var(--nav-light);cursor:pointer;font-weight:600">View</td></tr>
+                  <tr><td>Hiwot Mengistu</td><td>11:30</td><td>Nutrition Review</td><td>Nurse Tigist</td><td><span class="badge badge-pending">Scheduled</span></td><td style="color:var(--nav-light);cursor:pointer;font-weight:600">View</td></tr>
+                  <tr><td>Abebe Girma</td><td>14:00</td><td>Physical Exam</td><td>Dr. Lemma</td><td><span class="badge badge-high">URGENT</span></td><td style="color:var(--nav-light);cursor:pointer;font-weight:600">View</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATIENT PANEL -->
+      <div class="dash-panel" id="panel-patient">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>My Health Portal</span></div>
+          <div class="page-title">Welcome, Worke Tadesse</div>
+          <div class="page-subtitle">Your personal wellness dashboard</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card teal">
+            <div class="stat-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Upcoming Appts</div>
+            <div class="stat-sub">Next: May 30</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="ti ti-heart-rate" aria-hidden="true"></i></div>
+            <div class="stat-value">120/80</div>
+            <div class="stat-label">Last BP Reading</div>
+            <div class="stat-sub">May 23 · Normal</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-icon"><i class="ti ti-scale" aria-hidden="true"></i></div>
+            <div class="stat-value">72kg</div>
+            <div class="stat-label">Weight</div>
+            <div class="stat-trend up">Healthy BMI</div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon"><i class="ti ti-pill" aria-hidden="true"></i></div>
+            <div class="stat-value">1</div>
+            <div class="stat-label">Active Referrals</div>
+            <div class="stat-sub">Specialist review</div>
+          </div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">My Appointments</div></div>
+            <div class="card-body">
+              <div class="info-row">
+                <div class="info-avatar" style="background:#E0F2F1;color:var(--teal)"><i class="ti ti-stethoscope" aria-hidden="true"></i></div>
+                <div><div class="info-name">Wellness Consultation</div><div class="info-meta">May 30 · 10:00 AM · Dr. Lemma</div></div>
+                <div class="info-right"><span class="badge badge-completed">Confirmed</span></div>
+              </div>
+              <div class="info-row">
+                <div class="info-avatar" style="background:#E8EAF6;color:var(--nav)"><i class="ti ti-clipboard" aria-hidden="true"></i></div>
+                <div><div class="info-name">Lab Results Review</div><div class="info-meta">Jun 5 · 09:00 AM · Nurse Tigist</div></div>
+                <div class="info-right"><span class="badge badge-pending">Pending</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Wellness Goals</div></div>
+            <div class="card-body">
+              <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span>Daily Steps</span><span style="font-weight:600;color:var(--teal)">7,200 / 10,000</span></div><div class="progress-wrap"><div class="progress-fill teal" style="width:72%"></div></div></div>
+              <div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span>Water Intake</span><span style="font-weight:600;color:var(--nav-light)">1.8L / 2.5L</span></div><div class="progress-wrap"><div class="progress-fill" style="width:72%"></div></div></div>
+              <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span>Sleep Quality</span><span style="font-weight:600;color:var(--success)">Good</span></div><div class="progress-wrap"><div class="progress-fill success" style="width:80%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NURSE PANEL -->
+      <div class="dash-panel" id="panel-nurse">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>Nurse Officer Dashboard</span></div>
+          <div class="page-title">Patient Condition Queue</div>
+          <div class="page-subtitle">Review and approve patient conditions</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card danger"><div class="stat-icon"><i class="ti ti-alert-triangle" aria-hidden="true"></i></div><div class="stat-value">4</div><div class="stat-label">For Review</div></div>
+          <div class="stat-card teal"><div class="stat-icon"><i class="ti ti-check" aria-hidden="true"></i></div><div class="stat-value">11</div><div class="stat-label">Approved Today</div></div>
+          <div class="stat-card warning"><div class="stat-icon"><i class="ti ti-activity" aria-hidden="true"></i></div><div class="stat-value">23</div><div class="stat-label">Vitals Recorded</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-users" aria-hidden="true"></i></div><div class="stat-value">18</div><div class="stat-label">Patients Seen</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card card-full">
+            <div class="card-header"><div class="card-title">Condition Review Queue</div><div class="live-dot">Live</div></div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table">
+                <thead><tr><th>Patient</th><th>Conditions</th><th>Priority</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td>Worke T.</td><td>Hypertension, BMI: Obese</td><td><span class="badge badge-high">HIGH</span></td><td><button class="btn-primary" style="font-size:10px;padding:4px 10px;">Approve</button></td></tr>
+                  <tr><td>Selam B.</td><td>Normal BP, Healthy BMI</td><td><span class="badge badge-low">LOW</span></td><td><button class="btn-primary" style="font-size:10px;padding:4px 10px;">Approve</button></td></tr>
+                  <tr><td>Girma A.</td><td>Pre-diabetes, At Risk</td><td><span class="badge badge-high">HIGH</span></td><td><button class="btn-secondary" style="font-size:10px;padding:4px 10px;">Review</button></td></tr>
+                  <tr><td>Hiwot M.</td><td>Asthma, Underweight</td><td><span class="badge badge-medium">MEDIUM</span></td><td><button class="btn-secondary" style="font-size:10px;padding:4px 10px;">Review</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card card-full">
+            <div class="card-header"><div class="card-title">Record Vitals — Quick Entry</div></div>
+            <div class="card-body">
+              <div class="form-row" style="margin-bottom:12px;">
+                <div class="form-group"><label class="form-label">Patient</label><input class="form-input" placeholder="Search patient..." /></div>
+                <div class="form-group"><label class="form-label">Weight (kg)</label><input class="form-input" placeholder="e.g. 68.5" /></div>
+              </div>
+              <div class="form-row" style="margin-bottom:12px;">
+                <div class="form-group"><label class="form-label">BP (mmHg)</label><input class="form-input" placeholder="e.g. 120/80" /></div>
+                <div class="form-group"><label class="form-label">Heart Rate</label><input class="form-input" placeholder="e.g. 72" /></div>
+              </div>
+              <div class="form-row" style="margin-bottom:16px;">
+                <div class="form-group"><label class="form-label">Temp (°C)</label><input class="form-input" placeholder="e.g. 36.8" /></div>
+                <div class="form-group"><label class="form-label">Glucose</label><input class="form-input" placeholder="e.g. 95" /></div>
+              </div>
+              <button class="btn-primary">Save Vital Record</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAFF PANEL -->
+      <div class="dash-panel" id="panel-staff">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>Staff Dashboard</span></div>
+          <div class="page-title">Today's Work Queue</div>
+          <div class="page-subtitle">Addis Ababa Health Center · Shift: Morning</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card teal"><div class="stat-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div><div class="stat-value">7</div><div class="stat-label">My Appointments</div><div class="stat-sub">3 remaining</div></div>
+          <div class="stat-card warning"><div class="stat-icon"><i class="ti ti-clock" aria-hidden="true"></i></div><div class="stat-value">2</div><div class="stat-label">Pending Tasks</div></div>
+          <div class="stat-card success"><div class="stat-icon"><i class="ti ti-check" aria-hidden="true"></i></div><div class="stat-value">4</div><div class="stat-label">Completed</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-message" aria-hidden="true"></i></div><div class="stat-value">3</div><div class="stat-label">Messages</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card card-full">
+            <div class="card-header"><div class="card-title">My Appointment List</div></div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table">
+                <thead><tr><th>Time</th><th>Patient</th><th>Service Type</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>08:00</td><td>Worke Tadesse</td><td>Physical Exam</td><td><span class="badge badge-completed">Done</span></td></tr>
+                  <tr><td>09:30</td><td>Selam Bekele</td><td>Wellness Consult</td><td><span class="badge badge-active">Active</span></td></tr>
+                  <tr><td>11:00</td><td>Girma Ayana</td><td>Follow-Up</td><td><span class="badge badge-pending">Next</span></td></tr>
+                  <tr><td>13:30</td><td>Hiwot Mengistu</td><td>Nutrition Check</td><td><span class="badge badge-pending">Scheduled</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGIONAL PANEL -->
+      <div class="dash-panel" id="panel-regional">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>Regional Officer Dashboard</span></div>
+          <div class="page-title">Addis Ababa Region Overview</div>
+          <div class="page-subtitle">Aggregated data from 8 centers · This month</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-building" aria-hidden="true"></i></div><div class="stat-value">8</div><div class="stat-label">Centers</div><div class="stat-sub">7 active, 1 upgrading</div></div>
+          <div class="stat-card teal"><div class="stat-icon"><i class="ti ti-users" aria-hidden="true"></i></div><div class="stat-value">4,821</div><div class="stat-label">Patients Served</div><div class="stat-trend up">+9% this month</div></div>
+          <div class="stat-card success"><div class="stat-icon"><i class="ti ti-star" aria-hidden="true"></i></div><div class="stat-value">97.2%</div><div class="stat-label">Satisfaction</div></div>
+          <div class="stat-card warning"><div class="stat-icon"><i class="ti ti-alert-circle" aria-hidden="true"></i></div><div class="stat-value">3</div><div class="stat-label">Flagged Issues</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card card-full">
+            <div class="card-header"><div class="card-title">Center Performance</div></div>
+            <div class="card-body" style="padding:0">
+              <table class="data-table">
+                <thead><tr><th>Center</th><th>Patients MTD</th><th>Satisfaction</th><th>Capacity</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Bole Health Center</td><td>842</td><td>98.1%</td><td>91%</td><td><span class="badge badge-active">Active</span></td></tr>
+                  <tr><td>Kirkos Wellness Hub</td><td>710</td><td>96.5%</td><td>85%</td><td><span class="badge badge-active">Active</span></td></tr>
+                  <tr><td>Yeka Community Center</td><td>654</td><td>97.8%</td><td>78%</td><td><span class="badge badge-active">Active</span></td></tr>
+                  <tr><td>Nifas Silk Center</td><td>510</td><td>95.2%</td><td>70%</td><td><span class="badge badge-pending">Review</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEDERAL PANEL -->
+      <div class="dash-panel" id="panel-federal">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>Federal Office Dashboard</span></div>
+          <div class="page-title">National Health Overview</div>
+          <div class="page-subtitle">All regions · All centers · Real-time aggregation</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-map" aria-hidden="true"></i></div><div class="stat-value">15</div><div class="stat-label">Regions</div></div>
+          <div class="stat-card teal"><div class="stat-icon"><i class="ti ti-building-hospital" aria-hidden="true"></i></div><div class="stat-value">27</div><div class="stat-label">MESOB Centers</div></div>
+          <div class="stat-card success"><div class="stat-icon"><i class="ti ti-users" aria-hidden="true"></i></div><div class="stat-value">45,699</div><div class="stat-label">Citizens This Month</div><div class="stat-sub">499,946 total served</div></div>
+          <div class="stat-card warning"><div class="stat-icon"><i class="ti ti-star" aria-hidden="true"></i></div><div class="stat-value">98.8%</div><div class="stat-label">Avg Satisfaction</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-list" aria-hidden="true"></i></div><div class="stat-value">1,332</div><div class="stat-label">Total Services</div></div>
+          <div class="stat-card success"><div class="stat-icon"><i class="ti ti-tools" aria-hidden="true"></i></div><div class="stat-value">0</div><div class="stat-label">Centers Under Construction</div><div class="stat-sub">3 recently completed</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Daily Service Delivery</div><div class="live-dot">Live</div></div>
+            <div class="card-body">
+              <div class="chart-area">
+                <div class="chart-bars">
+                  <div class="bar" style="height:55%"></div><div class="bar" style="height:65%"></div>
+                  <div class="bar" style="height:60%"></div><div class="bar teal" style="height:75%"></div>
+                  <div class="bar" style="height:70%"></div><div class="bar" style="height:80%"></div>
+                  <div class="bar" style="height:72%"></div><div class="bar" style="height:88%"></div>
+                  <div class="bar" style="height:85%"></div><div class="bar" style="height:90%"></div>
+                  <div class="bar" style="height:78%"></div><div class="bar" style="height:88%"></div>
+                  <div class="bar highlight" style="height:100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Daily Satisfaction Rate</div><div class="live-dot">Live</div></div>
+            <div class="card-body">
+              <div class="chart-area">
+                <div class="chart-bars">
+                  <div class="bar teal" style="height:97%"></div><div class="bar teal" style="height:99%"></div>
+                  <div class="bar teal" style="height:98%"></div><div class="bar teal" style="height:99%"></div>
+                  <div class="bar teal" style="height:100%"></div><div class="bar teal" style="height:97%"></div>
+                  <div class="bar teal" style="height:99%"></div><div class="bar teal" style="height:98%"></div>
+                  <div class="bar teal" style="height:100%"></div><div class="bar teal" style="height:99%"></div>
+                  <div class="bar teal" style="height:98%"></div><div class="bar teal" style="height:99%"></div>
+                  <div class="bar highlight" style="height:99%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div class="dash-panel" id="panel-admin">
+        <div class="page-header">
+          <div class="page-breadcrumb">MESOB Wellness / <span>System Administration</span></div>
+          <div class="page-title">System Health & Administration</div>
+          <div class="page-subtitle">Platform management · MESOB Wellness v1.0</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card success"><div class="stat-icon"><i class="ti ti-server" aria-hidden="true"></i></div><div class="stat-value">99.9%</div><div class="stat-label">Uptime</div></div>
+          <div class="stat-card teal"><div class="stat-icon"><i class="ti ti-users" aria-hidden="true"></i></div><div class="stat-value">842</div><div class="stat-label">Active Users</div></div>
+          <div class="stat-card warning"><div class="stat-icon"><i class="ti ti-alert-circle" aria-hidden="true"></i></div><div class="stat-value">2</div><div class="stat-label">Pending Config</div></div>
+          <div class="stat-card"><div class="stat-icon"><i class="ti ti-shield" aria-hidden="true"></i></div><div class="stat-value">12</div><div class="stat-label">Audit Logs Today</div></div>
+        </div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-header"><div class="card-title">System Health</div><div class="live-dot">Live</div></div>
+            <div class="card-body">
+              <div class="sys-row"><span class="sys-label">API Server</span><span class="sys-status"><span class="dot-green"></span>Online</span></div>
+              <div class="sys-row"><span class="sys-label">Database</span><span class="sys-status"><span class="dot-green"></span>Connected</span></div>
+              <div class="sys-row"><span class="sys-label">Email Service</span><span class="sys-status"><span class="dot-green"></span>Configured</span></div>
+              <div class="sys-row"><span class="sys-label">Auth Service</span><span class="sys-status"><span class="dot-green"></span>Active</span></div>
+              <div class="sys-row"><span class="sys-label">Rate Limiting</span><span class="sys-status"><span class="dot-orange"></span>Not Set</span></div>
+              <div class="sys-row"><span class="sys-label">Caching Layer</span><span class="sys-status"><span class="dot-orange"></span>Not Set</span></div>
+              <div class="sys-row"><span class="sys-label">Backup</span><span class="sys-status"><span class="dot-orange"></span>Manual</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Recent Audit Log</div></div>
+            <div class="card-body">
+              <div class="notif-item"><div class="notif-dot" style="background:var(--teal)"></div><div><div class="notif-text">nurse.tigist — VITALS_RECORDED</div><div class="notif-time">08:55 today</div></div></div>
+              <div class="notif-item"><div class="notif-dot" style="background:var(--nav-light)"></div><div><div class="notif-text">staff.habtamu — APPT_CREATED</div><div class="notif-time">08:48 today</div></div></div>
+              <div class="notif-item"><div class="notif-dot" style="background:var(--warning)"></div><div><div class="notif-text">admin@mesob.gov — SETTINGS_UPDATED</div><div class="notif-time">08:30 today</div></div></div>
+              <div class="notif-item"><div class="notif-dot" style="background:var(--success)"></div><div><div class="notif-text">manager.abebe — REPORT_EXPORTED</div><div class="notif-time">08:15 today</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="gov-footer">
+    <div class="footer-left">
+      <strong>MESOB One-Stop Service Center</strong>
+      The FDRE MESOB Dashboard provides centralized insights<br>
+      from each center nationwide, based on available data.
+    </div>
+    <div class="footer-center">
+      <div class="footer-logo-circle">FDRE<br>MESOB</div>
+      <div class="footer-amharic">የመሶብ አገልግሎት</div>
+      <div class="footer-english">Federal Democratic Republic of Ethiopia · MESOB Service</div>
+    </div>
+    <div class="footer-right">
+      <button class="footer-visit-btn">Visit MESOB Portal</button>
+      <div class="footer-service">Citizen Service</div>
+      <div class="footer-number">9838</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const sidebarNavs = {
+  manager: [
+    { icon: 'ti-layout-dashboard', label: 'Overview', active: true },
+    { icon: 'ti-users', label: 'Staff', badge: '3' },
+    { icon: 'ti-user-heart', label: 'Patients' },
+    { icon: 'ti-chart-bar', label: 'Analytics' },
+    { icon: 'ti-file-report', label: 'Reports' },
+    { icon: 'ti-calendar', label: 'Appointments', badge: '5' },
+    { icon: 'ti-building', label: 'Centers' },
+  ],
+  patient: [
+    { icon: 'ti-home', label: 'My Dashboard', active: true },
+    { icon: 'ti-calendar', label: 'Appointments', badge: '2' },
+    { icon: 'ti-heart', label: 'Wellness Goals' },
+    { icon: 'ti-file-text', label: 'Health Records' },
+    { icon: 'ti-message', label: 'Messages' },
+    { icon: 'ti-settings', label: 'Settings' },
+  ],
+  staff: [
+    { icon: 'ti-layout-dashboard', label: 'My Queue', active: true },
+    { icon: 'ti-calendar', label: 'Appointments', badge: '3' },
+    { icon: 'ti-user', label: 'My Patients' },
+    { icon: 'ti-clipboard', label: 'Tasks', badge: '2' },
+    { icon: 'ti-message', label: 'Messages', badge: '3' },
+  ],
+  nurse: [
+    { icon: 'ti-layout-dashboard', label: 'Overview', active: true },
+    { icon: 'ti-user-heart', label: 'Patients' },
+    { icon: 'ti-activity', label: 'Vitals' },
+    { icon: 'ti-clipboard-list', label: 'Conditions', badge: '4' },
+    { icon: 'ti-heart', label: 'Wellness' },
+    { icon: 'ti-calendar', label: 'Appointments' },
+  ],
+  regional: [
+    { icon: 'ti-layout-dashboard', label: 'Region Overview', active: true },
+    { icon: 'ti-building', label: 'Centers' },
+    { icon: 'ti-users', label: 'Patients' },
+    { icon: 'ti-chart-line', label: 'Analytics' },
+    { icon: 'ti-file-report', label: 'Reports' },
+    { icon: 'ti-alert-circle', label: 'Flagged Issues', badge: '3' },
+  ],
+  federal: [
+    { icon: 'ti-layout-dashboard', label: 'National Overview', active: true },
+    { icon: 'ti-map', label: 'All Regions' },
+    { icon: 'ti-building-hospital', label: 'All Centers' },
+    { icon: 'ti-chart-bar', label: 'National Analytics' },
+    { icon: 'ti-file-report', label: 'Federal Reports' },
+    { icon: 'ti-settings', label: 'Policy Settings' },
+  ],
+  admin: [
+    { icon: 'ti-layout-dashboard', label: 'System Overview', active: true },
+    { icon: 'ti-users', label: 'User Management' },
+    { icon: 'ti-server', label: 'System Health' },
+    { icon: 'ti-shield', label: 'Audit Logs' },
+    { icon: 'ti-settings', label: 'Configuration', badge: '2' },
+    { icon: 'ti-database', label: 'Backup & Data' },
+  ]
+};
+
+const roleLabels = {
+  manager: 'Manager', patient: 'Patient', staff: 'Staff',
+  nurse: 'Nurse Officer', regional: 'Regional Officer',
+  federal: 'Federal Office', admin: 'System Admin'
+};
+
+function renderSidebar(role) {
+  const items = sidebarNavs[role] || [];
+  const container = document.getElementById('sidebar-nav');
+  container.innerHTML = '<div class="sidebar-section"><div class="sidebar-section-label">Navigation</div>' +
+    items.map(item => `
+      <div class="nav-item${item.active ? ' active' : ''}">
+        <i class="ti ${item.icon}" aria-hidden="true"></i>
+        ${item.label}
+        ${item.badge ? `<span class="nav-badge">${item.badge}</span>` : ''}
+      </div>
+    `).join('') + '</div>';
+}
+
+function switchRole(role) {
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('visible'));
+  event.target.classList.add('active');
+  const panel = document.getElementById('panel-' + role);
+  if (panel) panel.classList.add('visible');
+  document.getElementById('active-role-label').textContent = roleLabels[role] || role;
+  renderSidebar(role);
+}
+
+renderSidebar('manager');
+</script>
