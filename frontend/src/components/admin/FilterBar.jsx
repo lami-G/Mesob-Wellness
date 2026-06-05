@@ -1,14 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { adminService } from "../../services/adminService";
 
-function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter = true, showDateFilter = false }) {
+const normalizeFilters = (filters = {}) => ({
+  region: filters.region || "",
+  center: filters.center || "",
+  search: filters.search || "",
+  dateFrom: filters.dateFrom || "",
+  dateTo: filters.dateTo || "",
+  role: filters.role || "",
+});
+
+const areFiltersEqual = (left = {}, right = {}) => {
+  const leftNormalized = normalizeFilters(left);
+  const rightNormalized = normalizeFilters(right);
+  return Object.keys(leftNormalized).every(
+    (key) => leftNormalized[key] === rightNormalized[key],
+  );
+};
+
+function FilterBar({
+  onFilterChange,
+  showRegionFilter = true,
+  showCenterFilter = true,
+  showDateFilter = false,
+  showRoleFilter = false,
+  initialFilters = {},
+}) {
   const [filters, setFilters] = useState({
-    region: "",
-    center: "",
-    search: "",
-    dateFrom: "",
-    dateTo: "",
+    ...normalizeFilters(initialFilters),
   });
+
+  const lastInitialFilters = useRef(normalizeFilters(initialFilters));
 
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
@@ -28,6 +50,16 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
       setCenters([]);
     }
   }, [filters.region]);
+
+  useEffect(() => {
+    const nextFilters = normalizeFilters(initialFilters);
+    if (areFiltersEqual(lastInitialFilters.current, nextFilters)) return;
+    lastInitialFilters.current = nextFilters;
+    setFilters((prev) => ({
+      ...prev,
+      ...nextFilters,
+    }));
+  }, [initialFilters]);
 
   const loadRegions = async () => {
     try {
@@ -66,6 +98,7 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
       search: "",
       dateFrom: "",
       dateTo: "",
+      role: "",
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -129,6 +162,28 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
           </div>
         )}
 
+        {/* Role Filter */}
+        {showRoleFilter && (
+          <div className="filter-group">
+            <label htmlFor="role">Role</label>
+            <select
+              id="role"
+              value={filters.role}
+              onChange={(e) => handleFilterChange("role", e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Roles</option>
+              <option value="SYSTEM_ADMIN">System Admin</option>
+              <option value="REGIONAL_MANAGER">Regional Manager</option>
+              <option value="CENTER_MANAGER">Center Manager</option>
+              <option value="NURSE">Nurse</option>
+              <option value="RECEPTIONIST">Receptionist</option>
+              <option value="STAFF">Staff</option>
+              <option value="EXTERNAL_PATIENT">External Patient</option>
+            </select>
+          </div>
+        )}
+
         {/* Date Range Filter */}
         {showDateFilter && (
           <>
@@ -158,10 +213,7 @@ function FilterBar({ onFilterChange, showRegionFilter = true, showCenterFilter =
 
         {/* Action Buttons */}
         <div className="filter-actions">
-          <button 
-            className="btn-reset"
-            onClick={handleReset}
-          >
+          <button className="btn-reset" onClick={handleReset}>
             Reset
           </button>
         </div>

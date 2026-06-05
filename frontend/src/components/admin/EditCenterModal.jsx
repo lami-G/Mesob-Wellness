@@ -11,6 +11,8 @@ function EditCenterModal({ isOpen, onClose, center, onSuccess, regions = [] }) {
     email: "",
     status: "ACTIVE",
     capacity: "",
+    managerEmail: "",
+    managerPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,8 @@ function EditCenterModal({ isOpen, onClose, center, onSuccess, regions = [] }) {
         email: center.email || "",
         status: center.status || "ACTIVE",
         capacity: center.capacity || "",
+        managerEmail: center.managerEmail || "",
+        managerPassword: "",
       });
       setError("");
     }
@@ -206,6 +210,35 @@ function EditCenterModal({ isOpen, onClose, center, onSuccess, regions = [] }) {
               onChange={handleChange}
               min="1"
             />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="managerEmail">Center Admin Email</label>
+              <input
+                id="managerEmail"
+                type="email"
+                name="managerEmail"
+                value={formData.managerEmail}
+                onChange={handleChange}
+                placeholder="admin@mesob.et"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="managerPassword">Center Admin Password</label>
+              <input
+                id="managerPassword"
+                type="password"
+                name="managerPassword"
+                value={formData.managerPassword}
+                onChange={handleChange}
+                placeholder="Leave empty to keep current password"
+              />
+              <small style={{ color: "#6b7280", marginTop: "0.25rem", fontSize: "12px" }}>
+                Only fill if you want to change the password
+              </small>
+            </div>
           </div>
 
           <div className="modal-actions">

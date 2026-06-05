@@ -216,17 +216,6 @@ export const adminService = {
     }
   },
 
-  // Update appointment
-  updateAppointment: async (appointmentId, appointmentData) => {
-    try {
-      const response = await api.put(`/appointments/${appointmentId}`, appointmentData);
-      return response.data.data;
-    } catch (err) {
-      console.error("Error updating appointment:", err);
-      throw err;
-    }
-  },
-
   // Update user profile (for current user)
   updateProfile: async (profileData) => {
     try {
@@ -258,5 +247,16 @@ export const adminService = {
       console.error("Error deleting user:", err);
       throw err;
     }
+  },
+
+  // Region Admin
+  upsertRegionAdmin: async (region, data) => {
+    const response = await api.post(`/admin/regions/${region}/admin`, data);
+    return response.data.data;
+  },
+
+  getRegionAdmin: async (region) => {
+    const response = await api.get(`/admin/regions/${region}/admin`);
+    return response.data.data;
   },
 };

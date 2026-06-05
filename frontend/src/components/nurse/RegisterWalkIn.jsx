@@ -212,7 +212,7 @@ function RegisterWalkIn({ onSuccess }) {
                       {patient.fullName}
                     </p>
                     <p style={{ margin: '0.25rem 0', fontSize: '0.875rem', color: '#6B7280' }}>
-                      📧 {patient.email || 'N/A'} | 📱 {patient.phone}
+                      {patient.email || 'N/A'} | {patient.phone}
                     </p>
                     <p style={{ margin: '0.25rem 0', fontSize: '0.875rem', color: '#6B7280' }}>
                       ID: {patient.userId || patient.id}
@@ -235,7 +235,7 @@ function RegisterWalkIn({ onSuccess }) {
                     className="btn btn-primary"
                     style={{ minWidth: '150px' }}
                   >
-                    💉 Record Vitals
+                    Record Vitals
                   </button>
                 </div>
               ))}

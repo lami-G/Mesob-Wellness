@@ -9,6 +9,7 @@ import {
   getAvailableSlotsHandler,
   checkStaffActiveHandler,
   cancelAppointmentHandler,
+  deleteAppointmentHandler,
 } from "../controllers/appointments.controller";
 import { authenticate, authorizeMinRole } from "../middleware/auth.middleware";
 import { UserRole } from "../generated/prisma";
@@ -84,6 +85,14 @@ router.patch(
   authenticate,
   authorizeMinRole(UserRole.NURSE_OFFICER),
   updateAppointment,
+);
+
+// Admin can delete appointments
+router.delete(
+  "/:id",
+  authenticate,
+  authorizeMinRole(UserRole.SYSTEM_ADMIN),
+  deleteAppointmentHandler,
 );
 
 export default router;

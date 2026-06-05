@@ -58,7 +58,10 @@ function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-function validatePassword(password: string): { valid: boolean; message?: string } {
+function validatePassword(password: string): {
+  valid: boolean;
+  message?: string;
+} {
   if (password.length < PASSWORD_MIN_LENGTH) {
     return {
       valid: false,
@@ -107,7 +110,10 @@ export class AuthService {
    * Register a new user with atomic transaction
    * Creates both User and HealthProfile in a single transaction
    */
-  static async register(input: RegisterInput, auditContext?: Partial<AuditLogInput>): Promise<AuthResponse> {
+  static async register(
+    input: RegisterInput,
+    auditContext?: Partial<AuditLogInput>,
+  ): Promise<AuthResponse> {
     const startTime = Date.now();
 
     // Step A: Input Validation
@@ -145,7 +151,7 @@ export class AuthService {
     const user = await prisma.$transaction(async (tx) => {
       // Generate sequential display ID
       const displayId = await generateNextDisplayId();
-      
+
       // Create user
       const role = input.role || UserRole.STAFF;
       const newUser = await tx.user.create({
@@ -206,16 +212,23 @@ export class AuthService {
           "HIGH",
           "New User Registration",
           `New ${input.role} registered: ${input.fullName} (${input.email})`,
-          user.id
+          user.id,
         );
       }
     } catch (notificationError) {
       // Log but don't fail registration if notification creation fails
-      console.warn("Failed to create registration notification:", notificationError);
+      console.warn(
+        "Failed to create registration notification:",
+        notificationError,
+      );
     }
 
-    // Generate JWT token
-    const token = this.generateToken(user.id, user.role);
+    const settings = await SettingsService.getSettings();
+    const token = this.generateToken(
+      user.id,
+      user.role,
+      settings.sessionTimeout,
+    );
 
     // Performance check (must be < 2 seconds)
     const duration = Date.now() - startTime;
@@ -240,7 +253,10 @@ export class AuthService {
   /**
    * Login user with JWT generation
    */
-  static async login(input: LoginInput, auditContext?: Partial<AuditLogInput>): Promise<AuthResponse> {
+  static async login(
+    input: LoginInput,
+    auditContext?: Partial<AuditLogInput>,
+  ): Promise<AuthResponse> {
     const startTime = Date.now();
 
     // Step A: Verification
@@ -252,7 +268,25 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    // Account lock check removed for now
+    const settings = await SettingsService.getSettings();
+
+    if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+      const remainingMs = user.lockoutUntil.getTime() - Date.now();
+      const remainingMinutes = Math.max(1, Math.ceil(remainingMs / 60000));
+      throw new Error(
+        `Account locked. Try again in ${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}.`,
+      );
+    }
+
+    if (user.lockoutUntil && user.lockoutUntil <= new Date()) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: 0,
+          lockoutUntil: null,
+        },
+      });
+    }
 
     if (!user.isActive) {
       throw new Error("Account is deactivated. Please contact support.");
@@ -260,7 +294,9 @@ export class AuthService {
 
     // Check if user can login (external patients cannot login)
     if (!user.canLogin) {
-      throw new Error("This account cannot login. External patients must visit in person.");
+      throw new Error(
+        "This account cannot login. External patients must visit in person.",
+      );
     }
 
     // Verify password - handle nullable password for external patients
@@ -271,18 +307,64 @@ export class AuthService {
     const isPasswordValid = await bcrypt.compare(input.password, user.password);
 
     if (!isPasswordValid) {
+      const maxAttempts = settings.maxLoginAttempts || 2;
+      const lockoutMinutes = settings.lockoutDuration || 30;
+
+      const updated = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          failedLoginAttempts: { increment: 1 },
+        },
+        select: {
+          failedLoginAttempts: true,
+        },
+      });
+
+      console.log(
+        "[LOGIN-LOCKOUT]",
+        "email=",
+        user.email,
+        "attempts=",
+        updated.failedLoginAttempts,
+        "max=",
+        maxAttempts,
+        "lockoutMinutes=",
+        lockoutMinutes,
+      );
+
+      if (updated.failedLoginAttempts >= maxAttempts) {
+        const lockoutUntil = new Date(Date.now() + lockoutMinutes * 60 * 1000);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            failedLoginAttempts: 0,
+            lockoutUntil,
+          },
+        });
+
+        throw new Error(
+          `Account locked. Try again in ${lockoutMinutes} minute${lockoutMinutes === 1 ? "" : "s"}.`,
+        );
+      }
+
       throw new Error("Invalid email or password");
     }
 
     // Step B: Token Generation
-    const token = this.generateToken(user.id, user.role);
+    const token = this.generateToken(
+      user.id,
+      user.role,
+      settings.sessionTimeout,
+    );
 
     // Update last login timestamp and create audit log
     await prisma.$transaction([
       prisma.user.update({
         where: { id: user.id },
-        data: { 
+        data: {
           lastLoginAt: new Date(),
+          failedLoginAttempts: 0,
+          lockoutUntil: null,
         },
       }),
       prisma.auditLog.create({
@@ -324,15 +406,24 @@ export class AuthService {
   /**
    * Generate JWT token with user ID and role
    */
-  private static generateToken(userId: string, role: UserRole): string {
+  private static generateToken(
+    userId: string,
+    role: UserRole,
+    sessionTimeout?: number,
+  ): string {
     const payload = {
       userId,
       role,
       iat: Math.floor(Date.now() / 1000),
     };
 
-    return jwt.sign(payload, env.JWT_SECRET, { 
-      expiresIn: env.JWT_EXPIRES_IN
+    const expiresIn =
+      typeof sessionTimeout === "number" && sessionTimeout > 0
+        ? `${sessionTimeout}m`
+        : env.JWT_EXPIRES_IN;
+
+    return jwt.sign(payload, env.JWT_SECRET, {
+      expiresIn: expiresIn,
     } as jwt.SignOptions);
   }
 
@@ -370,7 +461,11 @@ export class AuthService {
   /**
    * Change user password
    */
-  static async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+  static async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
     // Get user
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -385,7 +480,10 @@ export class AuthService {
       throw new Error("User does not have a password set");
     }
 
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new Error("Current password is incorrect");
     }

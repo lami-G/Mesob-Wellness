@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { settingsService } from "../../services/settingsService";
 import "../../styles/admin-settings.css";
 
@@ -19,16 +19,27 @@ function SystemSettings() {
     databaseSize: "2.4 GB",
     uptime: "99.9%",
   });
+  const successMessageRef = useRef(null);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (saved && successMessageRef.current) {
+      successMessageRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [saved]);
 
   const loadSettings = async () => {
     try {
       setLoading(true);
       const data = await settingsService.getSettings();
       setSettings(data);
+      localStorage.setItem("systemSettings", JSON.stringify(data));
       setError("");
     } catch (err) {
       console.error("Error loading settings:", err);
@@ -52,9 +63,11 @@ function SystemSettings() {
     try {
       setLoading(true);
       setError("");
-      
-      await settingsService.updateSettings(settings);
-      
+
+      const updated = await settingsService.updateSettings(settings);
+      setSettings(updated);
+      localStorage.setItem("systemSettings", JSON.stringify(updated));
+
       setSaved(true);
       setTimeout(() => setSaved(false), 5000);
     } catch (err) {
@@ -78,7 +91,11 @@ function SystemSettings() {
         <p>Configure system-wide settings and preferences</p>
       </div>
 
-      {saved && <div className="success-message">✓ Settings saved successfully</div>}
+      {saved && (
+        <div className="success-message" ref={successMessageRef}>
+          ✓ Settings saved successfully
+        </div>
+      )}
       {error && <div className="error-message">✗ {error}</div>}
 
       <div className="settings-container">
@@ -88,7 +105,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="maxLoginAttempts">Max Login Attempts</label>
-              <p className="setting-description">Maximum failed login attempts before account lockout</p>
+              <p className="setting-description">
+                Maximum failed login attempts before account lockout
+              </p>
             </div>
             <input
               type="number"
@@ -106,7 +125,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="sessionTimeout">Session Timeout (minutes)</label>
-              <p className="setting-description">Automatically logout inactive users after this duration</p>
+              <p className="setting-description">
+                Automatically logout inactive users after this duration
+              </p>
             </div>
             <input
               type="number"
@@ -123,8 +144,12 @@ function SystemSettings() {
 
           <div className="setting-item">
             <div className="setting-label">
-              <label htmlFor="lockoutDuration">Account Lockout Duration (minutes)</label>
-              <p className="setting-description">How long to lock account after max failed attempts</p>
+              <label htmlFor="lockoutDuration">
+                Account Lockout Duration (minutes)
+              </label>
+              <p className="setting-description">
+                How long to lock account after max failed attempts
+              </p>
             </div>
             <input
               type="number"
@@ -146,7 +171,9 @@ function SystemSettings() {
           <div className="setting-item">
             <div className="setting-label">
               <label htmlFor="maintenanceMode">Maintenance Mode</label>
-              <p className="setting-description">Put system in maintenance mode (users cannot access)</p>
+              <p className="setting-description">
+                Put system in maintenance mode (users cannot access)
+              </p>
             </div>
             <input
               type="checkbox"
@@ -212,15 +239,11 @@ function SystemSettings() {
 
         {/* Action Buttons */}
         <div className="settings-actions">
-          <button 
-            onClick={handleSave} 
-            className="btn-save"
-            disabled={loading}
-          >
+          <button onClick={handleSave} className="btn-save" disabled={loading}>
             {loading ? "⏳ Saving..." : "💾 Save Settings"}
           </button>
-          <button 
-            onClick={handleReset} 
+          <button
+            onClick={handleReset}
             className="btn-reset-settings"
             disabled={loading}
           >

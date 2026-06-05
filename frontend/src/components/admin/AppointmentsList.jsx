@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 import api from "../../services/api";
 
-function AppointmentsList({ filters, onEdit, onDelete }) {
+function AppointmentsList({ filters, onDelete }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -125,13 +125,6 @@ function AppointmentsList({ filters, onEdit, onDelete }) {
                 <td className="cell-center">{apt.user?.center?.name || "N/A"}</td>
                 <td className="cell-region">{apt.user?.center?.region || "N/A"}</td>
                 <td className="cell-actions">
-                  <button 
-                    className="btn-icon edit"
-                    onClick={() => onEdit(apt)}
-                    title="Edit"
-                  >
-                    ✎
-                  </button>
                   {(apt.status === "WAITING" || apt.status === "CONFIRMED" || apt.status === "IN_PROGRESS" || apt.status === "IN_SERVICE") && (
                     <button 
                       className="btn-icon cancel"

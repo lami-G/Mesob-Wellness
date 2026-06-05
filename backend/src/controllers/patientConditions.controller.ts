@@ -284,39 +284,13 @@ export async function getConditionsByPeriod(
     // Get all wellness plans within the date range (or all time)
     const conditions = await PatientConditionsService.getConditionsByDateRange(start, end);
 
-    // Total wellness plans count
-    const totalWellnessPlans = conditions.length;
+    // Total wellness plans count (unique patients)
+    const totalWellnessPlans = conditions.reduce((sum, c) => sum + c.count, 0);
 
-    // Aggregate condition counts
-    const conditionCounts: Record<string, number> = {};
-    conditions.forEach((record) => {
-      const raw: unknown = record.conditions;
-
-      // Safely normalize to string[] (DB JSON may differ from the nominal Prisma type)
-      let conditionList: string[] = [];
-      if (Array.isArray(raw)) {
-        conditionList = raw.map(String);
-      } else if (typeof raw === 'string' && raw.trim().length > 0) {
-        conditionList = [raw];
-      } else if (raw && typeof raw === 'object') {
-        conditionList = Object.values(raw as Record<string, unknown>).map(String);
-      }
-
-      // If no conditions or empty array, count as "normal"
-      if (conditionList.length === 0) {
-        conditionCounts['normal'] = (conditionCounts['normal'] || 0) + 1;
-      } else {
-        conditionList.forEach((condition) => {
-          const key = condition.toLowerCase().trim();
-          if (key) conditionCounts[key] = (conditionCounts[key] || 0) + 1;
-        });
-      }
-    });
-
-    // Convert to array format
-    const result = Object.entries(conditionCounts).map(([condition, count]) => ({
-      condition,
-      count,
+    // Convert to array format (already aggregated by service)
+    const result = conditions.map(c => ({
+      condition: c.condition,
+      count: c.count,
     }));
 
     res.status(200).json({

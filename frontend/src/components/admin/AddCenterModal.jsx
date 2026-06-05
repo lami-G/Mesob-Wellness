@@ -12,6 +12,8 @@ function AddCenterModal({ isOpen, onClose, onSuccess, regions = [], region = nul
     phone: "",
     email: "",
     capacity: "",
+    managerEmail: "",
+    managerPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -80,6 +82,8 @@ function AddCenterModal({ isOpen, onClose, onSuccess, regions = [], region = nul
         phone: "",
         email: "",
         capacity: "",
+        managerEmail: "",
+        managerPassword: "",
       });
 
       onSuccess?.();
@@ -216,6 +220,32 @@ function AddCenterModal({ isOpen, onClose, onSuccess, regions = [], region = nul
               placeholder="e.g., 50"
               min="1"
             />
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="managerEmail">Center Admin Email</label>
+              <input
+                id="managerEmail"
+                type="email"
+                name="managerEmail"
+                value={formData.managerEmail}
+                onChange={handleChange}
+                placeholder="admin@mesob.et"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="managerPassword">Center Admin Password</label>
+              <input
+                id="managerPassword"
+                type="password"
+                name="managerPassword"
+                value={formData.managerPassword}
+                onChange={handleChange}
+                placeholder="Create a password"
+              />
+            </div>
           </div>
 
           <div className="modal-actions">

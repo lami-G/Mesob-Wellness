@@ -41,7 +41,6 @@ export async function getCenters(region?: string) {
       select: {
         id: true,
         name: true,
-        code: true,
         region: true,
         city: true,
         address: true,

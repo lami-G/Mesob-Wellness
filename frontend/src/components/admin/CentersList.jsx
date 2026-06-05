@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
 
-function CentersList({ filters, onEdit, onDelete }) {
+function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
 
   useEffect(() => {
     fetchCenters();
@@ -14,7 +19,11 @@ function CentersList({ filters, onEdit, onDelete }) {
   const fetchCenters = async () => {
     try {
       setLoading(true);
-      const result = await adminService.getCenters({ ...filters, page: pagination.page, limit: pagination.limit });
+      const result = await adminService.getCenters({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      });
       setCenters(result.data || []);
       setPagination(result.pagination || {});
       setError(null);
@@ -44,9 +53,9 @@ function CentersList({ filters, onEdit, onDelete }) {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Code</th>
             <th>Region</th>
             <th>City</th>
+            <th>Admin Email</th>
             <th>Status</th>
             <th>Staff</th>
             <th>Actions</th>
@@ -55,15 +64,17 @@ function CentersList({ filters, onEdit, onDelete }) {
         <tbody>
           {centers.length === 0 ? (
             <tr>
-              <td colSpan="7" className="table-empty">No centers found</td>
+              <td colSpan="7" className="table-empty">
+                No centers found
+              </td>
             </tr>
           ) : (
             centers.map((center) => (
               <tr key={center.id}>
                 <td className="cell-name">{center.name}</td>
-                <td className="cell-code">{center.code}</td>
                 <td className="cell-region">{center.region}</td>
                 <td className="cell-city">{center.city}</td>
+                <td className="cell-email">{center.managerEmail || "-"}</td>
                 <td className="cell-status">
                   <span className={`status ${center.status.toLowerCase()}`}>
                     {center.status}
@@ -71,20 +82,22 @@ function CentersList({ filters, onEdit, onDelete }) {
                 </td>
                 <td className="cell-count">{center._count?.staff || 0}</td>
                 <td className="cell-actions">
-                  <button 
+                  <button
                     className="btn-icon edit"
                     onClick={() => onEdit(center)}
                     title="Edit"
                   >
                     ✎
                   </button>
-                  <button 
-                    className="btn-icon delete"
-                    onClick={() => onDelete(center.id)}
-                    title="Delete"
-                  >
-                    🗑
-                  </button>
+                  {allowDelete && (
+                    <button
+                      className="btn-icon delete"
+                      onClick={() => onDelete(center.id)}
+                      title="Delete"
+                    >
+                      🗑
+                    </button>
+                  )}
                 </td>
               </tr>
             ))
@@ -94,7 +107,7 @@ function CentersList({ filters, onEdit, onDelete }) {
 
       {pagination.pages > 1 && (
         <div className="pagination">
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page - 1)}
             disabled={pagination.page === 1}
             className="btn-pagination"
@@ -104,7 +117,7 @@ function CentersList({ filters, onEdit, onDelete }) {
           <span className="pagination-info">
             Page {pagination.page} of {pagination.pages}
           </span>
-          <button 
+          <button
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={pagination.page === pagination.pages}
             className="btn-pagination"

@@ -1,4 +1,5 @@
 import prisma from "../config/prisma";
+import { AppointmentStatus } from "../generated/prisma";
 import {
   UserFilters,
   CenterFilters,
@@ -9,6 +10,79 @@ import {
   DashboardMetrics,
   PaginatedResponse,
 } from "../types/admin.types";
+
+/**
+ * Shared helper: Calculate appointments, walk-ins, and patients served
+ * Same logic used by nurse analytics dashboard
+ * @param startDate Start date for calculation
+ * @param endDate End date for calculation
+ */
+async function calculateQueueMetrics(startDate: Date, endDate: Date) {
+  try {
+    const appointmentStatuses: AppointmentStatus[] = [
+      AppointmentStatus.WAITING,
+      AppointmentStatus.IN_PROGRESS,
+      AppointmentStatus.IN_SERVICE,
+      AppointmentStatus.NO_SHOW,
+      AppointmentStatus.COMPLETED,
+      AppointmentStatus.PENDING,
+      AppointmentStatus.CONFIRMED,
+    ];
+
+    // Appointments in range (same status filter as queue endpoint)
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        scheduledAt: { gte: startDate, lte: endDate },
+        status: { in: appointmentStatuses },
+      },
+      select: { userId: true, status: true, scheduledAt: true },
+    });
+
+    const totalAppointments = appointments.length;
+    const completedAppointmentsCount = appointments.filter(
+      apt => apt.status === "COMPLETED"
+    ).length;
+
+    // Map of userId -> set of appointment dates (YYYY-MM-DD) in range
+    const appointmentDateMap = new Map<string, Set<string>>();
+    appointments.forEach(apt => {
+      const dayKey = apt.scheduledAt.toISOString().split("T")[0];
+      const existing = appointmentDateMap.get(apt.userId) || new Set<string>();
+      existing.add(dayKey);
+      appointmentDateMap.set(apt.userId, existing);
+    });
+
+    // Walk-ins: wellness plans created in range with no appointment same day
+    const wellnessPlans = await prisma.wellnessPlan.findMany({
+      where: {
+        createdAt: { gte: startDate, lte: endDate },
+      },
+      select: { userId: true, createdAt: true },
+    });
+
+    let walkInCount = 0;
+    wellnessPlans.forEach(plan => {
+      const planDayKey = plan.createdAt.toISOString().split("T")[0];
+      const userAppointments = appointmentDateMap.get(plan.userId);
+      if (!userAppointments || !userAppointments.has(planDayKey)) {
+        walkInCount += 1;
+      }
+    });
+
+    // Patients served = completed appointments + walk-ins
+    const patientsServed = completedAppointmentsCount + walkInCount;
+
+    return {
+      totalAppointments,
+      walkIns: walkInCount,
+      patientsServed,
+      completedAppointments: completedAppointmentsCount,
+    };
+  } catch (error) {
+    console.error("Error calculating queue metrics:", error);
+    throw error;
+  }
+}
 
 const AdminService = {
   /**
@@ -119,7 +193,7 @@ const AdminService = {
 
       // Get appointment stats with date filter
       const appointmentWhere: any = dateFrom ? { 
-        createdAt: { gte: dateFrom } 
+        scheduledAt: { gte: dateFrom } 
       } : {};
 
       const appointments = await prisma.appointment.groupBy({
@@ -171,17 +245,17 @@ const AdminService = {
         averageTemperature: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) / vitals.length : 0,
         averageOxygenSaturation: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) / vitals.length : 0,
         byBmiCategory: {
-          UNDERWEIGHT: 0,
-          NORMAL: 0,
-          OVERWEIGHT: 0,
-          OBESITY: 0,
+          UNDERWEIGHT: vitals.filter(v => v.bmiCategory === 'UNDERWEIGHT').length,
+          NORMAL: vitals.filter(v => v.bmiCategory === 'NORMAL').length,
+          OVERWEIGHT: vitals.filter(v => v.bmiCategory === 'OVERWEIGHT').length,
+          OBESITY: vitals.filter(v => v.bmiCategory === 'OBESITY').length,
         },
         byBpCategory: {
-          NORMAL: 0,
-          ELEVATED: 0,
-          HYPERTENSION_STAGE_1: 0,
-          HYPERTENSION_STAGE_2: 0,
-          HYPERTENSIVE_CRISIS: 0,
+          NORMAL: vitals.filter(v => v.bpCategory === 'NORMAL').length,
+          ELEVATED: vitals.filter(v => v.bpCategory === 'ELEVATED').length,
+          HYPERTENSION_STAGE_1: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_1').length,
+          HYPERTENSION_STAGE_2: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_2').length,
+          HYPERTENSIVE_CRISIS: vitals.filter(v => v.bpCategory === 'HYPERTENSIVE_CRISIS').length,
         },
       };
 
@@ -232,52 +306,40 @@ const AdminService = {
         }),
       };
 
-      // Get walk-in completed visits (count vital records without completed appointments)
-      // Each vital record for a patient without a COMPLETED appointment = 1 walk-in visit
-      // This includes external patients AND staff coming for emergency without appointment
-      const walkInCompletedWhere: any = dateFrom ? { 
-        recordedAt: { gte: dateFrom }
-      } : {};
+      // Use shared helper to calculate appointments, walk-ins, and patients served
+      // Same logic as nurse analytics dashboard
+      let queueStartDate: Date;
+      let queueEndDate = new Date();
 
-      // Get all vital records in the date range
-      const allVitalRecords = await prisma.vitalRecord.findMany({
-        where: walkInCompletedWhere,
-        select: { userId: true },
-      });
+      if (timePeriod === 'daily') {
+        queueStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        queueEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+      } else if (timePeriod === 'weekly') {
+        const day = now.getDay();
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+        queueStartDate = new Date(now);
+        queueStartDate.setDate(diff);
+        queueStartDate.setHours(0, 0, 0, 0);
+        queueEndDate = new Date(queueStartDate);
+        queueEndDate.setDate(queueStartDate.getDate() + 6);
+        queueEndDate.setHours(23, 59, 59, 999);
+      } else if (timePeriod === 'monthly') {
+        queueStartDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        queueEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      } else {
+        // all time
+        queueStartDate = new Date('2020-01-01');
+        queueEndDate = new Date(now);
+      }
 
-      // Get all COMPLETED appointments in the date range
-      const completedAppointments = await prisma.appointment.findMany({
-        where: dateFrom ? { 
-          scheduledAt: { gte: dateFrom },
-          status: "COMPLETED"
-        } : {
-          status: "COMPLETED"
-        },
-        select: { userId: true },
-      });
+      const queueMetrics = await calculateQueueMetrics(queueStartDate, queueEndDate);
 
-      // Get unique user IDs with completed appointments
-      const completedAppointmentUserIds = new Set(completedAppointments.map(apt => apt.userId));
+      const walkInStats = { total: queueMetrics.walkIns };
+      const patientsServedStats = { total: queueMetrics.patientsServed };
 
-      // Count vital records for users WITHOUT completed appointments (walk-in visits)
-      const walkInVisitCount = allVitalRecords.filter(vr => !completedAppointmentUserIds.has(vr.userId)).length;
-
-      const walkInStats = {
-        total: walkInVisitCount,
-      };
-
-      // Get completed appointments - filtered by date
-      const completedAppointmentsWhere: any = dateFrom ? { 
-        status: "COMPLETED",
-        updatedAt: { gte: dateFrom }
-      } : { status: "COMPLETED" };
-
-      const completedAppointmentsCount = await prisma.appointment.count({ where: completedAppointmentsWhere });
-
-      // Get patients served (walk-ins + completed appointments) - filtered by date
-      const patientsServedStats = {
-        total: walkInStats.total + completedAppointmentsCount,
-      };
+      // Override appointments count with total appointments from helper
+      appointmentStats.total = queueMetrics.totalAppointments;
+      appointmentStats.completed = queueMetrics.completedAppointments;
 
       // Get wellness plans stats with date filter
       const wellnessWhere: any = dateFrom ? { 
@@ -401,7 +463,13 @@ const AdminService = {
             region: true,
             city: true,
             status: true,
+            managerEmail: true,
             createdAt: true,
+            _count: {
+              select: {
+                staff: true,
+              },
+            },
           },
         }),
         prisma.center.count({ where }),
@@ -442,7 +510,8 @@ const AdminService = {
       }
       if (filters.search) {
         where.OR = [
-          { userId: { contains: filters.search, mode: "insensitive" } },
+          { user: { fullName: { contains: filters.search, mode: "insensitive" } } },
+          { user: { email: { contains: filters.search, mode: "insensitive" } } },
           { reason: { contains: filters.search, mode: "insensitive" } },
         ];
       }
@@ -586,6 +655,7 @@ const AdminService = {
       if (filters.user) where.userId = filters.user;
       if (filters.action) where.action = filters.action;
       if (filters.resource) where.resource = filters.resource;
+      if (filters.role) where.user = { role: filters.role };
       if (filters.dateFrom || filters.dateTo) {
         where.timestamp = {};
         if (filters.dateFrom) where.timestamp.gte = filters.dateFrom;
@@ -599,7 +669,7 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true, userId: true } },
+            user: { select: { fullName: true, email: true, userId: true, role: true } },
           },
         }),
         prisma.auditLog.count({ where }),

@@ -3,7 +3,7 @@ import FeedbackList from "../../components/admin/FeedbackList";
 import FeedbackAnalytics from "../../components/admin/FeedbackAnalytics";
 import "../../styles/admin-feedback.css";
 
-function FeedbackQuality() {
+function FeedbackQuality({ baseFilters = {} }) {
   const [activeTab, setActiveTab] = useState("list");
 
   return (
@@ -29,7 +29,7 @@ function FeedbackQuality() {
       </div>
 
       <div className="tab-content">
-        {activeTab === "list" && <FeedbackList />}
+        {activeTab === "list" && <FeedbackList baseFilters={baseFilters} />}
         {activeTab === "analytics" && <FeedbackAnalytics />}
       </div>
     </div>
