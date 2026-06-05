@@ -14,14 +14,14 @@
 
 /* ── Header ── */
 .dashboard-header {
-  background: linear-gradient(135deg, #1e3a8a 0%, #284394 60%, #1d4ed8 100%) !important;
+  background: linear-gradient(135deg, #1a3a6e 0%, #1e4ba8 100%) !important;
   border-radius: 12px !important;
-  padding: 1.5rem 2rem !important;
+  padding: 1.25rem 1.5rem !important;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0;
-  box-shadow: 0 4px 20px rgba(40, 67, 148, 0.35);
+  box-shadow: 0 4px 16px rgba(26,58,110,0.25);
 }
 
 .dashboard-header h1 {
@@ -66,13 +66,13 @@
 
 .tab-btn:hover {
   background: #f1f5f9;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .tab-btn.active {
-  background: #284394;
+  background: #1e4ba8;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(40, 67, 148, 0.35);
+  box-shadow: 0 2px 8px rgba(30,75,168,0.3);
 }
 
 .tab-btn:disabled {
@@ -95,7 +95,7 @@
   width: 22px;
   height: 22px;
   border: 3px solid #e2e8f0;
-  border-top-color: #284394;
+  border-top-color: #1e4ba8;
   border-radius: 50%;
   animation: mgrSpin 0.7s linear infinite;
   flex-shrink: 0;
@@ -279,7 +279,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 800;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .mgr-capacity-stat small {
@@ -307,7 +307,7 @@
   display: block;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .mgr-mini-stat small {
@@ -449,7 +449,7 @@
   transition: border-color 0.15s;
 }
 
-.modal .form-group select:focus { outline: none; border-color: #284394; }
+.modal .form-group select:focus { outline: none; border-color: #1e4ba8; }
 
 .modal-actions {
   display: flex; gap: 0.75rem; justify-content: flex-end;
@@ -767,11 +767,11 @@
 }
 
 .mgr-enhanced-service-delivery .mgr-chart-header {
-  background: linear-gradient(135deg, rgba(40, 67, 148, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%);
+  background: linear-gradient(135deg, rgba(30, 75, 168, 0.05) 0%, rgba(59, 130, 246, 0.03) 100%);
   border-radius: 8px;
   padding: 1.5rem;
   margin: -0.25rem -0.5rem 1.5rem -0.5rem;
-  border-bottom: 2px solid rgba(40, 67, 148, 0.1);
+  border-bottom: 2px solid rgba(30, 75, 168, 0.1);
 }
 
 .mgr-chart-title-section {
@@ -866,7 +866,7 @@
 
 .mgr-metric-badge.primary {
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  border: 2px solid rgba(40, 67, 148, 0.3);
+  border: 2px solid rgba(30, 75, 168, 0.3);
 }
 
 .mgr-metric-value {
@@ -881,7 +881,7 @@
 }
 
 .mgr-metric-badge.primary .mgr-metric-value {
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .mgr-metric-label {
@@ -902,7 +902,7 @@
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin: 1rem -0.5rem -0.25rem -0.5rem;
-  border-top: 1px solid rgba(40, 67, 148, 0.1);
+  border-top: 1px solid rgba(30, 75, 168, 0.1);
 }
 
 .mgr-performance-indicators {
@@ -931,8 +931,8 @@
 }
 
 .mgr-indicator-dot.primary {
-  background: #284394;
-  box-shadow: 0 0 8px rgba(40, 67, 148, 0.4);
+  background: #1e4ba8;
+  box-shadow: 0 0 8px rgba(30, 75, 168, 0.4);
 }
 
 .mgr-indicator-text {
@@ -1194,7 +1194,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(135deg, #284394 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #3b82f6 100%);
   transition: width 0.3s ease;
 }
 
@@ -1220,7 +1220,7 @@
   background: linear-gradient(
     45deg,
     transparent,
-    rgba(40, 67, 148, 0.03),
+    rgba(30, 75, 168, 0.03),
     transparent,
     rgba(34, 197, 94, 0.03),
     transparent
@@ -1443,7 +1443,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(40, 67, 148, 0.5),
+    rgba(30, 75, 168, 0.5),
     transparent
   );
   animation: mgrFooterGlow 2s ease-in-out infinite;

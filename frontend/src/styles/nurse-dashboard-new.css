@@ -8,7 +8,7 @@
 /* Sidebar */
 .nurse-sidebar {
   width: 250px;
-  background: linear-gradient(180deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(180deg, #1e4ba8 0%, #1e3a8a 100%);
   color: white;
   display: flex;
   flex-direction: column;

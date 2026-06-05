@@ -4,7 +4,7 @@
    ======================================== */
 
 :root {
-  --walkin-primary-blue: #3550A0;
+  --walkin-primary-blue: #1e4ba8;
   --walkin-accent-orange: #F59E0B;
   --walkin-gold: #FFA500;
   --walkin-white: #FFFFFF;
@@ -325,7 +325,7 @@
 .walkin-btn-primary:hover:not(:disabled) {
   background: #2A3F7F;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(53, 80, 160, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.3);
 }
 
 .walkin-btn-secondary {

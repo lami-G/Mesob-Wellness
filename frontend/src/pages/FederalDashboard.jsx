@@ -523,27 +523,67 @@ function FederalDashboard() {
 
   const renderOverview = () => (
     <div className="dashboard-section">
+      {/* Filter Bar — Region / Center / Time Period */}
+      <div className="dashboard-filter-bar">
+        <div className="filter-field">
+          <label>Region</label>
+          <select
+            value={globalFilters.region || "all"}
+            onChange={(e) => setGlobalFilters(p => ({ ...p, region: e.target.value }))}
+          >
+            <option value="all">All Regions</option>
+            {regions.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-field">
+          <label>Center</label>
+          <select
+            value={globalFilters.center || "all"}
+            onChange={(e) => setGlobalFilters(p => ({ ...p, center: e.target.value }))}
+          >
+            <option value="all">All Centers</option>
+            {allCenters.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="filter-field">
+          <label>Time Period</label>
+          <select
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+      </div>
+
+      {/* KPI Section */}
       {loading ? (
         <div className="metrics-loading">Loading federal overview...</div>
       ) : null}
 
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>System KPIs</h3>
-        <DashboardMetrics
-          onTabChange={setActiveTab}
-          timePeriod={timePeriod}
-          showControls={false}
-          selectedCenter={globalFilters.center || "all"}
-        />
-      </div>
+      <p className="kpi-section-label">System KPIs</p>
+      <DashboardMetrics
+        onTabChange={setActiveTab}
+        timePeriod={timePeriod}
+        showControls={false}
+        selectedCenter={globalFilters.center === "all" ? "all" : globalFilters.center}
+        selectedRegion={globalFilters.region === "all" ? "all" : globalFilters.region}
+      />
 
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>Health Condition Trends</h3>
-        <HealthConditionTrendsPanel
-          viewPeriod={timePeriod}
-          showPeriodSwitcher={false}
-        />
-      </div>
+      {/* Health Condition Trends */}
+      <HealthConditionTrendsPanel
+        viewPeriod={timePeriod}
+        showPeriodSwitcher={false}
+      />
     </div>
   );
 

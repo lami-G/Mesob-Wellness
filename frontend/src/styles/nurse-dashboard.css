@@ -288,7 +288,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .capacity-bar-container {
@@ -544,7 +544,7 @@
 }
 
 .display-screen {
-  background: linear-gradient(135deg, #284394 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #2563eb 100%);
   color: white;
   padding: 30px;
   border-radius: 12px;
@@ -704,7 +704,7 @@
 
 .plan-title {
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
   font-size: 1.05rem;
 }
 
@@ -1042,7 +1042,7 @@
 
 /* Queue Display Screen */
 .queue-display-screen {
-  background: linear-gradient(135deg, #284394 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #2563eb 100%);
   min-height: 100vh;
   color: white;
   padding: 2rem;
@@ -1083,7 +1083,7 @@
 
 .now-serving-card {
   background: white;
-  color: #284394;
+  color: #1e4ba8;
   border-radius: 16px;
   padding: 3rem;
   text-align: center;

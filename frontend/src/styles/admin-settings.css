@@ -127,7 +127,7 @@
 }
 
 .toggle-switch:checked {
-  background: #7c3aed;
+  background: #1e4ba8;
 }
 
 .toggle-switch:disabled {
@@ -169,8 +169,8 @@
 .setting-select:focus,
 .setting-input:focus {
   outline: none;
-  border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  border-color: #1e4ba8;
+  box-shadow: 0 0 0 3px rgba(30,75,168,0.12);
 }
 
 .setting-select:disabled {
@@ -257,12 +257,12 @@
 }
 
 .btn-save {
-  background: #7c3aed;
+  background: #1e4ba8;
   color: white;
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #6d28d9;
+  background: #1d4ed8;
 }
 
 .btn-save:disabled {
@@ -350,14 +350,14 @@
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: #254091;
+  background: #1e4ba8;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 60px;
   font-weight: 700;
   color: white;
-  border: 3px solid #254091;
+  border: 3px solid #1e4ba8;
   overflow: hidden;
 }
 
@@ -407,7 +407,7 @@
 
 .role-badge {
   display: inline-block;
-  background: #254091;
+  background: #1e4ba8;
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
@@ -446,7 +446,7 @@
 }
 
 .btn-edit {
-  background: #254091;
+  background: #1e4ba8;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -495,7 +495,7 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #254091;
+  border-color: #1e4ba8;
   box-shadow: 0 0 0 3px rgba(37, 64, 145, 0.1);
 }
 
@@ -506,7 +506,7 @@
 }
 
 .btn-save {
-  background: #254091;
+  background: #1e4ba8;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -542,7 +542,7 @@
 }
 
 .btn-action {
-  background: #254091;
+  background: #1e4ba8;
   color: white;
   border: none;
   padding: 8px 16px;

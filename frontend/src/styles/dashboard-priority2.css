@@ -448,7 +448,7 @@
 }
 
 .appointment-info strong {
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .qr-code-section {
@@ -526,7 +526,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
   margin-bottom: 5px;
 }
 
@@ -1060,7 +1060,7 @@
 }
 
 .user-profile-card {
-  background: linear-gradient(135deg, #284394 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #2563eb 100%);
   color: white;
 }
 
@@ -1239,7 +1239,7 @@
   display: block;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .summary-value.active {

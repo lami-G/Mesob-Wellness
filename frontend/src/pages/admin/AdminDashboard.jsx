@@ -78,7 +78,7 @@ function AdminDashboard() {
       case "dashboard":
         return (
           <div className="dashboard-section">
-            <h2>System Dashboard</h2>
+            <p className="kpi-section-label">System KPIs</p>
             <DashboardMetrics 
               onTabChange={setActiveTab}
               timePeriod={globalFilters.timePeriod}
@@ -116,90 +116,82 @@ function AdminDashboard() {
   return (
     <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
       {shouldShowFilters && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="dashboard-filter-bar" style={{ marginBottom: '1.25rem' }}>
+          <div className="filter-field">
+            <label>Region</label>
+            <select
+              value={globalFilters.region}
+              onChange={(e) => handleFilterChange("region", e.target.value)}
+            >
+              <option value="all">All Regions</option>
+              {regions.map((region) => (
+                <option key={region.id} value={region.id}>{region.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-field">
+            <label>Center</label>
+            <select
+              value={globalFilters.center}
+              onChange={(e) => handleFilterChange("center", e.target.value)}
+            >
+              <option value="all">All Centers</option>
+              {centers.map((center) => (
+                <option key={center.id} value={center.id}>{center.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-field">
+            <label>Time Period</label>
             <select
               value={globalFilters.timePeriod}
               onChange={(e) => handleFilterChange("timePeriod", e.target.value)}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
-              }}
             >
               <option value="all">All Time</option>
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
             </select>
+          </div>
 
-            <select
-              value={globalFilters.center}
-              onChange={(e) => handleFilterChange("center", e.target.value)}
+          <div className="filter-field" style={{ minWidth: 'auto' }}>
+            <label>Date From</label>
+            <input
+              type="date"
+              value={globalFilters.dateRange.start}
+              onChange={(e) => handleDateRangeChange(e.target.value, globalFilters.dateRange.end)}
               style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
+                padding: '0.5rem 0.75rem',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontFamily: 'inherit',
+                background: '#f8fafc',
+                color: '#334155',
+                outline: 'none',
               }}
-            >
-              <option value="all">All Centers</option>
-              {centers.map((center) => (
-                <option key={center.id} value={center.id}>
-                  {center.name}
-                </option>
-              ))}
-            </select>
+            />
+          </div>
 
-            <select
-              value={globalFilters.region}
-              onChange={(e) => handleFilterChange("region", e.target.value)}
+          <div className="filter-field" style={{ minWidth: 'auto' }}>
+            <label>Date To</label>
+            <input
+              type="date"
+              value={globalFilters.dateRange.end}
+              onChange={(e) => handleDateRangeChange(globalFilters.dateRange.start, e.target.value)}
               style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
+                padding: '0.5rem 0.75rem',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontFamily: 'inherit',
+                background: '#f8fafc',
+                color: '#334155',
+                outline: 'none',
               }}
-              className="region-select"
-            >
-              <option value="all" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>All Regions</option>
-              {regions.map((region) => (
-                <option key={region.id} value={region.id} style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
-                  {region.name}
-                </option>
-              ))}
-            </select>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <label style={{ fontWeight: 600, color: '#374151' }}>Date:</label>
-              <input
-                type="date"
-                value={globalFilters.dateRange.start}
-                onChange={(e) =>
-                  handleDateRangeChange(e.target.value, globalFilters.dateRange.end)
-                }
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, color: '#374151' }}
-              />
-              <span style={{ color: '#6b7280' }}>to</span>
-              <input
-                type="date"
-                value={globalFilters.dateRange.end}
-                onChange={(e) =>
-                  handleDateRangeChange(globalFilters.dateRange.start, e.target.value)
-                }
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, color: '#374151' }}
-              />
-            </div>
+            />
           </div>
         </div>
       )}

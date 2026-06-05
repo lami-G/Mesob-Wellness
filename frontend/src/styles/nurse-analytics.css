@@ -18,21 +18,21 @@
 .date-input-group label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .date-input-group input {
   padding: 0.5rem;
-  border: 2px solid #284394;
+  border: 2px solid #1e4ba8;
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .date-input-group input:focus {
   outline: none;
   border-color: #1e3a8a;
-  box-shadow: 0 0 0 3px rgba(40, 67, 148, 0.1);
+  box-shadow: 0 0 0 3px rgba(30, 75, 168, 0.1);
 }
 
 .analytics-cards-grid {
@@ -43,20 +43,20 @@
 }
 
 .analytics-card {
-  background: linear-gradient(135deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #1e3a8a 100%);
   color: white;
   padding: 1rem;
   border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  box-shadow: 0 4px 6px rgba(40, 67, 148, 0.15);
+  box-shadow: 0 4px 6px rgba(30, 75, 168, 0.15);
   transition: transform 0.2s;
 }
 
 .analytics-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(40, 67, 148, 0.25);
+  box-shadow: 0 6px 12px rgba(30, 75, 168, 0.25);
 }
 
 .analytics-card:nth-child(2) {
@@ -68,7 +68,7 @@
 }
 
 .analytics-card:nth-child(4) {
-  background: linear-gradient(135deg, #1e40af 0%, #284394 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1e4ba8 100%);
 }
 
 .card-icon {
@@ -110,7 +110,7 @@
 .metrics-card h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #284394;
+  color: #1e4ba8;
   font-size: 1.1rem;
 }
 
@@ -129,7 +129,7 @@
 
 .metric-value {
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
   font-size: 1.1rem;
 }
 
@@ -143,7 +143,7 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(90deg, #1e4ba8 0%, #1e3a8a 100%);
   transition: width 0.3s ease;
 }
 
@@ -162,7 +162,7 @@
 
 .breakdown-value {
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
   font-size: 1.2rem;
 }
 
@@ -177,7 +177,7 @@
 .activity-card h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .activity-grid {
@@ -196,8 +196,8 @@
 }
 
 .activity-item:hover {
-  border-color: #284394;
-  box-shadow: 0 2px 8px rgba(40, 67, 148, 0.1);
+  border-color: #1e4ba8;
+  box-shadow: 0 2px 8px rgba(30, 75, 168, 0.1);
 }
 
 .activity-label {
@@ -211,7 +211,7 @@
   margin: 0;
   font-size: 1.8rem;
   font-weight: bold;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 
@@ -242,7 +242,7 @@
 .chart-card h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #284394;
+  color: #1e4ba8;
   font-size: 1.1rem;
 }
 
@@ -343,7 +343,7 @@
 }
 
 .comparison-table thead tr {
-  background: linear-gradient(135deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #1e3a8a 100%);
   color: #ffffff;
 }
 

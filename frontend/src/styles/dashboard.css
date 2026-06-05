@@ -9,7 +9,7 @@
 }
 
 .user-profile-card {
-  background: #223E8E;
+  background: #1a3a6e;
   color: #ffffff;
   border: none;
 }
@@ -74,12 +74,12 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #3550A0;
+  border-bottom: 2px solid #1e4ba8;
 }
 
 .edit-profile-header h3 {
   margin: 0;
-  color: #3550A0;
+  color: #1e4ba8;
   font-size: 1.25rem;
 }
 
@@ -233,7 +233,7 @@
 
 .dashboard-header {
   padding: 1.5rem;
-  background: #223E8E;
+  background: #1a3a6e;
   color: white;
   border-radius: 12px;
 }
@@ -300,8 +300,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 2px solid #3550A0;
-  background: linear-gradient(135deg, #3550A0 0%, #2A4080 100%);
+  border-bottom: 2px solid #1e4ba8;
+  background: linear-gradient(135deg, #1e4ba8 0%, #2A4080 100%);
 }
 
 .modal-password-header h3 {
@@ -364,8 +364,8 @@
 
 .form-input-compact:focus {
   outline: none;
-  border-color: #3550A0;
-  box-shadow: 0 0 0 3px rgba(53, 80, 160, 0.1);
+  border-color: #1e4ba8;
+  box-shadow: 0 0 0 3px rgba(30, 75, 168, 0.1);
 }
 
 .form-input-compact:disabled {
@@ -389,7 +389,7 @@
 }
 
 .password-toggle-btn:hover {
-  color: #3550A0;
+  color: #1e4ba8;
 }
 
 .password-hint {
@@ -427,7 +427,7 @@
 .btn-password-primary {
   flex: 1;
   padding: 0.75rem 1.5rem;
-  background: #3550A0;
+  background: #1e4ba8;
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -440,7 +440,7 @@
 .btn-password-primary:hover:not(:disabled) {
   background: #2A4080;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(53, 80, 160, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.3);
 }
 
 .btn-password-primary:disabled {
@@ -513,13 +513,13 @@
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: rgba(53, 80, 160, 0.1);
+  background: rgba(30, 75, 168, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 3.5rem;
   font-weight: 700;
-  border: 4px solid #3550A0;
+  border: 4px solid #1e4ba8;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -531,7 +531,7 @@
 }
 
 .avatar-initials {
-  color: #3550A0;
+  color: #1e4ba8;
 }
 
 .btn-camera-overlay {
@@ -541,7 +541,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #3550A0;
+  background: #1e4ba8;
   border: 4px solid #ffffff;
   color: #ffffff;
   font-size: 1.5rem;
@@ -581,7 +581,7 @@
 }
 
 .profile-section-header {
-  background: #223E8E;
+  background: #1a3a6e;
   color: #ffffff;
   padding: 1.5rem;
   border-radius: 12px;
@@ -1730,7 +1730,7 @@
    ======================================== */
 
 .feedback-form {
-  background: linear-gradient(135deg, #284394 0%, #2563eb 100%) !important;
+  background: linear-gradient(135deg, #1e4ba8 0%, #2563eb 100%) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: white !important;
   backdrop-filter: none !important;
@@ -1797,7 +1797,7 @@
 .nps-header h3 {
   margin: 0 0 0.5rem;
   font-size: 1.25rem;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .nps-scale-label {
@@ -1826,16 +1826,16 @@
 }
 
 .nps-button:hover {
-  border-color: #284394;
+  border-color: #1e4ba8;
   background: #f0f4ff;
   transform: translateY(-2px);
 }
 
 .nps-button.active {
-  background: #284394;
+  background: #1e4ba8;
   color: white;
-  border-color: #284394;
-  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+  border-color: #1e4ba8;
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.3);
 }
 
 .nps-feedback {
@@ -1882,7 +1882,7 @@
 .section-title {
   margin: 0 0 1.5rem;
   font-size: 1.1rem;
-  color: #284394;
+  color: #1e4ba8;
   font-weight: 600;
 }
 
@@ -1933,16 +1933,16 @@
 }
 
 .rating-button:hover {
-  border-color: #284394;
+  border-color: #1e4ba8;
   background: #f0f4ff;
   transform: translateY(-2px);
 }
 
 .rating-button.active {
-  background: #284394;
-  border-color: #284394;
+  background: #1e4ba8;
+  border-color: #1e4ba8;
   color: white;
-  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.3);
 }
 
 .rating-number {
@@ -1993,7 +1993,7 @@
 
 .feedback-textarea:focus {
   outline: none;
-  border-color: #223E8E;
+  border-color: #1a3a6e;
   box-shadow: 0 0 0 3px rgba(34, 62, 142, 0.1);
 }
 
@@ -2169,7 +2169,7 @@
 .modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #223E8E;
+  color: #1a3a6e;
   font-weight: 600;
 }
 
@@ -2217,7 +2217,7 @@
 
 .cancel-reason-input:focus {
   outline: none;
-  border-color: #223E8E;
+  border-color: #1a3a6e;
   box-shadow: 0 0 0 3px rgba(34, 62, 142, 0.1);
 }
 

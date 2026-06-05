@@ -1,11 +1,121 @@
-/* Admin Filter Bar Styles */
+/* Admin Filter Bar — clean white card */
 
 .filter-bar {
   background: white;
+  border: 1px solid #e2e8f3;
   border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1.5rem;
+  padding: 1.125rem 1.375rem;
+  box-shadow: 0 1px 3px rgba(26,58,110,0.05);
+  margin-bottom: 1.25rem;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.875rem;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 180px;
+}
+
+.filter-group label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.filter-input,
+.filter-select {
+  padding: 0.55rem 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #334155;
+  background: #f8fafc;
+  transition: border-color 150ms ease;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #93c5fd;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(147,197,253,0.25);
+}
+
+.filter-input::placeholder { color: #94a3b8; }
+
+.filter-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.625rem center;
+  padding-right: 2rem;
+}
+
+.filter-select:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 0.625rem;
+  align-items: flex-end;
+}
+
+.btn-reset {
+  padding: 0.55rem 1.125rem;
+  background: white;
+  color: #1e4ba8;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 150ms ease;
+}
+
+.btn-reset:hover { background: #dbeafe; }
+
+.btn-apply {
+  padding: 0.55rem 1.125rem;
+  background: #1e4ba8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.btn-apply:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+@media (max-width: 1024px) {
+  .filter-group { min-width: 140px; flex: 0 1 calc(50% - 0.5rem); }
+}
+
+@media (max-width: 768px) {
+  .filter-bar { padding: 1rem; }
+  .filter-container { flex-direction: column; }
+  .filter-group { width: 100%; min-width: unset; }
+  .filter-actions { width: 100%; justify-content: flex-end; }
+  .btn-reset, .btn-apply { flex: 1; }
 }
 
 .filter-container {
@@ -44,8 +154,8 @@
 .filter-input:focus,
 .filter-select:focus {
   outline: none;
-  border-color: #284394;
-  box-shadow: 0 0 0 3px rgba(40, 67, 148, 0.1);
+  border-color: #1e4ba8;
+  box-shadow: 0 0 0 3px rgba(30, 75, 168, 0.1);
 }
 
 .filter-input::placeholder {
@@ -76,8 +186,8 @@
 .btn-reset {
   padding: 0.75rem 1.5rem;
   background: white;
-  color: #284394;
-  border: 1px solid #284394;
+  color: #1e4ba8;
+  border: 1px solid #1e4ba8;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
@@ -93,7 +203,7 @@
 
 .btn-apply {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #1e3a8a 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -105,7 +215,7 @@
 
 .btn-apply:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.4);
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.4);
 }
 
 /* Responsive */

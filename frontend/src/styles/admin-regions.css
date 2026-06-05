@@ -2,8 +2,209 @@
 .region-management-container {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 24px;
-  margin-top: 24px;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.add-region-card {
+  background: white;
+  border: 1px solid #e2e8f3;
+  border-radius: 12px;
+  padding: 1.375rem;
+  box-shadow: 0 1px 4px rgba(26,58,110,0.05);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.add-region-card h3 {
+  margin: 0 0 1.125rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.add-region-form { display: flex; flex-direction: column; gap: 0.875rem; }
+.add-region-form .form-group { display: flex; flex-direction: column; }
+.add-region-form label { font-size: 0.8125rem; font-weight: 600; color: #334155; margin-bottom: 0.375rem; }
+
+.add-region-form input {
+  padding: 0.575rem 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background: #f8fafc;
+  transition: border-color 150ms ease;
+  color: #1e293b;
+}
+
+.add-region-form input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(147,197,253,0.25);
+}
+
+.add-region-form input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+
+.add-region-form .btn-primary {
+  padding: 0.575rem 1rem;
+  background: #1e4ba8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 150ms ease;
+}
+
+.add-region-form .btn-primary:hover:not(:disabled) { background: #1d4ed8; }
+.add-region-form .btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+.regions-list-card {
+  background: white;
+  border: 1px solid #e2e8f3;
+  border-radius: 12px;
+  padding: 1.375rem;
+  box-shadow: 0 1px 4px rgba(26,58,110,0.05);
+}
+
+.regions-list-card h3 {
+  margin: 0 0 1.125rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.regions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.region-card {
+  background: white;
+  border: 1px solid #e2e8f3;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  box-shadow: 0 1px 3px rgba(26,58,110,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.region-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(26,58,110,0.11);
+  border-color: #bfdbfe;
+}
+
+.region-card-header {
+  background: linear-gradient(135deg, #1e4ba8, #1d4ed8);
+  color: white;
+  padding: 1.125rem 1.25rem;
+}
+
+.region-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.region-title h4 { margin: 0; font-size: 1rem; font-weight: 700; }
+
+.region-badge {
+  background: rgba(255,255,255,0.18);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.region-card-body { padding: 1.125rem 1.25rem; flex-grow: 1; }
+.region-stats { display: grid; grid-template-columns: 1fr; gap: 0.625rem; }
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.stat-label { font-size: 0.8125rem; color: #64748b; font-weight: 500; }
+.stat-value { font-size: 1.25rem; font-weight: 700; color: #1e4ba8; }
+
+.region-card-footer {
+  padding: 0.875rem 1.25rem;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.region-card-footer .btn-secondary {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  background: white;
+  color: #1e4ba8;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 150ms ease;
+}
+
+.region-card-footer .btn-secondary:hover { background: #dbeafe; }
+
+.region-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.region-header h4 { margin: 0; font-size: 1rem; font-weight: 700; color: #1e293b; }
+.region-info { padding-top: 0.75rem; border-top: 1px solid #f1f5f9; }
+.region-info p { margin: 0; font-size: 0.8125rem; color: #64748b; }
+
+.empty-state { text-align: center; padding: 2.5rem 1.25rem; color: #94a3b8; }
+.empty-state p { margin: 0; font-size: 0.875rem; }
+.loading-state { text-align: center; padding: 2.5rem 1.25rem; color: #64748b; font-size: 0.875rem; }
+
+.error-message {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 3px solid #dc2626;
+}
+
+.success-message {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 3px solid #22c55e;
+}
+
+@media (max-width: 1024px) {
+  .region-management-container { grid-template-columns: 1fr; }
+  .add-region-card { position: static; }
+  .regions-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .region-management-container { gap: 1rem; }
+  .add-region-card, .regions-list-card { padding: 1rem; }
+  .regions-grid { grid-template-columns: 1fr; }
 }
 
 /* Add Region Card */
@@ -53,8 +254,8 @@
 
 .add-region-form input:focus {
   outline: none;
-  border-color: #284394;
-  box-shadow: 0 0 0 3px rgba(40, 67, 148, 0.1);
+  border-color: #1e4ba8;
+  box-shadow: 0 0 0 3px rgba(30, 75, 168, 0.1);
 }
 
 .add-region-form input:disabled {
@@ -65,7 +266,7 @@
 
 .add-region-form .btn-primary {
   padding: 10px 16px;
-  background-color: #284394;
+  background-color: #1e4ba8;
   color: white;
   border: none;
   border-radius: 6px;
@@ -78,7 +279,7 @@
 .add-region-form .btn-primary:hover:not(:disabled) {
   background-color: #1e3a8a;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 75, 168, 0.3);
 }
 
 .add-region-form .btn-primary:disabled {
@@ -122,11 +323,11 @@
 .region-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  border-color: #284394;
+  border-color: #1e4ba8;
 }
 
 .region-card-header {
-  background: linear-gradient(135deg, #284394 0%, #1e3a8a 100%);
+  background: linear-gradient(135deg, #1e4ba8 0%, #1e3a8a 100%);
   color: white;
   padding: 20px;
 }
@@ -183,7 +384,7 @@
 .stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: #284394;
+  color: #1e4ba8;
 }
 
 .region-card-footer {
@@ -196,8 +397,8 @@
   width: 100%;
   padding: 10px 16px;
   background-color: white;
-  color: #284394;
-  border: 1px solid #284394;
+  color: #1e4ba8;
+  border: 1px solid #1e4ba8;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
@@ -206,7 +407,7 @@
 }
 
 .region-card-footer .btn-secondary:hover {
-  background-color: #284394;
+  background-color: #1e4ba8;
   color: white;
 }
 

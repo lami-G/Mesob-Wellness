@@ -362,7 +362,15 @@ function AdminHeader({
                   <div className="avatar-initials">{getInitials(user?.fullName)}</div>
                 )}
               </span>
-              <span className="user-name">{user?.fullName}</span>
+              <span className="user-info-header">
+                <span className="user-role-header">
+                  {dashboardType === "admin" ? "System Administrator" :
+                   dashboardType === "manager" ? "Center Manager" :
+                   dashboardType === "regional" ? "Regional Office" :
+                   dashboardType === "federal" ? "System Administrator" : "User"}
+                </span>
+                <span className="user-name">{getInitials(user?.fullName)}</span>
+              </span>
               <span className="dropdown-arrow">▼</span>
             </button>
 

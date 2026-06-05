@@ -366,14 +366,14 @@ export default function HealthConditionTrendsPanel({
         </div>
       )}
 
-      <div className="card" style={{ padding: "2rem", marginBottom: "1.5rem" }}>
+      <div className="card" style={{ padding: "1.75rem 2rem", marginBottom: "1.25rem" }}>
         <div style={{ marginBottom: "2rem" }}>
           <h3
             style={{
               margin: 0,
-              fontSize: "1.25rem",
-              fontWeight: "600",
-              color: "#111",
+              fontSize: "1.0625rem",
+              fontWeight: "700",
+              color: "#1a2540",
             }}
           >
             {new Date().toLocaleDateString("en-US", {
@@ -385,9 +385,10 @@ export default function HealthConditionTrendsPanel({
           </h3>
           <p
             style={{
-              margin: "0.5rem 0 0 0",
-              fontSize: "0.95rem",
-              color: "#666",
+              margin: "0.375rem 0 0 0",
+              fontSize: "0.8125rem",
+              color: "#8a96b0",
+              fontWeight: 500,
             }}
           >
             {periodSubtitle}
@@ -626,24 +627,28 @@ export default function HealthConditionTrendsPanel({
         </div>
       </div>
 
-      <div className="card trend-chart-card" style={{ padding: "2rem" }}>
+      <div className="card trend-chart-card" style={{ padding: "1.75rem 2rem" }}>
         <div style={{ marginBottom: "2rem" }}>
           <h3
             className="trend-chart-title"
             style={{
               margin: 0,
-              fontSize: "1.25rem",
-              fontWeight: "600",
-              color: "#111",
+              fontSize: "1.0625rem",
+              fontWeight: "700",
+              color: "#1a2540",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
             }}
           >
-            Health Condition Trends
+            📈 Health Condition Trends
           </h3>
           <p
             style={{
-              margin: "0.5rem 0 0 0",
-              fontSize: "0.95rem",
-              color: "#666",
+              margin: "0.375rem 0 0 0",
+              fontSize: "0.8125rem",
+              color: "#8a96b0",
+              fontWeight: 500,
             }}
           >
             {trendSubtitle}
