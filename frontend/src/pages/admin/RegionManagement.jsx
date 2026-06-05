@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 import AddCenterModal from "../../components/admin/AddCenterModal";
 import RegionManagerModal from "../../components/admin/RegionManagerModal";
-import "../../styles/admin-regions.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function RegionManagement() {
   const [regions, setRegions] = useState([]);

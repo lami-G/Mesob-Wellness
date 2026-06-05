@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
-import "../../../src/styles/admin-modals.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function AddCenterModal({ isOpen, onClose, onSuccess, regions = [], region = null }) {
   const [formData, setFormData] = useState({

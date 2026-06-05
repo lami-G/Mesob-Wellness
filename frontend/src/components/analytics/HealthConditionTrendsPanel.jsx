@@ -11,7 +11,7 @@ import {
   Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import "../../styles/nurse-analytics.css";
+// All styles imported through main.jsx - no additional imports needed
 
 ChartJS.register(
   CategoryScale,

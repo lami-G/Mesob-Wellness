@@ -1,21 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MainLayout from "../components/MainLayout";
 import RoleBasedRoute from "../components/RoleBasedRoute";
 import MaintenanceMode from "../components/MaintenanceMode";
+import ErrorBoundary from "../components/errors/ErrorBoundary";
+import RouteErrorBoundary from "../components/errors/RouteErrorBoundary";
+import DashboardSkeleton from "../components/loading/DashboardSkeleton";
 import api from "../services/api";
-import Dashboard from "../pages/Dashboard";
-import NurseDashboard from "../pages/NurseDashboard";
-import ManagerDashboard from "../pages/ManagerDashboard";
-import RegionalDashboard from "../pages/RegionalDashboard";
-import ManagerDashboardProfile from "../pages/ManagerDashboardProfile";
-import RegionalDashboardProfile from "../pages/RegionalDashboardProfile";
-import FederalDashboardProfile from "../pages/FederalDashboardProfile";
-import FederalDashboard from "../pages/FederalDashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
+
+// Lazy-loaded route components for code splitting
+const Login = lazy(() => import("../pages/auth/Login"));
+const Register = lazy(() => import("../pages/auth/Register"));
+const PatientDashboard = lazy(() => import("../pages/patient/Dashboard"));
+const NurseDashboard = lazy(() => import("../pages/nurse/Dashboard"));
+const ManagerDashboard = lazy(() => import("../pages/manager/Dashboard"));
+const ManagerProfile = lazy(() => import("../pages/manager/Profile"));
+const RegionalDashboard = lazy(() => import("../pages/regional/Dashboard"));
+const RegionalProfile = lazy(() => import("../pages/regional/Profile"));
+const FederalDashboard = lazy(() => import("../pages/federal/Dashboard"));
+const FederalProfile = lazy(() => import("../pages/federal/Profile"));
+const AdminDashboard = lazy(() => import("../pages/admin/Dashboard"));
+import AdminDashboard from "../pages/admin/Dashboard";
 
 function AppRouter() {
   const { user } = useAuth();
@@ -84,24 +90,56 @@ function AppRouter() {
     return <MaintenanceMode />;
   }
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route
-        path="/dashboard"
-        element={
-          <RoleBasedRoute allowedRoles={["STAFF"]}>
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          </RoleBasedRoute>
-        }
-      />
-      <Route
-        path="/nurse"
-        element={
-          <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
-            <MainLayout>
+    <ErrorBoundary>
+      <Routes>
+        <Route 
+          path="/login" 
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+              <RouteErrorBoundary>
+                <Login />
+              </RouteErrorBoundary>
+            </Suspense>
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div></div>}>
+              <RouteErrorBoundary>
+                <Register />
+              </RouteErrorBoundary>
+            </Suspense>
+          } 
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <RoleBasedRoute allowedRoles={["STAFF"]}>
+              <Suspense fallback={<DashboardSkeleton />}>
+                <RouteErrorBoundary>
+                  <MainLayout>
+                    <PatientDashboard />
+                  </MainLayout>
+                </RouteErrorBoundary>
+              </Suspense>
+            </RoleBasedRoute>
+          }
+        />
+        <Route
+          path="/nurse"
+          element={
+            <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
+              <Suspense fallback={<DashboardSkeleton />}>
+                <RouteErrorBoundary>
+                  <MainLayout>
+                    <NurseDashboard />
+                  </MainLayout>
+                </RouteErrorBoundary>
+              </Suspense>
+            </RoleBasedRoute>
+          }
+        />
               <NurseDashboard />
             </MainLayout>
           </RoleBasedRoute>
@@ -123,7 +161,7 @@ function AppRouter() {
         path="/manager-profile"
         element={
           <RoleBasedRoute allowedRoles={["MANAGER"]}>
-            <ManagerDashboardProfile />
+            <ManagerProfile />
           </RoleBasedRoute>
         }
       />
@@ -147,7 +185,7 @@ function AppRouter() {
         path="/federal-profile"
         element={
           <RoleBasedRoute allowedRoles={["FEDERAL_OFFICE"]}>
-            <FederalDashboardProfile />
+            <FederalProfile />
           </RoleBasedRoute>
         }
       />
@@ -155,7 +193,7 @@ function AppRouter() {
         path="/regional-profile"
         element={
           <RoleBasedRoute allowedRoles={["REGIONAL_OFFICE"]}>
-            <RegionalDashboardProfile />
+            <RegionalProfile />
           </RoleBasedRoute>
         }
       />

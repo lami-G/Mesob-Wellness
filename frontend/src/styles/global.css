@@ -1,14 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;600;700&family=Sora:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  font-family: 'Inter', Manrope, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #1a2540;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #0d2444;
   line-height: 1.5;
-  --mesob-navy: #1a3a6e;
-  --mesob-blue: #2355a0;
-  --mesob-purple: #8b5cf6;
-  --mesob-light: #f7f9fc;
-  --mesob-gold: #f5a623;
+  --mesob-navy: #1a3f6f;
+  --mesob-blue: #2563b0;
+  --mesob-sky: #D6E8FB;
+  --mesob-light: #f4f8fe;
+  --mesob-gold: #e8a020;
 }
 
 * {
@@ -57,10 +57,10 @@ body::before {
   z-index: 1;
 }
 
-/* Dashboard/Admin pages override: exact screenshot BG */
+/* Dashboard/Admin pages override: FDRE MESOB BG */
 body:has(.admin-layout),
 body:has(.layout-shell) {
-  background: #eef2f8;
+  background: #D6E8FB;
 }
 
 body:has(.admin-layout)::before,
@@ -73,7 +73,7 @@ body:has(.layout-shell)::before {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #eef2f8;
+  background: #D6E8FB;
 }
 
 /* ========================================

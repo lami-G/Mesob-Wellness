@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import FeedbackList from "../../components/admin/FeedbackList";
 import FeedbackAnalytics from "../../components/admin/FeedbackAnalytics";
-import "../../styles/admin-feedback.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function FeedbackQuality({ baseFilters = {} }) {
   const [activeTab, setActiveTab] = useState("list");

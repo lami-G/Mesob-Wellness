@@ -1,7 +1,7 @@
 import React from "react";
 import Input from "../forms/Input";
 import Button from "../forms/Button";
-import "../../styles/admin-modals.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function CenterFormModal({
   isOpen,

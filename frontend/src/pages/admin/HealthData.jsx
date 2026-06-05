@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 import api from "../../services/api";
-import "../../styles/admin-health.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function HealthData() {
   const [stats, setStats] = useState(null);

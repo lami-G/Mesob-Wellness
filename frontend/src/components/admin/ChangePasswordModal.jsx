@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../../services/adminService";
-import "../../styles/admin-settings.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function ChangePasswordModal({ isOpen, onClose, userName }) {
   const [formData, setFormData] = useState({

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import QuickHistoryModal from './QuickHistoryModal';
+// All styles imported through main.jsx - no additional imports needed
 
 function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
   const [queue, setQueue] = useState([]);

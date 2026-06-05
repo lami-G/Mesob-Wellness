@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
-import "../../styles/admin-analytics.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function Analytics() {
   const [metrics, setMetrics] = useState(null);

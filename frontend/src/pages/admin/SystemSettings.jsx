@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { settingsService } from "../../services/settingsService";
-import "../../styles/admin-settings.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function SystemSettings() {
   const [settings, setSettings] = useState({

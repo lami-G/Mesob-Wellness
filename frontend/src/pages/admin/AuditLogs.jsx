@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { adminService } from "../../services/adminService";
-import "../../styles/admin-audit.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function AuditLogs({ baseFilters = {} }) {
   const [logs, setLogs] = useState([]);

@@ -7,6 +7,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.101.0",
+    "@tanstack/react-query-devtools": "^5.101.0",
     "axios": "^1.6.2",
     "browserslist": "^4.28.2",
     "caniuse-lite": "^1.0.30001791",

@@ -1,101 +1,40 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import AdminSidebar from "../components/admin/AdminSidebar";
-import ManagerSidebar from "../components/admin/ManagerSidebar";
-import RegionalSidebar from "../components/admin/RegionalSidebar";
-import FederalSidebar from "../components/admin/FederalSidebar";
+import Sidebar from "../components/shared/Sidebar";
+import { adminSidebarConfig } from "../config/sidebar";
 import AdminHeader from "../components/admin/AdminHeader";
-import "../styles/admin-layout.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function AdminLayout({
   children,
   activeTab,
   onTabChange,
-  dashboardType = "admin",
   user,
-  capacityInfo,
-  staffCount,
-  centerStats,
-  centersCount,
-  onRefresh,
-  loading,
   lastUpdated,
   error,
-  selectedCenter,
-  setSelectedCenter,
-  centers,
 }) {
   const { user: authUser } = useAuth();
   const currentUser = user || authUser;
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const renderSidebar = () => {
-    const commonProps = {
-      activeTab,
-      onTabChange,
-      isOpen: sidebarOpen,
-      user: currentUser,
-    };
-
-    switch (dashboardType) {
-      case "manager":
-        return (
-          <ManagerSidebar
-            {...commonProps}
-            capacityInfo={capacityInfo}
-            staffCount={staffCount}
-            onRefresh={onRefresh}
-            loading={loading}
-          />
-        );
-      case "regional":
-        return (
-          <RegionalSidebar
-            {...commonProps}
-            centerStats={centerStats}
-            centersCount={centersCount}
-            selectedCenter={selectedCenter}
-            setSelectedCenter={setSelectedCenter}
-            centers={centers}
-          />
-        );
-      case "federal":
-        return <FederalSidebar {...commonProps} />;
-      default:
-        return <AdminSidebar {...commonProps} />;
-    }
-  };
-
-  const getHeaderTitle = () => {
-    switch (dashboardType) {
-      case "manager":
-        return "MESOB Manager Portal";
-      case "regional":
-        return "MESOB Regional Portal";
-      case "federal":
-        return "MESOB Federal Portal";
-      default:
-        return "MESOB Admin Portal";
-    }
-  };
-
   return (
     <div className="admin-layout">
-      {renderSidebar()}
+      <Sidebar
+        config={adminSidebarConfig}
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        isOpen={sidebarOpen}
+        extras={{ user: currentUser }}
+      />
 
       <div className="admin-main">
         <AdminHeader
           user={currentUser}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onTabChange={onTabChange}
-          title={getHeaderTitle()}
-          dashboardType={dashboardType}
-          onRefresh={onRefresh}
-          loading={loading}
+          title="MESOB Admin Portal"
+          dashboardType="admin"
           lastUpdated={lastUpdated}
-          selectedCenter={selectedCenter}
-          setSelectedCenter={setSelectedCenter}
-          centers={centers}
           activeTab={activeTab}
         />
 

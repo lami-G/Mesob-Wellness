@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { notificationService } from "../../services/notificationService";
-import "../../styles/notification-panel.css";
+// All styles imported through main.jsx - no additional imports needed
 
 function NotificationPanel({ isOpen, onClose }) {
   const [notifications, setNotifications] = useState([]);

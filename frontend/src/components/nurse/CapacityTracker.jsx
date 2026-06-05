@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+// All styles imported through main.jsx - no additional imports needed
 
 function CapacityTracker() {
   const [capacity, setCapacity] = useState(null);
