@@ -24,7 +24,6 @@ import {
   Area,
   AreaChart,
 } from "recharts";
-import "../../styles/regional-dashboard-responsive.css";
 
 // ─── Role guard ───────────────────────────────────────────────────────────────
 const REGIONAL_ROLES = ["REGIONAL_OFFICE", "SYSTEM_ADMIN"];
