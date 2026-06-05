@@ -6,8 +6,6 @@ import MyAppointments from "../components/dashboard/MyAppointments";
 import HealthJourney from "../components/dashboard/HealthJourney";
 import WellnessPlan from "../components/dashboard/WellnessPlan";
 import ProfileSection from "../components/dashboard/ProfileSection";
-import RiskScoring from "../components/dashboard/RiskScoring";
-import HealthAlerts from "../components/dashboard/HealthAlerts";
 import FeedbackForm from "../components/dashboard/FeedbackForm";
 import LongitudinalRecords from "../components/dashboard/LongitudinalRecords";
 
@@ -48,13 +46,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Welcome, {user?.fullName}</h1>
-        <p className="dashboard-subtitle">
-          Manage your health and appointments
-        </p>
-      </div>
-
       <div className="dashboard-content">
         {activeTab === "appointments" && (
           <>
@@ -65,8 +56,6 @@ function Dashboard() {
 
         {activeTab === "health" && (
           <>
-            <HealthAlerts />
-            <RiskScoring />
             <HealthJourney />
           </>
         )}

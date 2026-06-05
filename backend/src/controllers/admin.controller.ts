@@ -890,6 +890,15 @@ export const upsertRegionAdmin = async (
       const hashedPassword = await bcrypt.default.hash(password, 10);
 
       if (adminId) {
+        // Update existing admin user - check if new email conflicts with another user
+        if (existingUserByEmail && existingUserByEmail.id !== adminId) {
+          res.status(400).json({
+            status: "error",
+            message: "This email is already in use by another user",
+          });
+          return;
+        }
+
         // Update existing admin user
         await prisma.user.update({
           where: { id: adminId },
@@ -912,7 +921,7 @@ export const upsertRegionAdmin = async (
         });
         adminId = existingUserByEmail.id;
       } else {
-        // Create new admin user
+        // Create new admin user - email doesn't exist yet
         const displayId = await generateNextDisplayId();
 
         const admin = await prisma.user.create({
@@ -935,7 +944,7 @@ export const upsertRegionAdmin = async (
       if (existingUserByEmail && existingUserByEmail.id !== adminId) {
         res.status(400).json({
           status: "error",
-          message: "Email is already in use by another user",
+          message: "This email is already in use by another user",
         });
         return;
       }
@@ -989,6 +998,17 @@ export const upsertRegionAdmin = async (
       stack: error.stack,
       code: error.code,
     });
+
+    // Handle Prisma unique constraint errors
+    if (error.code === "P2002") {
+      const field = error.meta?.target?.[0] || "field";
+      res.status(400).json({
+        status: "error",
+        message: `This ${field} is already in use`,
+      });
+      return;
+    }
+
     res.status(500).json({
       status: "error",
       message: error.message || "Failed to update region admin",

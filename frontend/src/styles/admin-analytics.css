@@ -347,7 +347,8 @@
 
 
 /* Breakdown Items in Total Users Card */
-.breakdown-items {
+.admin-dashboard .breakdown-items,
+.admin-analytics .breakdown-items {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -357,19 +358,22 @@
   width: 100%;
 }
 
-.breakdown-item {
+.admin-dashboard .breakdown-item,
+.admin-analytics .breakdown-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 0.85rem;
 }
 
-.breakdown-label {
+.admin-dashboard .breakdown-label,
+.admin-analytics .breakdown-label {
   font-weight: 500;
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-.breakdown-value {
+.admin-dashboard .breakdown-value,
+.admin-analytics .breakdown-value {
   font-weight: 600;
   color: #ffffff !important;
   font-size: 0.9rem;

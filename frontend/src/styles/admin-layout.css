@@ -317,10 +317,20 @@
   justify-content: center;
 }
 
+.notification-btn svg {
+  display: block;
+  stroke: rgba(255, 255, 255, 0.8);
+  transition: stroke 0.2s ease;
+}
+
 .notification-btn:hover {
   color: #f5a623;
   border-color: #f5a623;
   background: rgba(245, 166, 35, 0.1);
+}
+
+.notification-btn:hover svg {
+  stroke: #f5a623;
 }
 
 .notification-badge {
@@ -369,9 +379,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   overflow: hidden;
   background: #f5a623;
   flex-shrink: 0;

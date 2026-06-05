@@ -142,7 +142,10 @@ function AdminHeader({
                 e.target.style.borderColor = 'rgba(255,255,255,0.3)';
               }}
             >
-              <span>{loading ? '⏳' : '🔄'}</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
               <span>{loading ? 'Updating...' : 'Refresh'}</span>
             </button>
           )}
@@ -150,6 +153,7 @@ function AdminHeader({
       );
     }
 
+    // Federal dashboard - add functional notifications
     return (
       <div className="header-actions">
         <button 
@@ -157,7 +161,10 @@ function AdminHeader({
           title="Notifications"
           onClick={handleNotificationClick}
         >
-          🔔
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
           {unreadCount > 0 && (
             <span className="notification-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
           )}
@@ -165,6 +172,142 @@ function AdminHeader({
       </div>
     );
   };
+
+  // Federal and Admin dashboards - render only right-side controls
+  if (dashboardType === "federal" || dashboardType === "admin") {
+    return (
+      <>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginLeft: "auto" }}>
+          <select 
+            style={{
+              background: "transparent",
+              border: "1.5px solid rgba(255, 255, 255, 0.35)",
+              borderRadius: "7px",
+              padding: "0.4rem 0.9rem",
+              fontSize: "0.875rem",
+              color: "#ffffff",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              fontFamily: "inherit",
+            }}
+          >
+            <option value="en" style={{ color: "#1e293b", background: "#ffffff" }}>English</option>
+            <option value="am" style={{ color: "#1e293b", background: "#ffffff" }}>አማርኛ</option>
+          </select>
+
+          {getHeaderActions()}
+
+          <div style={{ position: "relative" }}>
+            <button
+              type="button"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: "10px",
+                padding: "4px 12px 4px 4px",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                transition: "all 0.2s ease",
+                minHeight: "unset",
+                height: "42px",
+              }}
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <span style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                background: "#f5a623",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "none",
+                flexShrink: 0,
+                overflow: "hidden",
+              }}>
+                {user?.profilePicture ? (
+                  <img src={user.profilePicture} alt={user?.fullName} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }} />
+                ) : (
+                  <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#213D8D" }}>{getInitials(user?.fullName)}</span>
+                )}
+              </span>
+              <span style={{ fontSize: "0.65rem", opacity: 0.7, color: "rgba(255,255,255,0.8)" }}>▼</span>
+            </button>
+
+            {showUserMenu && (
+              <div style={{
+                position: "absolute",
+                top: "calc(100% + 6px)",
+                right: 0,
+                background: "white",
+                border: "1px solid #e2e8f0",
+                borderRadius: "10px",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.14)",
+                minWidth: "160px",
+                zIndex: 1001,
+                overflow: "hidden",
+              }}>
+                <button 
+                  style={{
+                    width: "100%",
+                    padding: "0.7rem 1rem",
+                    background: "none",
+                    border: "none",
+                    textAlign: "left",
+                    color: "#1e293b",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    transition: "background 0.15s",
+                    fontFamily: "inherit",
+                  }}
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    navigate("/federal-profile");
+                  }}
+                >
+                  Profile
+                </button>
+                <hr style={{ margin: 0, border: "none", borderTop: "1px solid #e2e8f0" }} />
+                <button 
+                  style={{
+                    width: "100%",
+                    padding: "0.7rem 1rem",
+                    background: "none",
+                    border: "none",
+                    textAlign: "left",
+                    color: "#1e293b",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    transition: "background 0.15s",
+                    fontFamily: "inherit",
+                  }}
+                  onClick={handleLogout}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = "#fee2e2";
+                    e.target.style.color = "#dc2626";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = "none";
+                    e.target.style.color = "#1e293b";
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+      </>
+    );
+  }
 
   return (
     <>
@@ -220,7 +363,12 @@ function AdminHeader({
                     e.target.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1)';
                   }}
                 >
-                  <span style={{ fontSize: '1.1rem' }}>🔍</span>
+                  <span style={{ fontSize: '1.1rem' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="8"/>
+                      <path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                  </span>
                   <span>Filter Centers</span>
                   <span style={{ fontSize: '0.75rem', opacity: 0.9, marginLeft: '0.25rem' }}>▼</span>
                 </button>
@@ -253,7 +401,12 @@ function AdminHeader({
                       alignItems: 'center',
                       gap: '0.5rem'
                     }}>
-                      <span style={{ fontSize: '1.2rem' }}>🏥</span>
+                      <span style={{ fontSize: '1.2rem' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                      </span>
                       <span>All Centers ({centers.length})</span>
                     </div>
 
@@ -286,7 +439,11 @@ function AdminHeader({
                         e.target.style.background = selectedCenter === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent';
                       }}
                     >
-                      <span style={{ fontSize: '1rem' }}>✅</span>
+                      <span style={{ fontSize: '1rem', width: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </span>
                       <span style={{ flex: 1 }}>All Centers</span>
                       {selectedCenter === 'all' && <span style={{ color: '#4ade80', fontWeight: 700 }}>✓</span>}
                     </button>
@@ -322,8 +479,10 @@ function AdminHeader({
                           e.target.style.background = selectedCenter === center.id ? 'rgba(255,255,255,0.15)' : 'transparent';
                         }}
                       >
-                        <span style={{ fontSize: '1rem' }}>
-                          {center.status === 'ACTIVE' ? '✅' : '⚠️'}
+                        <span style={{ fontSize: '1rem', width: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={center.status === 'ACTIVE' ? '#4ade80' : '#f59e0b'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
                         </span>
                         <span style={{ flex: 1 }}>
                           <div style={{ fontWeight: 500 }}>{center.name}</div>
@@ -332,7 +491,15 @@ function AdminHeader({
                             opacity: 0.7,
                             marginTop: '0.1rem'
                           }}>
-                            {center.status === 'ACTIVE' ? '🟢 Active' : '🟡 Inactive'}
+                            <span style={{ 
+                              display: 'inline-block',
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              background: center.status === 'ACTIVE' ? '#4ade80' : '#f59e0b',
+                              marginRight: '4px'
+                            }} />
+                            {center.status === 'ACTIVE' ? 'Active' : 'Inactive'}
                           </div>
                         </span>
                         {selectedCenter === center.id && (
@@ -374,13 +541,13 @@ function AdminHeader({
                       className="dropdown-item"
                       onClick={handleProfileClick}
                     >
-                      👤 Profile
+                      Profile
                     </button>
                     <button 
                       className="dropdown-item"
                       onClick={handleSettingsClick}
                     >
-                      ⚙️ Settings
+                      Settings
                     </button>
                     <hr className="dropdown-divider" />
                   </>
@@ -394,7 +561,7 @@ function AdminHeader({
                         navigate("/manager-profile");
                       }}
                     >
-                      👤 Profile
+                      Profile
                     </button>
                     <hr className="dropdown-divider" />
                   </>
@@ -408,7 +575,7 @@ function AdminHeader({
                         navigate("/regional-profile");
                       }}
                     >
-                      👤 Profile
+                      Profile
                     </button>
                     <hr className="dropdown-divider" />
                   </>
@@ -422,7 +589,7 @@ function AdminHeader({
                         navigate("/federal-profile");
                       }}
                     >
-                      👤 Profile
+                      Profile
                     </button>
                     <hr className="dropdown-divider" />
                   </>
@@ -431,7 +598,7 @@ function AdminHeader({
                   className="dropdown-item logout"
                   onClick={handleLogout}
                 >
-                  🚪 Logout
+                  Logout
                 </button>
               </div>
             )}

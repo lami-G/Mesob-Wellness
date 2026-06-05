@@ -30,6 +30,9 @@ function NurseDashboard() {
     const allowedTabs = ["analytics", "queue", "vitals", "walkin", "wellness", "history", "profile"];
     if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
+    } else {
+      // Reset to default analytics tab when no tab parameter
+      setActiveTab("analytics");
     }
   }, [searchParams]);
 

@@ -291,7 +291,7 @@ function RegisterWalkIn({ onSuccess }) {
       {showRegisterModal && (
         <div style={{
           position: 'fixed',
-          top: 0,
+          top: 80,
           left: 0,
           right: 0,
           bottom: 0,
@@ -299,7 +299,7 @@ function RegisterWalkIn({ onSuccess }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000,
+          zIndex: 1001,
         }}>
           <div style={{
             backgroundColor: '#FFFFFF',

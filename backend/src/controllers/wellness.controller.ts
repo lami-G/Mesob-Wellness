@@ -1,6 +1,53 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import * as WellnessService from "../services/wellness.service";
+import prisma from "../config/prisma";
+
+/**
+ * Helper function to resolve patient user ID from either 4-digit display ID or UUID
+ */
+async function resolvePatientUserId(inputId: string): Promise<string | null> {
+  const trimmedId = inputId.trim();
+
+  // Check if it looks like a UUID (contains hyphens and is 36 chars)
+  const isUUID = trimmedId.length === 36 && trimmedId.includes('-');
+
+  if (isUUID) {
+    // Try to find by UUID (id)
+    const userById = await prisma.user.findUnique({
+      where: { id: trimmedId },
+      select: { id: true },
+    });
+
+    if (userById) {
+      return userById.id;
+    }
+  } else {
+    // Try to find by 4-digit userId
+    const userByUserId = await prisma.user.findUnique({
+      where: { userId: trimmedId },
+      select: { id: true },
+    });
+
+    if (userByUserId) {
+      return userByUserId.id;
+    }
+  }
+
+  // Finally try to find by appointment ID (if it's a UUID)
+  if (isUUID) {
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: trimmedId },
+      select: { userId: true },
+    });
+
+    if (appointment) {
+      return appointment.userId;
+    }
+  }
+
+  return null;
+}
 
 /**
  * POST /api/v1/plans
@@ -120,14 +167,25 @@ export const getWellnessPlans = async (
       return;
     }
 
-    const { userId } = req.params;
+    const rawUserId = req.params.userId;
     const { activeOnly } = req.query;
 
     // Ensure userId is a string
-    if (!userId || typeof userId !== "string") {
+    if (!rawUserId || typeof rawUserId !== "string") {
       res.status(400).json({
         status: "error",
         message: "Invalid userId parameter",
+      });
+      return;
+    }
+
+    // Resolve the userId (could be 4-digit display ID or UUID)
+    const resolvedUserId = await resolvePatientUserId(rawUserId);
+    
+    if (!resolvedUserId) {
+      res.status(404).json({
+        status: "error",
+        message: "Customer not found",
       });
       return;
     }
@@ -139,7 +197,9 @@ export const getWellnessPlans = async (
       "REGIONAL_OFFICE",
       "FEDERAL_ADMIN",
     ];
-    if (req.user.userId !== userId && !allowedRoles.includes(req.user.role)) {
+    // Check if user is viewing their own data or has staff privileges
+    const isViewingOwnData = req.user.userId === rawUserId || req.user.userId === resolvedUserId;
+    if (!isViewingOwnData && !allowedRoles.includes(req.user.role)) {
       res.status(403).json({
         status: "error",
         message: "Insufficient permissions to view wellness plans",
@@ -148,7 +208,7 @@ export const getWellnessPlans = async (
     }
 
     const plans = await WellnessService.getWellnessPlans(
-      userId,
+      resolvedUserId,
       activeOnly === "true",
     );
 

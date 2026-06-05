@@ -1,40 +1,49 @@
 /* ========================================
-   LAYOUT STYLES
+   LAYOUT STYLES — MESOB FIXED
    ======================================== */
 
 .layout-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f1f5f9;
 }
 
+/* ── HEADER (fixed, full width) ── */
 .app-header {
-  padding: 0.5rem 1rem;
-  background: #223E8E;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0 2rem;
+  background: #213D8D;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 70px;
-  position: relative;
+  height: 80px;
+  min-height: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 .app-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
+/* Logo — keep as-is, just size it properly */
 .mesob-logo-img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
+  flex-shrink: 0;
 }
 
 .app-header h1 {
   margin: 0;
   font-family: Sora, Manrope, sans-serif;
-  font-size: 2rem;
+  font-size: 1.75rem;
   color: #ffffff;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -47,121 +56,33 @@
 .app-header-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-left: auto;
 }
 
 .language-selector {
-  background: white;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  color: #475569;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 7px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .language-selector:hover {
-  border-color: #94a3b8;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.logout-button {
-  background: #ef4444;
-  color: #ffffff;
-  border: 1px solid #dc2626;
-  border-radius: 6px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.language-selector option {
+  color: #1e293b;
+  background: #ffffff;
 }
 
-.logout-button:hover {
-  background: #dc2626;
-  border-color: #b91c1c;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-.layout-body {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  flex: 1;
-}
-
-.app-sidebar {
-  padding: 1.25rem;
-  background: #233F8F;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.app-sidebar nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.sidebar-subnav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-left: 0.75rem;
-  padding-left: 0.75rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.sidebar-subnav a {
-  font-size: 0.92rem;
-  padding: 0.6rem 0.9rem;
-}
-
-.app-sidebar a {
-  text-decoration: none;
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.app-sidebar a:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateX(4px);
-}
-
-.app-sidebar a.active {
-  background: linear-gradient(135deg, #3550A0 0%, #2A4080 100%);
-  border-color: #3550A0;
-  color: #FFA500;
-  box-shadow: 0 4px 12px rgba(53, 80, 160, 0.4);
-  font-weight: 700;
-}
-
-.app-main {
-  padding: 1.5rem;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .layout-body {
-    grid-template-columns: 1fr;
-  }
-
-  .app-sidebar {
-    border-right: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  }
-}
-
-/* ========================================
-   HEADER USER MENU STYLES
-   ======================================== */
-
+/* ── USER MENU ── */
 .user-menu-header {
   position: relative;
 }
@@ -169,33 +90,34 @@
 .user-btn-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  padding: 0.5rem 1.25rem;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 4px 12px 4px 4px;
   color: white;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
-  min-height: 100px;
+  min-height: unset;
+  height: 42px;
 }
 
 .user-btn-header:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .user-avatar-header {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f5a623;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: none;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -204,62 +126,51 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .avatar-initials-header {
-  font-size: 1.5rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: white;
-}
-
-.avatar-icon-header {
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-name-header {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #213D8D;
 }
 
 .dropdown-arrow-header {
-  font-size: 0.75rem;
-  opacity: 0.8;
+  font-size: 0.65rem;
+  opacity: 0.7;
+  color: rgba(255,255,255,0.8);
 }
 
 .user-dropdown-header {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   right: 0;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
-  margin-top: 0.5rem;
-  z-index: 1000;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  min-width: 160px;
+  z-index: 1001;
   overflow: hidden;
 }
 
 .dropdown-item-header {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   background: none;
   border: none;
   text-align: left;
   color: #1e293b;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.15s;
+  font-family: inherit;
 }
 
 .dropdown-item-header:hover {
   background: #f1f5f9;
-  color: #3550A0;
+  color: #213D8D;
 }
 
 .dropdown-item-header.logout-header:hover {
@@ -268,17 +179,166 @@
 }
 
 .dropdown-divider-header {
-  margin: 0.5rem 0;
+  margin: 0;
   border: none;
   border-top: 1px solid #e2e8f0;
 }
 
-@media (max-width: 768px) {
-  .user-name-header {
-    display: none;
+/* ── BODY (sidebar + main, sits below fixed header) ── */
+.layout-body {
+  display: flex;
+  flex: 1;
+  padding-top: 80px; /* exactly matches header height */
+  min-height: 0;
+}
+
+/* ── SIDEBAR ── */
+.app-sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: #213D8D;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  position: fixed;
+  top: 80px;        /* exactly matches header height */
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 12px 8px;
+}
+
+.app-sidebar::-webkit-scrollbar { width: 4px; }
+.app-sidebar::-webkit-scrollbar-track { background: transparent; }
+.app-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.app-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Sidebar nav links - unified styling */
+.sidebar-subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-subnav a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 11px;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  position: relative;
+}
+
+.sidebar-subnav a:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+/* ── GOLD active for all nav links ── */
+.sidebar-subnav a.active {
+  background: rgba(245, 166, 35, 0.13);
+  border-color: rgba(245, 166, 35, 0.2);
+  color: #f5a623;
+  font-weight: 600;
+}
+
+.sidebar-subnav a.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22%;
+  height: 56%;
+  width: 3px;
+  background: #f5a623;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── MAIN CONTENT AREA ── */
+.app-main {
+  margin-left: 280px;
+  min-height: calc(100vh - 80px);
+  width: calc(100% - 280px);
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── WELCOME BAR (replaces the big card) ── */
+.welcome-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.welcome-bar-left {}
+.welcome-bar-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #213D8D;
+  margin: 0 0 2px;
+}
+
+.welcome-bar-sub {
+  font-size: 11.5px;
+  color: #6b7a99;
+  margin: 0;
+}
+
+.welcome-bar-right {
+  font-size: 11px;
+  color: #6b7a99;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+/* Page scroll area */
+.app-main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .app-sidebar {
+    position: relative;
+    top: 0;
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   }
 
-  .user-btn-header {
-    padding: 0.5rem;
+  .app-main {
+    margin-left: 0;
+    width: 100%;
   }
+
+  .layout-body {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header h1 { font-size: 1.2rem; }
+  .welcome-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
 }

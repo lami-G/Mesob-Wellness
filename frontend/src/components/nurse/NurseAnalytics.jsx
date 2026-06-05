@@ -1189,7 +1189,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         {viewPeriod === 'monthly' && monthlyComparison && (
           <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
             <h4 style={{ margin: '0 0 1rem 0', fontSize: '1rem', fontWeight: '600', color: '#374151' }}>
-              📅 Month-over-Month Comparison
+               Month-over-Month Comparison
             </h4>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#ffffff', borderRadius: '6px', overflow: 'hidden' }}>
