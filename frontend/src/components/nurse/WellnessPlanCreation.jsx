@@ -207,6 +207,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         }
       }, 100);
       
+<<<<<<< Updated upstream
       // For walk-in patients: hide success message after 2 seconds, then show download button
       if (!appointmentId) {
         setTimeout(() => {
@@ -220,6 +221,12 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           setShowDownloadButton(true);
         }, 2000);
       }
+=======
+      // Hide success message after 2 seconds, but keep PDF button visible
+      setTimeout(() => {
+        setSuccess('');
+      }, 2000);
+>>>>>>> Stashed changes
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create wellness plan');
     } finally {
@@ -274,9 +281,13 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         });
       } else {
         // For walk-in patients: create a temporary appointment record and mark as completed
+        // Use today's date at noon to ensure it appears in today's analytics
+        const today = new Date();
+        today.setHours(12, 0, 0, 0); // Set to noon to avoid timezone issues
+        
         const response = await api.post('/api/v1/appointments', {
           patientId: selectedCustomerId,
-          scheduledAt: new Date().toISOString(),
+          scheduledAt: today.toISOString(),
           reason: 'Walk-in Service',
         });
 
@@ -344,6 +355,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       {error && <div className="alert alert-error">{error}</div>}
       
       {/* PDF Download and Mark as Completed Buttons */}
+<<<<<<< Updated upstream
       {createdPlanId && (
         <>
           {/* Success Message - shown first, then removed */}
@@ -405,6 +417,50 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
             </div>
           )}
         </>
+=======
+      {createdPlanId && !success && (
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '1rem',
+          backgroundColor: '#EFF6FF',
+          border: '2px solid #3550A0',
+          borderRadius: '8px',
+        }}>
+          <p style={{ margin: '0 0 1rem 0', color: '#1E40AF', fontWeight: 600 }}>
+            📄 Your wellness plan is ready!
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={handleDownloadPDF}
+              disabled={generatingPDF}
+              className="btn btn-primary"
+              style={{
+                cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                opacity: generatingPDF ? 0.6 : 1,
+                flex: 1,
+                minWidth: '200px',
+              }}
+            >
+              {generatingPDF ? '📄 Generating PDF...' : '📄 Download Health Report PDF'}
+            </button>
+            <button
+              onClick={handleMarkAsCompleted}
+              disabled={loading}
+              className="btn btn-success"
+              style={{
+                flex: 1,
+                minWidth: '150px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+                backgroundColor: '#10b981',
+              }}
+              title="Mark patient as completed and return to queue"
+            >
+              {loading ? '⏳ Processing...' : '✓ Mark as Completed'}
+            </button>
+          </div>
+        </div>
+>>>>>>> Stashed changes
       )}
 
       {/* Latest Vitals Display */}

@@ -1,0 +1,26 @@
+:root {
+  /* Spacing Scale */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 1rem;       /* 16px */
+  --space-lg: 1.5rem;     /* 24px */
+  --space-xl: 2rem;       /* 32px */
+  --space-2xl: 3rem;      /* 48px */
+  --space-3xl: 4rem;      /* 64px */
+  --space-4xl: 6rem;      /* 96px */
+  
+  /* Component Spacing */
+  --card-padding-sm: var(--space-md);
+  --card-padding-md: var(--space-lg);
+  --card-padding-lg: var(--space-xl);
+  
+  --section-gap: var(--space-xl);
+  --grid-gap: var(--space-md);
+  --form-gap: var(--space-md);
+  
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+}

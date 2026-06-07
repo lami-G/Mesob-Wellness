@@ -1,0 +1,107 @@
+/* Call Next Control Component */
+.callNextControl {
+  background: white;
+}
+
+.currentCustomerDisplay {
+  margin-bottom: 20px;
+}
+
+.displayScreen {
+  background: linear-gradient(135deg, #284394 0%, #2563eb 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.displayContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.displayLabel {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.displayName {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #fbbf24;
+}
+
+.displayId {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.95;
+}
+
+.displayTime {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.85;
+}
+
+.controlButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.customerInfo {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.customerInfo p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.customerInfo strong {
+  color: #333;
+}
+
+.noCustomer {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.emptyText {
+  text-align: center;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .controlButtons {
+    grid-template-columns: 1fr;
+  }
+
+  .displayName {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .displayScreen {
+    padding: 20px;
+  }
+
+  .displayName {
+    font-size: 1.3rem;
+  }
+
+  .displayId {
+    font-size: 1rem;
+  }
+}

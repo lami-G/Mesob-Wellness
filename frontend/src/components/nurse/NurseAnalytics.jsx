@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Pie, Line, Bar } from 'react-chartjs-2';
@@ -498,7 +498,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const completed = mappedAppointments.filter(a => a.appointmentStatus === 'COMPLETED').length;
       const waiting = mappedAppointments.filter(a => a.appointmentStatus === 'WAITING').length;
       const inProgress = mappedAppointments.filter(a => a.appointmentStatus === 'IN_PROGRESS').length;
+<<<<<<< Updated upstream
       const inService = mappedAppointments.filter(a => a.appointmentStatus === 'IN_SERVICE').length;
+=======
+>>>>>>> Stashed changes
       const completedAppointments = mappedAppointments.filter(a => a.appointmentStatus === 'COMPLETED');
       
       // Count online appointments (all appointments are online bookings)
@@ -580,6 +583,51 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       } catch (err) {
         console.error('Failed to count walk-ins:', err);
         walkin = 0; // Default to 0 if walk-in counting fails
+      }
+
+      // Count walk-ins separately from appointments
+      // Walk-ins are external patients who had vitals recorded today (no appointment needed)
+      try {
+        console.log('=== COUNTING WALK-INS ===');
+        // Get all vitals records for the selected date
+        const vitalsRes = await api.get('/api/v1/vitals/all', {
+          params: {
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString()
+          }
+        });
+        
+        if (vitalsRes.data.data && Array.isArray(vitalsRes.data.data)) {
+          const vitalsRecords = vitalsRes.data.data;
+          console.log(`Found ${vitalsRecords.length} vitals records in period`);
+          
+          // Get unique user IDs from vitals
+          const vitalsUserIds = [...new Set(vitalsRecords.map(v => v.userId))];
+          console.log('Users with vitals:', vitalsUserIds);
+          
+          // Check which users are external
+          for (const userId of vitalsUserIds) {
+            try {
+              const userRes = await api.get(`/api/v1/users/${userId}`);
+              const userData = userRes.data.data;
+              
+              if (userData?.isExternal === true) {
+                // Count vitals records for this external user
+                const userVitalsCount = vitalsRecords.filter(v => v.userId === userId).length;
+                if (userVitalsCount > 0) {
+                  walkin += 1; // Count each external user once
+                  console.log(`✓ Walk-in user ${userData.fullName}: ${userVitalsCount} vitals records`);
+                }
+              }
+            } catch (err) {
+              console.log(`Could not fetch user ${userId}:`, err.message);
+            }
+          }
+        }
+        console.log('Total walk-ins:', walkin);
+        console.log('=== WALK-IN COUNT COMPLETE ===');
+      } catch (err) {
+        console.error('Failed to count walk-ins:', err);
       }
 
       // Calculate average wait time from actual data
@@ -860,13 +908,23 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
 
         <div className="analytics-card">
+<<<<<<< Updated upstream
           <div className="card-content">
             <p className="card-label">{viewPeriod === 'all' ? 'Patients Total' : 'Patients Today'}</p>
+=======
+          <div className="card-icon">👥</div>
+          <div className="card-content">
+            <p className="card-label">Patients Today</p>
+>>>>>>> Stashed changes
             <p className="card-value">{analytics.totalPatientsToday}</p>
           </div>
         </div>
 
         <div className="analytics-card">
+<<<<<<< Updated upstream
+=======
+          <div className="card-icon">🚶</div>
+>>>>>>> Stashed changes
           <div className="card-content">
             <p className="card-label">Walk-in Completed</p>
             <p className="card-value">{analytics.walkinAppointments}</p>
@@ -901,6 +959,25 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           <div className="breakdown-item">
             <span>Wellness Plans</span>
             <span className="breakdown-value">{analytics.wellnessPlansCreated}</span>
+          </div>
+        </div>
+
+        <div className="card metrics-card">
+          <h3>Appointment Breakdown</h3>
+          
+          <div className="breakdown-item">
+            <span>⏳ Pending</span>
+            <span className="breakdown-value">{analytics.pendingAppointments}</span>
+          </div>
+
+          <div className="breakdown-item">
+            <span>✅ Completed</span>
+            <span className="breakdown-value">{analytics.completedAppointments}</span>
+          </div>
+
+          <div className="breakdown-item">
+            <span>❌ No-Show</span>
+            <span className="breakdown-value" title="Patient didn't show up for scheduled appointment">{analytics.noShowAppointments}</span>
           </div>
         </div>
       </div>

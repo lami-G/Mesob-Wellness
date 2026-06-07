@@ -30,7 +30,10 @@ export const searchUsers = async (req: AuthRequest, res: Response): Promise<void
         phone: user.phone,
         role: user.role,
         isExternal: user.isExternal,
+<<<<<<< Updated upstream
         userId: user.userId,
+=======
+>>>>>>> Stashed changes
       })),
     });
   } catch (error) {
@@ -101,7 +104,10 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
         dateOfBirth: user.dateOfBirth,
         gender: user.gender,
         isExternal: user.isExternal,
+<<<<<<< Updated upstream
         userId: user.userId,
+=======
+>>>>>>> Stashed changes
       },
     });
   } catch (error) {

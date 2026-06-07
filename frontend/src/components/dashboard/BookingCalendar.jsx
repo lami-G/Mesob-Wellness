@@ -188,10 +188,18 @@ function BookingCalendar() {
     try {
       setBookingLoading(true);
       
+<<<<<<< Updated upstream
       console.log(`Booking appointment for: ${selectedTime}`);
       
       const response = await api.post("/api/v1/appointments", {
         scheduledAt: selectedTime, // Send the ISO string with time
+=======
+      // Send just the date string (YYYY-MM-DD) without time to avoid timezone issues
+      const dateString = selectedDate.toISOString().split('T')[0];
+      
+      const response = await api.post("/api/v1/appointments", {
+        scheduledAt: dateString,
+>>>>>>> Stashed changes
         reason: bookingReason,
       });
 

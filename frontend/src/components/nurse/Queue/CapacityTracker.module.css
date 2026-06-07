@@ -1,0 +1,109 @@
+/* Capacity Tracker Component */
+.capacityTracker {
+  background: white;
+  position: sticky;
+  top: 20px;
+}
+
+.capacityInfo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.capacityStat {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.statLabel {
+  display: block;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #284394;
+}
+
+.capacityBarContainer {
+  margin-bottom: 15px;
+}
+
+.capacityBar {
+  width: 100%;
+  height: 24px;
+  background: #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.capacityFill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.capacityPercentage {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.capacityStatus {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.statusBadge.statusFull {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.statusBadge.statusHigh {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.statusBadge.statusMedium {
+  background: #dbeafe;
+  color: #0c4a6e;
+}
+
+.statusBadge.statusLow {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.loadingText {
+  text-align: center;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .capacityTracker {
+    position: static;
+  }
+
+  .capacityInfo {
+    grid-template-columns: 1fr;
+  }
+}

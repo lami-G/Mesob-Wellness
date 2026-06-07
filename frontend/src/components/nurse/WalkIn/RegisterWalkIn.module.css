@@ -1,0 +1,247 @@
+/* Register Walk-In Component */
+.registerWalkin {
+  /* Main container uses global .card class */
+}
+
+/* Alert Messages */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid;
+}
+
+.alertError {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border-color: #FECACA;
+}
+
+.alertSuccess {
+  background-color: #D1FAE5;
+  color: #065F46;
+  border-color: #6EE7B7;
+}
+
+.alertInfo {
+  background-color: #DBEAFE;
+  color: #0C4A6E;
+  border-color: #93C5FD;
+}
+
+/* Search Section */
+.searchHeader {
+  margin: 0 0 1.5rem 0;
+  color: #3550A0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.searchForm {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.searchButton {
+  min-width: 120px;
+}
+
+/* Search Results */
+.searchResults {
+  margin-bottom: 1.5rem;
+}
+
+.resultsHeader {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background-color: #F9FAFB;
+}
+
+.patientInfo {
+  flex: 1;
+}
+
+.patientName {
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.patientContact {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.patientId {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.patientBadge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeExternal {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badgeStaff {
+  background-color: #DBEAFE;
+  color: #0C4A6E;
+}
+
+.selectButton {
+  min-width: 150px;
+}
+
+/* Empty State / Register Section */
+.emptyState {
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #F3F4F6;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.emptyStateText {
+  margin: 0 0 1rem 0;
+  color: #6B7280;
+}
+
+.registerButton {
+  min-width: 200px;
+}
+
+/* Registration Modal */
+.modalOverlay {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.modalContent {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalTitle {
+  margin: 0;
+  color: #3550A0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6B7280;
+}
+
+.modalClose:hover {
+  color: #374151;
+}
+
+.modalForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.formGroup {
+  /* Form group container */
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #3550A0;
+  font-size: 0.875rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.formInputError {
+  border-color: #EF4444;
+}
+
+.formError {
+  font-size: 0.8rem;
+  color: #EF4444;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalButtonPrimary {
+  flex: 1;
+}
+
+.modalButtonSecondary {
+  flex: 1;
+}
+

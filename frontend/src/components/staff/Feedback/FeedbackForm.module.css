@@ -1,0 +1,396 @@
+/* ========================================
+   FEEDBACK FORM COMPONENT - MODERN DESIGN
+   ======================================== */
+
+.feedbackForm {
+  background: linear-gradient(135deg, #284394 0%, #2563eb 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  backdrop-filter: none !important;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feedbackHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.feedbackHeader h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.feedbackSubtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
+
+/* ========================================
+   SUCCESS ALERT
+   ======================================== */
+
+.feedbackSuccess {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 0.5rem;
+  color: #155724;
+}
+
+.successIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.feedbackSuccess strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #155724;
+}
+
+.feedbackSuccess p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #155724;
+}
+
+/* ========================================
+   FORM CONTENT
+   ======================================== */
+
+.feedbackFormContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ========================================
+   NPS SECTION
+   ======================================== */
+
+.npsSection {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.npsHeader {
+  margin-bottom: 1.5rem;
+}
+
+.npsHeader h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  color: #284394;
+  font-weight: 700;
+}
+
+.npsScaleLabel {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.npsScale {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.npsButton {
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  background: white;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #495057;
+  font-family: inherit;
+}
+
+.npsButton:hover {
+  border-color: #284394;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.npsButton.active {
+  background: #284394;
+  color: white;
+  border-color: #284394;
+  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+}
+
+.npsFeedback {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+.npsFeedbackDetractor {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.npsFeedbackPassive {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.npsFeedbackPromoter {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.npsEmoji {
+  font-size: 1.5rem;
+}
+
+.npsText {
+  flex: 1;
+}
+
+/* ========================================
+   RATINGS SECTION
+   ======================================== */
+
+.ratingsSection {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.sectionTitle {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+  color: #284394;
+  font-weight: 600;
+}
+
+.ratingGroup {
+  margin-bottom: 1.75rem;
+}
+
+.ratingGroup:last-child {
+  margin-bottom: 0;
+}
+
+.ratingHeader {
+  margin-bottom: 1rem;
+}
+
+.ratingLabel {
+  display: block;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.25rem;
+}
+
+.ratingDescription {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.ratingButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ratingButton {
+  flex: 1;
+  min-width: 70px;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  background: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: inherit;
+}
+
+.ratingButton:hover {
+  border-color: #284394;
+  background: #f0f4ff;
+  transform: translateY(-2px);
+}
+
+.ratingButton.active {
+  background: #284394;
+  border-color: #284394;
+  color: white;
+  box-shadow: 0 4px 12px rgba(40, 67, 148, 0.3);
+}
+
+.ratingNumber {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #f59e0b;
+}
+
+.ratingButton.active .ratingNumber {
+  color: #fff;
+}
+
+.ratingStars {
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #f59e0b;
+}
+
+.ratingButton.active .ratingStars {
+  color: #fbbf24;
+}
+
+/* ========================================
+   COMMENTS SECTION
+   ======================================== */
+
+.commentsSection {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.formLabel {
+  display: block;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 0.5rem;
+}
+
+.formHint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.feedbackTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.feedbackTextarea:focus {
+  outline: none;
+  border-color: #223E8E;
+  box-shadow: 0 0 0 3px rgba(34, 62, 142, 0.1);
+}
+
+.feedbackTextarea:disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+}
+
+/* ========================================
+   FORM ACTIONS
+   ======================================== */
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btnLarge {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.btnLarge:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .npsScale {
+    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+  }
+
+  .ratingButtons {
+    gap: 0.5rem;
+  }
+
+  .ratingButton {
+    min-width: 60px;
+    padding: 0.6rem;
+  }
+
+  .feedbackHeader h2 {
+    font-size: 1.5rem;
+  }
+
+  .npsSection,
+  .ratingsSection,
+  .commentsSection {
+    padding: 1.5rem;
+  }
+
+  .btnLarge {
+    min-width: 150px;
+    padding: 0.75rem 1.5rem;
+  }
+}
