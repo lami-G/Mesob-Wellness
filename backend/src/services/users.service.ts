@@ -18,10 +18,7 @@ export async function getUserProfile(userId: string) {
       isActive: true,
       isVerified: true,
       isExternal: true,
-<<<<<<< Updated upstream
       userId: true,
-=======
->>>>>>> Stashed changes
       createdAt: true,
       updatedAt: true,
     },
@@ -145,10 +142,7 @@ export async function searchUsers(searchTerm: string) {
       dateOfBirth: true,
       gender: true,
       isExternal: true,
-<<<<<<< Updated upstream
       userId: true,
-=======
->>>>>>> Stashed changes
     },
     take: 20, // Limit results
     orderBy: {
