@@ -21,6 +21,7 @@ import "../../styles/admin-audit.css";
 import "../../styles/admin-regions.css";
 import "../../styles/admin-analytics.css";
 import "../../styles/admin-modals.css";
+import styles from "./FederalDashboard.module.css";
 
 const FederalAnalyticsTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
@@ -41,90 +42,38 @@ const FederalAnalyticsTooltip = ({ active, payload, label }) => {
     .sort((a, b) => Number(b[1]) - Number(a[1]));
 
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-        border: "1px solid rgba(0,0,0,0.15)",
-        borderRadius: "12px",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-        color: "#1f2937",
-        padding: "0.75rem 1rem",
-        minWidth: "180px",
-      }}
-    >
-      <div
-        style={{
-          fontSize: "0.9rem",
-          fontWeight: 700,
-          color: "#111827",
-          marginBottom: "0.5rem",
-        }}
-      >
+    <div className={styles.tooltipContainer}>
+      <div className={styles.tooltipLabel}>
         {label}
       </div>
-      <div style={{ display: "grid", gap: "0.35rem" }}>
+      <div className={styles.tooltipGrid}>
         {payload.map((item) => (
-          <div
-            key={item.dataKey}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              color: "#374151",
-            }}
-          >
-            <span
-              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-            >
+          <div key={item.dataKey} className={styles.tooltipItem}>
+            <span className={styles.tooltipItemLabel}>
               <span
+                className={styles.tooltipDot}
                 style={{
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "50%",
                   background: item.color,
                   boxShadow: `0 0 6px ${item.color}55`,
                 }}
               />
               {item.name}
             </span>
-            <span style={{ fontWeight: 700, color: "#111827" }}>
+            <span className={styles.tooltipItemValue}>
               {item.value}
             </span>
           </div>
         ))}
       </div>
       {conditionEntries.length > 0 && (
-        <div
-          style={{
-            marginTop: "0.75rem",
-            paddingTop: "0.6rem",
-            borderTop: "1px solid rgba(0,0,0,0.08)",
-            display: "grid",
-            gap: "0.3rem",
-          }}
-        >
-          <div
-            style={{ fontSize: "0.75rem", fontWeight: 700, color: "#6b7280" }}
-          >
+        <div className={styles.tooltipConditions}>
+          <div className={styles.tooltipConditionsTitle}>
             Conditions
           </div>
           {conditionEntries.map(([key, value]) => (
-            <div
-              key={key}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "0.75rem",
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                color: "#374151",
-              }}
-            >
+            <div key={key} className={styles.tooltipConditionItem}>
               <span>{conditionLabels[key] || key}</span>
-              <span style={{ fontWeight: 700, color: "#111827" }}>{value}</span>
+              <span className={styles.tooltipItemValue}>{value}</span>
             </div>
           ))}
         </div>
@@ -540,8 +489,8 @@ function FederalDashboard() {
         <div className="metrics-loading">Loading federal overview...</div>
       ) : null}
 
-      <div className="dashboard-section" style={{ marginTop: "1.5rem" }}>
-        <h3 style={{ marginBottom: "1rem" }}>System KPIs</h3>
+      <div className={`dashboard-section ${styles.overviewSection}`}>
+        <h3 className={styles.overviewTitle}>System KPIs</h3>
         <DashboardMetrics
           onTabChange={setActiveTab}
           timePeriod={timePeriod}
@@ -555,18 +504,17 @@ function FederalDashboard() {
 
   const renderRegions = () => (
     <div className="dashboard-section">
-      <div className="users-header" style={{ marginBottom: "1rem" }}>
+      <div className={`users-header ${styles.regionsHeader}`}>
         <div>
           <h3>Region Directory</h3>
-          <p style={{ marginTop: "0.25rem", color: "#6b7280" }}>
+          <p className={styles.regionsHeaderText}>
             Active regions and their center coverage
           </p>
         </div>
         <select
           value={selectedRegion}
           onChange={(e) => setSelectedRegion(e.target.value)}
-          className="form-input"
-          style={{ maxWidth: "220px" }}
+          className={`form-input ${styles.regionSelect}`}
         >
           <option value="all">All Regions</option>
           {regions.map((region) => (
@@ -578,8 +526,7 @@ function FederalDashboard() {
         <select
           value={regionStatusFilter}
           onChange={(e) => setRegionStatusFilter(e.target.value)}
-          className="form-input"
-          style={{ maxWidth: "200px" }}
+          className={`form-input ${styles.regionStatusSelect}`}
         >
           <option value="all">All Status</option>
           <option value="ACTIVE">Active</option>
@@ -588,12 +535,9 @@ function FederalDashboard() {
         </select>
       </div>
 
-      <div
-        className="card"
-        style={{ padding: "1.5rem", marginBottom: "1.5rem" }}
-      >
-        <h4 style={{ marginBottom: "0.5rem" }}>Create New Region</h4>
-        <p style={{ color: "#6b7280", marginBottom: "1rem" }}>
+      <div className={`card ${styles.createRegionCard}`}>
+        <h4 className={styles.createRegionTitle}>Create New Region</h4>
+        <p className={styles.createRegionText}>
           This creates a regional placeholder center to register the region.
         </p>
         <button
@@ -606,7 +550,7 @@ function FederalDashboard() {
 
       {showRegionModal && (
         <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: "640px" }}>
+          <div className={`modal ${styles.regionModal}`}>
             <div className="modal-header">
               <h3>Create New Region</h3>
               <button
@@ -624,28 +568,16 @@ function FederalDashboard() {
             </div>
             <div>
               {regionError && (
-                <div
-                  className="alert alert-error"
-                  style={{ marginBottom: "0.75rem" }}
-                >
+                <div className={`alert alert-error ${styles.regionModalAlert}`}>
                   {regionError}
                 </div>
               )}
               {regionSuccess && (
-                <div
-                  className="success-message"
-                  style={{ marginBottom: "0.75rem" }}
-                >
+                <div className={`success-message ${styles.regionModalAlert}`}>
                   {regionSuccess}
                 </div>
               )}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "1rem",
-                }}
-              >
+              <div className={styles.regionModalInputGrid}>
                 <input
                   type="text"
                   className="form-input"
@@ -672,7 +604,7 @@ function FederalDashboard() {
                   onChange={(e) => setRegionAccountPassword(e.target.value)}
                 />
               </div>
-              <div className="modal-actions" style={{ marginTop: "1.5rem" }}>
+              <div className={`modal-actions ${styles.regionModalActions}`}>
                 <button
                   className="btn btn-primary"
                   onClick={async () => {
@@ -747,10 +679,7 @@ function FederalDashboard() {
       )}
 
       {regionSummary && (
-        <div
-          className="analytics-cards-grid"
-          style={{ marginBottom: "1.5rem" }}
-        >
+        <div className={`analytics-cards-grid ${styles.regionSummaryGrid}`}>
           <div className="analytics-card">
             <div className="card-icon">🏥</div>
             <div className="card-content">
@@ -809,12 +738,12 @@ function FederalDashboard() {
       )}
 
       {regionActionError && (
-        <div className="alert alert-error" style={{ marginBottom: "0.75rem" }}>
+        <div className={`alert alert-error ${styles.regionModalAlert}`}>
           {regionActionError}
         </div>
       )}
       {regionActionSuccess && (
-        <div className="success-message" style={{ marginBottom: "0.75rem" }}>
+        <div className={`success-message ${styles.regionModalAlert}`}>
           {regionActionSuccess}
         </div>
       )}
@@ -854,13 +783,7 @@ function FederalDashboard() {
                   <td>{row.completion}%</td>
                   <td>
                     {editingRegion === row.region ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          flexWrap: "wrap",
-                        }}
-                      >
+                      <div className={styles.regionActionsWrapper}>
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
@@ -955,13 +878,7 @@ function FederalDashboard() {
                         </button>
                       </div>
                     ) : (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "0.5rem",
-                          flexWrap: "wrap",
-                        }}
-                      >
+                      <div className={styles.regionActionsWrapper}>
                         <button
                           className="btn btn-secondary"
                           onClick={() => {
@@ -1063,12 +980,9 @@ function FederalDashboard() {
           </table>
         </div>
       ) : (
-        <div className="card metrics-card" style={{ padding: "1.5rem" }}>
-          <h3 style={{ marginBottom: "1rem" }}>{selectedRegion} Summary</h3>
-          <div
-            className="analytics-cards-grid"
-            style={{ marginBottom: "1rem" }}
-          >
+        <div className={`card metrics-card ${styles.regionSingleSummary}`}>
+          <h3 className={styles.regionSingleTitle}>{selectedRegion} Summary</h3>
+          <div className={`analytics-cards-grid ${styles.regionSingleGrid}`}>
             <div className="analytics-card">
               <div className="card-icon">🏥</div>
               <div className="card-content">
@@ -1091,7 +1005,7 @@ function FederalDashboard() {
               </div>
             </div>
           </div>
-          <p style={{ color: "#6b7280" }}>
+          <p className={styles.regionSingleText}>
             Centers shown below are active only.
           </p>
         </div>
@@ -1136,25 +1050,10 @@ function FederalDashboard() {
       {(activeTab === "overview" ||
         activeTab === "feedback" ||
         activeTab === "audit") && (
-        <div className="card" style={{ padding: "1rem", marginBottom: "1rem" }}>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "1rem",
-              alignItems: "flex-end",
-            }}
-          >
-            <div style={{ minWidth: "180px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  color: "#6b7280",
-                  marginBottom: "0.25rem",
-                }}
-              >
+        <div className={`card ${styles.filtersCard}`}>
+          <div className={styles.filtersGrid}>
+            <div className={styles.filterItem}>
+              <label className={styles.filterLabel}>
                 Region
               </label>
               <select
@@ -1176,16 +1075,8 @@ function FederalDashboard() {
                 ))}
               </select>
             </div>
-            <div style={{ minWidth: "220px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  color: "#6b7280",
-                  marginBottom: "0.25rem",
-                }}
-              >
+            <div className={styles.filterItemWide}>
+              <label className={styles.filterLabel}>
                 Center
               </label>
               <select
@@ -1207,16 +1098,8 @@ function FederalDashboard() {
                 ))}
               </select>
             </div>
-            <div style={{ minWidth: "200px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "0.75rem",
-                  fontWeight: 600,
-                  color: "#6b7280",
-                  marginBottom: "0.25rem",
-                }}
-              >
+            <div className={styles.filterItemMedium}>
+              <label className={styles.filterLabel}>
                 Time Period
               </label>
               <select
@@ -1231,16 +1114,8 @@ function FederalDashboard() {
               </select>
             </div>
             {statusOptions.length > 0 && (
-              <div style={{ minWidth: "200px" }}>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    color: "#6b7280",
-                    marginBottom: "0.25rem",
-                  }}
-                >
+              <div className={styles.filterItemMedium}>
+                <label className={styles.filterLabel}>
                   {statusLabel}
                 </label>
                 <select
