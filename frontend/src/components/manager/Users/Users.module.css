@@ -1,0 +1,16 @@
+/* ============================================
+   MANAGER USERS TAB - CSS MODULE
+   ============================================ */
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.roleHelp {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
