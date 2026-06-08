@@ -5,11 +5,18 @@ import { notificationService } from "../../services/notificationService";
 import NotificationPanel from "../admin/NotificationPanel";
 
 /**
- * MESOB Unified Navbar
- * Shared across all dashboards (Admin, Federal, Regional, Manager, Nurse, Patient)
- * Matches the design from the reference screenshot
+ * MESOB Unified Header
+ * 
+ * Single shared header component used across ALL roles:
+ * - Displays official MESOB branding with logo
+ * - Shows government identity (FDRE)
+ * - Notification bell
+ * - User profile menu
+ * - Same visual design regardless of role
+ * 
+ * This is the ONE AND ONLY header in the system.
  */
-function Navbar({ 
+function Header({ 
   onToggleSidebar, 
   onTabChange, 
   title = "MESOB Dashboard",
@@ -172,62 +179,75 @@ function Navbar({
 
   return (
     <>
-      <header className="admin-header">
-        {/* Left Section */}
-        <div className="flex items-center gap-4">
-          {/* Sidebar Toggle */}
+      <header className="mesob-header">
+        {/* Left Section - Government Branding */}
+        <div className="mesob-header-left">
+          {/* Sidebar Toggle Button - Angular Bracket */}
           <button 
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+            className="mesob-header-toggle"
             onClick={onToggleSidebar}
             title="Toggle sidebar"
           >
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="3" y1="12" x2="21" y2="12"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <line x1="3" y1="18" x2="21" y2="18"/>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="11 17 6 12 11 7"/>
+              <polyline points="18 17 13 12 18 7"/>
             </svg>
           </button>
 
-          {/* Government Branding */}
-          <div className="hidden md:flex flex-col text-white text-xs leading-tight">
-            <div className="font-semibold opacity-90">በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ</div>
-            <div className="opacity-75">Federal Democratic Republic of Ethiopia</div>
-            <div className="font-bold mt-0.5">MESOB Service</div>
+          {/* Government Identity */}
+          <div className="mesob-header-brand">
+            <div className="mesob-header-brand-line mesob-header-brand-amharic">በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ</div>
+            <div className="mesob-header-brand-line">Federal Democratic Republic of Ethiopia MESOB Service</div>
           </div>
         </div>
 
-        {/* Center Title */}
-        <h1 className="absolute left-1/2 transform -translate-x-1/2 text-white text-lg font-bold hidden lg:block">
-          {title}
+        {/* Center - Dashboard Title */}
+        <h1 className="mesob-header-title">
+          MESOB Service Wellness System
         </h1>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-4">
-          {getRightActions()}
+        {/* Right Section - Notifications & User */}
+        <div className="mesob-header-right">
+          {/* Notification Bell */}
+          <button 
+            className="mesob-header-notification"
+            title="Notifications"
+            onClick={handleNotificationClick}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            {unreadCount > 0 && (
+              <span className="mesob-header-notification-badge">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </button>
 
-          {/* User Menu */}
-          <div className="relative">
+          {/* User Profile Menu */}
+          <div className="mesob-header-user">
             <button 
-              className="flex items-center gap-2 hover:bg-white/10 p-2 rounded-lg transition-colors"
+              className="mesob-header-user-btn"
               onClick={() => setShowUserMenu(!showUserMenu)}
             >
-              <div className="w-10 h-10 rounded-full bg-mesob-gold flex items-center justify-center text-white font-bold overflow-hidden">
+              <div className="mesob-header-user-avatar">
                 {user?.profilePicture ? (
-                  <img src={user.profilePicture} alt={user?.fullName} className="w-full h-full object-cover" />
+                  <img src={user.profilePicture} alt={user?.fullName} />
                 ) : (
                   <span>{getInitials(user?.fullName)}</span>
                 )}
               </div>
-              <svg className="w-4 h-4 text-white hidden sm:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="mesob-header-user-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
 
-            {/* Dropdown Menu */}
+            {/* User Dropdown Menu */}
             {showUserMenu && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50 border border-gray-200">
+              <div className="mesob-header-user-dropdown">
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                  className="mesob-header-user-dropdown-item"
                   onClick={handleProfileClick}
                 >
                   <span>👤</span>
@@ -236,7 +256,7 @@ function Navbar({
                 
                 {(role === "admin" || role === "manager") && (
                   <button 
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                    className="mesob-header-user-dropdown-item"
                     onClick={handleSettingsClick}
                   >
                     <span>⚙️</span>
@@ -244,10 +264,10 @@ function Navbar({
                   </button>
                 )}
                 
-                <hr className="my-2 border-gray-200" />
+                <hr className="mesob-header-user-dropdown-divider" />
                 
                 <button 
-                  className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 transition-colors flex items-center gap-2"
+                  className="mesob-header-user-dropdown-item mesob-header-user-dropdown-logout"
                   onClick={handleLogout}
                 >
                   <span>🚪</span>
@@ -268,4 +288,4 @@ function Navbar({
   );
 }
 
-export default Navbar;
+export default Header;

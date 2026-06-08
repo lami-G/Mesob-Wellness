@@ -1,26 +1,30 @@
-/* ========================================
-   LAYOUT STYLES - FDRE MESOB Design
-   ======================================== */
+/**
+ * ========================================
+ * LEGACY LAYOUT STYLES - MainLayout Component
+ * For Patient/Staff simple layout only
+ * Modern layouts use unified-layout.css
+ * ========================================
+ */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
+/* Simple Patient/Staff Layout Shell */
 .layout-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-family);
+  background: var(--mesob-sky);
 }
 
 .app-header {
   padding: 0 20px;
-  background: linear-gradient(90deg, #0d2444 0%, #1a3f6f 50%, #0d2444 100%);
+  background: linear-gradient(90deg, #0d2444 0%, var(--mesob-navy) 50%, #0d2444 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 48px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
 }
 
 .app-header-left {
@@ -40,10 +44,10 @@
 
 .app-header h1 {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-family);
   font-size: 15px;
   color: #ffffff;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   position: absolute;
@@ -61,14 +65,14 @@
 .language-selector {
   background: rgba(214,232,251,0.08);
   border: 1px solid rgba(214,232,251,0.12);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 0.4rem 0.75rem;
   font-size: 12px;
   color: rgba(214,232,251,0.9);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all var(--transition-fast);
   font-family: inherit;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .language-selector:hover {
@@ -79,15 +83,15 @@
 
 .logout-button {
   background: rgba(239,68,68,0.15);
-  color: #fca5a5;
+  color: var(--color-error-light);
   border: 1px solid rgba(239,68,68,0.3);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 0.4rem 0.875rem;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   font-family: inherit;
-  transition: all 150ms ease;
+  transition: all var(--transition-fast);
 }
 
 .logout-button:hover {
@@ -104,7 +108,7 @@
 
 .app-sidebar {
   padding: 0.875rem 0.625rem;
-  background: linear-gradient(180deg, #0d2444 0%, #2563b0 100%);
+  background: linear-gradient(180deg, #0d2444 0%, var(--mesob-blue) 100%);
   position: relative;
   overflow-y: auto;
 }
@@ -150,14 +154,14 @@
   background: none;
   border: none;
   border-left: 3px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 8px 12px;
   margin: 1px 8px;
-  font-weight: 400;
+  font-weight: var(--font-weight-normal);
   font-size: 12px;
-  transition: all 150ms ease;
+  transition: all var(--transition-fast);
   display: block;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-family);
   position: relative;
   z-index: 1;
 }
@@ -170,14 +174,14 @@
 .app-sidebar a.active {
   background: rgba(214,232,251,0.15);
   color: #ffffff;
-  font-weight: 600;
-  border-left-color: #D6E8FB;
+  font-weight: var(--font-weight-semibold);
+  border-left-color: var(--mesob-sky);
 }
 
 .app-main {
   padding: 1.5rem 1.75rem;
   overflow-y: auto;
-  background: #D6E8FB;
+  background: var(--mesob-sky);
 }
 
 /* Responsive */
@@ -200,114 +204,4 @@
   }
 }
 
-/* ========================================
-   HEADER USER MENU STYLES - FDRE MESOB
-   ======================================== */
-
-.user-menu-header {
-  position: relative;
-}
-
-.user-btn-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: #ffffff;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 12px;
-  font-family: inherit;
-  transition: all 150ms ease;
-  min-height: unset;
-}
-
-.user-avatar-header {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #e8a020;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.avatar-img-header { width: 100%; height: 100%; object-fit: cover; }
-.avatar-initials-header { font-size: 12px; font-weight: 700; color: white; }
-.avatar-icon-header { font-size: 14px; display: flex; align-items: center; justify-content: center; color: white; }
-
-.user-name-header {
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 12px;
-  color: #ffffff;
-}
-
-.dropdown-arrow-header { 
-  font-size: 0.6rem; 
-  color: rgba(214,232,251,0.5); 
-  margin-left: 0.125rem;
-  transition: transform 150ms ease;
-}
-
-.user-btn-header:hover .dropdown-arrow-header { 
-  transform: rotate(180deg); 
-}
-
-.user-dropdown-header {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: #1a3f6f;
-  border: 1px solid rgba(214,232,251,0.2);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  min-width: 180px;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.dropdown-item-header {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: none;
-  border: none;
-  text-align: left;
-  color: rgba(214,232,251,0.9);
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-family: inherit;
-  transition: background 150ms ease;
-}
-
-.dropdown-item-header:hover { 
-  background: rgba(214,232,251,0.1); 
-  color: #ffffff; 
-}
-
-.dropdown-item-header.logout-header { 
-  color: #fca5a5; 
-}
-
-.dropdown-item-header.logout-header:hover { 
-  background: rgba(239,68,68,0.15); 
-  color: #fca5a5;
-}
-
-.dropdown-divider-header { 
-  margin: 0.25rem 0; 
-  border: none; 
-  border-top: 1px solid rgba(214,232,251,0.1); 
-}
-
-@media (max-width: 768px) {
-  .user-name-header { display: none; }
-  .user-btn-header  { padding: 0; }
-}
+/* END OF LEGACY LAYOUT */

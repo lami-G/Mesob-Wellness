@@ -117,32 +117,28 @@ function AppRouter() {
           }
         />
 
-        {/* Patient Route */}
+        {/* Patient Route - Using unified AppShell */}
         <Route
           path="/dashboard"
           element={
             <RoleBasedRoute allowedRoles={["STAFF"]}>
               <Suspense fallback={<DashboardSkeleton />}>
                 <RouteErrorBoundary>
-                  <MainLayout>
-                    <PatientDashboard />
-                  </MainLayout>
+                  <PatientDashboard />
                 </RouteErrorBoundary>
               </Suspense>
             </RoleBasedRoute>
           }
         />
 
-        {/* Nurse Routes */}
+        {/* Nurse Routes - Using unified AppShell */}
         <Route
           path="/nurse"
           element={
             <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
               <Suspense fallback={<DashboardSkeleton />}>
                 <RouteErrorBoundary>
-                  <MainLayout>
-                    <NurseDashboard />
-                  </MainLayout>
+                  <NurseDashboard />
                 </RouteErrorBoundary>
               </Suspense>
             </RoleBasedRoute>
@@ -153,7 +149,7 @@ function AppRouter() {
           element={<Navigate to="/nurse" replace />}
         />
 
-        {/* Manager Routes */}
+        {/* Manager Routes - Using unified AppShell */}
         <Route
           path="/manager"
           element={
@@ -179,7 +175,7 @@ function AppRouter() {
           }
         />
 
-        {/* Regional Routes */}
+        {/* Regional Routes - Using unified AppShell */}
         <Route
           path="/regional"
           element={
@@ -205,7 +201,7 @@ function AppRouter() {
           }
         />
 
-        {/* Federal Routes */}
+        {/* Federal Routes - Using unified AppShell */}
         <Route
           path="/federal"
           element={
@@ -231,7 +227,7 @@ function AppRouter() {
           }
         />
 
-        {/* Admin Routes */}
+        {/* Admin Routes - Using unified AppShell */}
         <Route
           path="/admin"
           element={

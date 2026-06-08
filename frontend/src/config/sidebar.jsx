@@ -113,7 +113,7 @@ export const adminSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'Federal Portal'
+    subtitle: 'Federal Wellness Portal'
   },
   sections: [
     {
@@ -152,7 +152,7 @@ export const federalSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'Federal Portal'
+    subtitle: 'Federal Wellness Portal'
   },
   sections: [
     {
@@ -181,7 +181,7 @@ export const managerSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'Manager Portal'
+    subtitle: 'Center Wellness Portal'
   },
   sections: [
     {
@@ -210,7 +210,7 @@ export const regionalSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'Regional Portal'
+    subtitle: 'Regional Wellness Portal'
   },
   sections: [
     {
@@ -237,22 +237,23 @@ export const nurseSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'Nurse Portal'
+    subtitle: 'Nurse Wellness Portal'
   },
   sections: [
     {
       label: 'PATIENT CARE',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: NAV_ICONS.dashboard },
-        { id: 'appointments', label: 'Appointments', icon: NAV_ICONS.appointments },
-        { id: 'vitals', label: 'Record Vitals', icon: NAV_ICONS.vitals }
+        { id: 'analytics', label: 'Analytics', icon: NAV_ICONS.analytics },
+        { id: 'queue', label: 'Queue Management', icon: NAV_ICONS.appointments },
+        { id: 'vitals', label: 'Record Vitals', icon: NAV_ICONS.vitals },
+        { id: 'walkin', label: 'Walk-in Registration', icon: NAV_ICONS.users },
+        { id: 'wellness', label: 'Wellness Plans', icon: NAV_ICONS.feedback },
+        { id: 'history', label: 'Patient History', icon: NAV_ICONS.audit }
       ]
     }
   ],
   footer: {
-    items: [
-      { id: 'settings', label: 'Settings', icon: NAV_ICONS.settings }
-    ],
+    items: [],
     version: 'v1.0.0'
   }
 };
@@ -264,7 +265,7 @@ export const patientSidebarConfig = {
     src: '/Mesob-short-png.png',
     alt: 'MESOB',
     title: 'FDRE MESOB',
-    subtitle: 'My Health'
+    subtitle: 'Personal Wellness Portal'
   },
   sections: [
     {
@@ -283,10 +284,37 @@ export const patientSidebarConfig = {
   }
 };
 
+// ─── Staff Configuration (Same as Patient) ───────────────────────────────────
+export const staffSidebarConfig = {
+  type: 'staff',
+  logo: {
+    src: '/Mesob-short-png.png',
+    alt: 'MESOB',
+    title: 'FDRE MESOB',
+    subtitle: 'Personal Wellness Portal'
+  },
+  sections: [
+    {
+      label: 'MY WELLNESS',
+      items: [
+        { id: 'appointments', label: 'My Appointments', icon: NAV_ICONS.appointments },
+        { id: 'health', label: 'Health Journey', icon: NAV_ICONS.vitals },
+        { id: 'wellness', label: 'Wellness Plan', icon: NAV_ICONS.feedback },
+        { id: 'records', label: 'Health Records', icon: NAV_ICONS.audit },
+        { id: 'feedback', label: 'Feedback', icon: NAV_ICONS.feedback }
+      ]
+    }
+  ],
+  footer: {
+    items: [],
+    version: 'v1.0.0'
+  }
+};
+
 // ─── Configuration Selector ───────────────────────────────────────────────────
 /**
  * Get sidebar configuration by type
- * @param {string} type - Dashboard type: 'admin' | 'federal' | 'manager' | 'regional' | 'nurse' | 'patient'
+ * @param {string} type - Dashboard type: 'admin' | 'federal' | 'manager' | 'regional' | 'nurse' | 'patient' | 'staff'
  * @returns {object} Sidebar configuration
  */
 export const getSidebarConfig = (type) => {
@@ -296,7 +324,8 @@ export const getSidebarConfig = (type) => {
     manager: managerSidebarConfig,
     regional: regionalSidebarConfig,
     nurse: nurseSidebarConfig,
-    patient: patientSidebarConfig
+    patient: patientSidebarConfig,
+    staff: staffSidebarConfig
   };
   return configs[type] || adminSidebarConfig;
 };
@@ -308,5 +337,6 @@ export const sidebarConfig = {
   manager: managerSidebarConfig,
   regional: regionalSidebarConfig,
   nurse: nurseSidebarConfig,
-  patient: patientSidebarConfig
+  patient: patientSidebarConfig,
+  staff: staffSidebarConfig
 };

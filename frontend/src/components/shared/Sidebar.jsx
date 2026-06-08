@@ -32,9 +32,9 @@ function Sidebar({
   const capColor = usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e';
 
   return (
-    <aside className={`admin-sidebar ${config.type === 'federal' ? 'federal-sidebar' : ''} ${isOpen ? "open" : "closed"}`}>
+    <aside className={`admin-sidebar ${config.type === 'federal' ? 'federal-sidebar' : ''} ${isOpen ? "open" : "closed"} ${!isOpen ? "collapsed" : ""}`}>
       
-      {/* ── Logo Block - Horizontal Layout ── */}
+      {/* ── Logo Block - Centered, Stacked Layout ── */}
       <div className="sidebar-logo-section">
         <div className="sidebar-logo-emblem">
           <img
@@ -43,7 +43,7 @@ function Sidebar({
           />
         </div>
         <div className="sidebar-logo-text">
-          <span className="sidebar-logo-name">{config.logo.title}</span>
+          {/* Only show role subtitle, not the main title */}
           <span className="sidebar-logo-tagline">{config.logo.subtitle}</span>
         </div>
       </div>

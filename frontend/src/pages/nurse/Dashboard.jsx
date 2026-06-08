@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import NurseLayout from "../../layouts/NurseLayout";
 import NurseAnalytics from "../../components/nurse/NurseAnalytics";
 import LiveQueuePanel from "../../components/nurse/LiveQueuePanel";
 import CapacityTracker from "../../components/nurse/CapacityTracker";
@@ -10,8 +11,11 @@ import CallNextControl from "../../components/nurse/CallNextControl";
 import WellnessPlanCreation from "../../components/nurse/WellnessPlanCreation";
 import CustomerHistoryView from "../../components/nurse/CustomerHistoryView";
 import ProfileSection from "../../components/dashboard/ProfileSection";
-// All styles imported through main.jsx - no additional imports needed
 
+/**
+ * Nurse Dashboard - Unified MESOB Layout
+ * Uses AppShell through NurseLayout for consistent experience
+ */
 function NurseDashboard() {
   const { user, logout } = useAuth();
   const [searchParams] = useSearchParams();
@@ -25,6 +29,7 @@ function NurseDashboard() {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [queueRefreshTrigger, setQueueRefreshTrigger] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -46,11 +51,12 @@ function NurseDashboard() {
 
   const handleCapacityUpdate = (newCapacity) => {
     setCapacity(newCapacity);
+    setLastUpdated(new Date());
   };
 
   const handleStatusChanged = () => {
-    // Trigger queue refresh when status changes
     setQueueRefreshTrigger(prev => prev + 1);
+    setLastUpdated(new Date());
   };
 
   const handleWalkInSuccess = (data) => {
@@ -59,13 +65,13 @@ function NurseDashboard() {
       setActiveTab('vitals');
     }
     setRefreshKey((prev) => prev + 1);
+    setLastUpdated(new Date());
   };
 
   const handleVitalsSuccess = (data) => {
     if (data?.action === 'createWellnessPlan') {
       setSelectedCustomer(data.patientId);
       setActiveTab('wellness');
-      // Pass vitals and suggested plan to wellness component
       if (data.suggestedPlan) {
         sessionStorage.setItem('suggestedWellnessPlan', JSON.stringify(data.suggestedPlan));
       }
@@ -74,13 +80,13 @@ function NurseDashboard() {
       }
     }
     setRefreshKey((prev) => prev + 1);
+    setLastUpdated(new Date());
   };
 
   const handleNavigateToWellness = (customerInfo) => {
     setSelectedCustomer(customerInfo.customerId);
     setSelectedAppointmentId(customerInfo.appointmentId);
     setActiveTab('wellness');
-    // Pass vitals and suggested plan to wellness component
     if (customerInfo.suggestedPlan) {
       sessionStorage.setItem('suggestedWellnessPlan', JSON.stringify(customerInfo.suggestedPlan));
     }
@@ -96,150 +102,57 @@ function NurseDashboard() {
   };
 
   const handleBackToQueue = async () => {
-    // Reset selected customer and appointment
     setSelectedCustomer(null);
     setSelectedAppointmentId(null);
-    // Refresh the queue to show updated status
     setRefreshKey((prev) => prev + 1);
-    // Navigate to queue
     setActiveTab('queue');
   };
 
   const handleNavigateToHistory = (customerInfo) => {
-    // Store customer info in sessionStorage for CustomerHistoryView to read
     sessionStorage.setItem('selectedCustomerForHistory', JSON.stringify({
       id: customerInfo.customerId,
       fullName: customerInfo.customerName,
     }));
-    // Navigate to history tab
     setActiveTab('history');
   };
 
   const handleWellnessSuccess = () => {
     setRefreshKey((prev) => prev + 1);
+    setLastUpdated(new Date());
   };
 
-  const getTabTitle = () => {
+  const renderContent = () => {
     switch (activeTab) {
-      case 'analytics': return 'Service Analytics';
-      case 'queue': return 'Queue Management';
-      case 'vitals': return 'Record Vitals';
-      case 'walkin': return 'Register Walk-in';
-      case 'wellness': return 'Create Wellness Plan';
-      case 'history': return 'Patient History';
-      case 'profile': return 'Profile';
-      default: return 'Nurse Dashboard';
-    }
-  };
-
-  return (
-    <div className="mesob-nurse-dashboard">
-      {/* FDRE MESOB Style Header */}
-      <header className="mesob-header">
-        <div className="mesob-header-left">
-          <div className="mesob-logo">
-            <span className="logo-icon">🏥</span>
-            <div className="logo-text">
-              <div className="logo-title">FDRE MESOB Health System</div>
-              <div className="logo-subtitle">Federal Democratic Republic of Ethiopia MESOB Service</div>
-            </div>
-          </div>
-        </div>
-        <div className="mesob-header-right">
-          <div className="header-user-info">
-            <span className="user-role">Nurse Officer</span>
-            <span className="user-name">{user?.fullName}</span>
-          </div>
-          <button className="notification-btn">🔔</button>
-          <button className="profile-btn" onClick={() => setActiveTab('profile')}>
-            {user?.fullName?.charAt(0) || 'N'}
-          </button>
-        </div>
-      </header>
-
-      {/* Navigation Tabs */}
-      <nav className="mesob-nav-tabs">
-        <button
-          className={`mesob-tab ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analytics')}
-        >
-          <span className="tab-icon">📊</span>
-          <span className="tab-label">Analytics</span>
-        </button>
-        
-        <button
-          className={`mesob-tab ${activeTab === 'queue' ? 'active' : ''}`}
-          onClick={() => setActiveTab('queue')}
-        >
-          <span className="tab-icon">📋</span>
-          <span className="tab-label">Queue</span>
-        </button>
-        
-        <button
-          className={`mesob-tab ${activeTab === 'vitals' ? 'active' : ''}`}
-          onClick={() => setActiveTab('vitals')}
-        >
-          <span className="tab-icon">🩺</span>
-          <span className="tab-label">Vitals</span>
-        </button>
-        
-        <button
-          className={`mesob-tab ${activeTab === 'walkin' ? 'active' : ''}`}
-          onClick={() => setActiveTab('walkin')}
-        >
-          <span className="tab-icon">🚶</span>
-          <span className="tab-label">Walk-in</span>
-        </button>
-        
-        <button
-          className={`mesob-tab ${activeTab === 'wellness' ? 'active' : ''}`}
-          onClick={() => setActiveTab('wellness')}
-        >
-          <span className="tab-icon">💪</span>
-          <span className="tab-label">Wellness</span>
-        </button>
-        
-        <button
-          className={`mesob-tab ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
-          <span className="tab-icon">📝</span>
-          <span className="tab-label">History</span>
-        </button>
-      </nav>
-
-      {/* Page Title Bar */}
-      <div className="mesob-page-title">
-        <h1>{getTabTitle()}</h1>
-        <div className="breadcrumb">
-          <span>Home</span>
-          <span className="separator">/</span>
-          <span className="current">{getTabTitle()}</span>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <main className="mesob-content">
-        {activeTab === "analytics" && (
-          <div className="content-section">
+      case "analytics":
+        return (
+          <div className="dashboard-section">
             <NurseAnalytics refreshTrigger={queueRefreshTrigger} />
           </div>
-        )}
+        );
 
-        {activeTab === "queue" && (
-          <div className="queue-layout">
-            <div className="queue-main-panel">
-              <LiveQueuePanel key={refreshKey} refreshTrigger={queueRefreshTrigger} onNavigateToHistory={handleNavigateToHistory} />
+      case "queue":
+        return (
+          <div className="nurse-queue-layout">
+            <div className="nurse-queue-main">
+              <LiveQueuePanel 
+                key={refreshKey} 
+                refreshTrigger={queueRefreshTrigger} 
+                onNavigateToHistory={handleNavigateToHistory} 
+              />
             </div>
-            <div className="queue-side-panel">
+            <div className="nurse-queue-sidebar">
               <CapacityTracker onCapacityUpdate={handleCapacityUpdate} />
-              <CallNextControl onNavigateToVitals={handleNavigateToVitals} onStatusChanged={handleStatusChanged} />
+              <CallNextControl 
+                onNavigateToVitals={handleNavigateToVitals} 
+                onStatusChanged={handleStatusChanged} 
+              />
             </div>
           </div>
-        )}
+        );
 
-        {activeTab === "vitals" && (
-          <div className="content-section">
+      case "vitals":
+        return (
+          <div className="dashboard-section">
             <VitalsEntry
               customerId={selectedCustomer}
               appointmentId={selectedAppointmentId}
@@ -247,19 +160,21 @@ function NurseDashboard() {
               onNavigateToWellness={handleNavigateToWellness}
             />
           </div>
-        )}
+        );
 
-        {activeTab === "walkin" && (
-          <div className="content-section">
+      case "walkin":
+        return (
+          <div className="dashboard-section">
             <RegisterWalkIn
               onSuccess={handleWalkInSuccess}
               capacityAvailable={capacity?.available > 0}
             />
           </div>
-        )}
+        );
 
-        {activeTab === "wellness" && (
-          <div className="content-section">
+      case "wellness":
+        return (
+          <div className="dashboard-section">
             <WellnessPlanCreation
               customerId={selectedCustomer}
               appointmentId={selectedAppointmentId}
@@ -268,21 +183,36 @@ function NurseDashboard() {
               onStatusChanged={handleStatusChanged}
             />
           </div>
-        )}
+        );
 
-        {activeTab === "history" && (
-          <div className="content-section">
+      case "history":
+        return (
+          <div className="dashboard-section">
             <CustomerHistoryView customerId={selectedCustomer} />
           </div>
-        )}
+        );
 
-        {activeTab === "profile" && (
-          <div className="content-section">
+      case "profile":
+        return (
+          <div className="dashboard-section">
             <ProfileSection onLogout={logout} />
           </div>
-        )}
-      </main>
-    </div>
+        );
+
+      default:
+        return <div>Page not found</div>;
+    }
+  };
+
+  return (
+    <NurseLayout 
+      activeTab={activeTab} 
+      onTabChange={setActiveTab}
+      user={user}
+      lastUpdated={lastUpdated}
+    >
+      {renderContent()}
+    </NurseLayout>
   );
 }
 

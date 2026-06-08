@@ -9,9 +9,10 @@ import App from "./App.jsx";
 
 // Core Styles (Order matters!)
 import "./styles/tailwind.css";      // Tailwind base
-import "./styles/tokens.css";        // Design tokens
+import "./styles/tokens.css";        // Design tokens (imported first)
+import "./styles/unified-layout.css"; // Unified layout system (NEW - uses tokens)
 import "./styles/global.css";        // Global styles
-import "./styles/layout.css";        // Layout structures
+import "./styles/layout.css";        // Legacy layout (MainLayout only)
 import "./styles/components.css";    // Component library (CONSOLIDATED)
 import "./styles/utilities.css";     // Custom utilities
 

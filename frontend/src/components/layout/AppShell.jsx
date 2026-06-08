@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Sidebar from '../shared/Sidebar';
-import Navbar from './Navbar';
+import Header from './Header';
 import { getSidebarConfig } from '../../config/sidebar';
 
 /**
- * MESOB AppShell
- * Unified layout wrapper for all dashboard types
- * Provides consistent Sidebar + Navbar + Content structure
+ * MESOB AppShell - UNIFIED LAYOUT FOR ALL ROLES
+ * 
+ * Single consistent application layout shared across:
+ * - Super Admin (SYSTEM_ADMIN)
+ * - Federal Office (FEDERAL_OFFICE)
+ * - Regional Admin (REGIONAL_OFFICE)
+ * - Center Admin (MANAGER)
+ * - Nurse Officer (NURSE_OFFICER)
+ * - Staff (STAFF)
+ * 
+ * Features:
+ * - One shared Header with MESOB branding
+ * - One shared Sidebar with role-based menu items
+ * - Consistent blue government theme
+ * - Professional dashboard experience
  */
 function AppShell({
   children,
@@ -24,19 +36,12 @@ function AppShell({
   // Get role-specific sidebar configuration
   const sidebarConfig = getSidebarConfig(role);
   
-  // Determine dashboard title
-  const dashboardTitle = title || {
-    admin: 'MESOB Admin Portal',
-    federal: 'MESOB Federal Portal',
-    regional: 'MESOB Regional Portal',
-    manager: 'MESOB Manager Portal',
-    nurse: 'MESOB Nurse Portal',
-    patient: 'My Health Dashboard'
-  }[role] || 'MESOB Dashboard';
+  // Determine dashboard title based on role
+  const dashboardTitle = title || 'MESOB Service Wellness System';
 
   return (
-    <div className="admin-layout">
-      {/* Sidebar */}
+    <div className="mesob-app-shell">
+      {/* UNIFIED SIDEBAR - Same design for all roles, different menu items */}
       <Sidebar
         config={sidebarConfig}
         activeTab={activeTab}
@@ -46,9 +51,9 @@ function AppShell({
       />
 
       {/* Main Content Area */}
-      <div className="admin-main">
-        {/* Navbar */}
-        <Navbar
+      <div className="mesob-app-main">
+        {/* UNIFIED HEADER - Same design for all roles */}
+        <Header
           user={user}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onTabChange={onTabChange}
@@ -59,7 +64,7 @@ function AppShell({
         />
 
         {/* Page Content */}
-        <main className="admin-content">
+        <main className="mesob-app-content">
           {error && (
             <div className="alert alert-error mb-4">
               {error}

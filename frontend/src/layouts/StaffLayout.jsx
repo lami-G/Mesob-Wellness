@@ -1,11 +1,10 @@
-import React from "react";
 import AppShell from "../components/layout/AppShell";
 
 /**
- * Admin Layout - Using AppShell
- * Simplified layout that delegates to AppShell
+ * Staff/Patient Layout - Using Unified AppShell
+ * Provides consistent MESOB experience for Staff users
  */
-function AdminLayout({
+function StaffLayout({
   children,
   activeTab,
   onTabChange,
@@ -15,7 +14,7 @@ function AdminLayout({
 }) {
   return (
     <AppShell
-      role="admin"
+      role="staff"
       activeTab={activeTab}
       onTabChange={onTabChange}
       error={error}
@@ -29,4 +28,4 @@ function AdminLayout({
   );
 }
 
-export default AdminLayout;
+export default StaffLayout;

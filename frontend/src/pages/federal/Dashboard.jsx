@@ -144,6 +144,7 @@ function FederalDashboard() {
   const [regionActionSuccess, setRegionActionSuccess] = useState("");
   const [regionAdmins, setRegionAdmins] = useState({});
   const [timePeriod, setTimePeriod] = useState("daily");
+  const [lastUpdated, setLastUpdated] = useState(new Date());
   const [globalFilters, setGlobalFilters] = useState({
     region: "all",
     center: "",
@@ -158,6 +159,13 @@ function FederalDashboard() {
   
   // Create region mutation
   const createRegionMutation = useCreateRegion();
+
+  // Update lastUpdated when data changes
+  useEffect(() => {
+    if (!isLoading && (regions.length > 0 || allCenters.length > 0)) {
+      setLastUpdated(new Date());
+    }
+  }, [isLoading, regions.length, allCenters.length]);
 
   // Load region admins when regions change
   useEffect(() => {
@@ -858,7 +866,7 @@ function FederalDashboard() {
                               setRegionActionSuccess(
                                 `Region "${row.region}" archived.`,
                               );
-                              await loadFederalData();
+                              await refetch();
                             } catch (err) {
                               const message =
                                 err.response?.data?.message ||
@@ -900,7 +908,7 @@ function FederalDashboard() {
                               setRegionActionSuccess(
                                 `Region "${row.region}" deleted.`,
                               );
-                              await loadFederalData();
+                              await refetch();
                             } catch (err) {
                               const message =
                                 err.response?.data?.message ||
@@ -959,7 +967,7 @@ function FederalDashboard() {
                               setRegionActionSuccess(
                                 `Region "${row.region}" archived.`,
                               );
-                              await loadFederalData();
+                              await refetch();
                             } catch (err) {
                               const message =
                                 err.response?.data?.message ||
@@ -1001,7 +1009,7 @@ function FederalDashboard() {
                               setRegionActionSuccess(
                                 `Region "${row.region}" deleted.`,
                               );
-                              await loadFederalData();
+                              await refetch();
                             } catch (err) {
                               const message =
                                 err.response?.data?.message ||
@@ -1238,7 +1246,7 @@ function FederalDashboard() {
           setShowRegionEditModal(false);
           setSelectedRegionForEdit(null);
           setRegionActionSuccess(`Region updated successfully.`);
-          await loadFederalData();
+          await refetch();
         }}
       />
     </FederalLayout>
@@ -1246,3 +1254,4 @@ function FederalDashboard() {
 }
 
 export default FederalDashboard;
+

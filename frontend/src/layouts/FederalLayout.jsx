@@ -18,7 +18,6 @@ function FederalLayout({
       role="federal"
       activeTab={activeTab}
       onTabChange={onTabChange}
-      title="MESOB Federal Portal"
       error={error}
       extras={{
         user,

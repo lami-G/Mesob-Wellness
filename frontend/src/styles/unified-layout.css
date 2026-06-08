@@ -1,0 +1,862 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * MESOB UNIFIED LAYOUT SYSTEM
+ * Single consistent design for all roles
+ * 
+ * NOTE: Design tokens are imported from tokens.css
+ * This file only contains layout-specific styles
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* Additional layout-specific variables not in tokens.css */
+  --mesob-navy-dark: #0d2444;
+  --header-height: 84px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 70px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APP SHELL - MAIN LAYOUT CONTAINER
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mesob-app-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--mesob-sky);
+  font-family: var(--font-family);
+  color: var(--color-gray-900);
+}
+
+.mesob-app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mesob-app-content {
+  flex: 1;
+  padding: var(--space-lg);
+  overflow-y: auto;
+  background: var(--mesob-sky);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIFIED HEADER - SAME FOR ALL ROLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mesob-header {
+  background: linear-gradient(90deg, var(--mesob-navy-dark) 0%, var(--mesob-navy) 50%, var(--mesob-navy-dark) 100%);
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  position: relative;
+  /* Softer bottom edge */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Subtle gradient overlay for depth */
+.mesob-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(214, 232, 251, 0.04) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.03) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure content is above overlay */
+.mesob-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Left Section - Government Branding */
+.mesob-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+}
+
+/* Modern Sidebar Toggle Button - Angular Bracket */
+.mesob-header-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.mesob-header-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mesob-header-toggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-3px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mesob-header-toggle:hover::before {
+  opacity: 1;
+}
+
+.mesob-header-toggle:active {
+  transform: translateX(-3px) scale(0.95);
+}
+
+/* Chevron animation - slides and rotates */
+.mesob-header-toggle svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mesob-header-toggle:hover svg {
+  transform: translateX(-2px);
+}
+
+/* When sidebar is collapsed, flip chevron */
+.mesob-app-shell .admin-sidebar.collapsed ~ .mesob-app-main .mesob-header-toggle svg,
+.mesob-app-shell .mesob-sidebar.collapsed ~ .mesob-app-main .mesob-header-toggle svg {
+  transform: rotate(180deg);
+}
+
+.mesob-app-shell .admin-sidebar.collapsed ~ .mesob-app-main .mesob-header-toggle:hover svg,
+.mesob-app-shell .mesob-sidebar.collapsed ~ .mesob-app-main .mesob-header-toggle:hover svg {
+  transform: rotate(180deg) translateX(-2px);
+}
+
+.mesob-header-brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.mesob-header-brand-line {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+.mesob-header-brand-amharic {
+  font-weight: 600;
+  color: white;
+}
+
+/* Center - Dashboard Title */
+.mesob-header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  letter-spacing: 0.025em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Right Section */
+.mesob-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+  justify-content: flex-end;
+}
+
+/* Notification Bell */
+.mesob-header-notification {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mesob-header-notification:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mesob-header-notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--color-error);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--mesob-navy);
+}
+
+/* User Profile */
+.mesob-header-user {
+  position: relative;
+}
+
+.mesob-header-user-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.mesob-header-user-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mesob-header-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--mesob-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mesob-header-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mesob-header-user-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  transition: transform var(--transition-fast);
+}
+
+.mesob-header-user-btn:hover .mesob-header-user-arrow {
+  transform: rotate(180deg);
+}
+
+/* User Dropdown */
+.mesob-header-user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  min-width: 180px;
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+.mesob-header-user-dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--color-gray-700);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.mesob-header-user-dropdown-item:hover {
+  background: var(--color-gray-50);
+  color: var(--color-gray-900);
+}
+
+.mesob-header-user-dropdown-logout {
+  color: var(--color-error);
+}
+
+.mesob-header-user-dropdown-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.mesob-header-user-dropdown-divider {
+  margin: 0.25rem 0;
+  border: none;
+  border-top: 1px solid var(--color-gray-200);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIFIED SIDEBAR - SAME DESIGN FOR ALL ROLES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-sidebar,
+.mesob-sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, var(--mesob-navy-dark) 0%, var(--mesob-blue) 100%);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width var(--transition-base), transform var(--transition-base);
+  box-shadow: 
+    2px 0 16px rgba(0, 0, 0, 0.08),
+    4px 0 32px rgba(0, 0, 0, 0.04);
+  /* Softer edge with border */
+  border-right: 1px solid rgba(214, 232, 251, 0.05);
+}
+
+/* Collapsed state */
+.admin-sidebar.collapsed,
+.mesob-sidebar.collapsed {
+  width: 70px;
+}
+
+/* Smooth fade overlay at header junction - Softer blend */
+.admin-sidebar::before,
+.mesob-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(13, 36, 68, 0.25) 0%,
+    rgba(13, 36, 68, 0.15) 30%,
+    rgba(37, 99, 176, 0.08) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  /* Ultra smooth fade with extended gradient */
+  opacity: 0.7;
+  filter: blur(8px);
+}
+
+.admin-sidebar::after,
+.mesob-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 84px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at 30% 0%, 
+    rgba(214, 232, 251, 0.06) 0%, 
+    rgba(214, 232, 251, 0.03) 40%,
+    transparent 80%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Sidebar Logo Section - Centered, Stacked */
+.sidebar-logo-section {
+  padding: var(--space-lg) var(--space-md) var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  position: relative;
+  z-index: 3;
+  text-align: center;
+}
+
+.sidebar-logo-emblem {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: transparent;
+  /* Continuous rotation animation */
+  animation: rotateLogo 20s linear infinite;
+}
+
+.sidebar-logo-emblem img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* No filter - show actual MESOB logo colors */
+}
+
+/* Rotation keyframes */
+@keyframes rotateLogo {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Collapsed sidebar: hide text */
+.admin-sidebar.collapsed .sidebar-logo-text,
+.mesob-sidebar.collapsed .sidebar-logo-text {
+  display: none;
+}
+
+.admin-sidebar.collapsed .sidebar-logo-emblem,
+.mesob-sidebar.collapsed .sidebar-logo-emblem {
+  width: 50px;
+  height: 50px;
+}
+
+.sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.sidebar-logo-name {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: white;
+  letter-spacing: 0.05em;
+}
+
+.sidebar-logo-tagline {
+  font-size: 13px;
+  color: rgba(214, 232, 251, 0.8);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-sm) 0;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Collapsed sidebar: hide labels */
+.admin-sidebar.collapsed .nav-label,
+.mesob-sidebar.collapsed .nav-label,
+.admin-sidebar.collapsed .nav-section-label,
+.mesob-sidebar.collapsed .nav-section-label {
+  display: none;
+}
+
+.admin-sidebar.collapsed .nav-item,
+.mesob-sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px;
+}
+
+.nav-section-label {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  color: rgba(214, 232, 251, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: var(--space-sm);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px var(--space-md);
+  margin: 2px var(--space-sm);
+  color: rgba(214, 232, 251, 0.7);
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  width: calc(100% - var(--space-md));
+  font-family: inherit;
+}
+
+.nav-item:hover {
+  background: rgba(214, 232, 251, 0.1);
+  color: rgba(214, 232, 251, 0.95);
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  background: rgba(214, 232, 251, 0.15);
+  color: white;
+  font-weight: var(--font-weight-bold);
+  border-left-color: var(--mesob-sky);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.nav-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-badge {
+  background: rgba(214, 232, 251, 0.2);
+  color: white;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.nav-divider {
+  margin: var(--space-md) var(--space-md);
+  border: none;
+  border-top: 1px solid rgba(214, 232, 251, 0.12);
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: var(--space-md);
+  border-top: 1px solid rgba(214, 232, 251, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+/* Collapsed sidebar: hide footer extras */
+.admin-sidebar.collapsed .sidebar-footer > div,
+.mesob-sidebar.collapsed .sidebar-footer > div,
+.admin-sidebar.collapsed .version,
+.mesob-sidebar.collapsed .version {
+  display: none;
+}
+
+.version {
+  text-align: center;
+  font-size: 10px;
+  color: rgba(214, 232, 251, 0.35);
+  margin: var(--space-sm) 0 0;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NURSE DASHBOARD SPECIFIC LAYOUTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Queue Layout - Two Column */
+.nurse-queue-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--space-lg);
+  height: calc(100vh - var(--header-height) - var(--space-lg) * 2);
+}
+
+.nurse-queue-main {
+  overflow-y: auto;
+}
+
+.nurse-queue-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  overflow-y: auto;
+}
+
+@media (max-width: 1200px) {
+  .nurse-queue-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .nurse-queue-sidebar {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 768px) {
+  .nurse-queue-sidebar {
+    flex-direction: column;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .mesob-header-title {
+    position: static;
+    transform: none;
+    font-size: var(--font-size-base);
+  }
+  
+  .mesob-header-brand {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-sidebar,
+  .mesob-sidebar {
+    position: fixed;
+    left: -100%;
+    z-index: calc(var(--z-sticky) + 10);
+    transition: left var(--transition-base);
+    width: 260px;
+  }
+  
+  .admin-sidebar.open,
+  .mesob-sidebar.open {
+    left: 0;
+  }
+  
+  .admin-sidebar.collapsed,
+  .mesob-sidebar.collapsed {
+    left: -70px;
+  }
+  
+  .mesob-app-content {
+    padding: var(--space-md);
+  }
+  
+  .mesob-header {
+    height: 64px;
+    padding: 0 var(--space-md);
+  }
+  
+  .mesob-header-title {
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEGACY HEADER USER MENU STYLES (From old layout.css - MainLayout)
+   Keep for backward compatibility with MainLayout component
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.user-menu-header {
+  position: relative;
+}
+
+.user-btn-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  font-size: 12px;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  min-height: unset;
+}
+
+.user-avatar-header {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--mesob-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.avatar-img-header { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+
+.avatar-initials-header { 
+  font-size: 12px; 
+  font-weight: var(--font-weight-bold); 
+  color: white; 
+}
+
+.avatar-icon-header { 
+  font-size: 14px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: white; 
+}
+
+.user-name-header {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.dropdown-arrow-header { 
+  font-size: 0.6rem; 
+  color: rgba(214,232,251,0.5); 
+  margin-left: 0.125rem;
+  transition: transform var(--transition-fast);
+}
+
+.user-btn-header:hover .dropdown-arrow-header { 
+  transform: rotate(180deg); 
+}
+
+.user-dropdown-header {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--mesob-navy);
+  border: 1px solid rgba(214,232,251,0.2);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  min-width: 180px;
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+.dropdown-item-header {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: rgba(214,232,251,0.9);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  transition: background var(--transition-fast);
+}
+
+.dropdown-item-header:hover { 
+  background: rgba(214,232,251,0.1); 
+  color: #ffffff; 
+}
+
+.dropdown-item-header.logout-header { 
+  color: var(--color-error-light); 
+}
+
+.dropdown-item-header.logout-header:hover { 
+  background: rgba(239,68,68,0.15); 
+  color: var(--color-error-light);
+}
+
+.dropdown-divider-header { 
+  margin: 0.25rem 0; 
+  border: none; 
+  border-top: 1px solid rgba(214,232,251,0.1); 
+}
+
+@media (max-width: 768px) {
+  .user-name-header { display: none; }
+  .user-btn-header  { padding: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BACKWARD COMPATIBILITY WITH EXISTING CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Map old class names to new ones for smooth transition */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--mesob-sky);
+  font-family: var(--font-family);
+}
+
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.admin-content {
+  flex: 1;
+  padding: var(--space-lg);
+  overflow-y: auto;
+  background: var(--mesob-sky);
+}
+
+.admin-header {
+  background: linear-gradient(90deg, var(--mesob-navy-dark) 0%, var(--mesob-navy) 50%, var(--mesob-navy-dark) 100%);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* END OF UNIFIED LAYOUT SYSTEM */
