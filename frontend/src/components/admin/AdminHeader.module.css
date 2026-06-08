@@ -1,0 +1,341 @@
+/* ═══════════════════════════════════════════
+   ADMIN HEADER — Navy + Gold Theme
+   ═══════════════════════════════════════════ */
+
+/* ── FEDERAL/ADMIN RIGHT-SIDE CONTROLS ── */
+.rightControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+/* ── LANGUAGE SELECTOR ── */
+.languageSelect {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 7px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.languageSelect option {
+  color: #1e293b;
+  background: #ffffff;
+}
+
+/* ── MANAGER/REGIONAL HEADER ACTIONS ── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.dateDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: white;
+}
+
+.dateText {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lastUpdatedContainer {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+
+.lastUpdatedLabel {
+  display: block;
+}
+
+.lastUpdatedTime {
+  font-weight: 600;
+  margin-top: 0.125rem;
+  display: block;
+}
+
+.refreshButton {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.refreshButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.refreshButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ── USER MENU BUTTON ── */
+.userMenuContainer {
+  position: relative;
+}
+
+.userMenuButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 4px 12px 4px 4px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  min-height: unset;
+  height: 42px;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f5a623;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.userAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.userAvatarInitials {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #213d8d;
+}
+
+.userMenuArrow {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── USER DROPDOWN MENU ── */
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  min-width: 160px;
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.dropdownButton {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.dropdownButton:hover {
+  background: #f1f5f9;
+}
+
+.dropdownButtonLogout:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.dropdownDivider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ── REGIONAL DASHBOARD CENTER FILTER ── */
+.centerFilterSection {
+  display: flex;
+  align-items: center;
+  margin-left: 2.5rem;
+  padding-left: 2.5rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+  height: 100%;
+}
+
+.centerFilterContainer {
+  position: relative;
+}
+
+.centerFilterButton {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.65rem 1.3rem;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.centerFilterButton:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.centerFilterIcon {
+  font-size: 1.1rem;
+}
+
+.centerFilterArrow {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-left: 0.25rem;
+}
+
+/* ── CENTER FILTER DROPDOWN ── */
+.centerDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.75rem;
+  background: #1e3a8a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  min-width: 280px;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.centerDropdownHeader {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.centerDropdownHeaderIcon {
+  font-size: 1.2rem;
+}
+
+.centerOption {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.centerOption:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.centerOptionActive {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+}
+
+.centerOptionLast {
+  border-bottom: none;
+}
+
+.centerOptionIcon {
+  font-size: 1rem;
+  width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.centerOptionContent {
+  flex: 1;
+}
+
+.centerOptionName {
+  font-weight: 500;
+}
+
+.centerOptionStatus {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 0.1rem;
+}
+
+.centerStatusDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.centerStatusDotActive {
+  background: #4ade80;
+}
+
+.centerStatusDotInactive {
+  background: #f59e0b;
+}
+
+.centerOptionCheckmark {
+  color: #4ade80;
+  font-weight: 700;
+}

@@ -1,0 +1,97 @@
+/* ═══════════════════════════════════════════
+   MANAGER SIDEBAR — Navy + Gold Theme
+   ═══════════════════════════════════════════ */
+
+.managerSidebar {
+  /* Uses existing .admin-sidebar from global styles */
+}
+
+/* ── USER CENTER LOCATION ── */
+.userCenter {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0.25rem 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── NAV COUNT BADGE ── */
+.navCount {
+  margin-left: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ── CAPACITY INDICATOR ── */
+.capacityContainer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.capacityHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.capacityIcon {
+  font-size: 1rem;
+}
+
+.capacityLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.capacityProgressBar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.capacityProgressFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.capacityInfo {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.25rem;
+}
+
+/* ── REFRESH BUTTON ── */
+.refreshContainer {
+  padding: 0 1rem 1rem;
+}
+
+.refreshButton {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.refreshButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

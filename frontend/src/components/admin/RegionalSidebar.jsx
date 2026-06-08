@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
+import styles from "./RegionalSidebar.module.css";
 
 function RegionalSidebar({ 
   activeTab, 
@@ -36,17 +37,10 @@ function RegionalSidebar({
         <div className="user-info">
           <p className="user-name">{currentUser?.fullName}</p>
           <p className="user-role">{roleLabel}</p>
-          <div style={{
-            fontSize: '0.75rem',
-            opacity: 0.7,
-            margin: '0.25rem 0 0 0',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem'
-          }}>
+          <div className={styles.statsRow}>
             <span>🏥</span>
             <span>{centerStats?.total || centersCount} Centers</span>
-            <span style={{ margin: '0 0.25rem' }}>•</span>
+            <span className={styles.statsSeparator}>•</span>
             <span>👥 {centerStats?.totalStaff || 0} Staff</span>
           </div>
         </div>
@@ -63,14 +57,7 @@ function RegionalSidebar({
             <span className="nav-label">
               {item.label}
               {item.count !== undefined && (
-                <span className="nav-count" style={{
-                  marginLeft: '0.5rem',
-                  background: 'rgba(255,255,255,0.2)',
-                  borderRadius: '12px',
-                  padding: '0.125rem 0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 600
-                }}>
+                <span className={styles.navCount}>
                   {item.count}
                 </span>
               )}
@@ -82,55 +69,30 @@ function RegionalSidebar({
       <div className="sidebar-footer">
         {/* Center Statistics */}
         {centerStats && (
-          <div style={{
-            padding: '1rem',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
-            marginBottom: '1rem'
-          }}>
-            <div style={{
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              marginBottom: '0.75rem',
-              color: 'rgba(255,255,255,0.9)'
-            }}>
+          <div className={styles.footerSystemStatus}>
+            <div className={styles.statusTitle}>
               📊 System Status
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Active Centers</span>
-                <span style={{ 
-                  fontSize: '0.875rem', 
-                  fontWeight: 700,
-                  color: '#22c55e'
-                }}>
+            <div className={styles.statusList}>
+              <div className={styles.statusItem}>
+                <span className={styles.statusLabel}>Active Centers</span>
+                <span className={`${styles.statusValue} ${styles.statusValueActive}`}>
                   {centerStats.active}/{centerStats.total}
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Total Capacity</span>
-                <span style={{ 
-                  fontSize: '0.875rem', 
-                  fontWeight: 700,
-                  color: '#3b82f6'
-                }}>
+              <div className={styles.statusItem}>
+                <span className={styles.statusLabel}>Total Capacity</span>
+                <span className={`${styles.statusValue} ${styles.statusValueCapacity}`}>
                   {centerStats.totalCapacity}
                 </span>
               </div>
-              <div style={{
-                width: '100%',
-                height: '4px',
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: '2px',
-                overflow: 'hidden',
-                marginTop: '0.25rem'
-              }}>
-                <div style={{
-                  width: `${Math.min((centerStats.active / centerStats.total) * 100, 100)}%`,
-                  height: '100%',
-                  background: '#22c55e',
-                  borderRadius: '2px',
-                  transition: 'width 0.3s ease'
-                }} />
+              <div className={styles.progressBarContainer}>
+                <div 
+                  className={styles.progressBarFill}
+                  style={{
+                    width: `${Math.min((centerStats.active / centerStats.total) * 100, 100)}%`
+                  }}
+                />
               </div>
             </div>
           </div>

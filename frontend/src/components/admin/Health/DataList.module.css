@@ -1,0 +1,285 @@
+/* Data List Styles - Shared for VitalRecordsList and WellnessPlansList */
+
+.dataList {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.listHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.listHeader h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.btnExport {
+  background: #254091;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.btnExport:hover {
+  background: #1e3a8a;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.filterInput,
+.filterSelect {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  color: #1f2937;
+  flex: 1;
+  min-width: 150px;
+  transition: border-color 0.2s ease;
+}
+
+.filterInput:focus,
+.filterSelect:focus {
+  outline: none;
+  border-color: #254091;
+  box-shadow: 0 0 0 3px rgba(37, 64, 145, 0.1);
+}
+
+.filterSelect {
+  cursor: pointer;
+}
+
+.btnReset {
+  padding: 8px 16px;
+  background: white;
+  color: #254091;
+  border: 1px solid #254091;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btnReset:hover {
+  background: #f7fafc;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dataTable thead {
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.dataTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dataTable tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+.dataTable tbody tr:hover {
+  background: #f9fafb;
+}
+
+.dataTable td {
+  padding: 14px 16px;
+  color: #1f2937;
+}
+
+.truncate {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.badgeNormal,
+.badgeActive {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
+
+.badgeUnderweight,
+.badgeElevated {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.badgeOverweight {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.badgeObesity,
+.badgeHypertensionStage1,
+.badgeHypertensionStage2,
+.badgeHypertensiveCrisis {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.badgeInactive {
+  background: rgba(107, 114, 128, 0.1);
+  color: #4b5563;
+}
+
+.btnView,
+.btnEdit {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-right: 6px;
+}
+
+.btnView {
+  background: #254091;
+  color: white;
+}
+
+.btnView:hover {
+  background: #1e3a8a;
+}
+
+.btnEdit {
+  background: #f59e0b;
+  color: white;
+}
+
+.btnEdit:hover {
+  background: #d97706;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btnPrev,
+.btnNext {
+  padding: 8px 16px;
+  background: white;
+  color: #254091;
+  border: 1px solid #254091;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btnPrev:hover:not(:disabled),
+.btnNext:hover:not(:disabled) {
+  background: #f7fafc;
+}
+
+.btnPrev:disabled,
+.btnNext:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #d1d5db;
+  color: #9ca3af;
+}
+
+.pageInfo {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 48px 20px;
+  font-size: 15px;
+}
+
+.loading {
+  color: #6b7280;
+}
+
+.error {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .filterInput,
+  .filterSelect {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .dataTable {
+    font-size: 12px;
+  }
+
+  .dataTable th,
+  .dataTable td {
+    padding: 8px 10px;
+  }
+}

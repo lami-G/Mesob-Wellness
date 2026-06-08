@@ -1,0 +1,160 @@
+/* ═══════════════════════════════════════════
+   FEEDBACK ANALYTICS
+   ═══════════════════════════════════════════ */
+
+.feedbackAnalytics {
+  width: 100%;
+}
+
+.analyticsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.analyticsHeader h2 {
+  font-size: 20px;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.analyticsHeader .filters {
+  display: flex;
+  gap: 10px;
+  margin: 0;
+}
+
+.filterInput {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.analyticsCard {
+  background: #254091;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.analyticsCard h3 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+  color: white;
+}
+
+.analyticsCard p {
+  color: white;
+}
+
+.metricValue {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.metricValuePositive {
+  color: white;
+}
+
+.metricValueNegative {
+  color: white;
+}
+
+.metricLabel {
+  font-size: 12px;
+  margin: 0;
+  color: white;
+}
+
+.analyticsCharts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.chartContainer {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chartContainer h3 {
+  font-size: 16px;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
+}
+
+.distributionBars {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.barItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.barLabel {
+  min-width: 120px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.barValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  min-width: 40px;
+}
+
+.barPercentage {
+  font-size: 12px;
+  color: #666;
+  min-width: 50px;
+}
+
+.loading,
+.error,
+.emptyState {
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.error {
+  color: #dc2626;
+  background: #fee2e2;
+  border-radius: 6px;
+}
+
+.loading {
+  color: #666;
+}
+
+.emptyState {
+  color: #999;
+}

@@ -5,7 +5,7 @@ import { analyticsService } from "../../services/analyticsService";
 import AdminLayout from "../../layouts/AdminLayout";
 import Button from "../../components/forms/Button";
 import Input from "../../components/forms/Input";
-import CenterFormModal from "../../components/admin/CenterFormModal";
+import CenterFormModal from "../../components/admin/Centers/CenterFormModal";
 import HealthConditionTrendsPanel from "../../components/analytics/HealthConditionTrendsPanel";
 import {
   BarChart,

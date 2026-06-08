@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
+import styles from "./ManagerSidebar.module.css";
 
 function ManagerSidebar({ 
   activeTab, 
@@ -39,14 +40,7 @@ function ManagerSidebar({
           <p className="user-name">{currentUser?.fullName}</p>
           <p className="user-role">Center Manager</p>
           {currentUser?.center?.name && (
-            <p className="user-center" style={{ 
-              fontSize: '0.75rem', 
-              opacity: 0.7, 
-              margin: '0.25rem 0 0 0',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}>
+            <p className={`user-center ${styles.userCenter}`}>
               📍 {currentUser.center.name}
             </p>
           )}
@@ -64,14 +58,7 @@ function ManagerSidebar({
             <span className="nav-label">
               {item.label}
               {item.count !== undefined && (
-                <span className="nav-count" style={{
-                  marginLeft: '0.5rem',
-                  background: 'rgba(255,255,255,0.2)',
-                  borderRadius: '12px',
-                  padding: '0.125rem 0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 600
-                }}>
+                <span className={styles.navCount}>
                   {item.count}
                 </span>
               )}
@@ -82,77 +69,38 @@ function ManagerSidebar({
 
       <div className="sidebar-footer">
         {/* Capacity Indicator */}
-        <div style={{
-          padding: '1rem',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          marginBottom: '1rem'
-        }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            marginBottom: '0.5rem'
-          }}>
-            <span style={{ fontSize: '1rem' }}>
+        <div className={styles.capacityContainer}>
+          <div className={styles.capacityHeader}>
+            <span className={styles.capacityIcon}>
               {usedPct > 85 ? '🔴' : usedPct > 60 ? '🟡' : '🟢'}
             </span>
-            <span style={{ 
-              fontSize: '0.875rem', 
-              fontWeight: 600,
-              color: capacityColor 
-            }}>
+            <span 
+              className={styles.capacityLabel}
+              style={{ color: capacityColor }}
+            >
               Capacity {usedPct}%
             </span>
           </div>
-          <div style={{
-            width: '100%',
-            height: '6px',
-            background: 'rgba(255,255,255,0.2)',
-            borderRadius: '3px',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              width: `${Math.min(usedPct, 100)}%`,
-              height: '100%',
-              background: capacityColor,
-              borderRadius: '3px',
-              transition: 'width 0.3s ease'
-            }} />
+          <div className={styles.capacityProgressBar}>
+            <div 
+              className={styles.capacityProgressFill}
+              style={{
+                width: `${Math.min(usedPct, 100)}%`,
+                background: capacityColor
+              }}
+            />
           </div>
-          <div style={{
-            fontSize: '0.75rem',
-            opacity: 0.7,
-            marginTop: '0.25rem'
-          }}>
+          <div className={styles.capacityInfo}>
             {capacityInfo?.slotsUsed || 0} of {capacityInfo?.dailyLimit || 100} slots
           </div>
         </div>
 
         {/* Refresh Button */}
-        <div style={{ padding: '0 1rem 1rem' }}>
+        <div className={styles.refreshContainer}>
           <button
             onClick={onRefresh}
             disabled={loading}
-            style={{
-              width: '100%',
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '6px',
-              padding: '0.5rem',
-              color: 'white',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) {
-                e.target.style.background = 'rgba(255,255,255,0.2)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'rgba(255,255,255,0.1)';
-            }}
+            className={styles.refreshButton}
           >
             {loading ? '⏳ Updating...' : '🔄 Refresh Data'}
           </button>

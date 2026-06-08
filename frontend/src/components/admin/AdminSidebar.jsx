@@ -1,5 +1,7 @@
 import React from "react";
 import { useAuth } from "../../context/AuthContext";
+import clsx from "clsx";
+import styles from "./AdminSidebar.module.css";
 
 function AdminSidebar({ activeTab, onTabChange, isOpen }) {
   const { user } = useAuth();
@@ -104,73 +106,19 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
 
   return (
     <aside
-      style={{
-        width: isOpen ? "220px" : "60px",
-        minWidth: isOpen ? "220px" : "60px",
-        background: "#213D8D",
-        display: "flex",
-        flexDirection: "column",
-        padding: "0",
-        transition: "width 0.2s ease, min-width 0.2s ease",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
+      className={clsx(
+        styles.adminSidebar,
+        isOpen ? styles.adminSidebarOpen : styles.adminSidebarClosed
+      )}
     >
       {/* Logo */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          padding: "16px 14px",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "8px",
-            background: "#f5a623",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: 800,
-            fontSize: "14px",
-            color: "#213D8D",
-            flexShrink: 0,
-          }}
-        >
-          SA
-        </div>
-        {isOpen && (
-          <span
-            style={{
-              fontWeight: 700,
-              fontSize: "12px",
-              color: "#ffffff",
-              letterSpacing: "0.04em",
-              whiteSpace: "nowrap",
-            }}
-          >
-            SYSTEM ADMIN
-          </span>
-        )}
+      <div className={styles.logoContainer}>
+        <div className={styles.logoIcon}>SA</div>
+        {isOpen && <span className={styles.logoText}>SYSTEM ADMIN</span>}
       </div>
 
       {/* Nav */}
-      <nav
-        style={{
-          flex: 1,
-          padding: "10px 8px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "2px",
-          overflowY: "auto",
-          overflowX: "hidden",
-        }}
-      >
+      <nav className={styles.navContainer}>
         {menuItems.map((item) => {
           const isActive = activeTab === item.id;
           return (
@@ -178,88 +126,32 @@ function AdminSidebar({ activeTab, onTabChange, isOpen }) {
               key={item.id}
               onClick={() => onTabChange(item.id)}
               title={!isOpen ? item.label : undefined}
-              style={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                padding: isOpen ? "9px 11px" : "10px",
-                justifyContent: isOpen ? "flex-start" : "center",
-                background: isActive ? "rgba(245,166,35,0.13)" : "transparent",
-                border: `1px solid ${isActive ? "rgba(245,166,35,0.2)" : "transparent"}`,
-                borderRadius: "8px",
-                color: isActive ? "#f5a623" : "rgba(255,255,255,0.55)",
-                fontSize: "12.5px",
-                fontWeight: isActive ? 600 : 500,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-                textAlign: "left",
-                position: "relative",
-                fontFamily: "inherit",
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.07)";
-                  e.currentTarget.style.color = "#ffffff";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "rgba(255,255,255,0.55)";
-                }
-              }}
+              className={clsx(
+                styles.navButton,
+                isOpen ? styles.navButtonOpen : styles.navButtonClosed,
+                isActive && styles.navButtonActive
+              )}
             >
               {/* Gold active bar */}
-              {isActive && (
-                <span
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: "22%",
-                    height: "56%",
-                    width: "3px",
-                    background: "#f5a623",
-                    borderRadius: "0 3px 3px 0",
-                  }}
-                />
-              )}
+              {isActive && <span className={styles.activeBar} />}
               {/* Icon */}
               <span
-                style={{
-                  width: "18px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  opacity: isActive ? 1 : 0.65,
-                }}
+                className={clsx(
+                  styles.navIcon,
+                  isActive && styles.navIconActive
+                )}
               >
                 {item.icon}
               </span>
               {/* Label */}
-              {isOpen && (
-                <span style={{ flex: 1, whiteSpace: "nowrap" }}>{item.label}</span>
-              )}
+              {isOpen && <span className={styles.navLabel}>{item.label}</span>}
             </button>
           );
         })}
       </nav>
 
       {/* Footer */}
-      {isOpen && (
-        <div
-          style={{
-            padding: "12px 14px",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
-            fontSize: "10px",
-            color: "rgba(255,255,255,0.3)",
-          }}
-        >
-          v1.0.0
-        </div>
-      )}
+      {isOpen && <div className={styles.footer}>v1.0.0</div>}
     </aside>
   );
 }
