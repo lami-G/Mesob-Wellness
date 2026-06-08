@@ -12,38 +12,19 @@ import {
 import '../../styles/admin-layout.css';
 import '../../styles/admin-dashboard.css';
 import '../../styles/tooltip-fix.css';
+import styles from './ManagerDashboard.module.css';
 
 // ─── Custom Tooltip Components ────────────────────────────────────────────────
 // Outstanding custom tooltips with perfect visibility
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{
-        background: '#1f2937',
-        border: '2px solid #284394',
-        borderRadius: '12px',
-        padding: '12px 16px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-        color: '#ffffff',
-        cursor: 'pointer'
-      }}>
-        <p style={{
-          margin: '0 0 8px 0',
-          fontWeight: 800,
-          fontSize: '14px',
-          color: '#ffffff',
-          borderBottom: '1px solid rgba(255,255,255,0.2)',
-          paddingBottom: '6px'
-        }}>
+      <div className={styles.tooltipDark}>
+        <p className={styles.tooltipDarkHeader}>
           {label}
         </p>
         {payload.map((entry, index) => (
-          <p key={index} style={{
-            margin: '4px 0',
-            fontSize: '13px',
-            fontWeight: 700,
-            color: '#ffffff'
-          }}>
+          <p key={index} className={styles.tooltipDarkItem}>
             <span style={{ color: entry.color }}>●</span> {entry.name}: <strong>{entry.value}</strong>
           </p>
         ))}
@@ -64,90 +45,52 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
     const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
     
     return (
-      <div style={{
-        background: '#ffffff',
-        border: '2px solid #e5e7eb',
-        borderRadius: '12px',
-        padding: '16px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-        color: '#1f2937',
-        minWidth: '240px',
-      }}>
+      <div className={styles.tooltipLight}>
         {/* Header with day */}
-        <div style={{
-          fontSize: '15px',
-          fontWeight: 700,
-          marginBottom: '12px',
-          paddingBottom: '10px',
-          borderBottom: '2px solid #f3f4f6',
-          color: '#111827',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px'
-        }}>
-          <span style={{ fontSize: '16px' }}>📅</span>
+        <div className={styles.tooltipLightHeader}>
+          <span className={styles.tooltipLightHeaderIcon}>📅</span>
           {label}
         </div>
 
         {/* Metrics List */}
-        <div style={{ display: 'grid', gap: '8px' }}>
+        <div className={styles.tooltipMetricsGrid}>
           {/* Total Appointments */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '6px 0',
-          }}>
-            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>📊</span> Total
+          <div className={styles.tooltipMetricRow}>
+            <span className={styles.tooltipMetricLabel}>
+              <span className={styles.tooltipMetricIcon}>📊</span> Total
             </span>
-            <span style={{ fontSize: '16px', fontWeight: 700, color: '#3b82f6' }}>
+            <span className={styles.tooltipMetricValue} style={{ color: '#3b82f6' }}>
               {total}
             </span>
           </div>
 
           {/* Completed */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '6px 0',
-          }}>
-            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>✅</span> Completed
+          <div className={styles.tooltipMetricRow}>
+            <span className={styles.tooltipMetricLabel}>
+              <span className={styles.tooltipMetricIcon}>✅</span> Completed
             </span>
-            <span style={{ fontSize: '16px', fontWeight: 700, color: '#10b981' }}>
+            <span className={styles.tooltipMetricValue} style={{ color: '#10b981' }}>
               {completed}
             </span>
           </div>
 
           {/* No-Show */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '6px 0',
-          }}>
-            <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>❌</span> No-Show
+          <div className={styles.tooltipMetricRow}>
+            <span className={styles.tooltipMetricLabel}>
+              <span className={styles.tooltipMetricIcon}>❌</span> No-Show
             </span>
-            <span style={{ fontSize: '16px', fontWeight: 700, color: '#f59e0b' }}>
+            <span className={styles.tooltipMetricValue} style={{ color: '#f59e0b' }}>
               {noShow}
             </span>
           </div>
 
           {/* Pending (if any) */}
           {pending > 0 && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '6px 0',
-            }}>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#6b7280', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '14px' }}>⏳</span> Pending
+            <div className={styles.tooltipMetricRow}>
+              <span className={styles.tooltipMetricLabel}>
+                <span className={styles.tooltipMetricIcon}>⏳</span> Pending
               </span>
-              <span style={{ fontSize: '16px', fontWeight: 700, color: '#8b5cf6' }}>
+              <span className={styles.tooltipMetricValue} style={{ color: '#8b5cf6' }}>
                 {pending}
               </span>
             </div>
@@ -155,29 +98,27 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
         </div>
 
         {/* Completion Rate */}
-        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '2px solid #f3f4f6' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280' }}>
+        <div className={styles.tooltipCompletionSection}>
+          <div className={styles.tooltipCompletionHeader}>
+            <span className={styles.tooltipCompletionLabel}>
               Completion Rate
             </span>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444' }}>
+            <span style={{ 
+              fontSize: '14px', 
+              fontWeight: 700, 
+              color: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444' 
+            }}>
               {completionRate}%
             </span>
           </div>
-          <div style={{
-            width: '100%',
-            height: '6px',
-            background: '#f3f4f6',
-            borderRadius: '3px',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              width: `${completionRate}%`,
-              height: '100%',
-              background: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444',
-              borderRadius: '3px',
-              transition: 'width 0.3s ease',
-            }} />
+          <div className={styles.tooltipCompletionBar}>
+            <div 
+              className={styles.tooltipCompletionFill}
+              style={{
+                width: `${completionRate}%`,
+                background: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444',
+              }} 
+            />
           </div>
         </div>
       </div>
@@ -189,31 +130,11 @@ const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
 const CustomPieTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{
-        background: '#1f2937',
-        border: '2px solid #284394',
-        borderRadius: '12px',
-        padding: '12px 16px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-        color: '#ffffff',
-        cursor: 'pointer'
-      }}>
-        <p style={{
-          margin: '0 0 8px 0',
-          fontWeight: 800,
-          fontSize: '14px',
-          color: '#ffffff',
-          borderBottom: '1px solid rgba(255,255,255,0.2)',
-          paddingBottom: '6px'
-        }}>
+      <div className={styles.tooltipDark}>
+        <p className={styles.tooltipDarkHeader}>
           {payload[0].name}
         </p>
-        <p style={{
-          margin: '4px 0',
-          fontSize: '13px',
-          fontWeight: 700,
-          color: '#ffffff'
-        }}>
+        <p className={styles.tooltipDarkItem}>
           <span style={{ color: payload[0].payload.color || payload[0].payload.fill }}>●</span> Count: <strong>{payload[0].value}</strong>
         </p>
       </div>
@@ -225,32 +146,12 @@ const CustomPieTooltip = ({ active, payload }) => {
 const CustomCapacityTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div style={{
-        background: '#1f2937',
-        border: '2px solid #284394',
-        borderRadius: '12px',
-        padding: '12px 16px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-        color: '#ffffff',
-        cursor: 'pointer'
-      }}>
-        <p style={{
-          margin: '0 0 8px 0',
-          fontWeight: 800,
-          fontSize: '14px',
-          color: '#ffffff',
-          borderBottom: '1px solid rgba(255,255,255,0.2)',
-          paddingBottom: '6px'
-        }}>
+      <div className={styles.tooltipDark}>
+        <p className={styles.tooltipDarkHeader}>
           {label}
         </p>
         {payload.map((entry, index) => (
-          <p key={index} style={{
-            margin: '4px 0',
-            fontSize: '13px',
-            fontWeight: 700,
-            color: '#ffffff'
-          }}>
+          <p key={index} className={styles.tooltipDarkItem}>
             {entry.dataKey === 'used' ? '🔵' : '🟢'} {entry.dataKey === 'used' ? 'Slots Used' : 'Slots Available'}: <strong>{entry.value} slots</strong>
           </p>
         ))}
@@ -360,19 +261,14 @@ const ManagerDashboard = () => {
           <div className="dashboard-section">
             <div className="section-header">
               <h2>📊 Center Overview</h2>
-              <div className="capacity-indicator" style={{
+              <div className={`capacity-indicator ${styles.capacityIndicator}`} style={{
                 background: capacityColor + '20', 
                 border: `1px solid ${capacityColor}60`,
-                borderRadius: '8px', 
-                padding: '0.5rem 1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
               }}>
-                <span style={{ fontSize: '1.2rem' }}>
+                <span className={styles.capacityIcon}>
                   {usedPct > 85 ? '🔴' : usedPct > 60 ? '🟡' : '🟢'}
                 </span>
-                <span style={{ fontWeight: 600, color: capacityColor }}>
+                <span className={styles.capacityText} style={{ color: capacityColor }}>
                   Capacity {usedPct}%
                 </span>
               </div>
@@ -480,11 +376,22 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
       <div className="dash-kpi-grid">
         {statCards.map((c) => (
           <div key={c.label} className="dash-kpi-card">
-            <div className="dash-kpi-icon" style={{ background: `${c.color}18`, color: c.color }}>
+            <div 
+              className={`dash-kpi-icon ${styles.kpiIconWithColor}`}
+              style={{ 
+                '--kpi-bg': `${c.color}18`,
+                '--kpi-color': c.color 
+              }}
+            >
               {c.icon}
             </div>
             <div className="dash-kpi-body">
-              <div className="dash-kpi-value" style={{ color: c.color }}>{c.value}</div>
+              <div 
+                className={`dash-kpi-value ${styles.kpiValueWithColor}`}
+                style={{ '--kpi-color': c.color }}
+              >
+                {c.value}
+              </div>
               <div className="dash-kpi-label">{c.label}</div>
               <div className="dash-kpi-sub">{c.sub}</div>
             </div>
@@ -493,9 +400,9 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
       </div>
 
       {/* Health Data Section — Employee Health Overview */}
-      <div className="mgr-health-section" style={{ marginTop: '2rem' }}>
+      <div className={`mgr-health-section ${styles.healthSection}`}>
         {/* Health KPI Cards with Real Data from Backend */}
-        <div className="dash-kpi-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '1.5rem' }}>
+        <div className={`dash-kpi-grid ${styles.healthKpiGrid}`}>
           {(() => {
             // Calculate real health percentages from healthData
             const totalPatients = healthData?.totalPatients || bookingStats?.totalUsers || 0;
@@ -537,82 +444,37 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
               },
             ];
           })().map((c) => (
-            <div key={c.label} className="dash-kpi-card" style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)',
-              border: '2px solid #e5e7eb',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-              transition: 'all 0.3s ease',
-            }}>
-              <div className="dash-kpi-icon" style={{ 
-                background: `${c.color}15`, 
-                color: c.color,
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.5rem',
-                marginBottom: '0.75rem'
-              }}>
+            <div key={c.label} className={`dash-kpi-card ${styles.healthKpiCard}`}>
+              <div 
+                className={`dash-kpi-icon ${styles.healthKpiIcon}`}
+                style={{ 
+                  background: `${c.color}15`, 
+                  color: c.color,
+                }}
+              >
                 {c.icon}
               </div>
               <div className="dash-kpi-body">
-                <div className="dash-kpi-value" style={{ 
-                  color: c.color, 
-                  fontSize: '2rem', 
-                  fontWeight: 800,
-                  marginBottom: '0.25rem'
-                }}>{c.value}</div>
-                <div className="dash-kpi-label" style={{ 
-                  fontSize: '0.875rem', 
-                  fontWeight: 600,
-                  color: '#1f2937',
-                  marginBottom: '0.25rem'
-                }}>{c.label}</div>
-                <div className="dash-kpi-sub" style={{ 
-                  fontSize: '0.75rem', 
-                  color: '#9ca3af',
-                  fontWeight: 500
-                }}>{c.sub}</div>
+                <div 
+                  className={`dash-kpi-value ${styles.healthKpiValue}`}
+                  style={{ color: c.color }}
+                >
+                  {c.value}
+                </div>
+                <div className={`dash-kpi-label ${styles.healthKpiLabel}`}>{c.label}</div>
+                <div className={`dash-kpi-sub ${styles.healthKpiSub}`}>{c.sub}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Health Charts Row */}
-        <div className="dash-charts-row" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr', 
-          gap: '1.5rem',
-          marginBottom: '1.5rem'
-        }}>
+        <div className={`dash-charts-row ${styles.chartsRow}`}>
           {/* Condition Trends Area Chart */}
-          <div className="mgr-chart-card" style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)',
-            border: '2px solid #e5e7eb',
-            borderRadius: '16px',
-            padding: '2rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <div className="mgr-chart-header" style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ 
-                margin: '0 0 0.5rem 0', 
-                fontSize: '1.25rem', 
-                fontWeight: 800, 
-                color: '#1f2937', 
-                letterSpacing: '-0.01em' 
-              }}>Condition Trends</h3>
-              <p style={{ 
-                margin: 0, 
-                fontSize: '0.875rem', 
-                color: '#6b7280', 
-                fontWeight: 500 
-              }}>Health condition progression over time</p>
+          <div className={`mgr-chart-card ${styles.chartCard}`}>
+            <div className={`mgr-chart-header ${styles.chartHeader}`}>
+              <h3 className={styles.chartTitle}>Condition Trends</h3>
+              <p className={styles.chartSubtitle}>Health condition progression over time</p>
             </div>
             <ResponsiveContainer width="100%" height={400}>
               <AreaChart 
@@ -863,66 +725,51 @@ const OverviewTab = ({ loading, capacityInfo, bookingStats, healthData }) => {
       </div>
 
       {/* Capacity Bar — Enhanced */}
-      <div className="mgr-chart-card" style={{
-        marginTop: '1.5rem',
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-        border: '1px solid #e5e7eb',
-        borderRadius: '12px',
-        padding: '2rem',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div className="mgr-chart-header" style={{ position: 'relative', zIndex: 1 }}>
-          <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.1rem', fontWeight: 700, color: '#1f2937' }}>Capacity Utilisation — {capacityInfo?.date ?? 'Today'}</h3>
-          <span className={`mgr-status-badge`} style={{
-            display: 'inline-block',
-            padding: '0.4rem 0.8rem',
-            borderRadius: '20px',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            background: usedPct > 85 ? 'rgba(239, 68, 68, 0.15)' : usedPct > 60 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(34, 197, 94, 0.15)',
-            color: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
-            border: usedPct > 85 ? '1px solid #ef4444' : usedPct > 60 ? '1px solid #f59e0b' : '1px solid #22c55e'
-          }}>
+      <div className={`mgr-chart-card ${styles.capacityCard}`}>
+        <div className={`mgr-chart-header ${styles.capacityCardHeader}`}>
+          <h3 className={styles.capacityCardTitle}>Capacity Utilisation — {capacityInfo?.date ?? 'Today'}</h3>
+          <span 
+            className={`mgr-status-badge ${styles.statusBadge}`}
+            style={{
+              background: usedPct > 85 ? 'rgba(239, 68, 68, 0.15)' : usedPct > 60 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+              color: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
+              border: usedPct > 85 ? '1px solid #ef4444' : usedPct > 60 ? '1px solid #f59e0b' : '1px solid #22c55e'
+            }}
+          >
             {usedPct > 85 ? '🔴 Critical' : usedPct > 60 ? '🟡 Moderate' : '🟢 Normal'}
           </span>
         </div>
-        <div className="mgr-capacity-row" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', position: 'relative', zIndex: 1 }}>
-          <div className="mgr-capacity-stat" style={{ textAlign: 'center', minWidth: '80px' }}>
-            <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#284394', display: 'block' }}>{capacityInfo?.slotsUsed ?? 0}</span>
-            <small style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>Used</small>
+        <div className={`mgr-capacity-row ${styles.capacityRow}`}>
+          <div className={`mgr-capacity-stat ${styles.capacityStat}`}>
+            <span className={styles.capacityStatValue} style={{ color: '#284394' }}>{capacityInfo?.slotsUsed ?? 0}</span>
+            <small className={styles.capacityStatLabel}>Used</small>
           </div>
-          <div className="mgr-capacity-bar-wrap" style={{ flex: 1 }}>
-            <div className="mgr-capacity-track" style={{
-              height: '12px',
-              background: '#e5e7eb',
-              borderRadius: '6px',
-              overflow: 'hidden'
-            }}>
-              <div className="mgr-capacity-fill" style={{
-                height: '100%',
-                width: `${usedPct}%`,
-                background: usedPct > 85 ? 'linear-gradient(90deg,#dc2626,#ef4444)' : usedPct > 60 ? 'linear-gradient(90deg,#d97706,#f59e0b)' : 'linear-gradient(90deg,#16a34a,#22c55e)',
-                borderRadius: '6px',
-                transition: 'width 0.8s ease'
-              }} />
+          <div className={`mgr-capacity-bar-wrap ${styles.capacityBarWrap}`}>
+            <div className={`mgr-capacity-track ${styles.capacityTrack}`}>
+              <div 
+                className={`mgr-capacity-fill ${styles.capacityFill}`}
+                style={{
+                  width: `${usedPct}%`,
+                  background: usedPct > 85 ? 'linear-gradient(90deg,#dc2626,#ef4444)' : usedPct > 60 ? 'linear-gradient(90deg,#d97706,#f59e0b)' : 'linear-gradient(90deg,#16a34a,#22c55e)',
+                }} 
+              />
             </div>
           </div>
-          <div className="mgr-capacity-pct" style={{
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            color: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
-            minWidth: '60px',
-            textAlign: 'right'
-          }}>{usedPct}%</div>
-          <div className="mgr-capacity-stat" style={{ textAlign: 'center', minWidth: '80px' }}>
-            <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0891b2', display: 'block' }}>{capacityInfo?.slotsRemaining ?? 0}</span>
-            <small style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>Remaining</small>
+          <div 
+            className={`mgr-capacity-pct ${styles.capacityPct}`}
+            style={{
+              color: usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e',
+            }}
+          >
+            {usedPct}%
           </div>
-          <div className="mgr-capacity-stat" style={{ textAlign: 'center', minWidth: '80px' }}>
-            <span style={{ fontSize: '1.75rem', fontWeight: 800, color: '#7c3aed', display: 'block' }}>{capacityInfo?.dailyLimit ?? 100}</span>
-            <small style={{ fontSize: '0.8rem', color: '#6b7280', fontWeight: 500 }}>Daily Limit</small>
+          <div className={`mgr-capacity-stat ${styles.capacityStat}`}>
+            <span className={styles.capacityStatValue} style={{ color: '#0891b2' }}>{capacityInfo?.slotsRemaining ?? 0}</span>
+            <small className={styles.capacityStatLabel}>Remaining</small>
+          </div>
+          <div className={`mgr-capacity-stat ${styles.capacityStat}`}>
+            <span className={styles.capacityStatValue} style={{ color: '#7c3aed' }}>{capacityInfo?.dailyLimit ?? 100}</span>
+            <small className={styles.capacityStatLabel}>Daily Limit</small>
           </div>
         </div>
       </div>
@@ -952,7 +799,7 @@ const CapacityTab = ({ loading, capacityInfo }) => {
   return (
     <div className="mgr-analytics">
       {/* Stats Row */}
-      <div className="mgr-kpi-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '1.5rem' }}>
+      <div className={`mgr-kpi-grid ${styles.capacityTabKpiGrid}`}>
         {[
           { icon: '📊', label: 'Daily Limit',   value: capacityInfo?.dailyLimit    ?? 100, color: '#284394' },
           { icon: '✅', label: 'Slots Used',    value: capacityInfo?.slotsUsed     ?? 0,   color: '#22c55e' },
@@ -1256,7 +1103,7 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
     <div className="mgr-analytics">
 
       {/* Enhanced KPI Row with Period-based Metrics */}
-      <div className="mgr-kpi-grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)', marginBottom: '1.5rem' }}>
+      <div className={`mgr-kpi-grid ${styles.analyticsKpiGrid}`}>
         {[
           { icon: '📊', label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
           { icon: '✅', label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
@@ -1265,71 +1112,53 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
           { icon: '👥', label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
           { icon: '⚡', label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
         ].map(c => (
-          <div key={c.label} className="mgr-kpi-card" style={{ position: 'relative', overflow: 'hidden' }}>
-            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}>{c.icon}</div>
+          <div key={c.label} className={`mgr-kpi-card ${styles.analyticsKpiCard}`}>
+            <div 
+              className="mgr-kpi-icon"
+              style={{ background: c.color + '18', color: c.color }}
+            >
+              {c.icon}
+            </div>
             <div className="mgr-kpi-body">
               <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
               <div className="mgr-kpi-label" style={{ fontSize: '0.75rem' }}>{c.label}</div>
-              <div style={{ 
-                fontSize: '0.7rem', 
-                color: c.trend.startsWith('+') ? '#22c55e' : '#ef4444',
-                fontWeight: 600,
-                marginTop: '0.25rem'
-              }}>
+              <div 
+                className={styles.kpiTrend}
+                style={{ 
+                  color: c.trend.startsWith('+') ? '#22c55e' : '#ef4444',
+                }}
+              >
                 {c.trend} vs prev period
               </div>
             </div>
             {/* Sparkline effect */}
-            <div style={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              width: '40px',
-              height: '20px',
-              background: `linear-gradient(45deg, ${c.color}20, transparent)`,
-              borderRadius: '8px 0 8px 0'
-            }} />
+            <div 
+              className={styles.kpiSparkline}
+              style={{
+                background: `linear-gradient(45deg, ${c.color}20, transparent)`,
+              }} 
+            />
           </div>
         ))}
       </div>
 
       {/* Advanced Control Panel */}
-      <div style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%)',
-        borderRadius: '16px',
-        padding: '1.5rem',
-        marginBottom: '1.5rem',
-        border: '2px solid rgba(0,0,0,0.08)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#1f2937' }}>
+      <div className={styles.controlPanel}>
+        <div className={styles.controlPanelHeader}>
+          <div className={styles.controlPanelTitle}>
+            <h3 className={styles.controlPanelTitleText}>
               Performance Trends Dashboard
             </h3>
           </div>
           
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className={styles.controlPanelControls}>
             {/* Period Selector */}
-            <div className="mgr-period-switcher" style={{ background: '#e2e8f0', borderRadius: '12px', padding: '0.25rem' }}>
+            <div className={styles.periodSwitcher}>
               {['daily', 'weekly', 'monthly'].map(p => (
                 <button 
                   key={p} 
-                  className={`mgr-period-btn ${period === p ? 'active' : ''}`} 
+                  className={`${styles.periodBtn} ${period === p ? styles.periodBtnActive : styles.periodBtnInactive}`}
                   onClick={() => setPeriod(p)}
-                  style={{
-                    background: period === p ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'transparent',
-                    color: period === p ? '#ffffff' : '#1e293b',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textTransform: 'capitalize',
-                    boxShadow: period === p ? '0 2px 8px rgba(99, 102, 241, 0.4)' : 'none'
-                  }}
                 >
                   📅 {p}
                 </button>
@@ -1340,22 +1169,7 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
             <select
               value={selectedMetric}
               onChange={(e) => setSelectedMetric(e.target.value)}
-              className="performance-metric-selector"
-              style={{
-                background: '#ffffff',
-                border: '2px solid #cbd5e1',
-                borderRadius: '8px',
-                padding: '0.5rem 1rem',
-                color: '#1e293b',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                outline: 'none',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                colorScheme: 'light',
-                WebkitAppearance: 'auto',
-                appearance: 'auto'
-              }}
+              className={`performance-metric-selector ${styles.metricSelector}`}
             >
               <option value="appointments" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>📊 Appointments Overview</option>
               <option value="vitals" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>🩺 Vitals Tracking</option>
@@ -1364,23 +1178,12 @@ const AnalyticsTab = ({ loading, queueData, healthData, trendsData }) => {
             </select>
 
             {/* View Mode Toggle */}
-            <div style={{ display: 'flex', background: '#e2e8f0', borderRadius: '8px', padding: '0.25rem' }}>
+            <div className={styles.viewModeToggle}>
               {['chart', 'table'].map(mode => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  style={{
-                    background: viewMode === mode ? '#284394' : 'transparent',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.4rem 0.8rem',
-                    color: viewMode === mode ? '#ffffff' : '#1e293b',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: viewMode === mode ? '0 2px 6px rgba(40,67,148,0.35)' : 'none'
-                  }}
+                  className={`${styles.viewModeBtn} ${viewMode === mode ? styles.viewModeBtnActive : styles.viewModeBtnInactive}`}
                 >
                   {mode === 'chart' ? '📈 Chart' : '📋 Table'}
                 </button>

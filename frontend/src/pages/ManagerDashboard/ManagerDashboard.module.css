@@ -1,0 +1,450 @@
+/* ============================================
+   MANAGER DASHBOARD - CSS MODULE
+   ============================================ */
+
+/* ─── Custom Tooltips ─────────────────────── */
+.tooltipDark {
+  background: #1f2937;
+  border: 2px solid #284394;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.tooltipDarkHeader {
+  margin: 0 0 8px 0;
+  font-weight: 800;
+  font-size: 14px;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 6px;
+}
+
+.tooltipDarkItem {
+  margin: 4px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.tooltipLight {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  color: #1f2937;
+  min-width: 240px;
+}
+
+.tooltipLightHeader {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f3f4f6;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltipLightHeaderIcon {
+  font-size: 16px;
+}
+
+.tooltipMetricsGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.tooltipMetricRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.tooltipMetricLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltipMetricIcon {
+  font-size: 14px;
+}
+
+.tooltipMetricValue {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tooltipCompletionSection {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #f3f4f6;
+}
+
+.tooltipCompletionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tooltipCompletionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.tooltipCompletionBar {
+  width: 100%;
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tooltipCompletionFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ─── Capacity Indicator ──────────────────── */
+.capacityIndicator {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.capacityIcon {
+  font-size: 1.2rem;
+}
+
+.capacityText {
+  font-weight: 600;
+}
+
+/* ─── Overview Tab ────────────────────────── */
+.kpiIconWithColor {
+  background: var(--kpi-bg);
+  color: var(--kpi-color);
+}
+
+.kpiValueWithColor {
+  color: var(--kpi-color);
+}
+
+.healthSection {
+  margin-top: 2rem;
+}
+
+.healthKpiGrid {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 1.5rem;
+}
+
+.healthKpiCard {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.healthKpiIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.healthKpiValue {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.healthKpiLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.healthKpiSub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.chartCard {
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.chartHeader {
+  margin-bottom: 1.5rem;
+}
+
+.chartTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2937;
+  letter-spacing: -0.01em;
+}
+
+.chartSubtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ─── Capacity Bar ────────────────────────── */
+.capacityCard {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.capacityCardHeader {
+  position: relative;
+  z-index: 1;
+}
+
+.capacityCardTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.capacityRow {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.capacityStat {
+  text-align: center;
+  min-width: 80px;
+}
+
+.capacityStatValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  display: block;
+}
+
+.capacityStatLabel {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.capacityBarWrap {
+  flex: 1;
+}
+
+.capacityTrack {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.capacityFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+
+.capacityPct {
+  font-size: 1.5rem;
+  font-weight: 800;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* ─── Analytics Tab ────────────────────────── */
+.analyticsKpiGrid {
+  grid-template-columns: repeat(6, 1fr);
+  margin-bottom: 1.5rem;
+}
+
+.analyticsKpiCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpiTrend {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.kpiSparkline {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 40px;
+  height: 20px;
+  border-radius: 8px 0 8px 0;
+}
+
+.controlPanel {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.controlPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.controlPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.controlPanelTitleText {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.controlPanelControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.periodSwitcher {
+  background: #e2e8f0;
+  border-radius: 12px;
+  padding: 0.25rem;
+}
+
+.periodBtn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.periodBtnActive {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.periodBtnInactive {
+  color: #1e293b;
+}
+
+.metricSelector {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: #1e293b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.viewModeToggle {
+  display: flex;
+  background: #e2e8f0;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.viewModeBtn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewModeBtnActive {
+  background: #284394;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(40, 67, 148, 0.35);
+}
+
+.viewModeBtnInactive {
+  color: #1e293b;
+}
+
+/* ─── CapacityTab ─────────────────────────── */
+.capacityTabKpiGrid {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 1.5rem;
+}
