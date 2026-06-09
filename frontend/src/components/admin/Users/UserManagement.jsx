@@ -75,7 +75,7 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
   return (
     <div className="management-section">
       <div className="section-header">
-        <h2>👥 User Management</h2>
+        <h2>User Management</h2>
       </div>
 
       <FilterBar

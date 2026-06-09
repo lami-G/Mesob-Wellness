@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import AdminLayout from "../../layouts/AdminLayout";
+import AdminSystemLayout from "../../layouts/AdminSystemLayout";
 import DashboardMetrics from "../../components/admin/Dashboard/DashboardMetrics";
 import api from "../../services/api";
 import RegionManagement from "../../components/admin/Regions/RegionManagement";
@@ -11,7 +11,6 @@ import FeedbackQuality from "../../components/admin/Feedback/FeedbackQuality";
 import AuditLogs from "../../components/admin/Audit/AuditLogs";
 import SystemSettings from "../../components/admin/Settings/SystemSettings";
 import AdminProfile from "../../components/admin/Profile/AdminProfile";
-import "../../styles/admin-layout.css";
 import "../../styles/admin-dashboard.css";
 import "../../styles/admin-health-dashboard.css";
 import "../../styles/admin-filters.css";
@@ -114,7 +113,10 @@ function AdminDashboard() {
   };
 
   return (
-    <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
+    <AdminSystemLayout 
+      activeTab={activeTab} 
+      onTabChange={setActiveTab}
+    >
       {shouldShowFilters && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -204,7 +206,7 @@ function AdminDashboard() {
         </div>
       )}
       {renderContent()}
-    </AdminLayout>
+    </AdminSystemLayout>
   );
 }
 

@@ -69,6 +69,13 @@ function RegisterWalkIn({ onSuccess }) {
       gender: '',
     });
     setRegisterErrors({});
+    // Scroll to top when modal opens
+    setTimeout(() => {
+      const modalOverlay = document.querySelector(`.${styles.modalOverlay}`);
+      if (modalOverlay) {
+        modalOverlay.scrollTop = 0;
+      }
+    }, 0);
   };
 
   // Validate registration form

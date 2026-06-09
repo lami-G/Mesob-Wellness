@@ -209,7 +209,7 @@ function AdminProfile() {
               {profilePicture ? (
                 <img src={profilePicture} alt={formData.fullName} />
               ) : (
-                <span className={styles.avatarIcon}>👤</span>
+                <span className={styles.avatarIcon}></span>
               )}
             </div>
             <button
@@ -217,7 +217,6 @@ function AdminProfile() {
               onClick={handlePictureClick}
               title="Change profile picture"
             >
-              📷
             </button>
             {showPictureMenu && profilePicture && (
               <div className={styles.pictureMenu}>

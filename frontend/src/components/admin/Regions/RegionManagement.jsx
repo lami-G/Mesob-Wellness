@@ -186,7 +186,7 @@ function RegionManagement() {
   return (
     <div className="management-section">
       <div className={styles.sectionHeader}>
-        <h2>🌍 Region Management</h2>
+        <h2>Region Management</h2>
         <button
           className={styles.toggleViewBtn}
           onClick={() => setShowDetailView(!showDetailView)}
@@ -294,7 +294,7 @@ function RegionManagement() {
                           setShowRegionManagerModal(true);
                         }}
                       >
-                        👤 Manager
+                        Manager
                       </button>
                     </div>
                   </div>
@@ -497,14 +497,12 @@ function RegionManagement() {
           {regionSummary && (
             <div className={styles.analyticsCardsGrid}>
               <div className="analytics-card">
-                <div className="card-icon">🏥</div>
                 <div className="card-content">
                   <p className="card-label">Centers</p>
                   <p className="card-value">{regionSummary.totalCenters || 0}</p>
                 </div>
               </div>
               <div className="analytics-card">
-                <div className="card-icon">👥</div>
                 <div className="card-content">
                   <p className="card-label">Total Staff</p>
                   <p className="card-value">
@@ -513,7 +511,6 @@ function RegionManagement() {
                 </div>
               </div>
               <div className="analytics-card">
-                <div className="card-icon">📋</div>
                 <div className="card-content">
                   <p className="card-label">Appointments</p>
                   <p className="card-value">
@@ -522,7 +519,6 @@ function RegionManagement() {
                 </div>
               </div>
               <div className="analytics-card">
-                <div className="card-icon">✅</div>
                 <div className="card-content">
                   <p className="card-label">Completed</p>
                   <p className="card-value">
@@ -531,7 +527,6 @@ function RegionManagement() {
                 </div>
               </div>
               <div className="analytics-card">
-                <div className="card-icon">🩺</div>
                 <div className="card-content">
                   <p className="card-label">Vitals</p>
                   <p className="card-value">
@@ -540,7 +535,6 @@ function RegionManagement() {
                 </div>
               </div>
               <div className="analytics-card">
-                <div className="card-icon">⭐</div>
                 <div className="card-content">
                   <p className="card-label">Avg Feedback</p>
                   <p className="card-value">
@@ -703,7 +697,6 @@ function RegionManagement() {
               <h3>{selectedRegion} Summary</h3>
               <div className={styles.analyticsCardsGrid3Col}>
                 <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-icon">🏥</div>
                   <div className="card-content">
                     <p className="card-label">Centers</p>
                     <p className="card-value">
@@ -712,7 +705,6 @@ function RegionManagement() {
                   </div>
                 </div>
                 <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-icon">👥</div>
                   <div className="card-content">
                     <p className="card-label">Total Staff</p>
                     <p className="card-value">
@@ -721,7 +713,6 @@ function RegionManagement() {
                   </div>
                 </div>
                 <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-icon">📋</div>
                   <div className="card-content">
                     <p className="card-label">Appointments</p>
                     <p className="card-value">

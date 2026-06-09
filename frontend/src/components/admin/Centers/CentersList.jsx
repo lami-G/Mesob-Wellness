@@ -97,7 +97,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
                       onClick={() => onDelete(center.id)}
                       title="Delete"
                     >
-                      🗑
+                      🗑️
                     </button>
                   )}
                 </td>

@@ -142,7 +142,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
                     onClick={() => handleDelete(user.id)}
                     title="Delete user"
                   >
-                    🗑
+                    🗑️
                   </button>
                 </td>
               </tr>

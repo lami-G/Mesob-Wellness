@@ -145,18 +145,26 @@
   min-width: 200px;
 }
 
-/* Registration Modal */
+/* ─────────────────────────────────────────────────────────────
+   REGISTRATION MODAL
+   Rendered via ReactDOM.createPortal into document.body so it
+   is completely outside the layout tree and cannot be clipped
+   by any ancestor overflow:hidden / overflow-y:auto.
+   ───────────────────────────────────────────────────────────── */
+
 .modalOverlay {
   position: fixed;
-  top: 80px;
+  top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1001;
+  justify-content: center;        /* was center — shift left with margin */
+  z-index: 99999;
+  padding: 0;
+  overflow: hidden;
 }
 
 .modalContent {
@@ -166,9 +174,34 @@
   max-width: 500px;
   width: 90%;
   max-height: 90vh;
-  overflow: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100000;
+  margin-left: 20%;                /* ← push it left of center */
+  margin-right: auto;
 }
+
+/* Scrollbar styling for the modal card */
+.modalContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #c0c7d4;
+  border-radius: 4px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: #8892a4;
+}
+
+/* ─── Modal internals ──────────────────────────────────────── */
 
 .modalHeader {
   display: flex;
@@ -190,6 +223,11 @@
   font-size: 1.5rem;
   cursor: pointer;
   color: #6B7280;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modalClose:hover {
@@ -218,9 +256,22 @@
   padding: 0.75rem 1rem;
   border: 2px solid #E5E7EB;
   border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: #3550A0;
 }
 
 .formInputError {
+  border-color: #EF4444;
+}
+
+.formInputError:focus {
   border-color: #EF4444;
 }
 
@@ -244,4 +295,3 @@
 .modalButtonSecondary {
   flex: 1;
 }
-

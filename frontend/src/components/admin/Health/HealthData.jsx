@@ -99,56 +99,56 @@ function HealthData() {
       <div className={styles.statsGrid}>
         {/* Vital Statistics */}
         <div className={styles.statCard}>
-          <h3>📊 Vital Records</h3>
+          <h3>Vital Records</h3>
           <div className={styles.statValue}>{stats.vitals?.total || 0}</div>
           <p className={styles.statLabel}>Total Records</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>❤️ Average Heart Rate</h3>
+          <h3>Average Heart Rate</h3>
           <div className={styles.statValue}>{stats.vitals?.averageHeartRate?.toFixed(0) || "-"}</div>
           <p className={styles.statLabel}>bpm</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>🌡️ Average Temperature</h3>
+          <h3>Average Temperature</h3>
           <div className={styles.statValue}>{stats.vitals?.averageTemperature?.toFixed(1) || "-"}</div>
           <p className={styles.statLabel}>°C</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>💨 Average O2 Saturation</h3>
+          <h3>Average O2 Saturation</h3>
           <div className={styles.statValue}>{stats.vitals?.averageOxygenSaturation?.toFixed(0) || "-"}</div>
           <p className={styles.statLabel}>%</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>⚖️ Average BMI</h3>
+          <h3>Average BMI</h3>
           <div className={styles.statValue}>{stats.vitals?.averageBMI?.toFixed(1) || "-"}</div>
           <p className={styles.statLabel}>kg/m²</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>🩸 Average Systolic BP</h3>
+          <h3>Average Systolic BP</h3>
           <div className={styles.statValue}>{stats.vitals?.averageSystolic?.toFixed(0) || "-"}</div>
           <p className={styles.statLabel}>mmHg</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>🩸 Average Diastolic BP</h3>
+          <h3>Average Diastolic BP</h3>
           <div className={styles.statValue}>{stats.vitals?.averageDiastolic?.toFixed(0) || "-"}</div>
           <p className={styles.statLabel}>mmHg</p>
         </div>
 
         {/* Wellness Statistics */}
         <div className={styles.statCard}>
-          <h3>💪 Wellness Plans</h3>
+          <h3>Wellness Plans</h3>
           <div className={styles.statValue}>{stats.wellness?.total || 0}</div>
           <p className={styles.statLabel}>Total Plans</p>
         </div>
 
         <div className={styles.statCard}>
-          <h3>✅ Active Plans</h3>
+          <h3>Active Plans</h3>
           <div className={styles.statValue}>{stats.wellness?.active || 0}</div>
           <p className={styles.statLabel}>Currently Active</p>
         </div>
@@ -179,7 +179,7 @@ function HealthData() {
       </div>
 
       <div className={styles.confidentialityNotice}>
-        <p>⚠️ <strong>Confidentiality Notice:</strong> This page displays only aggregated and anonymized health statistics. Individual patient health records are only accessible to authorized clinical staff.</p>
+        <p><strong>Confidentiality Notice:</strong> This page displays only aggregated and anonymized health statistics. Individual patient health records are only accessible to authorized clinical staff.</p>
       </div>
     </div>
   );

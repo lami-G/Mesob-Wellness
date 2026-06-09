@@ -18,10 +18,8 @@ import "./styles/tailwind.css";
 import "./styles/global.css";
 
 // OLD STYLES - Will be removed after migration
-import "./styles/layout.css";
 import "./styles/manager-dashboard.css";
 import "./styles/nurse-dashboard.css";
-import "./styles/nurse-dashboard-new.css";
 import "./styles/nurse-analytics.css";
 import "./styles/walkin.css";
 

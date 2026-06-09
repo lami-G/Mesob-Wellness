@@ -33,7 +33,7 @@ function AppointmentManagement({ baseFilters = {} }) {
   return (
     <div className="management-section">
       <div className="section-header">
-        <h2>📅 Appointment Management</h2>
+        <h2>Appointment Management</h2>
       </div>
 
       <FilterBar

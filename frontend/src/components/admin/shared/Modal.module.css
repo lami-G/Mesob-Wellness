@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
   backdrop-filter: blur(4px);
   scroll-behavior: smooth;
 }
@@ -46,8 +46,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  border-bottom: 2px solid rgba(139, 92, 246, 0.3);
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-bottom: 2px solid rgba(55, 81, 154, 0.3);
+  background: #37519A;
 }
 
 .modalHeader h3 {
@@ -91,7 +91,7 @@
 .formGroup label {
   font-size: 14px;
   font-weight: 600;
-  color: #1e40af;
+  color: #37519A;
   margin-bottom: 8px;
 }
 
@@ -112,8 +112,8 @@
 .formGroup select:focus,
 .formGroup textarea:focus {
   outline: none;
-  border-color: #1e40af;
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  border-color: #37519A;
+  box-shadow: 0 0 0 3px rgba(55, 81, 154, 0.1);
   background-color: #fafbff;
 }
 
@@ -186,15 +186,15 @@
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: #37519A;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+  box-shadow: 0 4px 12px rgba(55, 81, 154, 0.3);
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  background: #2d4080;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+  box-shadow: 0 6px 16px rgba(55, 81, 154, 0.4);
 }
 
 .btnPrimary:disabled {
@@ -204,14 +204,14 @@
 }
 
 .btnSecondary {
-  background-color: #e0e7ff;
-  color: #1e40af;
+  background-color: #e8edf7;
+  color: #37519A;
   border: 2px solid #c7d2fe;
 }
 
 .btnSecondary:hover {
-  background-color: #c7d2fe;
-  border-color: #a5b4fc;
+  background-color: #d4ddf0;
+  border-color: #b5c3e6;
 }
 
 .btnDelete {

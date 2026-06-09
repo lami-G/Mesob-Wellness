@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import StaffLayout from "../../layouts/StaffLayout";
 import BookingCalendar from "../../components/staff/Appointments/BookingCalendar";
 import MyAppointments from "../../components/staff/Appointments/MyAppointments";
 import HealthJourney from "../../components/staff/Health/HealthJourney";
@@ -8,7 +9,6 @@ import WellnessPlan from "../../components/staff/Wellness/WellnessPlan";
 import ProfileSection from "../../components/staff/Profile/ProfileSection";
 import FeedbackForm from "../../components/staff/Feedback/FeedbackForm";
 import LongitudinalRecords from "../../components/staff/Records/LongitudinalRecords";
-import styles from "./StaffDashboard.module.css";
 
 function StaffDashboard() {
   const { user, logout } = useAuth();
@@ -45,31 +45,43 @@ function StaffDashboard() {
     return () => window.removeEventListener('navigateToAppointments', handleNavigateToAppointments);
   }, []);
 
-  return (
-    <div className={styles.dashboardContainer}>
-      <div className={styles.dashboardContent}>
-        {activeTab === "appointments" && (
+  const renderContent = () => {
+    switch (activeTab) {
+      case "appointments":
+        return (
           <>
             <BookingCalendar />
             <MyAppointments />
           </>
-        )}
+        );
 
-        {activeTab === "health" && (
-          <>
-            <HealthJourney />
-          </>
-        )}
+      case "health":
+        return <HealthJourney />;
 
-        {activeTab === "wellness" && <WellnessPlan />}
+      case "wellness":
+        return <WellnessPlan />;
 
-        {activeTab === "records" && <LongitudinalRecords />}
+      case "records":
+        return <LongitudinalRecords />;
 
-        {activeTab === "feedback" && <FeedbackForm />}
+      case "feedback":
+        return <FeedbackForm />;
 
-        {activeTab === "profile" && <ProfileSection onLogout={logout} />}
-      </div>
-    </div>
+      case "profile":
+        return <ProfileSection onLogout={logout} />;
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <StaffLayout
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+    >
+      {renderContent()}
+    </StaffLayout>
   );
 }
 

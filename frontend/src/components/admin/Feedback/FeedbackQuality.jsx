@@ -19,13 +19,13 @@ function FeedbackQuality({ baseFilters = {} }) {
           className={clsx(styles.tabButton, activeTab === "list" && styles.tabButtonActive)}
           onClick={() => setActiveTab("list")}
         >
-          📋 Feedback List
+          Feedback List
         </button>
         <button
           className={clsx(styles.tabButton, activeTab === "analytics" && styles.tabButtonActive)}
           onClick={() => setActiveTab("analytics")}
         >
-          📊 Analytics
+          Analytics
         </button>
       </div>
 

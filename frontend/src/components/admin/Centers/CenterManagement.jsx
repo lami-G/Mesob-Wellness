@@ -170,7 +170,7 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
   return (
     <div className="management-section">
       <div className="section-header">
-        <h2>🏥 Center Management</h2>
+        <h2>Center Management</h2>
         <button className="btn-primary" onClick={handleCreate}>
           + Add Center
         </button>
@@ -193,8 +193,8 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
 
       <CenterFormModal
         isOpen={showModal}
-        title={selectedCenter ? "✏️ Edit Center" : "➕ Create New Center"}
-        submitLabel={selectedCenter ? "💾 Update Center" : "➕ Create Center"}
+        title={selectedCenter ? "Edit Center" : "Create New Center"}
+        submitLabel={selectedCenter ? "Update Center" : "Create Center"}
         formData={formData}
         setFormData={setFormData}
         formError={formError}

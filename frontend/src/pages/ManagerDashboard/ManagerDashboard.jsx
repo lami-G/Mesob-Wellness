@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { analyticsService } from '../../services/analyticsService';
-import AdminLayout from '../../layouts/AdminLayout';
+import ManagerLayout from '../../layouts/ManagerLayout';
 import Overview from '../../components/manager/Overview/Overview';
 import Capacity from '../../components/manager/Capacity/Capacity';
 import Analytics from '../../components/manager/Analytics/Analytics';
 import Users from '../../components/manager/Users/Users';
 import Audit from '../../components/manager/Audit/Audit';
 import Settings from '../../components/manager/Settings/Settings';
-import '../../styles/admin-layout.css';
 import '../../styles/admin-dashboard.css';
 import '../../styles/tooltip-fix.css';
 import styles from './ManagerDashboard.module.css';
@@ -170,20 +169,17 @@ const ManagerDashboard = () => {
   };
 
   return (
-    <AdminLayout 
+    <ManagerLayout 
       activeTab={activeTab} 
       onTabChange={setActiveTab}
-      dashboardType="manager"
-      user={user}
       capacityInfo={capacityInfo}
       staffCount={users.length}
       onRefresh={loadDashboardData}
       loading={loading}
-      lastUpdated={lastUpdated}
       error={error}
     >
       {renderContent()}
-    </AdminLayout>
+    </ManagerLayout>
   );
 };
 

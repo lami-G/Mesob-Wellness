@@ -141,7 +141,7 @@ function AppointmentsList({ filters, onDelete }) {
                     onClick={() => onDelete(apt.id)}
                     title="Delete"
                   >
-                    🗑
+                    🗑️
                   </button>
                 </td>
               </tr>

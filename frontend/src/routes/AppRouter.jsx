@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import MainLayout from "../components/MainLayout";
 import RoleBasedRoute from "../components/RoleBasedRoute";
 import MaintenanceMode from "../components/MaintenanceMode";
 import api from "../services/api";
@@ -91,9 +90,7 @@ function AppRouter() {
         path="/dashboard"
         element={
           <RoleBasedRoute allowedRoles={["STAFF"]}>
-            <MainLayout>
-              <StaffDashboard />
-            </MainLayout>
+            <StaffDashboard />
           </RoleBasedRoute>
         }
       />
@@ -101,9 +98,7 @@ function AppRouter() {
         path="/nurse"
         element={
           <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
-            <MainLayout>
-              <NurseDashboard />
-            </MainLayout>
+            <NurseDashboard />
           </RoleBasedRoute>
         }
       />

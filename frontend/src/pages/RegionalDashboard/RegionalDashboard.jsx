@@ -2,12 +2,11 @@
 import { useAuth } from "../../context/AuthContext";
 import { regionalService } from "../../services/regionalService";
 import { analyticsService } from "../../services/analyticsService";
-import AdminLayout from "../../layouts/AdminLayout";
+import RegionalLayout from "../../layouts/RegionalLayout";
 import Managers from "../../components/regional/Managers/Managers";
 import Centers from "../../components/regional/Centers/Centers";
 import Overview from "../../components/regional/Overview/Overview";
 import Performance from "../../components/regional/Performance/Performance";
-import "../../styles/admin-layout.css";
 import "../../styles/admin-dashboard.css";
 import "../../styles/manager-dashboard.css";
 import "../../styles/regional-dashboard-responsive.css";
@@ -213,23 +212,15 @@ const RegionalDashboard = () => {
   };
 
   return (
-    <AdminLayout
+    <RegionalLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      dashboardType="regional"
-      user={user}
       centerStats={centerStats}
       centersCount={centers.length}
-      onRefresh={loadDashboardData}
-      loading={loading}
-      lastUpdated={lastUpdated}
       error={error}
-      selectedCenter={selectedCenter}
-      setSelectedCenter={setSelectedCenter}
-      centers={centers}
     >
       {renderContent()}
-    </AdminLayout>
+    </RegionalLayout>
   );
 };
 

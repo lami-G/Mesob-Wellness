@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import AdminLayout from "../../layouts/AdminLayout";
+import FederalLayout from "../../layouts/FederalLayout";
 import { regionalService } from "../../services/regionalService";
 import { adminService } from "../../services/adminService";
 import { analyticsService } from "../../services/analyticsService";
@@ -11,7 +11,6 @@ import AdminUsers from "../AdminDashboard/AdminUsers";
 import DashboardMetrics from "../../components/admin/Dashboard/DashboardMetrics";
 import HealthConditionTrendsPanel from "../../components/analytics/HealthConditionTrendsPanel";
 import RegionEditModal from "../../components/admin/Regions/RegionEditModal";
-import "../../styles/admin-layout.css";
 import "../../styles/admin-dashboard.css";
 import "../../styles/admin-filters.css";
 import "../../styles/admin-tables.css";
@@ -1040,10 +1039,9 @@ function FederalDashboard() {
   };
 
   return (
-    <AdminLayout
+    <FederalLayout
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      dashboardType="federal"
       error={error}
     >
       {/* Show filters for overview, feedback and audit tabs */}
@@ -1158,7 +1156,7 @@ function FederalDashboard() {
           await loadFederalData();
         }}
       />
-    </AdminLayout>
+    </FederalLayout>
   );
 }
 

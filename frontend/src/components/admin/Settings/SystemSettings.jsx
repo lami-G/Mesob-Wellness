@@ -211,27 +211,24 @@ function SystemSettings() {
           <h2>System Health</h2>
           <div className={styles.healthMetricsGrid}>
             <div className={styles.healthMetricCard}>
-              <div className={styles.healthIcon}>⚡</div>
               <div className={styles.healthContent}>
                 <p className={styles.healthLabel}>API Response Time</p>
                 <p className={styles.healthValue}>245ms</p>
-                <span className={`${styles.healthStatus} ${styles.good}`}>✓ Good</span>
+                <span className={`${styles.healthStatus} ${styles.good}`}>✅ Good</span>
               </div>
             </div>
             <div className={styles.healthMetricCard}>
-              <div className={styles.healthIcon}>🔌</div>
               <div className={styles.healthContent}>
                 <p className={styles.healthLabel}>Database Connections</p>
                 <p className={styles.healthValue}>12/50</p>
-                <span className={`${styles.healthStatus} ${styles.good}`}>✓ Good</span>
+                <span className={`${styles.healthStatus} ${styles.good}`}>✅ Good</span>
               </div>
             </div>
             <div className={styles.healthMetricCard}>
-              <div className={styles.healthIcon}>⏱️</div>
               <div className={styles.healthContent}>
                 <p className={styles.healthLabel}>System Uptime</p>
                 <p className={styles.healthValue}>99.9%</p>
-                <span className={`${styles.healthStatus} ${styles.good}`}>✓ Good</span>
+                <span className={`${styles.healthStatus} ${styles.good}`}>✅ Good</span>
               </div>
             </div>
           </div>
@@ -240,14 +237,14 @@ function SystemSettings() {
         {/* Action Buttons */}
         <div className={styles.settingsActions}>
           <button onClick={handleSave} className={styles.btnSave} disabled={loading}>
-            {loading ? "⏳ Saving..." : "💾 Save Settings"}
+            {loading ? "Saving..." : "Save Settings"}
           </button>
           <button
             onClick={handleReset}
             className={styles.btnResetSettings}
             disabled={loading}
           >
-            ↻ Reload Settings
+            Reload Settings
           </button>
         </div>
       </div>

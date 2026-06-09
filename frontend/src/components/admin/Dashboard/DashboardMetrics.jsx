@@ -293,7 +293,6 @@ function DashboardMetrics({
       {/* ── TOP 3 STATIC KPI CARDS ── */}
       <div className={styles.staticTotalsRow}>
         <div className={styles.staticTotalCard}>
-          <div className={styles.staticIconWrap}>👥</div>
           <div className={styles.staticValue}>{totalUsers}</div>
           <div className={styles.staticLabel}>Total Users</div>
           <hr className={styles.staticDivider} />
@@ -312,13 +311,11 @@ function DashboardMetrics({
         </div>
 
         <div className={styles.staticTotalCard}>
-          <div className={styles.staticIconWrap}>🏥</div>
           <div className={styles.staticValue}>{totalCenters}</div>
           <div className={styles.staticLabel}>Total Centers</div>
         </div>
 
         <div className={styles.staticTotalCard}>
-          <div className={styles.staticIconWrap}>🗺️</div>
           <div className={styles.staticValue}>{totalRegions}</div>
           <div className={styles.staticLabel}>Total Regions</div>
         </div>
@@ -353,7 +350,6 @@ function DashboardMetrics({
       {/* ── BOTTOM 4 ACTIVITY CARDS ── */}
       <div className={styles.metricsGrid}>
         <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>📅</span>
           <div className={styles.metricTitle}>Appointments</div>
           <div className={styles.metricValue}>{totalAppointments}</div>
           <div className={styles.metricPeriod}>{getPeriodLabel()}</div>
@@ -361,7 +357,6 @@ function DashboardMetrics({
         </div>
 
         <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>🚶</span>
           <div className={styles.metricTitle}>Walk-ins</div>
           <div className={styles.metricValue}>{totalWalkIns}</div>
           <div className={styles.metricPeriod}>{getPeriodLabel()}</div>
@@ -369,7 +364,6 @@ function DashboardMetrics({
         </div>
 
         <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>⭐</span>
           <div className={styles.metricTitle}>Feedback</div>
           <div className={styles.metricValue}>{totalFeedback}</div>
           <div className={styles.metricPeriod}>{getPeriodLabel()}</div>
@@ -377,7 +371,6 @@ function DashboardMetrics({
         </div>
 
         <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>🩺</span>
           <div className={styles.metricTitle}>Patients served</div>
           <div className={styles.metricValue}>{totalPatientsServed}</div>
           <div className={styles.metricPeriod}>{getPeriodLabel()}</div>
