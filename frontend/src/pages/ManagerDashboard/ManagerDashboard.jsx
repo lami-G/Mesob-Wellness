@@ -94,10 +94,10 @@ const ManagerDashboard = () => {
   const tabs = [
     { id: 'overview',  label: '📊 Overview'  },
     { id: 'capacity',  label: '📈 Capacity'  },
-    { id: 'analytics', label: '📊 Analytics' },
-    { id: 'users',     label: `👥 Staff (${users.length})`     },
-    { id: 'audit',     label: '🔍 Audit'     },
-    { id: 'settings',  label: '⚙️ Settings'  },
+    { id: 'analytics', label: 'Analytics' },
+    { id: 'users',     label: `Staff (${users.length})`     },
+    { id: 'audit',     label: 'Audit'     },
+    { id: 'settings',  label: 'Settings'  },
   ];
 
   // Capacity urgency color
@@ -152,7 +152,7 @@ const ManagerDashboard = () => {
       case 'audit':
         return (
           <div className="dashboard-section">
-            <h2>🔍 Audit & Activity Logs</h2>
+            <h2>Audit & Activity Logs</h2>
             <Audit loading={loading} logs={auditLogs} />
           </div>
         );

@@ -124,6 +124,22 @@
   margin-bottom: 1rem;
 }
 
+/* Search Input Group - Fixed width, not full width */
+.inlineSearch :global(.search-input-group) {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.inlineSearch :global(.search-input-group) input[type="text"] {
+  width: 300px;
+}
+
+.inlineSearch :global(.search-input-group) button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .searchResultsInline {
   margin-top: 1rem;
 }

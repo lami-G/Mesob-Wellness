@@ -40,8 +40,8 @@ function QuickHistoryModal({ customerId, customerName, onClose, onViewDetails })
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content quick-history-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3>📚 Quick History - {customerName}</h3>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <h3>Quick History - {customerName}</h3>
+          <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
         {error && <div className="alert alert-error">{error}</div>}

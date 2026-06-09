@@ -360,7 +360,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                   disabled={generatingPDF}
                   className="btn btn-primary btn-small"
                 >
-                  {generatingPDF ? '📄 Generating...' : '📄 Download Report'}
+                  {generatingPDF ? 'Generating...' : 'Download Report'}
                 </button>
               )}
               {/* For appointment patients: show download button */}
@@ -371,7 +371,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                     disabled={generatingPDF}
                     className="btn btn-primary btn-small"
                   >
-                    {generatingPDF ? '📄 Generating...' : '📄 Download Report'}
+                    {generatingPDF ? 'Generating...' : 'Download Report'}
                   </button>
                   {/* Only show "Mark as Completed" button for staff with appointments */}
                   {onBackToQueue && (
@@ -380,7 +380,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                       disabled={loading}
                       className="btn btn-secondary btn-small"
                     >
-                      {loading ? '⏳ Processing...' : '✓ Completed'}
+                      {loading ? 'Processing...' : 'Completed'}
                     </button>
                   )}
                 </>
@@ -453,7 +453,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           
           {suggestedPlan && (
             <p className={styles.aiSuggestionNote}>
-              💡 AI-suggested plan based on vitals. Please review and edit as needed.
+              AI-suggested plan based on vitals. Please review and edit as needed.
             </p>
           )}
         </div>
@@ -472,7 +472,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           
           {conditionsAutoFilled && (
             <p className={styles.autoFilledNote}>
-              ✓ Auto-filled from latest vitals. You can edit these conditions.
+              Auto-filled from latest vitals. You can edit these conditions.
             </p>
           )}
           
@@ -542,7 +542,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
       {/* Customer Search Section */}
       {!selectedCustomerId ? (
         <div className={styles.inlineSearch}>
-          <h4>🔍 Search Customer</h4>
+          <h4>Search Customer</h4>
           <p className={styles.searchDescription}>
             Search by name, email, or customer ID
           </p>
@@ -563,7 +563,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
                 className="btn btn-primary"
                 disabled={searching || !searchTerm.trim()}
               >
-                {searching ? 'Searching...' : '🔍 Search'}
+                {searching ? 'Searching...' : 'Search'}
               </button>
             </div>
           </form>
@@ -645,7 +645,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         </div>
 
         <div className="form-group">
-          <label className="form-label">🥗 Nutrition Recommendations</label>
+          <label className="form-label">Nutrition Recommendations</label>
           <textarea
             name="nutritionRecommendations"
             value={formData.nutritionRecommendations}
@@ -658,7 +658,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         </div>
 
         <div className="form-group">
-          <label className="form-label">🏃 Exercise Recommendations</label>
+          <label className="form-label">Exercise Recommendations</label>
           <textarea
             name="exerciseRecommendations"
             value={formData.exerciseRecommendations}
@@ -671,7 +671,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         </div>
 
         <div className="form-group">
-          <label className="form-label">🧘 Stress Management Advice</label>
+          <label className="form-label">Stress Management Advice</label>
           <textarea
             name="stressManagementAdvice"
             value={formData.stressManagementAdvice}
@@ -684,7 +684,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         </div>
 
         <div className="form-group">
-          <label className="form-label">📍 Goals (one per line)</label>
+          <label className="form-label">Goals (one per line)</label>
           <textarea
             name="goals"
             value={formData.goals}
@@ -715,7 +715,7 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
           className="btn btn-primary btn-large"
           disabled={loading || !selectedCustomerId}
         >
-          {loading ? 'Creating...' : '✓ Create Wellness Plan'}
+          {loading ? 'Creating...' : 'Create Wellness Plan'}
         </button>
       </form>
     </div>

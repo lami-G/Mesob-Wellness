@@ -91,12 +91,12 @@ function WellnessPlanTemplates({ onSelectTemplate, onClose }) {
                 <h4>{template.title}</h4>
                 <p className={styles.templateDuration}>Duration: {template.duration} days</p>
                 <div className={styles.templatePreview}>
-                  <p><strong>🥗 Nutrition:</strong> {template.nutritionRecommendations.substring(0, 80)}...</p>
-                  <p><strong>🏃 Exercise:</strong> {template.exerciseRecommendations.substring(0, 80)}...</p>
-                  <p><strong>🧘 Stress:</strong> {template.stressManagementAdvice.substring(0, 80)}...</p>
+                  <p><strong>Nutrition:</strong> {template.nutritionRecommendations.substring(0, 80)}...</p>
+                  <p><strong>Exercise:</strong> {template.exerciseRecommendations.substring(0, 80)}...</p>
+                  <p><strong>Stress:</strong> {template.stressManagementAdvice.substring(0, 80)}...</p>
                 </div>
                 {selectedTemplate?.id === template.id && (
-                  <div className={styles.selectedBadge}>✓ Selected</div>
+                  <div className={styles.selectedBadge}>Selected</div>
                 )}
               </div>
             ))}

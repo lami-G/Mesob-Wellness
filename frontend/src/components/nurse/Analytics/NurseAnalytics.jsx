@@ -794,7 +794,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
   if (loading) {
     return (
       <div className={`card ${styles.analyticsContainer}`}>
-        <h2>📊 Analytics</h2>
+        <h2>Analytics</h2>
         <p className={styles.loading}>Loading analytics...</p>
       </div>
     );
@@ -834,7 +834,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             className="btn btn-secondary"
             disabled={loading}
           >
-            🔄 Refresh
+            Refresh
           </button>
         </div>
       </div>
@@ -1099,7 +1099,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       title: function(context) {
                         const label = context[0].label;
                         const isHighlighted = context[0].dataIndex === chartData.conditionTrends.highlightedIndex;
-                        return isHighlighted ? `${label} ⭐` : label;
+                        return isHighlighted ? `${label} (Current)` : label;
                       },
                       label: function(context) {
                         const label = context.dataset.label || '';

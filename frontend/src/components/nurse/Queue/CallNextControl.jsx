@@ -164,7 +164,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
 
   return (
     <div className={`card ${styles.callNextControl}`}>
-      <h3>📢 Call Next & Display</h3>
+      <h3>Call Next & Display</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
@@ -190,7 +190,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
                   onClick={handleCallNext}
                   disabled={loading}
                 >
-                  📢 Call Next
+                  Call Next
                 </button>
               ) : (
                 <div style={{ display: 'flex', gap: '1rem' }}>
@@ -200,7 +200,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
                     disabled={loading}
                     style={{ flex: 1 }}
                   >
-                    💉 Record Vitals
+                    Record Vitals
                   </button>
                   <button
                     className="btn btn-danger btn-large"
@@ -208,7 +208,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
                     disabled={loading}
                     style={{ flex: 1 }}
                   >
-                    ❌ Mark Absent
+                    Mark Absent
                   </button>
                 </div>
               )}
@@ -216,13 +216,13 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
 
             <div className={styles.customerInfo}>
               <p><strong>Status:</strong> {currentCustomer.status}</p>
-              <p><strong>Type:</strong> {currentCustomer.type === 'ONLINE' ? '📅 Online' : '🚶 Walk-in'}</p>
+              <p><strong>Type:</strong> {currentCustomer.type === 'ONLINE' ? 'Online' : 'Walk-in'}</p>
               <p><strong>Check-in:</strong> {new Date(currentCustomer.checkInTime).toLocaleTimeString()}</p>
             </div>
           </>
         ) : (
           <div className={styles.noCustomer}>
-            <p className={styles.emptyText}>✓ No customers waiting</p>
+            <p className={styles.emptyText}>No customers waiting</p>
             <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
               All customers are being served or queue is empty
             </p>
@@ -232,7 +232,7 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
               disabled={loading}
               style={{ marginTop: '1rem' }}
             >
-              🔄 Refresh
+              Refresh
             </button>
           </div>
         )}

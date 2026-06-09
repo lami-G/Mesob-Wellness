@@ -142,10 +142,11 @@
 .customerInputGroup {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .customerInputGroup .form-input {
-  flex: 1;
+  width: 300px;
 }
 
 /* Search Button Override for White Background */
@@ -194,6 +195,11 @@
 .searchInputGroup {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+}
+
+.searchInputGroup input[type="text"] {
+  width: 300px;
 }
 
 .searchResultsInline {
@@ -265,11 +271,6 @@
 
 .customerInfo p {
   margin: 0.25rem 0;
-}
-
-.customerInputGroup {
-  display: flex;
-  gap: 0.5rem;
 }
 
 .glucoseTypeSelect {

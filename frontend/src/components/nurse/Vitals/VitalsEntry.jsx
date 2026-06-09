@@ -45,7 +45,7 @@ function PostVitalsActions({ vitals, appointmentId, onSuccess, onStartNewRecord,
   return (
     <div ref={actionsRef} className={styles.postVitalsActions}>
       <p className={styles.successMessage}>
-        ✓ Vitals recorded successfully for {customerInfo.fullName}!
+        Vitals recorded successfully for {customerInfo.fullName}!
         {appointmentId && ' (Appointment)'}
         {!appointmentId && ' (Walk-in)'}
       </p>

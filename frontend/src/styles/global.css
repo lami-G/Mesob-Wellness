@@ -337,3 +337,66 @@ select option {
   color: #1f2937 !important;
   background-color: #ffffff !important;
 }
+
+/* ========================================
+   BUTTON VISIBILITY FIXES
+   ======================================== */
+/* Fix for buttons with white text on white background */
+.btn-secondary,
+button[class*="secondary"],
+button[class*="Secondary"] {
+  background: #e5e7eb !important;
+  color: #1f2937 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.btn-secondary:hover:not(:disabled),
+button[class*="secondary"]:hover:not(:disabled),
+button[class*="Secondary"]:hover:not(:disabled) {
+  background: #d1d5db !important;
+  color: #111827 !important;
+  border-color: #9ca3af !important;
+}
+
+/* Fix for any button that might have white text on white background */
+button[style*="color: white"][style*="background: white"],
+button[style*="color: #fff"][style*="background: #fff"],
+button[style*="color: #ffffff"][style*="background: #ffffff"] {
+  background: #213D8D !important;
+  color: #ffffff !important;
+}
+
+/* Force visibility for action buttons */
+.btn-action,
+.btn-edit,
+.btn-delete,
+.btn-view {
+  min-height: 36px;
+  font-weight: 600;
+}
+
+.btn-action:not([class*="primary"]):not([class*="danger"]) {
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.btn-action:not([class*="primary"]):not([class*="danger"]):hover {
+  background: #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+/* ========================================
+   HIDE ALL EMOJIS GLOBALLY
+   ======================================== */
+/* Hide common emoji patterns in text */
+button::before,
+h1::before, h2::before, h3::before, h4::before, h5::before, h6::before,
+span::before, div::before, p::before, label::before {
+  content: none !important;
+}
+
+/* Remove emoji characters using unicode ranges */
+* {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+}

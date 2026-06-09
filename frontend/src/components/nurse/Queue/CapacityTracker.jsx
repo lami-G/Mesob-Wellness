@@ -80,7 +80,7 @@ function CapacityTracker() {
   if (!capacity) {
     return (
       <div className={`card ${styles.capacityTracker}`}>
-        <h3>📊 Daily Capacity</h3>
+        <h3>Daily Capacity</h3>
         <p className={styles.loadingText}>Loading...</p>
       </div>
     );
@@ -118,7 +118,7 @@ function CapacityTracker() {
 
   return (
     <div className={`card ${styles.capacityTracker}`}>
-      <h3>📊 Daily Capacity</h3>
+      <h3>Daily Capacity</h3>
 
       {error && <div className="alert alert-error">{error}</div>}
 
@@ -148,10 +148,10 @@ function CapacityTracker() {
 
       <div className={styles.capacityStatus}>
         <span className={`${styles.statusBadge} ${getStatusClass()}`}>
-          {getCapacityStatus() === 'full' && '🔴 FULL'}
-          {getCapacityStatus() === 'high' && '🟠 HIGH'}
-          {getCapacityStatus() === 'medium' && '🔵 MEDIUM'}
-          {getCapacityStatus() === 'low' && '🟢 AVAILABLE'}
+          {getCapacityStatus() === 'full' && 'FULL'}
+          {getCapacityStatus() === 'high' && 'HIGH'}
+          {getCapacityStatus() === 'medium' && 'MEDIUM'}
+          {getCapacityStatus() === 'low' && 'AVAILABLE'}
         </span>
       </div>
 
@@ -160,7 +160,7 @@ function CapacityTracker() {
         onClick={fetchCapacity}
         disabled={loading}
       >
-        🔄 Refresh
+        Refresh
       </button>
     </div>
   );

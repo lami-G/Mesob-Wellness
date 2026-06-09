@@ -172,7 +172,7 @@ function RegisterWalkIn({ onSuccess }) {
       {/* Search Section */}
       <div>
         <h3 className={styles.searchHeader}>
-          🔍 Search Patient
+          Search Patient
         </h3>
 
         <form onSubmit={handleSearch} className={styles.searchForm}>
@@ -188,7 +188,7 @@ function RegisterWalkIn({ onSuccess }) {
             className={clsx('btn btn-primary', styles.searchButton)}
             disabled={searching}
           >
-            {searching ? '⏳ Searching...' : '🔍 Search'}
+            {searching ? 'Searching...' : 'Search'}
           </button>
         </form>
 
@@ -215,7 +215,7 @@ function RegisterWalkIn({ onSuccess }) {
                       styles.patientBadge,
                       patient.role === 'EXTERNAL_PATIENT' ? styles.badgeExternal : styles.badgeStaff
                     )}>
-                      {patient.role === 'EXTERNAL_PATIENT' ? '🟠 External' : '🔵 Staff'}
+                      {patient.role === 'EXTERNAL_PATIENT' ? 'External' : 'Staff'}
                     </span>
                   </div>
                   <button
@@ -393,7 +393,7 @@ function RegisterWalkIn({ onSuccess }) {
                   className={clsx('btn btn-primary', styles.modalButtonPrimary)}
                   disabled={registering}
                 >
-                  {registering ? '⏳ Registering...' : '✓ Register'}
+                  {registering ? 'Registering...' : 'Register'}
                 </button>
                 <button
                   type="button"

@@ -103,10 +103,10 @@ function CustomerHistoryView({ customerId }) {
   if (!selectedCustomerId) {
     return (
       <div className="card customer-history">
-        <h3>📚 Customer History</h3>
+        <h3>Customer History</h3>
         
         <div className={styles.inlineSearch}>
-          <h4>🔍 Search Customer</h4>
+          <h4>Search Customer</h4>
           <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
             Search by name, email, or customer ID
           </p>
@@ -127,7 +127,7 @@ function CustomerHistoryView({ customerId }) {
                 className="btn btn-primary"
                 disabled={searching || !searchTerm.trim()}
               >
-                {searching ? 'Searching...' : '🔍 Search'}
+                {searching ? 'Searching...' : 'Search'}
               </button>
             </div>
           </form>
@@ -165,7 +165,7 @@ function CustomerHistoryView({ customerId }) {
   return (
     <div className="card customer-history">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h3>📚 Customer History</h3>
+        <h3>Customer History</h3>
         <button
           type="button"
           onClick={handleClearCustomer}
@@ -188,13 +188,13 @@ function CustomerHistoryView({ customerId }) {
           className={clsx(styles.tabBtn, activeTab === 'vitals' && 'active')}
           onClick={() => setActiveTab('vitals')}
         >
-          💉 Vitals ({vitalsHistory.length})
+          Vitals ({vitalsHistory.length})
         </button>
         <button
           className={clsx(styles.tabBtn, activeTab === 'plans' && 'active')}
           onClick={() => setActiveTab('plans')}
         >
-          🎯 Plans ({wellnessPlans.length})
+          Plans ({wellnessPlans.length})
         </button>
       </div>
 
@@ -298,7 +298,7 @@ function CustomerHistoryView({ customerId }) {
         onClick={fetchCustomerHistory}
         disabled={loading}
       >
-        🔄 Refresh
+        Refresh
       </button>
     </div>
   );

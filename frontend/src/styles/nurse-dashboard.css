@@ -1104,10 +1104,16 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  align-items: center;
 }
 
 .search-input-group .form-input {
-  flex: 1;
+  width: 300px;
+}
+
+.search-input-group button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .search-results {
@@ -1169,10 +1175,16 @@
 .customer-input-group {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
 }
 
 .customer-input-group .form-input {
-  flex: 1;
+  width: 300px;
+}
+
+.customer-input-group button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Wellness Plan Templates Modal */
@@ -1925,4 +1937,58 @@
   text-align: center;
   color: #6b7280;
   padding: 20px;
+}
+
+/* ========================================
+   VISIBILITY FIXES FOR HOVER CARDS
+   ======================================== */
+/* Fix dark background card text visibility */
+.nurse-kpi-card,
+.nurse-info-card,
+[class*="dark-card"],
+[style*="background: #213D8D"],
+[style*="background: #284394"],
+[style*="background: #1e"],
+[style*="background: #2d3"] {
+  color: #ffffff !important;
+}
+
+.nurse-kpi-card *,
+.nurse-info-card *,
+[class*="dark-card"] * {
+  color: inherit;
+}
+
+/* Ensure all text in dark backgrounds is white */
+.nurse-kpi-label,
+.nurse-kpi-value,
+.nurse-kpi-badge,
+[class*="kpi-label"],
+[class*="kpi-value"] {
+  color: #ffffff !important;
+}
+
+/* Fix for capacity/stats display */
+[class*="capacity"],
+[class*="stats"],
+[class*="metric"] {
+  color: #1f2937;
+}
+
+[class*="capacity"][style*="#213"],
+[class*="capacity"][style*="#284"],
+[class*="stats"][style*="#213"],
+[class*="stats"][style*="#284"],
+[class*="metric"][style*="#213"],
+[class*="metric"][style*="#284"] {
+  color: #ffffff !important;
+}
+
+[class*="capacity"][style*="#213"] *,
+[class*="capacity"][style*="#284"] *,
+[class*="stats"][style*="#213"] *,
+[class*="stats"][style*="#284"] *,
+[class*="metric"][style*="#213"] *,
+[class*="metric"][style*="#284"] * {
+  color: #ffffff !important;
 }

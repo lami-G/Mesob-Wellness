@@ -211,7 +211,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
                       onClick={() => handleSendEmail(item.appointmentId, item.customerName, item.customerEmail)}
                       title="Send email reminder to customer"
                     >
-                      📧 Send Email
+                      Send Email
                     </button>
                     <button 
                       className="btn btn-small btn-secondary"
@@ -233,7 +233,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
         onClick={fetchQueue}
         disabled={loading}
       >
-        🔄 Refresh Queue
+        Refresh Queue
       </button>
 
       {showHistoryModal && selectedCustomerForHistory && (
