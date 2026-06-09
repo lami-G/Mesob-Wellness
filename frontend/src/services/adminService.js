@@ -126,6 +126,7 @@ export const adminService = {
     if (filters.user) params.append("user", filters.user);
     if (filters.action) params.append("action", filters.action);
     if (filters.resource) params.append("resource", filters.resource);
+    if (filters.role) params.append("role", filters.role);
     if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
     if (filters.dateTo) params.append("dateTo", filters.dateTo);
     if (filters.page) params.append("page", filters.page);

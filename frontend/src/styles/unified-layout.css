@@ -149,7 +149,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .mesob-header {
-  background: #37519A;
+  background: #213D8D;
   height: 80px;
   min-height: 80px;
   display: flex;
@@ -449,7 +449,7 @@
 .admin-sidebar,
 .mesob-sidebar {
   width: 220px;
-  background: #37519A;
+  background: #213D8D;
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -963,7 +963,7 @@
 }
 
 .admin-header {
-  background: #37519A;
+  background: #213D8D;
   height: 80px;
   min-height: 80px;
   display: flex;

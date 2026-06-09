@@ -70,7 +70,7 @@ function AdminDashboard() {
     }));
   };
 
-  const shouldShowFilters = ["dashboard", "feedback", "audit"].includes(activeTab);
+  const shouldShowFilters = ["dashboard"].includes(activeTab);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -174,10 +174,10 @@ function AdminDashboard() {
               }}
               className="region-select"
             >
-              <option value="all" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>All Regions</option>
+              <option value="all">All Regions</option>
               {regions.map((region) => (
-                <option key={region.id} value={region.id} style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
-                  {region.name}
+                <option key={region.id || region} value={region.id || region}>
+                  {region.name || region}
                 </option>
               ))}
             </select>

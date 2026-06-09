@@ -405,8 +405,8 @@
 }
 
 .btn-primary:hover {
-  background: #f5a623;
-  color: #213d8d;
+  background: #213D8D;
+  color: #f5a623;
   transform: translateY(-1px);
 }
 

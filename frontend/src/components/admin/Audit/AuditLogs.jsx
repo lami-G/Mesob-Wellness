@@ -7,6 +7,8 @@ function AuditLogs({ baseFilters = {} }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [regions, setRegions] = useState([]);
+  const [centers, setCenters] = useState([]);
   const [filters, setFilters] = useState({
     region: "",
     center: "",
@@ -26,6 +28,39 @@ function AuditLogs({ baseFilters = {} }) {
   useEffect(() => {
     setFilters((prev) => ({ ...prev, ...baseFilters }));
   }, [JSON.stringify(baseFilters)]);
+
+  useEffect(() => {
+    // Fetch regions on mount
+    fetchRegions();
+  }, []);
+
+  useEffect(() => {
+    // Fetch centers when region changes
+    if (filters.region) {
+      fetchCenters(filters.region);
+    } else {
+      setCenters([]);
+    }
+  }, [filters.region]);
+
+  const fetchRegions = async () => {
+    try {
+      const data = await adminService.getRegions();
+      setRegions(data);
+    } catch (err) {
+      console.error("Error fetching regions:", err);
+    }
+  };
+
+  const fetchCenters = async (region) => {
+    try {
+      const data = await adminService.getCentersByRegion(region);
+      setCenters(data);
+    } catch (err) {
+      console.error("Error fetching centers:", err);
+      setCenters([]);
+    }
+  };
 
   const fetchLogs = async () => {
     try {
@@ -47,7 +82,14 @@ function AuditLogs({ baseFilters = {} }) {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setFilters((prev) => {
+      const newFilters = { ...prev, [name]: value };
+      // Clear center filter when region changes
+      if (name === 'region') {
+        newFilters.center = '';
+      }
+      return newFilters;
+    });
     setPage(1);
   };
 
@@ -85,6 +127,49 @@ function AuditLogs({ baseFilters = {} }) {
       </div>
 
       <div className={styles.filters}>
+        <select
+          name="region"
+          value={filters.region}
+          onChange={handleFilterChange}
+          className={styles.filterSelect}
+        >
+          <option value="">All Regions</option>
+          {regions.map((region) => (
+            <option key={region} value={region}>
+              {region}
+            </option>
+          ))}
+        </select>
+        <select
+          name="center"
+          value={filters.center}
+          onChange={handleFilterChange}
+          className={styles.filterSelect}
+          disabled={!filters.region}
+        >
+          <option value="">All Centers</option>
+          {centers.map((center) => (
+            <option key={center.id} value={center.name}>
+              {center.name}
+            </option>
+          ))}
+        </select>
+        <input
+          type="date"
+          name="dateFrom"
+          placeholder="Date From"
+          value={filters.dateFrom}
+          onChange={handleFilterChange}
+          className={styles.filterInput}
+        />
+        <input
+          type="date"
+          name="dateTo"
+          placeholder="Date To"
+          value={filters.dateTo}
+          onChange={handleFilterChange}
+          className={styles.filterInput}
+        />
         <input
           type="text"
           name="search"
@@ -127,27 +212,13 @@ function AuditLogs({ baseFilters = {} }) {
         >
           <option value="">All Roles</option>
           <option value="SYSTEM_ADMIN">System Admin</option>
-          <option value="REGIONAL_MANAGER">Regional Manager</option>
-          <option value="CENTER_MANAGER">Center Manager</option>
-          <option value="NURSE">Nurse</option>
-          <option value="RECEPTIONIST">Receptionist</option>
+          <option value="FEDERAL_OFFICE">Federal Office</option>
+          <option value="REGIONAL_OFFICE">Regional Office</option>
+          <option value="MANAGER">Manager</option>
+          <option value="NURSE_OFFICER">Nurse Officer</option>
           <option value="STAFF">Staff</option>
           <option value="EXTERNAL_PATIENT">External Patient</option>
         </select>
-        <input
-          type="date"
-          name="dateFrom"
-          value={filters.dateFrom}
-          onChange={handleFilterChange}
-          className={styles.filterInput}
-        />
-        <input
-          type="date"
-          name="dateTo"
-          value={filters.dateTo}
-          onChange={handleFilterChange}
-          className={styles.filterInput}
-        />
         <button onClick={handleResetFilters} className={styles.btnReset}>
           Reset
         </button>

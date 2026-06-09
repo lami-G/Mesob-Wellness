@@ -784,8 +784,11 @@ const AdminService = {
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      const userWhere: any = {};
+      if (filters.region) userWhere.center = { region: filters.region };
+      if (filters.center) userWhere.centerId = filters.center;
+      if (Object.keys(userWhere).length > 0) where.user = userWhere;
+
       if (filters.npsScore !== undefined) where.npsScore = filters.npsScore;
       if (filters.feedbackType) where.feedbackType = filters.feedbackType;
       if (filters.dateFrom || filters.dateTo) {
@@ -833,10 +836,15 @@ const AdminService = {
 
       const where: any = {};
 
+      const userWhere: any = {};
+      if (filters.region) userWhere.center = { region: filters.region };
+      if (filters.center) userWhere.centerId = filters.center;
+      if (filters.role) userWhere.role = filters.role;
+      if (Object.keys(userWhere).length > 0) where.user = userWhere;
+
       if (filters.user) where.userId = filters.user;
       if (filters.action) where.action = filters.action;
       if (filters.resource) where.resource = filters.resource;
-      if (filters.role) where.user = { role: filters.role };
       if (filters.dateFrom || filters.dateTo) {
         where.timestamp = {};
         if (filters.dateFrom) where.timestamp.gte = filters.dateFrom;

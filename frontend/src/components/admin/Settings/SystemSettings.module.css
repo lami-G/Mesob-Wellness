@@ -240,7 +240,9 @@
 }
 
 .btnSave:hover:not(:disabled) {
-  background: #2d4080;
+  background: #213D8D;
+  color: #f5a623;
+  transform: translateY(-2px);
 }
 
 .btnSave:disabled {

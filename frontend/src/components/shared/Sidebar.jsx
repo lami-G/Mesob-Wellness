@@ -21,7 +21,7 @@ function Sidebar({
   const capColor = usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e';
 
   return (
-    <aside className={`admin-sidebar mesob-sidebar ${isOpen ? 'open' : 'closed'}`}>
+    <aside className={`admin-sidebar mesob-sidebar ${!isOpen ? 'collapsed' : ''}`}>
       
       {/* ── Logo Block - Centered, Stacked Layout ── */}
       <div className="sidebar-logo-section">

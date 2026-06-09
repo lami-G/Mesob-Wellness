@@ -404,7 +404,9 @@ function DashboardMetrics({
           </div>
         ) : healthData ? (
           <>
-            <div className={styles.healthScoreOnly}>
+            {/* 2x2 Grid Layout */}
+            <div className={styles.healthCardsGrid}>
+              {/* Overall Health Score - Large Card */}
               <div className={styles.healthScoreCard}>
                 <h4>Overall Health Score</h4>
                 <div className={styles.scoreDisplay}>
@@ -415,20 +417,21 @@ function DashboardMetrics({
                             healthData.highRiskCount) /
                             healthData.totalVitalsRecorded) *
                             100
-                        : 0,
+                        : 100,
                     )}
                   </div>
                   <div className={styles.scoreLabel}>/100</div>
                 </div>
               </div>
-            </div>
 
-            <div className={styles.healthStatsExpandedGrid}>
-              <div className={styles.healthStatExpandedCard}>
+              {/* Total Employees */}
+              <div className={styles.healthStatCard}>
                 <div className={styles.statLabel}>Total Employees</div>
                 <div className={styles.statValue}>{healthData.totalPatients}</div>
               </div>
-              <div className={styles.healthStatExpandedCard}>
+
+              {/* Healthy % */}
+              <div className={styles.healthStatCard}>
                 <div className={styles.statLabel}>Healthy %</div>
                 <div className={`${styles.statValue} ${styles.statValueHealthy}`}>
                   {healthData.totalVitalsRecorded > 0
@@ -439,12 +442,14 @@ function DashboardMetrics({
                           healthData.totalVitalsRecorded) *
                           100,
                       )
-                    : 0}
+                    : 100}
                   %
                 </div>
-                <div className={styles.statSublabel}>{getPeriodLabel()}</div>
+                <div className={styles.statSublabel}>Today</div>
               </div>
-              <div className={styles.healthStatExpandedCard}>
+
+              {/* At-Risk % */}
+              <div className={styles.healthStatCard}>
                 <div className={styles.statLabel}>At-Risk %</div>
                 <div className={`${styles.statValue} ${styles.statValueAtRisk}`}>
                   {healthData.totalVitalsRecorded > 0
@@ -456,9 +461,11 @@ function DashboardMetrics({
                     : 0}
                   %
                 </div>
-                <div className={styles.statSublabel}>{getPeriodLabel()}</div>
+                <div className={styles.statSublabel}>Today</div>
               </div>
-              <div className={styles.healthStatExpandedCard}>
+
+              {/* Critical % */}
+              <div className={styles.healthStatCard}>
                 <div className={styles.statLabel}>Critical %</div>
                 <div className={`${styles.statValue} ${styles.statValueCritical}`}>
                   {healthData.totalVitalsRecorded > 0

@@ -1044,10 +1044,8 @@ function FederalDashboard() {
       onTabChange={setActiveTab}
       error={error}
     >
-      {/* Show filters for overview, feedback and audit tabs */}
-      {(activeTab === "overview" ||
-        activeTab === "feedback" ||
-        activeTab === "audit") && (
+      {/* Show filters for overview tab */}
+      {(activeTab === "overview") && (
         <div className={`card ${styles.filtersCard}`}>
           <div className={styles.filtersGrid}>
             <div className={styles.filterItem}>

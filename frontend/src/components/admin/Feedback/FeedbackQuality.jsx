@@ -9,11 +9,6 @@ function FeedbackQuality({ baseFilters = {} }) {
 
   return (
     <div className={styles.feedbackQualityPage}>
-      <div className={styles.pageHeader}>
-        <h1>Feedback & Quality Management</h1>
-        <p>Monitor customer satisfaction and service quality</p>
-      </div>
-
       <div className={styles.tabs}>
         <button
           className={clsx(styles.tabButton, activeTab === "list" && styles.tabButtonActive)}

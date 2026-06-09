@@ -97,9 +97,10 @@ body::before {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: #213D8D;
+  color: #f5a623;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(33, 61, 141, 0.4);
 }
 
 .btn-secondary {
@@ -314,4 +315,25 @@ body::before {
   overflow-x: auto;
   font-size: 0.85rem;
   color: #475569;
+}
+
+/* ========================================
+   SELECT DROPDOWN OPTIONS FIX
+   ======================================== */
+/* Ensure all select dropdown options have dark text for visibility */
+select {
+  color: #374151;
+}
+
+select option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+  padding: 0.5rem;
+  font-weight: 500;
+}
+
+/* Specific fix for region select */
+.region-select option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
 }

@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 function Header({ title, onToggleSidebar, dashboardType }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
   const userMenuRef = useRef(null);
   const notifRef = useRef(null);
 
@@ -24,6 +28,53 @@ function Header({ title, onToggleSidebar, dashboardType }) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Fetch notifications when component mounts
+  useEffect(() => {
+    if (showNotificationBell) {
+      fetchNotifications();
+    }
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoadingNotifications(true);
+      const response = await api.get('/api/v1/notifications');
+      if (response.data.status === 'success') {
+        const notifs = response.data.data.notifications || [];
+        setNotifications(notifs);
+        const unread = notifs.filter(n => !n.isRead).length;
+        setUnreadCount(unread);
+      }
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      setNotifications([]);
+      setUnreadCount(0);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  const markAsRead = async (notificationId) => {
+    try {
+      await api.put(`/api/v1/notifications/${notificationId}/read`);
+      // Update local state
+      setNotifications(prev => 
+        prev.map(n => n.id === notificationId ? { ...n, isRead: true } : n)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.isRead) {
+      await markAsRead(notification.id);
+    }
+    // Handle navigation based on notification type if needed
+    setShowNotifications(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -44,6 +95,24 @@ function Header({ title, onToggleSidebar, dashboardType }) {
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  // Determine which roles should see notifications
+  const showNotificationBell = ['SYSTEM_ADMIN', 'MANAGER', 'REGIONAL_OFFICE', 'FEDERAL_OFFICE'].includes(dashboardType);
+
+  const formatNotificationTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
   return (
@@ -91,39 +160,99 @@ function Header({ title, onToggleSidebar, dashboardType }) {
           <option value="am">አማርኛ</option>
         </select>
 
-        {/* Notification Bell */}
-        <div className="mesob-header-notification" ref={notifRef}>
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            aria-label="Notifications"
-            aria-expanded={showNotifications}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        {/* Notification Bell - Only for Admin, Manager, Regional, Federal */}
+        {showNotificationBell && (
+          <div className="mesob-header-notification" ref={notifRef}>
+            <button
+              onClick={() => {
+                setShowNotifications(!showNotifications);
+                if (!showNotifications) {
+                  fetchNotifications();
+                }
+              }}
+              aria-label="Notifications"
+              aria-expanded={showNotifications}
             >
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            {/* Badge for notifications */}
-            <span className="mesob-header-notification-badge">3</span>
-          </button>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {/* Badge for unread notifications - only show if count > 0 */}
+              {unreadCount > 0 && (
+                <span className="mesob-header-notification-badge">{unreadCount}</span>
+              )}
+            </button>
 
-          {/* Notification Dropdown */}
-          {showNotifications && (
-            <div className="mesob-header-user-dropdown">
-              <div style={{ padding: '1rem', color: '#6b7280', fontSize: '0.875rem' }}>
-                No new notifications
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="mesob-header-user-dropdown" style={{ minWidth: '320px', maxHeight: '400px', overflowY: 'auto' }}>
+                {loadingNotifications ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
+                    Loading notifications...
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div style={{ padding: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
+                    No new notifications
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#111827', fontSize: '0.875rem' }}>
+                      Notifications ({unreadCount} unread)
+                    </div>
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification)}
+                        style={{
+                          padding: '0.75rem 1rem',
+                          borderBottom: '1px solid #f3f4f6',
+                          cursor: 'pointer',
+                          backgroundColor: notification.isRead ? '#ffffff' : '#f0f9ff',
+                          transition: 'background-color 0.15s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = notification.isRead ? '#ffffff' : '#f0f9ff'}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                          {!notification.isRead && (
+                            <div style={{ 
+                              width: '8px', 
+                              height: '8px', 
+                              borderRadius: '50%', 
+                              backgroundColor: '#3b82f6',
+                              flexShrink: 0,
+                              marginTop: '0.25rem'
+                            }} />
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '0.875rem', color: '#111827', fontWeight: notification.isRead ? '500' : '600', marginBottom: '0.25rem' }}>
+                              {notification.title}
+                            </div>
+                            <div style={{ fontSize: '0.8125rem', color: '#4b5563', marginBottom: '0.25rem' }}>
+                              {notification.message}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
+                              {formatNotificationTime(notification.createdAt)}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* User Profile */}
         <div className="mesob-header-user" ref={userMenuRef}>
