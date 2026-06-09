@@ -509,21 +509,22 @@
 
 /* Sidebar Logo Section - Compact */
 .sidebar-logo-section {
-  padding: 16px 12px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   position: relative;
   z-index: 3;
   text-align: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: padding 0.3s ease;
 }
 
 .sidebar-logo-emblem {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -531,6 +532,7 @@
   flex-shrink: 0;
   background: transparent;
   animation: rotateLogo 20s linear infinite;
+  transition: width 0.3s ease, height 0.3s ease;
 }
 
 .sidebar-logo-emblem img {
@@ -544,7 +546,7 @@
   to   { transform: rotate(360deg); }
 }
 
-/* Collapsed sidebar: hide text */
+/* Collapsed sidebar: hide text and smaller logo */
 .admin-sidebar.collapsed .sidebar-logo-text,
 .mesob-sidebar.collapsed .sidebar-logo-text {
   display: none;
@@ -651,15 +653,15 @@
 
 .nav-item:hover {
   background: rgba(214, 232, 251, 0.12);
-  color: rgba(214, 232, 251, 1);
+  color: #f5a623;
   transform: translateX(2px);
 }
 
 .nav-item.active {
   background: rgba(214, 232, 251, 0.15);
-  color: white;
+  color: #f5a623;
   font-weight: var(--font-weight-bold);
-  border-left-color: #ffffff;
+  border-left-color: #f5a623;
   box-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);

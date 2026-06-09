@@ -23,7 +23,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     completedAppointments: 0,
     pendingAppointments: 0,
     inProgressAppointments: 0,
-    noShowAppointments: 0,
+    absentAppointments: 0,
     totalPatientsToday: 0,
     capacityUtilization: 0,
     averageWaitTime: 0,
@@ -506,7 +506,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       let walkin = 0;
 
       // NO_SHOW appointments - fetch from queue
-      const noShow = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
+      const absent = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
       // Walk-ins = wellness plans created for users WITHOUT appointments on that specific day
@@ -668,7 +668,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         waitingAppointments: waiting,
         inProgressAppointments: inProgress,
         inServiceAppointments: inService,
-        noShowAppointments: noShow,
+        absentAppointments: absent,
         totalPatientsToday: completed + walkin, // Walk-ins + Completed appointments
         capacityUtilization: utilizationPct,
         averageWaitTime: averageWaitTime,
@@ -680,7 +680,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       });
 
       // Generate chart data with all appointments
-      generateChartData(mappedAppointments, noShow);
+      generateChartData(mappedAppointments, absent);
 
       // Fetch health conditions data
       await fetchHealthConditions();
@@ -698,7 +698,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
     }
   };
 
-  const generateChartData = (appointmentsData, noShowCount = 0) => {
+  const generateChartData = (appointmentsData, absentCount = 0) => {
     // Map queue status to appointment status
     const mappedAppointments = appointmentsData.map(apt => ({
       ...apt,
@@ -876,8 +876,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           </div>
 
           <div className={styles.breakdownItem}>
-            <span>No-Show</span>
-            <span className={styles.breakdownValue} title="Patient didn't show up for scheduled appointment">{analytics.noShowAppointments}</span>
+            <span>Absent</span>
+            <span className={styles.breakdownValue} title="Patient didn't show up for scheduled appointment">{analytics.absentAppointments}</span>
           </div>
         </div>
 
