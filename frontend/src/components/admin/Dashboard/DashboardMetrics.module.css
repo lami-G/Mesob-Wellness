@@ -189,6 +189,7 @@
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+  color: #f5a623;
 }
 
 .metricCard:hover {
@@ -217,7 +218,7 @@
 .metricTitle {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #ffffff;
+  color: #f5a623 !important;
   margin-bottom: 0.5rem;
 }
 
@@ -231,7 +232,7 @@
 
 .metricPeriod {
   font-size: 0.8rem;
-  color: #f5a623;
+  color: #f5a623 !important;
   font-weight: 600;
   margin-top: 0.75rem;
 }
