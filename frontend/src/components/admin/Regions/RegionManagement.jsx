@@ -3,6 +3,7 @@ import { adminService } from "../../../services/adminService";
 import { regionalService } from "../../../services/regionalService";
 import RegionEditModal from "./RegionEditModal";
 import RegionManagerModal from "./RegionManagerModal";
+import RegionHealthComparison from "./RegionHealthComparison";
 import styles from "./RegionManagement.module.css";
 import "../../../styles/admin-regions.css";
 
@@ -31,6 +32,8 @@ function RegionManagement() {
   const [regionStats, setRegionStats] = useState({});
   const [showRegionManagerModal, setShowRegionManagerModal] = useState(false);
   const [selectedRegionForManager, setSelectedRegionForManager] = useState(null);
+  const [regionCardsPage, setRegionCardsPage] = useState(1);
+  const cardsPerPage = 8;
 
   const loadRegionData = useCallback(async () => {
     setLoading(true);
@@ -256,7 +259,30 @@ function RegionManagement() {
 
           {/* Regions List */}
           <div className="regions-list-card">
-            <h3>Existing Regions ({regions.length})</h3>
+            <div className="regions-list-header">
+              <h3>Existing Regions ({regions.length})</h3>
+              {Math.ceil(regions.length / cardsPerPage) > 1 && (
+                <div className="pagination-controls">
+                  <button
+                    onClick={() => setRegionCardsPage(Math.max(1, regionCardsPage - 1))}
+                    disabled={regionCardsPage === 1}
+                    className="pagination-btn"
+                  >
+                    ← Previous
+                  </button>
+                  <span className="page-info">
+                    Page {regionCardsPage} of {Math.ceil(regions.length / cardsPerPage)}
+                  </span>
+                  <button
+                    onClick={() => setRegionCardsPage(Math.min(Math.ceil(regions.length / cardsPerPage), regionCardsPage + 1))}
+                    disabled={regionCardsPage === Math.ceil(regions.length / cardsPerPage)}
+                    className="pagination-btn"
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+            </div>
 
             {loading && regions.length === 0 ? (
               <div className="loading-state">Loading regions...</div>
@@ -266,7 +292,9 @@ function RegionManagement() {
               </div>
             ) : (
               <div className="regions-grid">
-                {regions.map((region) => (
+                {regions
+                  .slice((regionCardsPage - 1) * cardsPerPage, regionCardsPage * cardsPerPage)
+                  .map((region) => (
                   <div key={region} className="region-card">
                     <div className="region-card-header">
                       <div className="region-title">
@@ -701,6 +729,9 @@ function RegionManagement() {
           )}
         </div>
       )}
+
+      {/* Regional Staff Health Comparison - Only show in card view */}
+      {!showDetailView && <RegionHealthComparison />}
 
       <RegionManagerModal
         isOpen={showRegionManagerModal}

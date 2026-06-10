@@ -945,6 +945,189 @@ const AdminService = {
       throw error;
     }
   },
+
+  /**
+   * Get regional staff health comparison
+   * Only includes STAFF role users, excludes EXTERNAL_PATIENT
+   */
+  async getRegionalHealthComparison(
+    timePeriod?: string,
+  ): Promise<any> {
+    try {
+      // Calculate date range
+      const now = new Date();
+      let dateFrom: Date | undefined;
+
+      if (timePeriod === "daily") {
+        dateFrom = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+      } else if (timePeriod === "weekly") {
+        dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (timePeriod === "monthly") {
+        dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      }
+
+      // Get all regions
+      const regions = await prisma.center.findMany({
+        select: { region: true },
+        distinct: ["region"],
+      });
+
+      const regionList = regions.map((r) => r.region);
+
+      // Process each region
+      const regionHealthData = await Promise.all(
+        regionList.map(async (region) => {
+          // Get staff users in this region (STAFF role only)
+          const staffUsers = await prisma.user.findMany({
+            where: {
+              center: { region },
+              role: "STAFF",
+            },
+            select: { id: true },
+          });
+
+          const staffUserIds = staffUsers.map((u) => u.id);
+          const totalStaff = staffUserIds.length;
+
+          if (totalStaff === 0) {
+            return {
+              region,
+              totalStaff: 0,
+              healthScore: 0,
+              healthyPercent: 0,
+              atRiskPercent: 0,
+              criticalPercent: 0,
+              conditions: {},
+              vitalsRecorded: 0,
+            };
+          }
+
+          // Get wellness plans with conditions (staff only)
+          const wellnessWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) wellnessWhere.createdAt = { gte: dateFrom };
+
+          const wellnessPlans = await prisma.wellnessPlan.findMany({
+            where: wellnessWhere,
+            select: {
+              conditions: true,
+            },
+          });
+
+          // Count conditions
+          const conditionCounts: Record<string, number> = {};
+          wellnessPlans.forEach((plan) => {
+            if (plan.conditions && Array.isArray(plan.conditions)) {
+              plan.conditions.forEach((condition: any) => {
+                const key = String(condition).toLowerCase().replace(/ /g, "_");
+                conditionCounts[key] = (conditionCounts[key] || 0) + 1;
+              });
+            }
+          });
+
+          // Get vital records (staff only)
+          const vitalsWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) vitalsWhere.recordedAt = { gte: dateFrom };
+
+          const vitals = await prisma.vitalRecord.findMany({
+            where: vitalsWhere,
+            select: {
+              bmiCategory: true,
+              bpCategory: true,
+              heartRate: true,
+              temperature: true,
+              oxygenSaturation: true,
+            },
+          });
+
+          // Calculate risk levels based on vitals
+          let healthyCount = 0;
+          let atRiskCount = 0;
+          let criticalCount = 0;
+
+          vitals.forEach((vital) => {
+            // Check BMI risk
+            const bmiRisk =
+              vital.bmiCategory === "OBESITY" ||
+              vital.bmiCategory === "OVERWEIGHT";
+
+            // Check BP risk
+            const bpRisk =
+              vital.bpCategory === "HYPERTENSION_STAGE_2" ||
+              vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check critical BP
+            const bpCritical = vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check other vitals
+            const heartRateAbnormal =
+              (vital.heartRate && (vital.heartRate < 60 || vital.heartRate > 100));
+            const tempAbnormal =
+              (vital.temperature &&
+                (vital.temperature < 36.1 || vital.temperature > 37.2));
+            const o2Abnormal =
+              (vital.oxygenSaturation && vital.oxygenSaturation < 95);
+
+            if (bpCritical || o2Abnormal) {
+              criticalCount++;
+            } else if (bmiRisk || bpRisk || heartRateAbnormal || tempAbnormal) {
+              atRiskCount++;
+            } else {
+              healthyCount++;
+            }
+          });
+
+          const vitalsRecorded = vitals.length;
+          const healthyPercent =
+            vitalsRecorded > 0
+              ? Math.round((healthyCount / vitalsRecorded) * 100)
+              : 100;
+          const atRiskPercent =
+            vitalsRecorded > 0
+              ? Math.round((atRiskCount / vitalsRecorded) * 100)
+              : 0;
+          const criticalPercent =
+            vitalsRecorded > 0
+              ? Math.round((criticalCount / vitalsRecorded) * 100)
+              : 0;
+
+          // Calculate health score (0-100)
+          // Based on: healthy %, low at-risk %, low critical %
+          const healthScore = Math.round(
+            healthyPercent * 0.7 +
+              (100 - atRiskPercent) * 0.2 +
+              (100 - criticalPercent) * 0.1,
+          );
+
+          return {
+            region,
+            totalStaff,
+            healthScore,
+            healthyPercent,
+            atRiskPercent,
+            criticalPercent,
+            conditions: conditionCounts,
+            vitalsRecorded,
+          };
+        }),
+      );
+
+      return regionHealthData;
+    } catch (error) {
+      console.error("Error getting regional health comparison:", error);
+      throw error;
+    }
+  },
 };
 
 export default AdminService;

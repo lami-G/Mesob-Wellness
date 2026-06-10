@@ -16,6 +16,7 @@ router.get("/dashboard/metrics", AdminController.getDashboardMetrics);
  * Regions Management
  */
 router.get("/regions", AdminController.getRegions);
+router.get("/regions/health-comparison", AdminController.getRegionalHealthComparison);
 router.get("/regions/:region/centers", AdminController.getCentersByRegion);
 router.post("/regions/:region/admin", AdminController.upsertRegionAdmin);
 router.get("/regions/:region/admin", AdminController.getRegionAdmin);

@@ -94,17 +94,58 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.regions-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .regions-list-card h3 {
-  margin: 0 0 20px 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: #1f2937;
 }
 
-/* Regions Grid */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1.5px solid #d0d7ea;
+  border-radius: 8px;
+  background: white;
+  color: #213d8d;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #f5a623;
+  color: #f5a623;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Regions Grid - 4 columns × 2 rows = 8 cards per page */
 .regions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
@@ -277,6 +318,12 @@
 }
 
 /* Responsive */
+@media (max-width: 1400px) {
+  .regions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 1024px) {
   .region-management-container {
     grid-template-columns: 1fr;
@@ -287,7 +334,7 @@
   }
 
   .regions-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -313,5 +360,10 @@
 
   .region-badge {
     align-self: flex-start;
+  }
+  
+  .pagination-controls {
+    flex-direction: column;
+    gap: 8px;
   }
 }

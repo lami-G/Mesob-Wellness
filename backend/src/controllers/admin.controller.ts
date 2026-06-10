@@ -1052,3 +1052,37 @@ export const getRegionAdmin = async (
     });
   }
 };
+
+/**
+ * GET /api/v1/admin/regions/health-comparison
+ * Get regional staff health comparison
+ */
+export const getRegionalHealthComparison = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const timePeriod = req.query.timePeriod as string | undefined;
+
+    const data = await AdminService.getRegionalHealthComparison(timePeriod);
+
+    res.status(200).json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    console.error("Get regional health comparison error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve regional health comparison",
+    });
+  }
+};

@@ -267,4 +267,12 @@ export const adminService = {
     const response = await api.get(`/admin/regions/${region}/admin`);
     return response.data.data;
   },
+
+  // Regional Health Comparison
+  getRegionalHealthComparison: async (timePeriod = "monthly") => {
+    const params = new URLSearchParams();
+    if (timePeriod) params.append("timePeriod", timePeriod);
+    const response = await api.get(`/admin/regions/health-comparison?${params}`);
+    return response.data.data;
+  },
 };
