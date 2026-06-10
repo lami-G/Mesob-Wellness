@@ -231,8 +231,11 @@ export const FEDERAL_CONFIG = {
       items: [
         { id: "overview", label: "Overview", icon: Icons.overview },
         { id: "regions", label: "Regions", icon: Icons.regions },
-        { id: "analytics", label: "Analytics", icon: Icons.analytics },
-        { id: "health", label: "Health Trends", icon: Icons.health },
+        { id: "centers", label: "Centers", icon: Icons.centers },
+        { id: "admin-users", label: "Admin Users", icon: Icons.users },
+        { id: "appointments", label: "Appointments", icon: Icons.appointments },
+        { id: "feedback", label: "Feedback", icon: Icons.feedback },
+        { id: "audit", label: "Audit", icon: Icons.audit },
       ],
     },
   ],

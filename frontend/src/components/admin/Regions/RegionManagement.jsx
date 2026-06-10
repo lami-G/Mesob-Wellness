@@ -694,33 +694,6 @@ function RegionManagement() {
             </div>
           ) : (
             <div className={styles.cardCentered}>
-              <h3>{selectedRegion} Summary</h3>
-              <div className={styles.analyticsCardsGrid3Col}>
-                <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-content">
-                    <p className="card-label">Centers</p>
-                    <p className="card-value">
-                      {regionSummary?.summary?.totalCenters || 0}
-                    </p>
-                  </div>
-                </div>
-                <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-content">
-                    <p className="card-label">Total Staff</p>
-                    <p className="card-value">
-                      {regionSummary?.summary?.totalStaff || 0}
-                    </p>
-                  </div>
-                </div>
-                <div className={`analytics-card ${styles.analyticsCardNavy}`}>
-                  <div className="card-content">
-                    <p className="card-label">Appointments</p>
-                    <p className="card-value">
-                      {regionSummary?.summary?.totalAppointments || 0}
-                    </p>
-                  </div>
-                </div>
-              </div>
               <p className={styles.helperText}>
                 Centers shown below are active only.
               </p>

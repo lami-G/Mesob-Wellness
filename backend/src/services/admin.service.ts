@@ -553,12 +553,26 @@ const AdminService = {
       if (filters.status) where.isActive = filters.status === "active";
       if (filters.verification)
         where.isVerified = filters.verification === "verified";
-      if (filters.region) {
+      
+      // Handle region and center filters correctly
+      if (filters.region && filters.center) {
+        // Both region and center specified
+        where.AND = [
+          { centerId: filters.center },
+          { center: { region: filters.region } }
+        ];
+      } else if (filters.center) {
+        // Only center specified
+        where.centerId = filters.center;
+      } else if (filters.region) {
+        // Only region specified
         where.center = {
-          region: filters.region,
+          is: {
+            region: filters.region,
+          }
         };
       }
-      if (filters.center) where.centerId = filters.center;
+      
       if (filters.search) {
         where.OR = [
           { email: { contains: filters.search, mode: "insensitive" } },
@@ -671,8 +685,31 @@ const AdminService = {
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      // Handle region and center filters correctly
+      if (filters.region && filters.center) {
+        // Both region and center specified
+        where.user = { 
+          AND: [
+            { centerId: filters.center },
+            { center: { is: { region: filters.region } } }
+          ]
+        };
+      } else if (filters.center) {
+        // Only center specified
+        where.user = { 
+          centerId: filters.center 
+        };
+      } else if (filters.region) {
+        // Only region specified
+        where.user = { 
+          center: { 
+            is: { 
+              region: filters.region 
+            } 
+          } 
+        };
+      }
+      
       if (filters.status) where.status = filters.status;
       if (filters.dateFrom || filters.dateTo) {
         where.scheduledAt = {};
@@ -785,8 +822,22 @@ const AdminService = {
       const where: any = {};
 
       const userWhere: any = {};
-      if (filters.region) userWhere.center = { region: filters.region };
-      if (filters.center) userWhere.centerId = filters.center;
+      
+      // Handle region and center filters correctly
+      if (filters.region && filters.center) {
+        // Both region and center specified
+        userWhere.AND = [
+          { centerId: filters.center },
+          { center: { is: { region: filters.region } } }
+        ];
+      } else if (filters.center) {
+        // Only center specified
+        userWhere.centerId = filters.center;
+      } else if (filters.region) {
+        // Only region specified
+        userWhere.center = { is: { region: filters.region } };
+      }
+      
       if (Object.keys(userWhere).length > 0) where.user = userWhere;
 
       if (filters.npsScore !== undefined) where.npsScore = filters.npsScore;
@@ -837,8 +888,22 @@ const AdminService = {
       const where: any = {};
 
       const userWhere: any = {};
-      if (filters.region) userWhere.center = { region: filters.region };
-      if (filters.center) userWhere.centerId = filters.center;
+      
+      // Handle region and center filters correctly
+      if (filters.region && filters.center) {
+        // Both region and center specified
+        userWhere.AND = [
+          { centerId: filters.center },
+          { center: { is: { region: filters.region } } }
+        ];
+      } else if (filters.center) {
+        // Only center specified
+        userWhere.centerId = filters.center;
+      } else if (filters.region) {
+        // Only region specified
+        userWhere.center = { is: { region: filters.region } };
+      }
+      
       if (filters.role) userWhere.role = filters.role;
       if (Object.keys(userWhere).length > 0) where.user = userWhere;
 

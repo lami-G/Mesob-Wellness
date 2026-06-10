@@ -9,6 +9,7 @@ const normalizeFilters = (filters = {}) => ({
   dateFrom: filters.dateFrom || "",
   dateTo: filters.dateTo || "",
   role: filters.role || "",
+  timePeriod: filters.timePeriod || "",
 });
 
 const areFiltersEqual = (left = {}, right = {}) => {
@@ -24,6 +25,7 @@ function FilterBar({
   showRegionFilter = true,
   showCenterFilter = true,
   showDateFilter = false,
+  showTimePeriodFilter = false,
   showRoleFilter = false,
   initialFilters = {},
 }) {
@@ -100,6 +102,7 @@ function FilterBar({
       dateFrom: "",
       dateTo: "",
       role: "",
+      timePeriod: "",
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
@@ -210,6 +213,24 @@ function FilterBar({
               />
             </div>
           </>
+        )}
+
+        {/* Time Period Filter */}
+        {showTimePeriodFilter && (
+          <div className={styles.filterGroup}>
+            <label htmlFor="timePeriod">Period</label>
+            <select
+              id="timePeriod"
+              value={filters.timePeriod}
+              onChange={(e) => handleFilterChange("timePeriod", e.target.value)}
+              className={styles.filterSelect}
+            >
+              <option value="">All Time</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
         )}
 
         {/* Action Buttons */}

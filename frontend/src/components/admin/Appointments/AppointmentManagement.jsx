@@ -12,7 +12,48 @@ function AppointmentManagement({ baseFilters = {} }) {
   }, [JSON.stringify(baseFilters)]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters({ ...baseFilters, ...newFilters });
+    // Calculate date range based on time period
+    let processedFilters = { ...baseFilters, ...newFilters };
+    
+    if (newFilters.timePeriod) {
+      const today = new Date();
+      let dateFrom = null;
+      let dateTo = null;
+
+      switch (newFilters.timePeriod) {
+        case "daily":
+          // Today only
+          dateFrom = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          dateTo = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+          break;
+        case "weekly":
+          // Last 7 days
+          dateFrom = new Date(today);
+          dateFrom.setDate(today.getDate() - 7);
+          dateTo = new Date();
+          break;
+        case "monthly":
+          // Current month
+          dateFrom = new Date(today.getFullYear(), today.getMonth(), 1);
+          dateTo = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+          break;
+        default:
+          // All time - no date filters
+          dateFrom = null;
+          dateTo = null;
+      }
+
+      if (dateFrom && dateTo) {
+        processedFilters.dateFrom = dateFrom.toISOString().split('T')[0];
+        processedFilters.dateTo = dateTo.toISOString().split('T')[0];
+      } else {
+        // Clear date filters for "All Time"
+        delete processedFilters.dateFrom;
+        delete processedFilters.dateTo;
+      }
+    }
+    
+    setFilters(processedFilters);
   };
 
   const handleDelete = async (appointmentId) => {
@@ -41,6 +82,7 @@ function AppointmentManagement({ baseFilters = {} }) {
         showRegionFilter={true}
         showCenterFilter={true}
         showDateFilter={true}
+        showTimePeriodFilter={true}
         initialFilters={baseFilters}
       />
 

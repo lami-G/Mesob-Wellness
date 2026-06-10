@@ -149,7 +149,7 @@ function AuditLogs({ baseFilters = {} }) {
         >
           <option value="">All Centers</option>
           {centers.map((center) => (
-            <option key={center.id} value={center.name}>
+            <option key={center.id} value={center.id}>
               {center.name}
             </option>
           ))}
