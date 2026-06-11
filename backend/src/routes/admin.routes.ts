@@ -35,6 +35,7 @@ router.post("/users/:id/unlock", AdminController.unlockUser);
  */
 router.post("/centers", AdminController.createCenter);
 router.get("/centers", AdminController.getCenters);
+router.get("/centers/health-comparison", AdminController.getCenterHealthComparison);
 
 /**
  * Appointments Management

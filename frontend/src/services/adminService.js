@@ -275,4 +275,14 @@ export const adminService = {
     const response = await api.get(`/admin/regions/health-comparison?${params}`);
     return response.data.data;
   },
+
+  // Center Health Comparison
+  getCenterHealthComparison: async (timePeriod = "monthly", region = "all") => {
+    const params = new URLSearchParams();
+    if (timePeriod) params.append("timePeriod", timePeriod);
+    if (region && region !== "all") params.append("region", region);
+    const response = await api.get(`/admin/centers/health-comparison?${params}`);
+    return response.data.data;
+  },
 };
+

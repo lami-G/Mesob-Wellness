@@ -1086,3 +1086,38 @@ export const getRegionalHealthComparison = async (
     });
   }
 };
+
+/**
+ * GET /api/v1/admin/centers/health-comparison
+ * Get center staff health comparison
+ */
+export const getCenterHealthComparison = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    const timePeriod = req.query.timePeriod as string | undefined;
+    const region = req.query.region as string | undefined;
+
+    const data = await AdminService.getCenterHealthComparison(timePeriod, region);
+
+    res.status(200).json({
+      status: "success",
+      data,
+    });
+  } catch (error) {
+    console.error("Get center health comparison error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to retrieve center health comparison",
+    });
+  }
+};

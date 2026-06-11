@@ -16,7 +16,7 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
 
   useEffect(() => {
     fetchCenters();
-  }, [filters]);
+  }, [filters, pagination.page]);
 
   const fetchCenters = async () => {
     try {
@@ -26,8 +26,14 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
         page: pagination.page,
         limit: pagination.limit,
       });
+      console.log('Centers API Response:', result); // Debug log
       setCenters(result.data || []);
-      setPagination(result.pagination || {});
+      // Preserve limit when updating pagination
+      setPagination(prev => ({
+        ...prev,
+        ...(result.pagination || {}),
+        limit: prev.limit, // Keep the limit from state
+      }));
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load centers");
@@ -40,6 +46,13 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
   const handlePageChange = (newPage) => {
     setPagination({ ...pagination, page: newPage });
   };
+
+  useEffect(() => {
+    // Reset to page 1 when filters change
+    if (pagination.page !== 1) {
+      setPagination({ ...pagination, page: 1 });
+    }
+  }, [JSON.stringify(filters)]);
 
   if (loading) {
     return <div className={styles.tableLoading}>Loading centers...</div>;
@@ -107,21 +120,24 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
         </tbody>
       </table>
 
-      {pagination.pages > 1 && (
+      {pagination.total > 0 && (
         <div className={styles.pagination}>
           <button
             onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1}
+            disabled={pagination.page === 1 || pagination.pages <= 1}
             className={styles.btnPagination}
           >
             ← Previous
           </button>
-          <span className={styles.paginationInfo}>
-            Page {pagination.page} of {pagination.pages}
-          </span>
+          <div className={styles.paginationInfo}>
+            <div>Page {pagination.page} of {pagination.pages || 1}</div>
+            <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+              {pagination.total} total centers
+            </div>
+          </div>
           <button
             onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page === pagination.pages}
+            disabled={pagination.page >= (pagination.pages || 1)}
             className={styles.btnPagination}
           >
             Next →

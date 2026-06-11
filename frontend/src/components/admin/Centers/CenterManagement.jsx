@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import FilterBar from "../FilterBar";
 import CentersList from "./CentersList";
 import CenterFormModal from "./CenterFormModal";
+import CenterHealthComparison from "./CenterHealthComparison";
 import { adminService } from "../../../services/adminService";
 
 function CenterManagement({ baseFilters = {}, allowDelete = true }) {
@@ -190,6 +191,9 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
         onDelete={handleDelete}
         allowDelete={allowDelete}
       />
+
+      {/* Center Staff Health Comparison */}
+      <CenterHealthComparison />
 
       <CenterFormModal
         isOpen={showModal}

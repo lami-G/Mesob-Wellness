@@ -1,0 +1,350 @@
+/* ═══════════════════════════════════════════
+   CENTER HEALTH COMPARISON
+   ═══════════════════════════════════════════ */
+
+.healthComparisonSection {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #d0d7ea;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 2rem;
+}
+
+.headerText h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #213d8d;
+  margin: 0 0 0.5rem 0;
+}
+
+.headerText p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.headerControls {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.select {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #d0d7ea;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #213d8d;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.select:focus,
+.select:hover {
+  border-color: #f5a623;
+}
+
+/* ── DISPLAY TOGGLE ── */
+.displayToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  background: #f0f2f8;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.toggleBtn {
+  padding: 0.625rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleBtn:hover {
+  color: #213d8d;
+}
+
+.toggleBtn.active {
+  background: #ffffff;
+  color: #213d8d;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ── CHARTS SECTION ── */
+.chartsSection {
+  margin-bottom: 2rem;
+}
+
+.chartCard {
+  background: #f0f2f8;
+  border: 1px solid #d0d7ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.chartCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #213d8d;
+  margin: 0 0 1.5rem 0;
+}
+
+/* ── TABLE ── */
+.tableCard {
+  background: #f0f2f8;
+  border: 1px solid #d0d7ea;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tableCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #213d8d;
+  margin: 0;
+}
+
+.tablePagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.paginationBtn {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid #d0d7ea;
+  border-radius: 8px;
+  background: white;
+  color: #213d8d;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.paginationBtn:hover:not(:disabled) {
+  border-color: #f5a623;
+  color: #f5a623;
+}
+
+.paginationBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.tableFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d0d7ea;
+}
+
+.tableInfo {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table thead tr {
+  background: #213d8d;
+  color: #ffffff;
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s;
+}
+
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  color: #1f2937;
+}
+
+.rankCell {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.centerCell {
+  font-weight: 600;
+  color: #213d8d;
+}
+
+.regionCell {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.scoreCell {
+  text-align: center;
+}
+
+.scoreBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.scoreHigh {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.scoreMedium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.scoreLow {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.healthy {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.atRisk {
+  color: #f5a623;
+  font-weight: 600;
+}
+
+.critical {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* ── STATES ── */
+.loading,
+.error,
+.empty {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.error {
+  color: #dc2626;
+  background: #fee2e2;
+  border-radius: 8px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerControls {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .select {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .tableHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .tableFooter {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .tablePagination {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .healthComparisonSection {
+    padding: 1rem;
+  }
+
+  .displayToggle {
+    width: 100%;
+  }
+
+  .toggleBtn {
+    flex: 1;
+  }
+
+  .tablePagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .paginationBtn {
+    width: 100%;
+  }
+}
