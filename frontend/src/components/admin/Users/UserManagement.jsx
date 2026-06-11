@@ -38,10 +38,7 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
   }, [baseFilters]);
 
   const handleFilterChange = (newFilters) => {
-    const nextFilters = { ...normalizeFilters(baseFilters), ...newFilters };
-    setFilters((prev) =>
-      areFiltersEqual(prev, nextFilters) ? prev : nextFilters,
-    );
+    setFilters(newFilters);
   };
 
   const handleEdit = (user) => {

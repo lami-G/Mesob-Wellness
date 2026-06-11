@@ -13,7 +13,7 @@ function CentersList({
   initialFilters = {},
   onCreateClick
 }) {
-  const [centers, setCenters] = useState([]);
+  const [allCenters, setAllCenters] = useState([]); // Store all centers
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
@@ -24,6 +24,36 @@ function CentersList({
   });
 
   const [regions, setRegions] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Client-side filtered centers
+  const filteredCenters = allCenters.filter(center => {
+    // Region filter
+    if (filters?.region && center.region !== filters.region) return false;
+    
+    // Status filter
+    if (filters?.status && center.status !== filters.status) return false;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchName = center.name?.toLowerCase().includes(query);
+      const matchRegion = center.region?.toLowerCase().includes(query);
+      const matchCity = center.city?.toLowerCase().includes(query);
+      const matchEmail = center.managerEmail?.toLowerCase().includes(query);
+      if (!matchName && !matchRegion && !matchCity && !matchEmail) return false;
+    }
+    
+    return true;
+  });
+
+  // Paginated filtered centers
+  const paginatedCenters = filteredCenters.slice(
+    (pagination.page - 1) * pagination.limit,
+    pagination.page * pagination.limit
+  );
+
+  const totalPages = Math.ceil(filteredCenters.length / pagination.limit);
 
   // Load regions for filter
   useEffect(() => {
@@ -36,28 +66,27 @@ function CentersList({
     if (onFilterChange) {
       onFilterChange({ ...filters, [field]: value });
     }
+    // Reset to page 1 when filters change
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
+  // Reset to page 1 when search changes
   useEffect(() => {
-    fetchCenters();
-  }, [filters, pagination.page]);
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [searchQuery]);
 
-  const fetchCenters = async () => {
+  // Fetch all centers only once on mount
+  useEffect(() => {
+    fetchAllCenters();
+  }, []);
+
+  const fetchAllCenters = async () => {
     try {
       setLoading(true);
       const result = await adminService.getCenters({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit,
+        limit: 10000, // Get all centers
       });
-      console.log('Centers API Response:', result); // Debug log
-      setCenters(result.data || []);
-      // Preserve limit when updating pagination
-      setPagination(prev => ({
-        ...prev,
-        ...(result.pagination || {}),
-        limit: prev.limit, // Keep the limit from state
-      }));
+      setAllCenters(result.data || []);
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load centers");
@@ -68,15 +97,8 @@ function CentersList({
   };
 
   const handlePageChange = (newPage) => {
-    setPagination({ ...pagination, page: newPage });
+    setPagination((prev) => ({ ...prev, page: newPage }));
   };
-
-  useEffect(() => {
-    // Reset to page 1 when filters change
-    if (pagination.page !== 1) {
-      setPagination({ ...pagination, page: 1 });
-    }
-  }, [JSON.stringify(filters)]);
 
   if (loading) {
     return <div className={styles.tableLoading}>Loading centers...</div>;
@@ -142,8 +164,8 @@ function CentersList({
             <input
               type="text"
               placeholder="Search centers..."
-              value={filters?.search || ''}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 padding: '0.375rem 0.625rem',
                 borderRadius: '6px',
@@ -159,6 +181,7 @@ function CentersList({
             {/* Reset Button */}
             <button
               onClick={() => {
+                setSearchQuery('');
                 if (onFilterChange) {
                   onFilterChange({
                     region: '',
@@ -212,14 +235,16 @@ function CentersList({
           </tr>
         </thead>
         <tbody>
-          {centers.length === 0 ? (
+          {paginatedCenters.length === 0 ? (
             <tr>
               <td colSpan="7" className={styles.tableEmpty}>
-                No centers found
+                {searchQuery || filters?.region || filters?.status
+                  ? "No centers found matching the filters"
+                  : "No centers found"}
               </td>
             </tr>
           ) : (
-            centers.map((center) => (
+            paginatedCenters.map((center) => (
               <tr key={center.id}>
                 <td className={styles.cellName}>{center.name}</td>
                 <td className={styles.cellRegion}>{center.region}</td>
@@ -255,24 +280,24 @@ function CentersList({
         </tbody>
       </table>
 
-      {pagination.total > 0 && (
+      {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
             onClick={() => handlePageChange(pagination.page - 1)}
-            disabled={pagination.page === 1 || pagination.pages <= 1}
+            disabled={pagination.page === 1}
             className={styles.btnPagination}
           >
             ← Previous
           </button>
           <div className={styles.paginationInfo}>
-            <div>Page {pagination.page} of {pagination.pages || 1}</div>
+            <div>Page {pagination.page} of {totalPages}</div>
             <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.25rem' }}>
-              {pagination.total} total centers
+              {filteredCenters.length} centers
             </div>
           </div>
           <button
             onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page >= (pagination.pages || 1)}
+            disabled={pagination.page >= totalPages}
             className={styles.btnPagination}
           >
             Next →

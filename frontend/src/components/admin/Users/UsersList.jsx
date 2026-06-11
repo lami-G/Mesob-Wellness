@@ -3,7 +3,7 @@ import { adminService } from "../../../services/adminService";
 import styles from "./UsersList.module.css";
 
 function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, showRegionFilter, showCenterFilter, showRoleFilter, initialFilters = {} }) {
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]); // Store all users
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
@@ -15,6 +15,41 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
 
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Client-side filtered users
+  const filteredUsers = allUsers.filter(user => {
+    // Region filter
+    if (filters?.region && user.center?.region !== filters.region) return false;
+    
+    // Center filter
+    if (filters?.center && user.centerId !== filters.center) return false;
+    
+    // Role filter
+    if (filters?.role && user.roleId !== filters.role) return false;
+    
+    // Status filter
+    if (filters?.status && user.status !== filters.status) return false;
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchName = user.fullName?.toLowerCase().includes(query);
+      const matchEmail = user.email?.toLowerCase().includes(query);
+      const matchId = user.userId?.toLowerCase().includes(query);
+      if (!matchName && !matchEmail && !matchId) return false;
+    }
+    
+    return true;
+  });
+
+  // Paginated filtered users
+  const paginatedUsers = filteredUsers.slice(
+    (pagination.page - 1) * pagination.limit,
+    pagination.page * pagination.limit
+  );
+
+  const totalPages = Math.ceil(filteredUsers.length / pagination.limit);
 
   // Load regions and centers for filters
   useEffect(() => {
@@ -35,37 +70,27 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
     if (onFilterChange) {
       onFilterChange({ ...filters, [field]: value });
     }
+    // Reset to page 1 when filters change
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
+  // Reset to page 1 when search changes
   useEffect(() => {
-    setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
-  }, [filters]);
+    setPagination(prev => ({ ...prev, page: 1 }));
+  }, [searchQuery]);
 
+  // Fetch all users only once on mount
   useEffect(() => {
-    fetchUsers();
-  }, [filters, pagination.page, pagination.limit]);
+    fetchAllUsers();
+  }, []);
 
-  const fetchUsers = async () => {
+  const fetchAllUsers = async () => {
     try {
       setLoading(true);
       const result = await adminService.getUsers({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.limit,
+        limit: 10000, // Get all users
       });
-      setUsers(result.data || []);
-      const nextPagination = result.pagination || {};
-      setPagination((prev) => {
-        if (
-          prev.page === nextPagination.page &&
-          prev.limit === nextPagination.limit &&
-          prev.total === nextPagination.total &&
-          prev.pages === nextPagination.pages
-        ) {
-          return prev;
-        }
-        return { ...prev, ...nextPagination };
-      });
+      setAllUsers(result.data || []);
       setError(null);
     } catch (err) {
       setError(err.message || "Failed to load users");
@@ -77,20 +102,6 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
-  };
-
-  const handleDelete = async (userId) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      try {
-        await adminService.deleteUser(userId);
-        setUsers(users.filter((u) => u.id !== userId));
-      } catch (err) {
-        alert(
-          "Failed to delete user: " +
-            (err.response?.data?.message || err.message),
-        );
-      }
-    }
   };
 
   if (loading) {
@@ -206,8 +217,8 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
             <input
               type="text"
               placeholder="Search users..."
-              value={filters?.search || ''}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 padding: '0.375rem 0.625rem',
                 borderRadius: '6px',
@@ -223,6 +234,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
             {/* Reset Button */}
             <button
               onClick={() => {
+                setSearchQuery('');
                 if (onFilterChange) {
                   onFilterChange({
                     region: '',
@@ -277,14 +289,16 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
           </tr>
         </thead>
         <tbody>
-          {users.length === 0 ? (
+          {paginatedUsers.length === 0 ? (
             <tr>
               <td colSpan="7" className={styles.tableEmpty}>
-                No users found
+                {searchQuery || filters?.region || filters?.center || filters?.role || filters?.status
+                  ? "No users found matching the filters"
+                  : "No users found"}
               </td>
             </tr>
           ) : (
-            users.map((user) => (
+            paginatedUsers.map((user) => (
               <tr key={user.id}>
                 <td className={styles.cellId}>{user.userId || "N/A"}</td>
                 <td className={styles.cellName}>{user.fullName}</td>
@@ -318,7 +332,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
                   </button>
                   <button
                     className={`${styles.btnIcon} ${styles.btnIconDelete}`}
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => onDelete(user.id)}
                     title="Delete user"
                   >
                     🗑️
@@ -330,7 +344,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
         </tbody>
       </table>
 
-      {pagination.pages > 1 && (
+      {totalPages > 1 && (
         <div className={styles.pagination}>
           <button
             onClick={() => handlePageChange(pagination.page - 1)}
@@ -340,11 +354,11 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
             ← Previous
           </button>
           <span className={styles.paginationInfo}>
-            Page {pagination.page} of {pagination.pages}
+            Page {pagination.page} of {totalPages} ({filteredUsers.length} users)
           </span>
           <button
             onClick={() => handlePageChange(pagination.page + 1)}
-            disabled={pagination.page === pagination.pages}
+            disabled={pagination.page === totalPages}
             className={styles.btnPagination}
           >
             Next →

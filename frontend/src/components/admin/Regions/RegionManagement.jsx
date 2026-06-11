@@ -33,7 +33,13 @@ function RegionManagement() {
   const [showRegionManagerModal, setShowRegionManagerModal] = useState(false);
   const [selectedRegionForManager, setSelectedRegionForManager] = useState(null);
   const [regionCardsPage, setRegionCardsPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const cardsPerPage = 8;
+
+  // Filter regions based on search query
+  const filteredRegions = regions.filter(region =>
+    region.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const loadRegionData = useCallback(async () => {
     setLoading(true);
@@ -188,66 +194,59 @@ function RegionManagement() {
 
   return (
     <div className="management-section">
-      <div className={styles.sectionHeader}>
-        <button
-          className={styles.toggleViewBtn}
-          onClick={() => setShowDetailView(!showDetailView)}
-        >
-          {showDetailView ? "← Back to Cards" : "Region Details →"}
-        </button>
-      </div>
-
       {!showDetailView ? (
         // CARD VIEW - Original Region Cards
         <div className={styles.regionManagementContainer}>
-          {/* Add Region Form */}
-          <div className="add-region-card">
-            <h3>Add New Region</h3>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                if (!newRegion.trim()) {
-                  setRegionError("Please enter a region name");
-                  return;
-                }
-                if (regions.includes(newRegion.trim())) {
-                  setRegionError("This region already exists");
-                  return;
-                }
-                try {
-                  setLoading(true);
-                  await adminService.createCenter({
-                    name: `${newRegion} Regional Center`,
-                    region: newRegion.trim(),
-                    city: newRegion.trim(),
-                    address: "To be updated",
-                    status: "ACTIVE",
-                  });
-                  setRegionSuccess(`Region "${newRegion}" created successfully!`);
-                  setNewRegion("");
-                  await loadRegionData();
-                } catch (err) {
-                  const errorMsg = err.response?.data?.message || "Failed to create region";
-                  setRegionError(errorMsg);
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              className="add-region-form"
-            >
-              {regionError && <div className="error-message">{regionError}</div>}
-              {regionSuccess && <div className="success-message">{regionSuccess}</div>}
+          {/* Top row with Add Region Form and Region Details button */}
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+            {/* Add Region Form */}
+            <div className="add-region-card" style={{ flex: '1' }}>
+              <h3>Add New Region</h3>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!newRegion.trim()) {
+                    setRegionError("Please enter a region name");
+                    return;
+                  }
+                  if (regions.includes(newRegion.trim())) {
+                    setRegionError("This region already exists");
+                    return;
+                  }
+                  try {
+                    setLoading(true);
+                    await adminService.createCenter({
+                      name: `${newRegion} Regional Center`,
+                      region: newRegion.trim(),
+                      city: newRegion.trim(),
+                      address: "To be updated",
+                      status: "ACTIVE",
+                    });
+                    setRegionSuccess(`Region "${newRegion}" created successfully!`);
+                    setNewRegion("");
+                    await loadRegionData();
+                  } catch (err) {
+                    const errorMsg = err.response?.data?.message || "Failed to create region";
+                    setRegionError(errorMsg);
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="add-region-form"
+              >
+                {regionError && <div className="error-message">{regionError}</div>}
+                {regionSuccess && <div className="success-message">{regionSuccess}</div>}
 
-              <div className="form-group">
-                <label htmlFor="regionName">Region Name</label>
-                <input
-                  id="regionName"
-                  type="text"
-                  value={newRegion}
-                  onChange={(e) => setNewRegion(e.target.value)}
-                  placeholder="e.g., Addis Ababa, Oromia, Amhara"
-                  disabled={loading}
-                />
+                <div className="form-group">
+                  <label htmlFor="regionName">Region Name</label>
+                  <input
+                    id="regionName"
+                    type="text"
+                    value={newRegion}
+                    onChange={(e) => setNewRegion(e.target.value)}
+                    placeholder="e.g., Addis Ababa, Oromia, Amhara"
+                    disabled={loading}
+                  />
               </div>
 
               <button type="submit" className="btn-primary" disabled={loading}>
@@ -255,43 +254,75 @@ function RegionManagement() {
               </button>
             </form>
           </div>
+          
+          {/* Region Details Button */}
+          <button
+            className={styles.toggleViewBtn}
+            onClick={() => setShowDetailView(!showDetailView)}
+            style={{ minWidth: '150px', height: 'fit-content' }}
+          >
+            Region Details →
+          </button>
+        </div>
 
-          {/* Regions List */}
+          {/* Search and Regions List */}
           <div className="regions-list-card">
             <div className="regions-list-header">
-              <h3>Existing Regions ({regions.length})</h3>
-              {Math.ceil(regions.length / cardsPerPage) > 1 && (
-                <div className="pagination-controls">
-                  <button
-                    onClick={() => setRegionCardsPage(Math.max(1, regionCardsPage - 1))}
-                    disabled={regionCardsPage === 1}
-                    className="pagination-btn"
-                  >
-                    ← Previous
-                  </button>
-                  <span className="page-info">
-                    Page {regionCardsPage} of {Math.ceil(regions.length / cardsPerPage)}
-                  </span>
-                  <button
-                    onClick={() => setRegionCardsPage(Math.min(Math.ceil(regions.length / cardsPerPage), regionCardsPage + 1))}
-                    disabled={regionCardsPage === Math.ceil(regions.length / cardsPerPage)}
-                    className="pagination-btn"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
+              <h3>Existing Regions ({filteredRegions.length})</h3>
+              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                {/* Search Input */}
+                <input
+                  type="text"
+                  placeholder="Search regions..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setRegionCardsPage(1); // Reset to first page on search
+                  }}
+                  style={{
+                    padding: '0.375rem 0.625rem',
+                    borderRadius: '6px',
+                    border: '1px solid #D1D5DB',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 500,
+                    fontSize: '0.8rem',
+                    color: '#374151',
+                    minWidth: '200px',
+                  }}
+                />
+                {Math.ceil(filteredRegions.length / cardsPerPage) > 1 && (
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() => setRegionCardsPage(Math.max(1, regionCardsPage - 1))}
+                      disabled={regionCardsPage === 1}
+                      className="pagination-btn"
+                    >
+                      ← Previous
+                    </button>
+                    <span className="page-info">
+                      Page {regionCardsPage} of {Math.ceil(filteredRegions.length / cardsPerPage)}
+                    </span>
+                    <button
+                      onClick={() => setRegionCardsPage(Math.min(Math.ceil(filteredRegions.length / cardsPerPage), regionCardsPage + 1))}
+                      disabled={regionCardsPage === Math.ceil(filteredRegions.length / cardsPerPage)}
+                      className="pagination-btn"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {loading && regions.length === 0 ? (
+            {loading && filteredRegions.length === 0 ? (
               <div className="loading-state">Loading regions...</div>
-            ) : regions.length === 0 ? (
+            ) : filteredRegions.length === 0 ? (
               <div className="empty-state">
-                <p>No regions found. Create your first region above.</p>
+                <p>{searchQuery ? `No regions found matching "${searchQuery}"` : "No regions found. Create your first region above."}</p>
               </div>
             ) : (
               <div className="regions-grid">
-                {regions
+                {filteredRegions
                   .slice((regionCardsPage - 1) * cardsPerPage, regionCardsPage * cardsPerPage)
                   .map((region) => (
                   <div key={region} className="region-card">
@@ -333,48 +364,103 @@ function RegionManagement() {
       ) : (
         // DETAIL VIEW - Federal-Style Table
         <div className={styles.dashboardSection}>
-          <div className={styles.usersHeader}>
-            <div>
-              <h3>Region Directory</h3>
-              <p>
-                Active regions and their center coverage
-              </p>
+          {/* Header with inline filters and buttons */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            padding: '0.875rem 1rem', 
+            backgroundColor: '#ffffff', 
+            borderRadius: '12px', 
+            marginBottom: '1rem',
+            border: '1px solid #e2e8f0',
+            gap: '1rem',
+            flexWrap: 'wrap'
+          }}>
+            {/* Left side - Filters */}
+            <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="all">All Regions</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={regionStatusFilter}
+                onChange={(e) => setRegionStatusFilter(e.target.value)}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="all">All Status</option>
+                <option value="ACTIVE">Active</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
             </div>
-            <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className={styles.formInput}
-            >
-              <option value="all">All Regions</option>
-              {regions.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </select>
-            <select
-              value={regionStatusFilter}
-              onChange={(e) => setRegionStatusFilter(e.target.value)}
-              className={styles.formInput}
-            >
-              <option value="all">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="MAINTENANCE">Maintenance</option>
-              <option value="INACTIVE">Inactive</option>
-            </select>
-          </div>
 
-          <div className={styles.card}>
-            <h4>Create New Region</h4>
-            <p>
-              This creates a regional placeholder center to register the region.
-            </p>
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowRegionModal(true)}
-            >
-              + Create Region
-            </button>
+            {/* Right side - Buttons */}
+            <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
+              <button
+                onClick={() => setShowRegionModal(true)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.3px',
+                  background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 6px rgba(30, 64, 175, 0.25)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                + Create Region
+              </button>
+              <button
+                onClick={() => setShowDetailView(!showDetailView)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  backgroundColor: '#FFFFFF',
+                  color: '#374151',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                ← Back to Cards
+              </button>
+            </div>
           </div>
 
           {showRegionModal && (
