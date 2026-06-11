@@ -1959,12 +1959,12 @@
   color: inherit;
 }
 
-/* Ensure all text in dark backgrounds is white */
-.nurse-kpi-label,
-.nurse-kpi-value,
-.nurse-kpi-badge,
-[class*="kpi-label"],
-[class*="kpi-value"] {
+/* Ensure all text in dark backgrounds is white - ONLY for Nurse Dashboard */
+.nurse-dashboard .nurse-kpi-label,
+.nurse-dashboard .nurse-kpi-value,
+.nurse-dashboard .nurse-kpi-badge,
+.nurse-dashboard [class*="kpi-label"],
+.nurse-dashboard [class*="kpi-value"] {
   color: #ffffff !important;
 }
 

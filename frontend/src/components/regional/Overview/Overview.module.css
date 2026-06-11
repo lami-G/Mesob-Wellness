@@ -73,22 +73,23 @@
   font-weight: 800;
   margin-bottom: 0.25rem;
   line-height: 1;
-  /* color set via inline CSS variable */
+  color: #213d8d;
 }
 
 .kpiValueWithColor {
-  color: var(--kpi-color);
+  color: #213d8d;
 }
 
 .topKpiLabel {
   font-size: 0.9rem;
-  color: #4b5563;
+  color: #213d8d;
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
 
 .topKpiSub {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: #213d8d;
   font-weight: 500;
+  opacity: 0.85;
 }

@@ -505,10 +505,10 @@ const Performance = ({ loading, analytics, trendsData, centers }) => {
               {c.icon}
             </div>
             <div className="mgr-kpi-body">
-              <div className="mgr-kpi-value" style={{ color: c.color }}>
+              <div className="mgr-kpi-value" style={{ color: "#213d8d" }}>
                 {c.value}
               </div>
-              <div className="mgr-kpi-label" style={{ fontSize: "0.75rem" }}>
+              <div className="mgr-kpi-label" style={{ fontSize: "0.75rem", color: "#213d8d" }}>
                 {c.label}
               </div>
               <div
