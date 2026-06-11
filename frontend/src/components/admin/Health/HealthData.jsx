@@ -70,11 +70,6 @@ function HealthData() {
 
   return (
     <div className={styles.healthDataPage}>
-      <div className={styles.pageHeader}>
-        <h1>Health Data Analytics</h1>
-        <p>Aggregated health statistics and trends (anonymized)</p>
-      </div>
-
       <div className={styles.timePeriodSelector}>
         <button
           className={`${styles.periodBtn} ${timePeriod === "daily" ? styles.active : ""}`}

@@ -86,11 +86,6 @@ function SystemSettings() {
 
   return (
     <div className={styles.systemSettingsPage}>
-      <div className={styles.pageHeader}>
-        <h1>System Settings</h1>
-        <p>Configure system-wide settings and preferences</p>
-      </div>
-
       {saved && (
         <div className={styles.successMessage} ref={successMessageRef}>
           ✓ Settings saved successfully

@@ -48,45 +48,10 @@ function AppLayout({
   const getHeaderTitle = () => {
     if (title) return title;
     
-    const titles = {
-      SYSTEM_ADMIN: 'MESOB Admin Portal',
-      MANAGER: 'MESOB Manager Portal',
-      REGIONAL_OFFICE: 'MESOB Regional Portal',
-      FEDERAL_OFFICE: 'MESOB Federal Portal',
-      NURSE_OFFICER: 'MESOB Nurse Portal',
-      STAFF: 'MESOB Staff Portal',
-    };
-    
-    return titles[role] || 'MESOB Portal';
+    return 'MESOB Wellness';
   };
 
-  // Get welcome bar content
-  const getWelcomeContent = () => {
-    const welcomeTitles = {
-      SYSTEM_ADMIN: 'System Administrator',
-      MANAGER: 'Center Manager',
-      REGIONAL_OFFICE: 'Regional Officer',
-      FEDERAL_OFFICE: 'Federal Officer',
-      NURSE_OFFICER: 'Nurse Officer',
-      STAFF: 'Staff Member',
-    };
 
-    const welcomeSubtitles = {
-      SYSTEM_ADMIN: 'System-wide management and configuration',
-      MANAGER: 'Center operations and staff management',
-      REGIONAL_OFFICE: 'Regional oversight and center coordination',
-      FEDERAL_OFFICE: 'System-wide overview and administration',
-      NURSE_OFFICER: 'Manage patient queue and vitals',
-      STAFF: 'Manage your health and appointments',
-    };
-
-    return {
-      title: `Welcome, ${user?.fullName || welcomeTitles[role]}`,
-      subtitle: welcomeSubtitles[role] || 'Welcome to MESOB Portal',
-    };
-  };
-
-  const welcomeContent = getWelcomeContent();
 
   return (
     <div className="mesob-layout">
@@ -117,24 +82,6 @@ function AppLayout({
 
         {/* Main Content Area */}
         <div className="mesob-layout-main">
-          {/* Welcome Bar */}
-          <div className="mesob-welcome-bar">
-            <div className="mesob-welcome-bar-left">
-              <h2 className="mesob-welcome-bar-title">{welcomeContent.title}</h2>
-              <p className="mesob-welcome-bar-subtitle">{welcomeContent.subtitle}</p>
-            </div>
-            <div className="mesob-welcome-bar-right">
-              <span className="mesob-welcome-bar-date">
-                {new Date().toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </span>
-            </div>
-          </div>
-
           {/* Scrollable Content */}
           <div className="mesob-layout-content">
             {error && (

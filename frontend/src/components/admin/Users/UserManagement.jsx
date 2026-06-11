@@ -74,24 +74,17 @@ function UserManagement({ baseFilters = {}, allowedRoles, disallowEditRoles }) {
 
   return (
     <div className="management-section">
-      <div className="section-header">
-        <h2>User Management</h2>
-      </div>
-
-      <FilterBar
-        onFilterChange={handleFilterChange}
-        showRegionFilter={true}
-        showCenterFilter={true}
-        showRoleFilter={true}
-        initialFilters={baseFilters}
-      />
-
       <UsersList
         key={refreshKey}
         filters={filters}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onCreateClick={() => setShowCreateModal(true)}
+        onFilterChange={handleFilterChange}
+        showRegionFilter={true}
+        showCenterFilter={true}
+        showRoleFilter={true}
+        initialFilters={baseFilters}
       />
 
       <EditUserModal

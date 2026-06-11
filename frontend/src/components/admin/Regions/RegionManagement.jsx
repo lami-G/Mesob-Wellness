@@ -189,7 +189,6 @@ function RegionManagement() {
   return (
     <div className="management-section">
       <div className={styles.sectionHeader}>
-        <h2>Region Management</h2>
         <button
           className={styles.toggleViewBtn}
           onClick={() => setShowDetailView(!showDetailView)}

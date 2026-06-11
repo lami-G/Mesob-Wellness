@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { adminService } from "../../../services/adminService";
 import styles from "./UsersList.module.css";
 
-function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
+function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, showRegionFilter, showCenterFilter, showRoleFilter, initialFilters = {} }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,6 +12,30 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
     total: 0,
     pages: 0,
   });
+
+  const [regions, setRegions] = useState([]);
+  const [centers, setCenters] = useState([]);
+
+  // Load regions and centers for filters
+  useEffect(() => {
+    if (showRegionFilter) {
+      adminService.getRegions().then(data => setRegions(data || [])).catch(err => console.error(err));
+    }
+  }, [showRegionFilter]);
+
+  useEffect(() => {
+    if (filters?.region && showCenterFilter) {
+      adminService.getCentersByRegion(filters.region).then(data => setCenters(data || [])).catch(err => console.error(err));
+    } else {
+      setCenters([]);
+    }
+  }, [filters?.region, showCenterFilter]);
+
+  const handleFilterChange = (field, value) => {
+    if (onFilterChange) {
+      onFilterChange({ ...filters, [field]: value });
+    }
+  };
 
   useEffect(() => {
     setPagination((prev) => (prev.page === 1 ? prev : { ...prev, page: 1 }));
@@ -80,7 +104,162 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick }) {
   return (
     <div className={styles.tableContainer}>
       <div className={styles.tableHeader}>
-        <h2>Users Management</h2>
+        {/* Inline Filters */}
+        {onFilterChange && (
+          <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {showRegionFilter && (
+              <select
+                value={filters?.region || ''}
+                onChange={(e) => handleFilterChange('region', e.target.value)}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="">All Regions</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+            )}
+            
+            {showCenterFilter && (
+              <select
+                value={filters?.center || ''}
+                onChange={(e) => handleFilterChange('center', e.target.value)}
+                disabled={!filters?.region}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: filters?.region ? '#FFFFFF' : '#F3F4F6',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: filters?.region ? 'pointer' : 'not-allowed',
+                }}
+              >
+                <option value="">All Centers</option>
+                {centers.map((center) => (
+                  <option key={center.id} value={center.id}>
+                    {center.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            
+            {showRoleFilter && (
+              <select
+                value={filters?.role || ''}
+                onChange={(e) => handleFilterChange('role', e.target.value)}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="">All Roles</option>
+                <option value="SYSTEM_ADMIN">System Admin</option>
+                <option value="REGIONAL_OFFICE">Regional Office</option>
+                <option value="FEDERAL_OFFICE">Federal Office</option>
+                <option value="MANAGER">Manager</option>
+                <option value="NURSE_OFFICER">Nurse Officer</option>
+                <option value="STAFF">Staff</option>
+                <option value="EXTERNAL_PATIENT">External Patient</option>
+              </select>
+            )}
+            
+            {/* Status Filter */}
+            <select
+              value={filters?.status || ''}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">All Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+            
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={filters?.search || ''}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 500,
+                fontSize: '0.8rem',
+                color: '#374151',
+                minWidth: '150px',
+              }}
+            />
+            
+            {/* Reset Button */}
+            <button
+              onClick={() => {
+                if (onFilterChange) {
+                  onFilterChange({
+                    region: '',
+                    center: '',
+                    role: '',
+                    status: '',
+                    search: '',
+                    dateFrom: '',
+                    dateTo: '',
+                  });
+                }
+              }}
+              style={{
+                padding: '0.375rem 0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#6B7280',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#F3F4F6';
+                e.target.style.borderColor = '#9CA3AF';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#FFFFFF';
+                e.target.style.borderColor = '#D1D5DB';
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        )}
+        
         <button className={styles.btnPrimary} onClick={onCreateClick}>
           + Create User
         </button>

@@ -150,7 +150,7 @@ function Header({ title, onToggleSidebar, dashboardType }) {
       </div>
 
       {/* Center - Dashboard Title */}
-      <h1 className="mesob-header-title">{title || 'MESOB Portal'}</h1>
+      <h1 className="mesob-header-title">{title || 'MESOB Wellness'}</h1>
 
       {/* Right Section - Language, Notifications, User */}
       <div className="mesob-header-right">

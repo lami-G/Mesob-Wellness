@@ -170,26 +170,16 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
 
   return (
     <div className="management-section">
-      <div className="section-header">
-        <h2>Center Management</h2>
-        <button className="btn-primary" onClick={handleCreate}>
-          + Add Center
-        </button>
-      </div>
-
-      <FilterBar
-        onFilterChange={handleFilterChange}
-        showRegionFilter={true}
-        showCenterFilter={false}
-        initialFilters={baseFilters}
-      />
-
       <CentersList
         key={refreshKey}
         filters={filters}
         onEdit={handleEdit}
         onDelete={handleDelete}
         allowDelete={allowDelete}
+        onFilterChange={handleFilterChange}
+        showRegionFilter={true}
+        initialFilters={baseFilters}
+        onCreateClick={handleCreate}
       />
 
       {/* Center Staff Health Comparison */}

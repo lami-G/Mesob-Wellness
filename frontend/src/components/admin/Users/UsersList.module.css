@@ -13,9 +13,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
+  padding: 0.875rem 1rem;
   border-bottom: 1px solid #e2e8f0;
   background: white;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .tableHeader h2 {
@@ -25,24 +27,25 @@
 }
 
 .btnPrimary {
-  padding: 12px 24px;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
+  white-space: nowrap;
 }
 
 .btnPrimary:hover {
   background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.35);
 }
 
 .dataTable {

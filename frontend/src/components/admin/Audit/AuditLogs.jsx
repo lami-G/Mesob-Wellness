@@ -121,11 +121,6 @@ function AuditLogs({ baseFilters = {} }) {
 
   return (
     <div className={styles.auditLogsPage}>
-      <div className={styles.pageHeader}>
-        <h1>Audit Logs</h1>
-        <p>Track all system activities and changes</p>
-      </div>
-
       <div className={styles.filters}>
         <select
           name="region"

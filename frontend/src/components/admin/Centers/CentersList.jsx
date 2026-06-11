@@ -3,7 +3,16 @@ import { adminService } from "../../../services/adminService";
 import clsx from "clsx";
 import styles from "./CentersList.module.css";
 
-function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
+function CentersList({ 
+  filters, 
+  onEdit, 
+  onDelete, 
+  allowDelete = true,
+  onFilterChange,
+  showRegionFilter,
+  initialFilters = {},
+  onCreateClick
+}) {
   const [centers, setCenters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -13,6 +22,21 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
     total: 0,
     pages: 0,
   });
+
+  const [regions, setRegions] = useState([]);
+
+  // Load regions for filter
+  useEffect(() => {
+    if (showRegionFilter) {
+      adminService.getRegions().then(data => setRegions(data || [])).catch(err => console.error(err));
+    }
+  }, [showRegionFilter]);
+
+  const handleFilterChange = (field, value) => {
+    if (onFilterChange) {
+      onFilterChange({ ...filters, [field]: value });
+    }
+  };
 
   useEffect(() => {
     fetchCenters();
@@ -64,6 +88,117 @@ function CentersList({ filters, onEdit, onDelete, allowDelete = true }) {
 
   return (
     <div className={styles.tableContainer}>
+      {/* Header with inline filters and Add Center button */}
+      <div className={styles.tableHeader}>
+        {/* Inline Filters */}
+        {onFilterChange && (
+          <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {showRegionFilter && (
+              <select
+                value={filters?.region || ''}
+                onChange={(e) => handleFilterChange('region', e.target.value)}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  borderRadius: '6px',
+                  border: '1px solid #D1D5DB',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="">All Regions</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>
+                    {region}
+                  </option>
+                ))}
+              </select>
+            )}
+            
+            {/* Status Filter */}
+            <select
+              value={filters?.status || ''}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">All Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="MAINTENANCE">Maintenance</option>
+            </select>
+            
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search centers..."
+              value={filters?.search || ''}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 500,
+                fontSize: '0.8rem',
+                color: '#374151',
+                minWidth: '150px',
+              }}
+            />
+            
+            {/* Reset Button */}
+            <button
+              onClick={() => {
+                if (onFilterChange) {
+                  onFilterChange({
+                    region: '',
+                    status: '',
+                    search: '',
+                  });
+                }
+              }}
+              style={{
+                padding: '0.375rem 0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#6B7280',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#F3F4F6';
+                e.target.style.borderColor = '#9CA3AF';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#FFFFFF';
+                e.target.style.borderColor = '#D1D5DB';
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        )}
+        
+        {onCreateClick && (
+          <button className={styles.btnPrimary} onClick={onCreateClick}>
+            + Add Center
+          </button>
+        )}
+      </div>
+      
       <table className={styles.dataTable}>
         <thead>
           <tr>

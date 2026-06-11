@@ -76,18 +76,15 @@ function AdminDashboard() {
     switch (activeTab) {
       case "dashboard":
         return (
-          <div className="dashboard-section">
-            <h2>System Dashboard</h2>
-            <DashboardMetrics 
-              onTabChange={setActiveTab}
-              timePeriod={globalFilters.timePeriod}
-              onTimePeriodChange={(value) => handleFilterChange("timePeriod", value)}
-              selectedCenter={globalFilters.center}
-              selectedRegion={globalFilters.region}
-              dateRange={globalFilters.dateRange}
-              showControls={false}
-            />
-          </div>
+          <DashboardMetrics 
+            onTabChange={setActiveTab}
+            timePeriod={globalFilters.timePeriod}
+            onTimePeriodChange={(value) => handleFilterChange("timePeriod", value)}
+            selectedCenter={globalFilters.center}
+            selectedRegion={globalFilters.region}
+            dateRange={globalFilters.dateRange}
+            showControls={false}
+          />
         );
       case "regions":
         return <RegionManagement />;
@@ -118,90 +115,91 @@ function AdminDashboard() {
       onTabChange={setActiveTab}
     >
       {shouldShowFilters && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem', padding: '1rem', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <select
-              value={globalFilters.timePeriod}
-              onChange={(e) => handleFilterChange("timePeriod", e.target.value)}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="all">All Time</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
+        <div style={{ display: 'inline-flex', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.625rem', padding: '0.625rem 0.875rem', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+          <select
+            value={globalFilters.timePeriod}
+            onChange={(e) => handleFilterChange("timePeriod", e.target.value)}
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
 
-            <select
-              value={globalFilters.center}
-              onChange={(e) => handleFilterChange("center", e.target.value)}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="all">All Centers</option>
-              {centers.map((center) => (
-                <option key={center.id} value={center.id}>
-                  {center.name}
-                </option>
-              ))}
-            </select>
+          <select
+            value={globalFilters.center}
+            onChange={(e) => handleFilterChange("center", e.target.value)}
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Centers</option>
+            {centers.map((center) => (
+              <option key={center.id} value={center.id}>
+                {center.name}
+              </option>
+            ))}
+          </select>
 
-            <select
-              value={globalFilters.region}
-              onChange={(e) => handleFilterChange("region", e.target.value)}
-              style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                color: '#374151',
-                cursor: 'pointer',
-              }}
-              className="region-select"
-            >
-              <option value="all">All Regions</option>
-              {regions.map((region) => (
-                <option key={region.id || region} value={region.id || region}>
-                  {region.name || region}
-                </option>
-              ))}
-            </select>
+          <select
+            value={globalFilters.region}
+            onChange={(e) => handleFilterChange("region", e.target.value)}
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: 'pointer',
+            }}
+            className="region-select"
+          >
+            <option value="all">All Regions</option>
+            {regions.map((region) => (
+              <option key={region.id || region} value={region.id || region}>
+                {region.name || region}
+              </option>
+            ))}
+          </select>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <label style={{ fontWeight: 600, color: '#374151' }}>Date:</label>
-              <input
-                type="date"
-                value={globalFilters.dateRange.start}
-                onChange={(e) =>
-                  handleDateRangeChange(e.target.value, globalFilters.dateRange.end)
-                }
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, color: '#374151' }}
-              />
-              <span style={{ color: '#6b7280' }}>to</span>
-              <input
-                type="date"
-                value={globalFilters.dateRange.end}
-                onChange={(e) =>
-                  handleDateRangeChange(globalFilters.dateRange.start, e.target.value)
-                }
-                style={{ padding: '0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, color: '#374151' }}
-              />
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.75rem', color: '#374151' }}>Date:</label>
+            <input
+              type="date"
+              value={globalFilters.dateRange.start}
+              onChange={(e) =>
+                handleDateRangeChange(e.target.value, globalFilters.dateRange.end)
+              }
+              style={{ padding: '0.375rem 0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, fontSize: '0.75rem', color: '#374151' }}
+            />
+            <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>to</span>
+            <input
+              type="date"
+              value={globalFilters.dateRange.end}
+              onChange={(e) =>
+                handleDateRangeChange(globalFilters.dateRange.start, e.target.value)
+              }
+              style={{ padding: '0.375rem 0.5rem', borderRadius: '6px', border: '1px solid #D1D5DB', fontWeight: 600, fontSize: '0.75rem', color: '#374151' }}
+            />
           </div>
         </div>
       )}

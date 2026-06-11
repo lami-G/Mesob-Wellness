@@ -198,10 +198,6 @@ function AdminProfile() {
           ✗ {errorMessage}
         </div>
       )}
-      <div className={styles.pageHeader}>
-        <h1>Admin Profile</h1>
-        <p>Manage your profile information</p>
-      </div>
       <div className={styles.settingsContainer}>
         <div className={styles.profilePictureCard}>
           <div className={styles.profilePictureContainer}>
