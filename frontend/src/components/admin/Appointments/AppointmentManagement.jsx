@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import FilterBar from "../FilterBar";
 import AppointmentsList from "./AppointmentsList";
 import { adminService } from "../../../services/adminService";
 
@@ -73,19 +72,11 @@ function AppointmentManagement({ baseFilters = {} }) {
 
   return (
     <div className="management-section">
-      <FilterBar
-        onFilterChange={handleFilterChange}
-        showRegionFilter={true}
-        showCenterFilter={true}
-        showDateFilter={true}
-        showTimePeriodFilter={true}
-        initialFilters={baseFilters}
-      />
-
       <AppointmentsList
         key={refreshKey}
         filters={filters}
         onDelete={handleDelete}
+        onFilterChange={handleFilterChange}
       />
     </div>
   );

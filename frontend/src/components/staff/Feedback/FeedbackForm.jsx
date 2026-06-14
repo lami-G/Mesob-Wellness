@@ -104,16 +104,14 @@ function FeedbackForm() {
 
   const getNpsDescription = (score) => {
     if (score === null) return 'Select a score';
-    if (score <= 6) return '😞 Detractor - We\'re sorry to hear that';
-    if (score <= 8) return '😐 Passive - Thank you for your feedback';
-    return '😊 Promoter - We\'re thrilled you\'re happy!';
+    if (score <= 6) return 'Detractor - We\'re sorry to hear that';
+    if (score <= 8) return 'Passive - Thank you for your feedback';
+    return 'Promoter - We\'re thrilled you\'re happy!';
   };
 
   const getNpsEmoji = (score) => {
-    if (score === null) return '❓';
-    if (score <= 6) return '😞';
-    if (score <= 8) return '😐';
-    return '😊';
+    if (score === null) return '';
+    return '';
   };
 
   return (
@@ -125,7 +123,7 @@ function FeedbackForm() {
 
       {success && (
         <div className={styles.feedbackSuccess}>
-          <span className={styles.successIcon}>✅</span>
+          <span className={styles.successIcon}>✓</span>
           <div>
             <strong>Thank you!</strong>
             <p>Your feedback has been submitted successfully.</p>
@@ -162,7 +160,6 @@ function FeedbackForm() {
               formData.npsScore <= 8 ? styles.npsFeedbackPassive :
               styles.npsFeedbackPromoter
             )}>
-              <span className={styles.npsEmoji}>{getNpsEmoji(formData.npsScore)}</span>
               <span className={styles.npsText}>{getNpsDescription(formData.npsScore)}</span>
             </div>
           )}

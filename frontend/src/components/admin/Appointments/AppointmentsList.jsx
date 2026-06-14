@@ -4,7 +4,7 @@ import api from "../../../services/api";
 import clsx from "clsx";
 import styles from "./AppointmentsList.module.css";
 
-function AppointmentsList({ filters, onDelete }) {
+function AppointmentsList({ filters, onDelete, onFilterChange }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -13,6 +13,23 @@ function AppointmentsList({ filters, onDelete }) {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   const [cancellationReason, setCancellationReason] = useState("");
   const [cancelling, setCancelling] = useState(false);
+  const [regions, setRegions] = useState([]);
+  const [centers, setCenters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Load regions for filter
+  useEffect(() => {
+    adminService.getRegions().then(data => setRegions(data || [])).catch(err => console.error(err));
+  }, []);
+
+  // Load centers when region changes
+  useEffect(() => {
+    if (filters?.region) {
+      adminService.getCentersByRegion(filters.region).then(data => setCenters(data || [])).catch(err => console.error(err));
+    } else {
+      setCenters([]);
+    }
+  }, [filters?.region]);
 
   useEffect(() => {
     fetchAppointments();
@@ -30,6 +47,26 @@ function AppointmentsList({ filters, onDelete }) {
       console.error("Error fetching appointments:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (field, value) => {
+    if (onFilterChange) {
+      onFilterChange({ ...filters, [field]: value });
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery('');
+    if (onFilterChange) {
+      onFilterChange({
+        region: '',
+        center: '',
+        status: '',
+        timePeriod: 'all',
+        dateFrom: '',
+        dateTo: '',
+      });
     }
   };
 
@@ -94,6 +131,151 @@ function AppointmentsList({ filters, onDelete }) {
 
   return (
     <div className={styles.tableContainer}>
+      {/* Header with inline filters */}
+      <div className={styles.tableHeader}>
+        {onFilterChange && (
+          <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Time Period Filter */}
+            <select
+              value={filters?.timePeriod || 'all'}
+              onChange={(e) => handleFilterChange('timePeriod', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="all">All Time</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+
+            {/* Region Filter */}
+            <select
+              value={filters?.region || ''}
+              onChange={(e) => handleFilterChange('region', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">All Regions</option>
+              {regions.map((region) => (
+                <option key={region} value={region}>
+                  {region}
+                </option>
+              ))}
+            </select>
+
+            {/* Center Filter */}
+            <select
+              value={filters?.center || ''}
+              onChange={(e) => handleFilterChange('center', e.target.value)}
+              disabled={!filters?.region}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: filters?.region ? '#FFFFFF' : '#F3F4F6',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: filters?.region ? 'pointer' : 'not-allowed',
+              }}
+            >
+              <option value="">All Centers</option>
+              {centers.map((center) => (
+                <option key={center.id} value={center.id}>
+                  {center.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={filters?.status || ''}
+              onChange={(e) => handleFilterChange('status', e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#374151',
+                cursor: 'pointer',
+              }}
+            >
+              <option value="">All Status</option>
+              <option value="PENDING">Pending</option>
+              <option value="CONFIRMED">Confirmed</option>
+              <option value="WAITING">Waiting</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="IN_SERVICE">In Service</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+              <option value="NO_SHOW">No Show</option>
+            </select>
+
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 500,
+                fontSize: '0.8rem',
+                color: '#374151',
+                minWidth: '150px',
+              }}
+            />
+
+            {/* Reset Button */}
+            <button
+              onClick={handleResetFilters}
+              style={{
+                padding: '0.375rem 0.75rem',
+                borderRadius: '6px',
+                border: '1px solid #D1D5DB',
+                backgroundColor: '#FFFFFF',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: '#6B7280',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#F3F4F6';
+                e.target.style.borderColor = '#9CA3AF';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#FFFFFF';
+                e.target.style.borderColor = '#D1D5DB';
+              }}
+            >
+              Reset
+            </button>
+          </div>
+        )}
+      </div>
+
       <table className={styles.dataTable}>
         <thead>
           <tr>

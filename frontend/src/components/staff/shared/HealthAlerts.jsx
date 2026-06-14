@@ -56,7 +56,7 @@ function HealthAlerts() {
           type: 'critical',
           title: 'Critical Blood Pressure',
           message: `Your BP is ${vital.systolicBP}/${vital.diastolicBP}. Seek immediate medical attention.`,
-          icon: '🚨',
+          icon: '!',
           action: 'Contact Doctor',
         });
       } else if (vital.systolicBP >= 140 || vital.diastolicBP >= 90) {
@@ -65,7 +65,7 @@ function HealthAlerts() {
           type: 'warning',
           title: 'High Blood Pressure',
           message: `Your BP is ${vital.systolicBP}/${vital.diastolicBP}. Monitor closely and follow your wellness plan.`,
-          icon: '⚠️',
+          icon: '!',
           action: 'View Plan',
         });
       } else if (vital.systolicBP >= 130 || vital.diastolicBP >= 80) {
@@ -74,7 +74,7 @@ function HealthAlerts() {
           type: 'info',
           title: 'Elevated Blood Pressure',
           message: `Your BP is ${vital.systolicBP}/${vital.diastolicBP}. Maintain healthy habits.`,
-          icon: 'ℹ️',
+          icon: 'i',
           action: 'Learn More',
         });
       }
@@ -88,7 +88,7 @@ function HealthAlerts() {
           type: 'critical',
           title: 'Critical Blood Glucose',
           message: `Your glucose is ${vital.glucose} mg/dL. Seek immediate medical attention.`,
-          icon: '🚨',
+          icon: '!',
           action: 'Contact Doctor',
         });
       } else if (vital.glucose >= 200) {
@@ -97,7 +97,7 @@ function HealthAlerts() {
           type: 'warning',
           title: 'High Blood Glucose',
           message: `Your glucose is ${vital.glucose} mg/dL. This may indicate diabetes.`,
-          icon: '⚠️',
+          icon: '!',
           action: 'View Plan',
         });
       } else if (vital.glucose >= 126) {
@@ -106,7 +106,7 @@ function HealthAlerts() {
           type: 'info',
           title: 'Elevated Blood Glucose',
           message: `Your glucose is ${vital.glucose} mg/dL. You may be prediabetic.`,
-          icon: 'ℹ️',
+          icon: 'i',
           action: 'Learn More',
         });
       }
@@ -120,7 +120,7 @@ function HealthAlerts() {
           type: 'warning',
           title: 'Severe Obesity',
           message: `Your BMI is ${vital.bmi.toFixed(1)}. Consider consulting a healthcare provider.`,
-          icon: '⚠️',
+          icon: '!',
           action: 'View Plan',
         });
       } else if (vital.bmi >= 30) {
@@ -129,7 +129,7 @@ function HealthAlerts() {
           type: 'info',
           title: 'Obesity',
           message: `Your BMI is ${vital.bmi.toFixed(1)}. Follow your exercise plan.`,
-          icon: 'ℹ️',
+          icon: 'i',
           action: 'View Plan',
         });
       } else if (vital.bmi >= 25) {
@@ -138,7 +138,7 @@ function HealthAlerts() {
           type: 'info',
           title: 'Overweight',
           message: `Your BMI is ${vital.bmi.toFixed(1)}. Maintain healthy habits.`,
-          icon: 'ℹ️',
+          icon: 'i',
           action: 'Learn More',
         });
       }
@@ -152,7 +152,7 @@ function HealthAlerts() {
           type: 'critical',
           title: 'High Fever',
           message: `Your temperature is ${vital.temperature}°C. Seek medical attention.`,
-          icon: '🚨',
+          icon: '!',
           action: 'Contact Doctor',
         });
       } else if (vital.temperature >= 38) {
@@ -161,7 +161,7 @@ function HealthAlerts() {
           type: 'warning',
           title: 'Fever',
           message: `Your temperature is ${vital.temperature}°C. Rest and monitor.`,
-          icon: '⚠️',
+          icon: '!',
           action: 'View Tips',
         });
       }
@@ -175,7 +175,7 @@ function HealthAlerts() {
           type: 'critical',
           title: 'Low Oxygen Saturation',
           message: `Your O₂ saturation is ${vital.oxygenSaturation}%. Seek immediate medical attention.`,
-          icon: '🚨',
+          icon: '!',
           action: 'Contact Doctor',
         });
       } else if (vital.oxygenSaturation < 95) {
@@ -184,7 +184,7 @@ function HealthAlerts() {
           type: 'warning',
           title: 'Low Oxygen Saturation',
           message: `Your O₂ saturation is ${vital.oxygenSaturation}%. Monitor closely.`,
-          icon: '⚠️',
+          icon: '!',
           action: 'Learn More',
         });
       }
@@ -209,9 +209,9 @@ function HealthAlerts() {
   if (visibleAlerts.length === 0) {
     return (
       <div className="card health-alerts">
-        <h3>🔔 Health Alerts</h3>
+        <h3>Health Alerts</h3>
         <div className="alert alert-success">
-          ✅ No health alerts. Keep up the good work!
+          No health alerts. Keep up the good work!
         </div>
       </div>
     );
@@ -219,7 +219,7 @@ function HealthAlerts() {
 
   return (
     <div className="card health-alerts">
-      <h3>🔔 Health Alerts ({visibleAlerts.length})</h3>
+      <h3>Health Alerts ({visibleAlerts.length})</h3>
       
       <div className="alerts-list">
         {visibleAlerts.map((alert) => (

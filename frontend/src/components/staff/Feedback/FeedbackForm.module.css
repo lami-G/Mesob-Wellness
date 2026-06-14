@@ -3,9 +3,9 @@
    ======================================== */
 
 .feedbackForm {
-  background: linear-gradient(135deg, #284394 0%, #2563eb 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+  border: 1px solid #dee2e6 !important;
+  color: #212529 !important;
   backdrop-filter: none !important;
   border-radius: 12px;
   padding: 25px;
@@ -21,13 +21,13 @@
 .feedbackHeader h2 {
   margin: 0 0 0.5rem;
   font-size: 1.75rem;
-  color: #ffffff;
+  color: #284394;
   font-weight: 700;
 }
 
 .feedbackSubtitle {
   margin: 0;
-  color: rgba(255, 255, 255, 0.85);
+  color: #6c757d;
   font-size: 0.95rem;
 }
 

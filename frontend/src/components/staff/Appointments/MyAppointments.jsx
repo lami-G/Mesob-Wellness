@@ -114,9 +114,9 @@ function MyAppointments() {
   const handleSendReminder = async (appointmentId) => {
     try {
       await api.post(`/api/v1/appointments/${appointmentId}/send-reminder`);
-      alert("✅ SMS reminder sent successfully!");
+      alert("SMS reminder sent successfully!");
     } catch (err) {
-      alert("❌ Failed to send SMS reminder");
+      alert("Failed to send SMS reminder");
       console.error(err);
     }
   };
@@ -156,7 +156,7 @@ function MyAppointments() {
       setError("");
       closeCancelModal();
       fetchAppointments();
-      alert("✅ Appointment cancelled successfully!");
+      alert("Appointment cancelled successfully!");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to cancel appointment");
       console.error(err);
@@ -176,7 +176,7 @@ function MyAppointments() {
 
   return (
     <div className={clsx('card', styles.myAppointments)}>
-      <h2>📋 My Appointments</h2>
+      <h2>My Appointments</h2>
 
       {error && <div className={clsx(styles.alert, styles.alertError)}>{error}</div>}
 
@@ -237,7 +237,7 @@ function MyAppointments() {
                       onClick={() => openCancelModal(apt.id)}
                       title="Cancel this appointment"
                     >
-                      ❌ Cancel
+                      Cancel
                     </button>
                   )}
                 </div>
@@ -283,7 +283,7 @@ function MyAppointments() {
                     className="btn btn-primary"
                     onClick={() => handleSendReminder(apt.id)}
                   >
-                    📱 Send SMS Reminder
+                    Send SMS Reminder
                   </button>
                 )}
               </div>

@@ -251,7 +251,7 @@ function FeedbackList({ baseFilters = {} }) {
         <input
           type="text"
           name="search"
-          placeholder="Search by patient..."
+          placeholder="Search..."
           value={filters.search}
           onChange={handleFilterChange}
           className={styles.filterInput}

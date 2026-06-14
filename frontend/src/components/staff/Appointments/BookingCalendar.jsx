@@ -294,7 +294,7 @@ function BookingCalendar() {
 
   return (
     <div className={clsx('card', styles.bookingCalendar)}>
-      <h2>📅 Booking Calendar</h2>
+      <h2>Booking Calendar</h2>
 
       {error && <div className={clsx(styles.alert, styles.alertError)} ref={errorRef}>{error}</div>}
 

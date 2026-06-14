@@ -62,7 +62,7 @@ function AppointmentReminders() {
   if (reminders.length === 0) {
     return (
       <div className="card appointment-reminders">
-        <h3>📬 Appointment Reminders</h3>
+        <h3>Appointment Reminders</h3>
         <p className="empty-text">No upcoming appointments in the next 7 days</p>
       </div>
     );
@@ -70,7 +70,7 @@ function AppointmentReminders() {
 
   return (
     <div className="card appointment-reminders">
-      <h3>📬 Appointment Reminders ({reminders.length})</h3>
+      <h3>Appointment Reminders ({reminders.length})</h3>
       
       <div className="reminders-list">
         {reminders.map((reminder) => (
@@ -98,17 +98,17 @@ function AppointmentReminders() {
                 className="btn btn-small btn-primary"
                 onClick={() => sendSmsReminder(reminder.id)}
               >
-                📱 Send SMS Reminder
+                Send SMS Reminder
               </button>
               <span className="sms-status">
                 {reminder.reminderSentAt ? (
                   <>
-                    ✅ Sent {reminder.reminderCount || 1}x
+                    Sent {reminder.reminderCount || 1}x
                     <br />
                     <small>Last: {new Date(reminder.reminderSentAt).toLocaleString()}</small>
                   </>
                 ) : (
-                  '⏳ Not sent yet'
+                  'Not sent yet'
                 )}
               </span>
             </div>
@@ -117,7 +117,7 @@ function AppointmentReminders() {
       </div>
 
       <div className="reminder-info">
-        <p>💡 Tip: SMS reminders help you remember your appointments. Enable notifications in your phone settings.</p>
+        <p>Tip: SMS reminders help you remember your appointments. Enable notifications in your phone settings.</p>
       </div>
     </div>
   );

@@ -3,12 +3,13 @@ import { adminService } from "../../../services/adminService";
 import styles from "./AuditLogs.module.css";
 
 function AuditLogs({ baseFilters = {} }) {
-  const [logs, setLogs] = useState([]);
+  const [allLogs, setAllLogs] = useState([]); // Store all logs
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
     region: "",
     center: "",
@@ -16,32 +17,103 @@ function AuditLogs({ baseFilters = {} }) {
     resource: "",
     dateFrom: "",
     dateTo: "",
-    search: "",
     role: "",
     ...baseFilters,
   });
 
-  useEffect(() => {
-    fetchLogs();
-  }, [page, JSON.stringify(filters)]);
+  // Client-side filtered logs
+  const filteredLogs = allLogs.filter(log => {
+    // Region filter
+    if (filters.region && log.center?.region !== filters.region) return false;
+    
+    // Center filter
+    if (filters.center && log.centerId !== filters.center) return false;
+    
+    // Action filter
+    if (filters.action && !log.action?.includes(filters.action)) return false;
+    
+    // Resource filter
+    if (filters.resource && log.resource !== filters.resource) return false;
+    
+    // Role filter
+    if (filters.role && log.user?.role !== filters.role) return false;
+    
+    // Date range filter
+    if (filters.dateFrom) {
+      const logDate = new Date(log.timestamp);
+      const fromDate = new Date(filters.dateFrom);
+      if (logDate < fromDate) return false;
+    }
+    if (filters.dateTo) {
+      const logDate = new Date(log.timestamp);
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      if (logDate > toDate) return false;
+    }
+    
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchUser = log.user?.fullName?.toLowerCase().includes(query);
+      const matchResource = log.resource?.toLowerCase().includes(query);
+      const matchAction = log.action?.toLowerCase().includes(query);
+      if (!matchUser && !matchResource && !matchAction) return false;
+    }
+    
+    return true;
+  });
 
-  useEffect(() => {
-    setFilters((prev) => ({ ...prev, ...baseFilters }));
-  }, [JSON.stringify(baseFilters)]);
+  // Paginated filtered logs
+  const paginatedLogs = filteredLogs.slice(
+    (page - 1) * 20,
+    page * 20
+  );
 
+  const totalPages = Math.ceil(filteredLogs.length / 20);
+
+  // Fetch all logs only once on mount
   useEffect(() => {
-    // Fetch regions on mount
+    fetchAllLogs();
+  }, []);
+
+  // Fetch regions on mount
+  useEffect(() => {
     fetchRegions();
   }, []);
 
+  // Fetch centers when region changes
   useEffect(() => {
-    // Fetch centers when region changes
     if (filters.region) {
       fetchCenters(filters.region);
     } else {
       setCenters([]);
     }
   }, [filters.region]);
+
+  // Reset to page 1 when filters or search change
+  useEffect(() => {
+    setPage(1);
+  }, [filters, searchQuery]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, ...baseFilters }));
+  }, [JSON.stringify(baseFilters)]);
+
+  const fetchAllLogs = async () => {
+    try {
+      setLoading(true);
+      const response = await adminService.getAuditLogs({
+        limit: 10000, // Get all logs
+      });
+      setAllLogs(response.data || []);
+      setError(null);
+    } catch (err) {
+      setError(err.message || "Failed to load audit logs");
+      console.error("Error fetching logs:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchRegions = async () => {
     try {
@@ -62,38 +134,19 @@ function AuditLogs({ baseFilters = {} }) {
     }
   };
 
-  const fetchLogs = async () => {
-    try {
-      setLoading(true);
-      const response = await adminService.getAuditLogs({
-        ...filters,
-        page,
-        limit: 20,
-      });
-      setLogs(response.data || []);
-      setError(null);
-    } catch (err) {
-      setError(err.message || "Failed to load audit logs");
-      console.error("Error fetching logs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
+  const handleFilterChange = (field, value) => {
     setFilters((prev) => {
-      const newFilters = { ...prev, [name]: value };
+      const newFilters = { ...prev, [field]: value };
       // Clear center filter when region changes
-      if (name === 'region') {
+      if (field === 'region') {
         newFilters.center = '';
       }
       return newFilters;
     });
-    setPage(1);
   };
 
   const handleResetFilters = () => {
+    setSearchQuery('');
     setFilters({
       region: "",
       center: "",
@@ -101,11 +154,9 @@ function AuditLogs({ baseFilters = {} }) {
       resource: "",
       dateFrom: "",
       dateTo: "",
-      search: "",
       role: "",
       ...baseFilters,
     });
-    setPage(1);
   };
 
   const getActionColor = (action) => {
@@ -123,9 +174,8 @@ function AuditLogs({ baseFilters = {} }) {
     <div className={styles.auditLogsPage}>
       <div className={styles.filters}>
         <select
-          name="region"
           value={filters.region}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('region', e.target.value)}
           className={styles.filterSelect}
         >
           <option value="">All Regions</option>
@@ -136,9 +186,8 @@ function AuditLogs({ baseFilters = {} }) {
           ))}
         </select>
         <select
-          name="center"
           value={filters.center}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('center', e.target.value)}
           className={styles.filterSelect}
           disabled={!filters.region}
         >
@@ -151,32 +200,28 @@ function AuditLogs({ baseFilters = {} }) {
         </select>
         <input
           type="date"
-          name="dateFrom"
           placeholder="Date From"
           value={filters.dateFrom}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
           className={styles.filterInput}
         />
         <input
           type="date"
-          name="dateTo"
           placeholder="Date To"
           value={filters.dateTo}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('dateTo', e.target.value)}
           className={styles.filterInput}
         />
         <input
           type="text"
-          name="search"
-          placeholder="Search by user or resource..."
-          value={filters.search}
-          onChange={handleFilterChange}
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className={styles.filterInput}
         />
         <select
-          name="action"
           value={filters.action}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('action', e.target.value)}
           className={styles.filterSelect}
         >
           <option value="">All Actions</option>
@@ -187,9 +232,8 @@ function AuditLogs({ baseFilters = {} }) {
           <option value="LOGOUT">Logout</option>
         </select>
         <select
-          name="resource"
           value={filters.resource}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('resource', e.target.value)}
           className={styles.filterSelect}
         >
           <option value="">All Resources</option>
@@ -200,9 +244,8 @@ function AuditLogs({ baseFilters = {} }) {
           <option value="FEEDBACK">Feedback</option>
         </select>
         <select
-          name="role"
           value={filters.role}
-          onChange={handleFilterChange}
+          onChange={(e) => handleFilterChange('role', e.target.value)}
           className={styles.filterSelect}
         >
           <option value="">All Roles</option>
@@ -232,7 +275,7 @@ function AuditLogs({ baseFilters = {} }) {
           </tr>
         </thead>
         <tbody>
-          {logs.map((log) => (
+          {paginatedLogs.map((log) => (
             <tr key={log.id}>
               <td>{new Date(log.timestamp).toLocaleString()}</td>
               <td>{log.user?.fullName || "System"}</td>
@@ -257,27 +300,35 @@ function AuditLogs({ baseFilters = {} }) {
         </tbody>
       </table>
 
-      {logs.length === 0 && (
-        <div className={styles.emptyState}>No audit logs found</div>
+      {paginatedLogs.length === 0 && (
+        <div className={styles.emptyState}>
+          {searchQuery || Object.values(filters).some(v => v)
+            ? "No audit logs found matching the filters"
+            : "No audit logs found"}
+        </div>
       )}
 
-      <div className={styles.pagination}>
-        <button
-          onClick={() => setPage(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className={styles.btnPrev}
-        >
-          Previous
-        </button>
-        <span className={styles.pageInfo}>Page {page}</span>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={logs.length < 20}
-          className={styles.btnNext}
-        >
-          Next
-        </button>
-      </div>
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            onClick={() => setPage(Math.max(1, page - 1))}
+            disabled={page === 1}
+            className={styles.btnPrev}
+          >
+            Previous
+          </button>
+          <span className={styles.pageInfo}>
+            Page {page} of {totalPages} ({filteredLogs.length} logs)
+          </span>
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page >= totalPages}
+            className={styles.btnNext}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

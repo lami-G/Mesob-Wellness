@@ -114,7 +114,7 @@ function RiskScoring() {
   if (!riskScores) {
     return (
       <div className="card risk-scoring">
-        <h3>📊 Risk Scoring</h3>
+        <h3>Risk Scoring</h3>
         <p className="empty-text">No vitals recorded yet. Risk scores will appear after your first health screening.</p>
       </div>
     );
@@ -122,7 +122,7 @@ function RiskScoring() {
 
   return (
     <div className="card risk-scoring">
-      <h3>📊 Risk Scoring Analysis</h3>
+      <h3>Risk Scoring Analysis</h3>
       
       {error && <div className="alert alert-error">{error}</div>}
 
@@ -172,16 +172,16 @@ function RiskScoring() {
         <h4>Recommendations</h4>
         <ul>
           {riskScores.hypertension > 50 && (
-            <li>🩺 Monitor blood pressure regularly. Consider reducing salt intake.</li>
+            <li>Monitor blood pressure regularly. Consider reducing salt intake.</li>
           )}
           {riskScores.diabetes > 50 && (
-            <li>🍎 Reduce sugar intake and maintain regular exercise routine.</li>
+            <li>Reduce sugar intake and maintain regular exercise routine.</li>
           )}
           {riskScores.obesity > 50 && (
-            <li>💪 Increase physical activity and follow your wellness plan.</li>
+            <li>Increase physical activity and follow your wellness plan.</li>
           )}
           {riskScores.overall < 30 && (
-            <li>✅ Great! Keep maintaining your healthy lifestyle.</li>
+            <li>Great! Keep maintaining your healthy lifestyle.</li>
           )}
         </ul>
       </div>

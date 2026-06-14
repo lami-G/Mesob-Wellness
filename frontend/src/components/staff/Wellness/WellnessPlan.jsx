@@ -157,21 +157,21 @@ function WellnessPlan() {
               <div className={styles.planSections}>
                 {plan.nutritionRecommendations && (
                   <div className={styles.planSection}>
-                    <h4>🥗 Nutrition Recommendations</h4>
+                    <h4>Nutrition Recommendations</h4>
                     <p>{plan.nutritionRecommendations}</p>
                   </div>
                 )}
 
                 {plan.exerciseRecommendations && (
                   <div className={styles.planSection}>
-                    <h4>🏃 Exercise Recommendations</h4>
+                    <h4>Exercise Recommendations</h4>
                     <p>{plan.exerciseRecommendations}</p>
                   </div>
                 )}
 
                 {plan.stressManagementAdvice && (
                   <div className={styles.planSection}>
-                    <h4>🧘 Stress Management</h4>
+                    <h4>Stress Management</h4>
                     <p>{plan.stressManagementAdvice}</p>
                   </div>
                 )}
@@ -179,7 +179,7 @@ function WellnessPlan() {
 
               {plan.goals && plan.goals.length > 0 && (
                 <div className={styles.goalsSection}>
-                  <h4>📍 Goals & Progress</h4>
+                  <h4>Goals & Progress</h4>
                   <div className={styles.progressBar}>
                     <div
                       className={styles.progressFill}
