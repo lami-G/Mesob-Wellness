@@ -340,8 +340,6 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
 
   return (
     <div className={`card ${styles.wellnessPlanCreation}`}>
-      <h3>Create Wellness Plan</h3>
-
       {error && <div className="alert alert-error">{error}</div>}
       
       {/* PDF Download and Mark as Completed Buttons */}

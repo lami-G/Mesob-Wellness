@@ -175,7 +175,7 @@ function RegisterWalkIn({ onSuccess }) {
           Search Patient
         </h3>
 
-        <form onSubmit={handleSearch} className={styles.searchForm}>
+        <form onSubmit={handleSearch} className={styles.searchForm} style={{ maxWidth: '500px' }}>
           <input
             type="text"
             value={searchTerm}
@@ -189,6 +189,13 @@ function RegisterWalkIn({ onSuccess }) {
             disabled={searching}
           >
             {searching ? 'Searching...' : 'Search'}
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenRegisterModal}
+            className={clsx('btn btn-primary', styles.registerButton)}
+          >
+            + Register New Patient
           </button>
         </form>
 
@@ -236,27 +243,6 @@ function RegisterWalkIn({ onSuccess }) {
             <p className={styles.emptyStateText}>
               No patient found with "{searchTerm}"
             </p>
-            <button
-              onClick={handleOpenRegisterModal}
-              className={clsx('btn btn-primary', styles.registerButton)}
-            >
-              ➕ Register New External Patient
-            </button>
-          </div>
-        )}
-
-        {/* Initial State - Register Button */}
-        {searchResults.length === 0 && !searchTerm && (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyStateText}>
-              Or register a new external patient
-            </p>
-            <button
-              onClick={handleOpenRegisterModal}
-              className={clsx('btn btn-primary', styles.registerButton)}
-            >
-              ➕ Register New Patient
-            </button>
           </div>
         )}
       </div>

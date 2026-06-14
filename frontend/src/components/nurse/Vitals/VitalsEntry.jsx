@@ -540,8 +540,6 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
 
   return (
     <div className={clsx('card', styles.vitalsEntry)}>
-      <h3>Record Vitals</h3>
-
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 

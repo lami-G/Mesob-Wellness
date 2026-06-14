@@ -38,7 +38,7 @@
 }
 
 .searchForm {
-  display: flex;
+  display: inline-flex;
   gap: 0.75rem;
   margin-bottom: 1.5rem;
   align-items: center;
@@ -52,8 +52,16 @@
 }
 
 .searchButton {
-  min-width: 120px;
+  min-width: 100px;
   flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.registerButton {
+  min-width: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.75rem 1rem;
 }
 
 /* Search Results */
@@ -129,22 +137,16 @@
   min-width: 150px;
 }
 
-/* Empty State / Register Section */
+/* Empty State */
 .emptyState {
-  padding: 1.5rem;
-  border-radius: 8px;
-  background-color: #F3F4F6;
-  text-align: center;
+  padding: 1rem 0;
   margin-bottom: 1.5rem;
 }
 
 .emptyStateText {
-  margin: 0 0 1rem 0;
+  margin: 0;
   color: #6B7280;
-}
-
-.registerButton {
-  min-width: 200px;
+  font-size: 0.875rem;
 }
 
 /* ─────────────────────────────────────────────────────────────

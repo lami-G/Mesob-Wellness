@@ -43,14 +43,14 @@
 
 .filterBtn:hover {
   background: #f9fafb;
-  border-color: #2563eb;
-  color: #2563eb;
+  border-color: #37519A;
+  color: #37519A;
 }
 
 .filterBtn.active {
-  background: #2563eb;
+  background: #37519A;
   color: white;
-  border-color: #2563eb;
+  border-color: #37519A;
 }
 
 .loadingText {

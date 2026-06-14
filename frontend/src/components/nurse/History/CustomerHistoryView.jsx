@@ -103,8 +103,6 @@ function CustomerHistoryView({ customerId }) {
   if (!selectedCustomerId) {
     return (
       <div className="card customer-history">
-        <h3>Customer History</h3>
-        
         <div className={styles.inlineSearch}>
           <h4>Search Customer</h4>
           <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>
@@ -119,6 +117,10 @@ function CustomerHistoryView({ customerId }) {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Enter name, email, or ID..."
                 className="form-input"
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  fontSize: '0.8rem',
+                }}
                 disabled={searching}
               />
               <button
@@ -126,6 +128,10 @@ function CustomerHistoryView({ customerId }) {
                 onClick={handleSearch}
                 className="btn btn-primary"
                 disabled={searching || !searchTerm.trim()}
+                style={{
+                  padding: '0.375rem 0.75rem',
+                  fontSize: '0.8rem',
+                }}
               >
                 {searching ? 'Searching...' : 'Search'}
               </button>
@@ -165,7 +171,6 @@ function CustomerHistoryView({ customerId }) {
   return (
     <div className="card customer-history">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h3>Customer History</h3>
         <button
           type="button"
           onClick={handleClearCustomer}

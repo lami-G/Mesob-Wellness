@@ -123,8 +123,6 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
 
   return (
     <div className={`card ${styles.liveQueuePanel}`}>
-      <h2>Live Queue</h2>
-
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className={styles.queueControls}>

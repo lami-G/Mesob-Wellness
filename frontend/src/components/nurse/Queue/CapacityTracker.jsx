@@ -80,7 +80,6 @@ function CapacityTracker() {
   if (!capacity) {
     return (
       <div className={`card ${styles.capacityTracker}`}>
-        <h3>Daily Capacity</h3>
         <p className={styles.loadingText}>Loading...</p>
       </div>
     );
@@ -118,8 +117,6 @@ function CapacityTracker() {
 
   return (
     <div className={`card ${styles.capacityTracker}`}>
-      <h3>Daily Capacity</h3>
-
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className={styles.capacityInfo}>

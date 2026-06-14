@@ -794,7 +794,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
   if (loading) {
     return (
       <div className={`card ${styles.analyticsContainer}`}>
-        <h2>Analytics</h2>
         <p className={styles.loading}>Loading analytics...</p>
       </div>
     );
@@ -803,13 +802,15 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
   return (
     <div className={styles.analyticsContainer}>
       <div className={styles.header}>
-        <h2>Nurse Analytics</h2>
-        
         <div className={styles.controls}>
           <select
             value={viewPeriod}
             onChange={(e) => setViewPeriod(e.target.value)}
             className={styles.periodSelect}
+            style={{
+              padding: '0.375rem 0.625rem',
+              fontSize: '0.8rem',
+            }}
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -825,6 +826,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
                 className={`form-input ${styles.datePicker}`}
+                style={{
+                  padding: '0.375rem 0.625rem',
+                  fontSize: '0.8rem',
+                }}
               />
             </div>
           )}
@@ -868,8 +873,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       {/* Appointment Breakdown and Activity Summary - Side by Side */}
       <div className={styles.analyticsMetricsGrid}>
         <div className={styles.metricsCard}>
-          <h3>Appointment Breakdown</h3>
-          
           <div className={styles.breakdownItem}>
             <span>Completed</span>
             <span className={styles.breakdownValue}>{analytics.completedAppointments}</span>
@@ -882,8 +885,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
 
         <div className={styles.metricsCard}>
-          <h3>{viewPeriod === 'all' ? 'Activity Summary' : "Today's Activity Summary"}</h3>
-          
           <div className={styles.breakdownItem}>
             <span>Vitals Recorded</span>
             <span className={styles.breakdownValue}>{analytics.vitalsRecorded}</span>

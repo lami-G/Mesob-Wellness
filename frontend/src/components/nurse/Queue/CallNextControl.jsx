@@ -164,8 +164,6 @@ function CallNextControl({ onNavigateToVitals, onStatusChanged }) {
 
   return (
     <div className={`card ${styles.callNextControl}`}>
-      <h3>Call Next & Display</h3>
-
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
