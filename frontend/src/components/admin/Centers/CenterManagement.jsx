@@ -22,8 +22,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
     capacity: "",
     phone: "",
     email: "",
-    managerEmail: "",
-    managerPassword: "",
     status: "ACTIVE",
   });
 
@@ -60,8 +58,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
       capacity: "",
       phone: "",
       email: "",
-      managerEmail: "",
-      managerPassword: "",
       status: "ACTIVE",
     });
     setFormError("");
@@ -84,8 +80,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
       capacity: center.capacity || "",
       phone: center.phone || "",
       email: center.email || "",
-      managerEmail: center.managerEmail || "",
-      managerPassword: "",
       status: center.status || "ACTIVE",
     });
     loadRegions();
@@ -135,14 +129,6 @@ function CenterManagement({ baseFilters = {}, allowDelete = true }) {
           : undefined,
         status: formData.status,
       };
-
-      // Add manager fields if provided
-      if (formData.managerEmail) {
-        centerPayload.managerEmail = formData.managerEmail;
-      }
-      if (formData.managerPassword) {
-        centerPayload.managerPassword = formData.managerPassword;
-      }
 
       if (selectedCenter) {
         await adminService.updateCenter(selectedCenter.id, centerPayload);

@@ -25,8 +25,6 @@ const Centers = ({ loading, centers, selectedCenter, onRefresh }) => {
     capacity: "",
     phone: "",
     email: "",
-    managerEmail: "",
-    managerPassword: "",
     status: "ACTIVE",
   });
 
@@ -106,8 +104,6 @@ const Centers = ({ loading, centers, selectedCenter, onRefresh }) => {
       capacity: "",
       phone: "",
       email: "",
-      managerEmail: "",
-      managerPassword: "",
       status: "ACTIVE",
     });
     loadRegions(); // Load regions when opening modal
@@ -125,8 +121,6 @@ const Centers = ({ loading, centers, selectedCenter, onRefresh }) => {
       capacity: center.capacity || "",
       phone: center.phone || "",
       email: center.email || "",
-      managerEmail: "",
-      managerPassword: "",
       status: center.status || "ACTIVE",
     });
     loadRegions(); // Load regions when opening modal

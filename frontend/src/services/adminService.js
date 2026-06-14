@@ -257,17 +257,6 @@ export const adminService = {
     }
   },
 
-  // Region Admin
-  upsertRegionAdmin: async (region, data) => {
-    const response = await api.post(`/admin/regions/${region}/admin`, data);
-    return response.data.data;
-  },
-
-  getRegionAdmin: async (region) => {
-    const response = await api.get(`/admin/regions/${region}/admin`);
-    return response.data.data;
-  },
-
   // Regional Health Comparison
   getRegionalHealthComparison: async (timePeriod = "monthly") => {
     const params = new URLSearchParams();

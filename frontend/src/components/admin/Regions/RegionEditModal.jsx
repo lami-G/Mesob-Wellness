@@ -6,43 +6,20 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
   const [formData, setFormData] = useState({
     name: "",
     status: "ACTIVE",
-    managerEmail: "",
-    managerPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (isOpen && region) {
-      // Load existing region admin data
-      loadRegionAdmin();
       setFormData({
         name: region,
         status: regionStatus || "ACTIVE",
-        managerEmail: "",
-        managerPassword: "",
       });
       setError("");
-      setShowPassword(false);
     }
   }, [isOpen, region, regionStatus]);
-
-  const loadRegionAdmin = async () => {
-    try {
-      const regionAdmin = await adminService.getRegionAdmin(region);
-      if (regionAdmin && regionAdmin.email) {
-        setFormData(prev => ({
-          ...prev,
-          managerEmail: regionAdmin.email,
-        }));
-      }
-    } catch (err) {
-      // Region admin doesn't exist yet, that's okay
-      console.log("No existing region admin");
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,15 +58,6 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
           })
         )
       );
-
-      // Update region admin if email provided
-      if (formData.managerEmail) {
-        const adminData = { email: formData.managerEmail };
-        if (formData.managerPassword) {
-          adminData.password = formData.managerPassword;
-        }
-        await adminService.upsertRegionAdmin(trimmed, adminData);
-      }
 
       onSuccess?.();
       onClose();
@@ -140,47 +108,6 @@ function RegionEditModal({ isOpen, onClose, region, regionStatus, allCenters, on
               <option value="MAINTENANCE">Maintenance</option>
               <option value="INACTIVE">Inactive</option>
             </select>
-          </div>
-
-          <div className={styles.formGrid}>
-            <div className={styles.formGroup}>
-              <label htmlFor="managerEmail">Region Admin Email</label>
-              <input
-                id="managerEmail"
-                type="email"
-                name="managerEmail"
-                value={formData.managerEmail}
-                onChange={handleChange}
-                placeholder="admin@mesob.et"
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="managerPassword">Region Admin Password</label>
-              <div className={styles.passwordInputContainer}>
-                <input
-                  id="managerPassword"
-                  type={showPassword ? "text" : "password"}
-                  name="managerPassword"
-                  value={formData.managerPassword}
-                  onChange={handleChange}
-                  placeholder="Leave empty to keep current password"
-                  className={styles.passwordInput}
-                />
-                {formData.managerPassword && (
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={styles.passwordToggleBtn}
-                  >
-                    {showPassword ? "👁️" : "👁️‍🗨️"}
-                  </button>
-                )}
-              </div>
-              <small>
-                Only fill if you want to change the password
-              </small>
-            </div>
           </div>
 
           <div className={styles.modalActions}>

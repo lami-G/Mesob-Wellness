@@ -40,8 +40,7 @@ function CentersList({
       const matchName = center.name?.toLowerCase().includes(query);
       const matchRegion = center.region?.toLowerCase().includes(query);
       const matchCity = center.city?.toLowerCase().includes(query);
-      const matchEmail = center.managerEmail?.toLowerCase().includes(query);
-      if (!matchName && !matchRegion && !matchCity && !matchEmail) return false;
+      if (!matchName && !matchRegion && !matchCity) return false;
     }
     
     return true;
@@ -228,7 +227,6 @@ function CentersList({
             <th>Name</th>
             <th>Region</th>
             <th>City</th>
-            <th>Admin Email</th>
             <th>Status</th>
             <th>Staff</th>
             <th>Actions</th>
@@ -237,7 +235,7 @@ function CentersList({
         <tbody>
           {paginatedCenters.length === 0 ? (
             <tr>
-              <td colSpan="7" className={styles.tableEmpty}>
+              <td colSpan="6" className={styles.tableEmpty}>
                 {searchQuery || filters?.region || filters?.status
                   ? "No centers found matching the filters"
                   : "No centers found"}
@@ -249,7 +247,6 @@ function CentersList({
                 <td className={styles.cellName}>{center.name}</td>
                 <td className={styles.cellRegion}>{center.region}</td>
                 <td className={styles.cellCity}>{center.city}</td>
-                <td className={styles.cellEmail}>{center.managerEmail || "-"}</td>
                 <td className={styles.cellStatus}>
                   <span className={clsx(styles.status, styles[`status${center.status.charAt(0).toUpperCase() + center.status.slice(1).toLowerCase()}`])}>
                     {center.status}

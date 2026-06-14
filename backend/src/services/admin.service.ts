@@ -646,7 +646,6 @@ const AdminService = {
             region: true,
             city: true,
             status: true,
-            managerEmail: true,
             createdAt: true,
             _count: {
               select: {

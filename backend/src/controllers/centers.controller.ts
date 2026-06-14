@@ -187,7 +187,7 @@ export const updateCenter = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    const { name, region, city, address, phone, email, status, capacity, managerEmail, managerPassword } = req.body;
+    const { name, region, city, address, phone, email, status, capacity } = req.body;
 
     const updateData: any = {};
     if (name !== undefined) updateData.name = name;
@@ -198,64 +198,6 @@ export const updateCenter = async (req: AuthRequest, res: Response): Promise<voi
     if (email !== undefined) updateData.email = email;
     if (status !== undefined) updateData.status = status;
     if (capacity !== undefined) updateData.capacity = capacity;
-
-    // Get existing center to check for manager
-    const existingCenter = await prisma.center.findUnique({
-      where: { id },
-    });
-
-    if (!existingCenter) {
-      res.status(404).json({
-        status: "error",
-        message: "Center not found",
-      });
-      return;
-    }
-
-    // Handle manager updates
-    if (managerEmail) {
-      updateData.managerEmail = managerEmail;
-
-      if (managerPassword) {
-        const bcrypt = await import("bcryptjs");
-        const hashedPassword = await bcrypt.default.hash(managerPassword, 10);
-
-        if (existingCenter.managerId) {
-          // Update existing manager
-          await prisma.user.update({
-            where: { id: existingCenter.managerId },
-            data: {
-              email: managerEmail,
-              password: hashedPassword,
-            },
-          });
-        } else {
-          // Create new manager
-          const { generateNextDisplayId } = await import("../utils/sequentialId.js");
-          const displayId = await generateNextDisplayId();
-
-          const manager = await prisma.user.create({
-            data: {
-              fullName: `${name || existingCenter.name} Admin`,
-              email: managerEmail,
-              password: hashedPassword,
-              role: "MANAGER" as any,
-              userId: displayId,
-              isActive: true,
-              isVerified: true,
-            },
-          });
-
-          updateData.managerId = manager.id;
-        }
-      } else if (existingCenter.managerId) {
-        // Update email only
-        await prisma.user.update({
-          where: { id: existingCenter.managerId },
-          data: { email: managerEmail },
-        });
-      }
-    }
 
     const center = await CentersService.updateCenter(id, updateData);
 

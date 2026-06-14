@@ -95,8 +95,6 @@ function FederalDashboard() {
   const [regionError, setRegionError] = useState("");
   const [regionSuccess, setRegionSuccess] = useState("");
   const [creatingRegion, setCreatingRegion] = useState(false);
-  const [regionAccountEmail, setRegionAccountEmail] = useState("");
-  const [regionAccountPassword, setRegionAccountPassword] = useState("");
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [editingRegion, setEditingRegion] = useState(null);
   const [showRegionEditModal, setShowRegionEditModal] = useState(false);
@@ -107,7 +105,6 @@ function FederalDashboard() {
   const [regionActionLoading, setRegionActionLoading] = useState(false);
   const [regionActionError, setRegionActionError] = useState("");
   const [regionActionSuccess, setRegionActionSuccess] = useState("");
-  const [regionAdmins, setRegionAdmins] = useState({});
   const [timePeriod, setTimePeriod] = useState("daily");
   const [trendsData, setTrendsData] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -138,22 +135,6 @@ function FederalDashboard() {
       if (regionsRes.status === "fulfilled") {
         const regionsList = regionsRes.value?.data || regionsRes.value || [];
         setRegions(regionsList);
-
-        // Load region admins for all regions
-        const adminsMap = {};
-        await Promise.all(
-          regionsList.map(async (region) => {
-            try {
-              const adminData = await adminService.getRegionAdmin(region);
-              if (adminData) {
-                adminsMap[region] = adminData;
-              }
-            } catch (err) {
-              // Region admin doesn't exist, that's okay
-            }
-          }),
-        );
-        setRegionAdmins(adminsMap);
       }
 
       if (centersRes.status === "fulfilled") {

@@ -38,8 +38,6 @@ export const createCenter = async (
       phone,
       email,
       capacity,
-      managerEmail,
-      managerPassword,
     } = req.body;
 
     if (!name || !region || !city || !address) {
@@ -48,31 +46,6 @@ export const createCenter = async (
         message: "name, region, city, and address are required",
       });
       return;
-    }
-
-    let managerId: string | undefined;
-
-    // Create center manager if email and password provided
-    if (managerEmail && managerPassword) {
-      const bcrypt = await import("bcryptjs");
-      const hashedPassword = await bcrypt.default.hash(managerPassword, 10);
-      const { generateNextDisplayId } =
-        await import("../utils/sequentialId.js");
-      const displayId = await generateNextDisplayId();
-
-      const manager = await prisma.user.create({
-        data: {
-          fullName: `${name} Admin`,
-          email: managerEmail,
-          password: hashedPassword,
-          role: "MANAGER" as any,
-          userId: displayId,
-          isActive: true,
-          isVerified: true,
-        },
-      });
-
-      managerId = manager.id;
     }
 
     const center = await AdminService.createCenter({
@@ -84,8 +57,6 @@ export const createCenter = async (
       email,
       capacity,
       status: "ACTIVE",
-      managerId,
-      managerEmail,
     });
 
     res.status(201).json({
@@ -824,234 +795,7 @@ export const unlockUser = async (
   }
 };
 
-/**
- * POST /api/v1/admin/regions/:region/admin
- * Create or update region admin
- */
-export const upsertRegionAdmin = async (
-  req: AuthRequest,
-  res: Response,
-): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({
-        status: "error",
-        message: "Authentication required",
-      });
-      return;
-    }
 
-    const { region } = req.params;
-    const regionStr = Array.isArray(region) ? region[0] : region;
-    const { email, password } = req.body;
-
-    if (!regionStr) {
-      res.status(400).json({
-        status: "error",
-        message: "Region is required",
-      });
-      return;
-    }
-
-    if (!email) {
-      res.status(400).json({
-        status: "error",
-        message: "Email is required",
-      });
-      return;
-    }
-
-    // Check if region admin already exists
-    const existingRegionAdmin = await prisma.regionAdmin.findUnique({
-      where: { region: regionStr },
-    });
-
-    let adminId: string | undefined = existingRegionAdmin?.adminId || undefined;
-
-    // If adminId exists, verify the user still exists
-    if (adminId) {
-      const userExists = await prisma.user.findUnique({
-        where: { id: adminId },
-      });
-      if (!userExists) {
-        // User was deleted, clear the adminId
-        adminId = undefined;
-      }
-    }
-
-    // Check if a user with this email already exists (for creating/updating)
-    const existingUserByEmail = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    // If password provided, create or update the user
-    if (password) {
-      const bcrypt = await import("bcryptjs");
-      const hashedPassword = await bcrypt.default.hash(password, 10);
-
-      if (adminId) {
-        // Update existing admin user - check if new email conflicts with another user
-        if (existingUserByEmail && existingUserByEmail.id !== adminId) {
-          res.status(400).json({
-            status: "error",
-            message: "This email is already in use by another user",
-          });
-          return;
-        }
-
-        // Update existing admin user
-        await prisma.user.update({
-          where: { id: adminId },
-          data: {
-            email,
-            password: hashedPassword,
-          },
-        });
-      } else if (existingUserByEmail) {
-        // Email exists but not linked to this region - use existing user
-        // Update password and ensure correct role
-        await prisma.user.update({
-          where: { email },
-          data: {
-            password: hashedPassword,
-            role: "REGIONAL_OFFICE" as any,
-            isActive: true,
-            isVerified: true,
-          },
-        });
-        adminId = existingUserByEmail.id;
-      } else {
-        // Create new admin user - email doesn't exist yet
-        const displayId = await generateNextDisplayId();
-
-        const admin = await prisma.user.create({
-          data: {
-            fullName: `${regionStr} Admin`,
-            email,
-            password: hashedPassword,
-            role: "REGIONAL_OFFICE" as any,
-            userId: displayId,
-            isActive: true,
-            isVerified: true,
-          },
-        });
-
-        adminId = admin.id;
-      }
-    } else if (adminId) {
-      // Update email only if admin exists
-      // Check if new email is already in use by another user
-      if (existingUserByEmail && existingUserByEmail.id !== adminId) {
-        res.status(400).json({
-          status: "error",
-          message: "This email is already in use by another user",
-        });
-        return;
-      }
-      await prisma.user.update({
-        where: { id: adminId },
-        data: { email },
-      });
-    } else if (existingUserByEmail) {
-      // Email exists but no password provided - link existing user to region
-      await prisma.user.update({
-        where: { email },
-        data: {
-          role: "REGIONAL_OFFICE" as any,
-          isActive: true,
-          isVerified: true,
-        },
-      });
-      adminId = existingUserByEmail.id;
-    } else if (!password && !adminId) {
-      // Cannot create admin without password
-      res.status(400).json({
-        status: "error",
-        message: "Password is required when creating a new region admin",
-      });
-      return;
-    }
-
-    // Upsert region admin record
-    const regionAdmin = await prisma.regionAdmin.upsert({
-      where: { region: regionStr },
-      create: {
-        region: regionStr,
-        adminId: adminId || null,
-        email,
-      },
-      update: {
-        adminId: adminId || null,
-        email,
-      },
-    });
-
-    res.status(200).json({
-      status: "success",
-      data: regionAdmin,
-      message: "Region admin updated successfully",
-    });
-  } catch (error: any) {
-    console.error("Upsert region admin error:", error);
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      code: error.code,
-    });
-
-    // Handle Prisma unique constraint errors
-    if (error.code === "P2002") {
-      const field = error.meta?.target?.[0] || "field";
-      res.status(400).json({
-        status: "error",
-        message: `This ${field} is already in use`,
-      });
-      return;
-    }
-
-    res.status(500).json({
-      status: "error",
-      message: error.message || "Failed to update region admin",
-    });
-  }
-};
-
-/**
- * GET /api/v1/admin/regions/:region/admin
- * Get region admin
- */
-export const getRegionAdmin = async (
-  req: AuthRequest,
-  res: Response,
-): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({
-        status: "error",
-        message: "Authentication required",
-      });
-      return;
-    }
-
-    const { region } = req.params;
-    const regionStr = Array.isArray(region) ? region[0] : region;
-
-    const regionAdmin = await prisma.regionAdmin.findUnique({
-      where: { region: regionStr },
-    });
-
-    res.status(200).json({
-      status: "success",
-      data: regionAdmin,
-    });
-  } catch (error) {
-    console.error("Get region admin error:", error);
-    res.status(500).json({
-      status: "error",
-      message: "Failed to retrieve region admin",
-    });
-  }
-};
 
 /**
  * GET /api/v1/admin/regions/health-comparison

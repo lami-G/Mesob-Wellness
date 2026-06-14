@@ -152,31 +152,6 @@ function CenterFormModal({
             />
           </div>
 
-          {showManagerFields && (
-            <div className={styles.formGrid}>
-              <Input
-                label="Center Admin Email"
-                name="managerEmail"
-                type="email"
-                value={formData.managerEmail}
-                onChange={(e) =>
-                  setFormData({ ...formData, managerEmail: e.target.value })
-                }
-                placeholder="admin@mesob.et"
-              />
-              <Input
-                label="Center Admin Password"
-                name="managerPassword"
-                type="password"
-                value={formData.managerPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, managerPassword: e.target.value })
-                }
-                placeholder="Create a password"
-              />
-            </div>
-          )}
-
           <div className={styles.modalActions}>
             <Button type="submit" disabled={saving}>
               {saving ? "Saving..." : submitLabel}

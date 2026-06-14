@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { adminService } from "../../../services/adminService";
 import { regionalService } from "../../../services/regionalService";
 import RegionEditModal from "./RegionEditModal";
-import RegionManagerModal from "./RegionManagerModal";
 import RegionHealthComparison from "./RegionHealthComparison";
 import styles from "./RegionManagement.module.css";
 import "../../../styles/admin-regions.css";
@@ -18,8 +17,6 @@ function RegionManagement() {
   const [regionError, setRegionError] = useState("");
   const [regionSuccess, setRegionSuccess] = useState("");
   const [creatingRegion, setCreatingRegion] = useState(false);
-  const [regionAccountEmail, setRegionAccountEmail] = useState("");
-  const [regionAccountPassword, setRegionAccountPassword] = useState("");
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [showRegionEditModal, setShowRegionEditModal] = useState(false);
   const [selectedRegionForEdit, setSelectedRegionForEdit] = useState(null);
@@ -27,11 +24,8 @@ function RegionManagement() {
   const [regionActionLoading, setRegionActionLoading] = useState(false);
   const [regionActionError, setRegionActionError] = useState("");
   const [regionActionSuccess, setRegionActionSuccess] = useState("");
-  const [regionAdmins, setRegionAdmins] = useState({});
   const [showDetailView, setShowDetailView] = useState(false);
   const [regionStats, setRegionStats] = useState({});
-  const [showRegionManagerModal, setShowRegionManagerModal] = useState(false);
-  const [selectedRegionForManager, setSelectedRegionForManager] = useState(null);
   const [regionCardsPage, setRegionCardsPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const cardsPerPage = 8;
@@ -61,22 +55,6 @@ function RegionManagement() {
           stats[region] = centers.length;
         }
         setRegionStats(stats);
-
-        // Load region admins for all regions
-        const adminsMap = {};
-        await Promise.all(
-          regionsList.map(async (region) => {
-            try {
-              const adminData = await adminService.getRegionAdmin(region);
-              if (adminData) {
-                adminsMap[region] = adminData;
-              }
-            } catch (err) {
-              // Region admin doesn't exist, that's okay
-            }
-          }),
-        );
-        setRegionAdmins(adminsMap);
       }
 
       if (allCentersRes.status === "fulfilled") {
@@ -168,29 +146,6 @@ function RegionManagement() {
       : analytics?.regions?.find(
           (region) => region.region === selectedRegion,
         ) || null;
-
-  const handleSaveRegionManager = async (data) => {
-    try {
-      setRegionError("");
-      setRegionSuccess("");
-      
-      // Call the backend API to upsert region admin
-      await adminService.upsertRegionAdmin(data.region, {
-        email: data.managerEmail,
-        password: data.managerPassword,
-      });
-      
-      setRegionSuccess(`Region manager for ${data.region} updated successfully!`);
-      
-      // Reload region data to fetch updated admin emails
-      await loadRegionData();
-    } catch (err) {
-      console.error("Failed to update region manager:", err);
-      const errorMsg = err.response?.data?.message || err.message || "Failed to update region manager";
-      setRegionError(errorMsg);
-      throw err; // Re-throw so the modal can handle it
-    }
-  };
 
   return (
     <div className="management-section">
@@ -344,17 +299,6 @@ function RegionManagement() {
                         </div>
                       </div>
                     </div>
-                    <div className="region-card-footer">
-                      <button
-                        className="btn-secondary"
-                        onClick={() => {
-                          setSelectedRegionForManager(region);
-                          setShowRegionManagerModal(true);
-                        }}
-                      >
-                        Manager
-                      </button>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -472,8 +416,6 @@ function RegionManagement() {
                     onClick={() => {
                       setShowRegionModal(false);
                       setNewRegion("");
-                      setRegionAccountEmail("");
-                      setRegionAccountPassword("");
                       setRegionError("");
                       setRegionSuccess("");
                     }}
@@ -504,20 +446,6 @@ function RegionManagement() {
                         setRegionSuccess("");
                       }}
                     />
-                    <input
-                      type="email"
-                      className="form-input"
-                      placeholder="Region admin email"
-                      value={regionAccountEmail}
-                      onChange={(e) => setRegionAccountEmail(e.target.value)}
-                    />
-                    <input
-                      type="password"
-                      className="form-input"
-                      placeholder="Region admin password"
-                      value={regionAccountPassword}
-                      onChange={(e) => setRegionAccountPassword(e.target.value)}
-                    />
                   </div>
                   <div className={styles.modalActions}>
                     <button
@@ -545,34 +473,10 @@ function RegionManagement() {
                             status: "ACTIVE",
                           });
 
-                          // Create region admin if email and password provided
-                          if (regionAccountEmail && regionAccountPassword) {
-                            try {
-                              await adminService.upsertRegionAdmin(trimmed, {
-                                email: regionAccountEmail,
-                                password: regionAccountPassword,
-                              });
-                            } catch (adminErr) {
-                              console.error("Failed to create region admin:", adminErr);
-                              // Region created but admin failed - show partial success
-                              setRegionError(
-                                `Region "${trimmed}" created, but failed to create admin: ${adminErr.response?.data?.message || adminErr.message}`,
-                              );
-                              setNewRegion("");
-                              setRegionAccountEmail("");
-                              setRegionAccountPassword("");
-                              await loadRegionData();
-                              setCreatingRegion(false);
-                              return;
-                            }
-                          }
-
                           setRegionSuccess(
                             `Region "${trimmed}" created successfully.`,
                           );
                           setNewRegion("");
-                          setRegionAccountEmail("");
-                          setRegionAccountPassword("");
                           setShowRegionModal(false);
                           await loadRegionData();
                         } catch (err) {
@@ -593,8 +497,6 @@ function RegionManagement() {
                       onClick={() => {
                         setShowRegionModal(false);
                         setNewRegion("");
-                        setRegionAccountEmail("");
-                        setRegionAccountPassword("");
                         setRegionError("");
                         setRegionSuccess("");
                       }}
@@ -680,7 +582,6 @@ function RegionManagement() {
                   <tr>
                     <th>Region</th>
                     <th>Status</th>
-                    <th>Admin Email</th>
                     <th>Centers</th>
                     <th>Active</th>
                     <th>Appointments</th>
@@ -699,7 +600,6 @@ function RegionManagement() {
                           {row.status}
                         </span>
                       </td>
-                      <td>{regionAdmins[row.region]?.email || "-"}</td>
                       <td>{row.totalCenters}</td>
                       <td>{row.activeCenters}</td>
                       <td>{row.totalAppointments}</td>
@@ -817,16 +717,6 @@ function RegionManagement() {
 
       {/* Regional Staff Health Comparison - Only show in card view */}
       {!showDetailView && <RegionHealthComparison />}
-
-      <RegionManagerModal
-        isOpen={showRegionManagerModal}
-        onClose={() => {
-          setShowRegionManagerModal(false);
-          setSelectedRegionForManager(null);
-        }}
-        region={selectedRegionForManager}
-        onSave={handleSaveRegionManager}
-      />
 
       <RegionEditModal
         isOpen={showRegionEditModal}
