@@ -7,7 +7,6 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
     role: "STAFF",
     region: "",
     centerId: "",
@@ -38,6 +37,8 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
   useEffect(() => {
     if (isOpen) {
       fetchRegions();
+      // Generate initial password when modal opens
+      setFormData((prev) => ({ ...prev, password: generateRandomPassword() }));
       if (
         allowedRoles &&
         allowedRoles.length &&
@@ -96,6 +97,21 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
     }
   };
 
+  const generateRandomPassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
+  };
+
+  const handleRegeneratePassword = () => {
+    const newPassword = generateRandomPassword();
+    setFormData((prev) => ({ ...prev, password: newPassword }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -118,19 +134,20 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
 
-    // Require center for STAFF role
-    if (formData.role === "STAFF" && !formData.centerId) {
-      setError("Please select a center for staff users");
+    // Require center for STAFF, NURSE_OFFICER, and MANAGER roles
+    if ((formData.role === "STAFF" || formData.role === "NURSE_OFFICER" || formData.role === "MANAGER") && !formData.centerId) {
+      setError(`Please select a center for ${formData.role === "MANAGER" ? "managers" : formData.role === "NURSE_OFFICER" ? "nurse officers" : "staff users"}`);
+      return;
+    }
+
+    // Require region for REGIONAL_OFFICE role  
+    if (formData.role === "REGIONAL_OFFICE" && !formData.region) {
+      setError("Please select a region for regional office users");
       return;
     }
 
@@ -148,14 +165,19 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
         userData.centerId = formData.centerId;
       }
 
+      // Include region for REGIONAL_OFFICE
+      if (formData.role === "REGIONAL_OFFICE" && formData.region) {
+        userData.region = formData.region;
+      }
+
       await adminService.createUser(userData);
+      alert("User created successfully! Make sure to share the password securely.");
       onSuccess?.();
       onClose();
       setFormData({
         fullName: "",
         email: "",
         password: "",
-        confirmPassword: "",
         role: "STAFF",
         region: "",
         centerId: "",
@@ -210,29 +232,42 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
           </div>
 
           <div className={modalStyles.formGroup}>
-            <label htmlFor="password">Password *</label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password (min 6 characters)"
-              required
-            />
-          </div>
-
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password *</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm password"
-              required
-            />
+            <label htmlFor="password">Generated Password *</label>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                id="password"
+                type="text"
+                name="password"
+                value={formData.password}
+                readOnly
+                style={{ fontFamily: "monospace", backgroundColor: "#f9fafb" }}
+                required
+              />
+              <button
+                type="button"
+                className={modalStyles.btnSecondary}
+                onClick={() => {
+                  navigator.clipboard.writeText(formData.password);
+                  alert("Password copied to clipboard!");
+                }}
+                title="Copy password"
+                style={{ minWidth: "auto", padding: "0.5rem 0.75rem" }}
+              >
+                📋
+              </button>
+              <button
+                type="button"
+                className={modalStyles.btnSecondary}
+                onClick={handleRegeneratePassword}
+                title="Generate new password"
+                style={{ minWidth: "auto", padding: "0.5rem 0.75rem" }}
+              >
+                🔄
+              </button>
+            </div>
+            <small style={{ color: "#6b7280", marginTop: "0.25rem", display: "block" }}>
+              Copy this password and share it with the user securely
+            </small>
           </div>
 
           <div className={modalStyles.formGroup}>
@@ -241,7 +276,11 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
               id="role"
               name="role"
               value={formData.role}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                // Reset centerId when role changes
+                setFormData(prev => ({ ...prev, centerId: "" }));
+              }}
               required
             >
               {roles.map((role) => (
@@ -258,7 +297,11 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
               id="region"
               name="region"
               value={formData.region}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                // Reset centerId when region changes
+                setFormData(prev => ({ ...prev, centerId: "" }));
+              }}
               disabled={regionsLoading}
               required
             >
@@ -273,32 +316,42 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
             </select>
           </div>
 
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="centerId">Center *</label>
-            <select
-              id="centerId"
-              name="centerId"
-              value={formData.centerId}
-              onChange={handleChange}
-              disabled={centersLoading || !formData.region}
-              required
-            >
-              <option value="">
-                {!formData.region
-                  ? "Select region first"
-                  : centersLoading
-                    ? "Loading centers..."
-                    : centers.length === 0
-                      ? "No centers available"
-                      : "Select Center"}
-              </option>
-              {centers.map((center) => (
-                <option key={center.id} value={center.id}>
-                  {center.name} - {center.city}
+          {(formData.role === "STAFF" || formData.role === "NURSE_OFFICER" || formData.role === "MANAGER") && (
+            <div className={modalStyles.formGroup}>
+              <label htmlFor="centerId">Center *</label>
+              <select
+                id="centerId"
+                name="centerId"
+                value={formData.centerId}
+                onChange={handleChange}
+                disabled={centersLoading || !formData.region}
+                required
+              >
+                <option value="">
+                  {!formData.region
+                    ? "Select region first"
+                    : centersLoading
+                      ? "Loading centers..."
+                      : centers.length === 0
+                        ? "No centers available"
+                        : "Select Center"}
                 </option>
-              ))}
-            </select>
-          </div>
+                {centers.map((center) => (
+                  <option key={center.id} value={center.id}>
+                    {center.name} - {center.city}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {formData.role === "REGIONAL_OFFICE" && (
+            <div className={modalStyles.formGroup}>
+              <small style={{ color: "#6b7280", marginTop: "0.25rem", display: "block" }}>
+                Regional Office will manage all centers in the selected region
+              </small>
+            </div>
+          )}
 
           <div className={modalStyles.modalActions}>
             <button type="button" className={modalStyles.btnSecondary} onClick={onClose}>

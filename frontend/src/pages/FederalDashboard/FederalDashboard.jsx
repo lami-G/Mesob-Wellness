@@ -7,7 +7,7 @@ import CenterManagement from "../../components/admin/Centers/CenterManagement";
 import AppointmentManagement from "../../components/admin/Appointments/AppointmentManagement";
 import FeedbackQuality from "../../components/admin/Feedback/FeedbackQuality";
 import AuditLogs from "../../components/admin/Audit/AuditLogs";
-import AdminUsers from "../AdminDashboard/AdminUsers";
+import FederalUsers from "./FederalUsers";
 import DashboardMetrics from "../../components/admin/Dashboard/DashboardMetrics";
 import HealthConditionTrendsPanel from "../../components/analytics/HealthConditionTrendsPanel";
 import RegionManagement from "../../components/admin/Regions/RegionManagement";
@@ -498,7 +498,7 @@ function FederalDashboard() {
           />
         );
       case "admin-users":
-        return <AdminUsers />;
+        return <FederalUsers />;
       case "appointments":
         return <AppointmentManagement baseFilters={appointmentBaseFilters} />;
       case "feedback":
