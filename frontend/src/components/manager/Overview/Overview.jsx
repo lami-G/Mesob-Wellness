@@ -27,12 +27,12 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
     : systemDefaultTime;
 
   const statCards = [
-    { icon: '🏥', label: 'Daily Capacity',     value: capacityInfo?.slotsUsed ?? 0,              sub: `of ${capacityInfo?.dailyLimit ?? 36} slots`,  color: '#284394' },
-    { icon: '📋', label: 'Total Appointments', value: bookingStats?.totalAppointments ?? 0,       sub: 'today',                                         color: '#2563eb' },
-    { icon: '✅', label: 'Completed Today',    value: bookingStats?.completedToday ?? 0,           sub: 'appointments',                                  color: '#16a34a' },
-    { icon: '📊', label: 'No-Show Rate',       value: `${bookingStats?.noShowRate ?? 0}%`,         sub: 'this week',                                     color: '#dc2626' },
-    { icon: '⏱️', label: 'Avg Service Time',   value: `${validatedAvgServiceTime}m`, sub: 'per patient',                                   color: '#7c3aed' },
-    { icon: '👥', label: 'Total Users',        value: bookingStats?.totalUsers ?? 0,               sub: `${bookingStats?.activeUsers ?? 0} active`,      color: '#0891b2' },
+    { label: 'Daily Capacity',     value: capacityInfo?.slotsUsed ?? 0,              sub: `of ${capacityInfo?.dailyLimit ?? 36} slots`,  color: '#284394' },
+    { label: 'Total Appointments', value: bookingStats?.totalAppointments ?? 0,       sub: 'today',                                         color: '#2563eb' },
+    { label: 'Completed Today',    value: bookingStats?.completedToday ?? 0,           sub: 'appointments',                                  color: '#16a34a' },
+    { label: 'No-Show Rate',       value: `${bookingStats?.noShowRate ?? 0}%`,         sub: 'this week',                                     color: '#dc2626' },
+    { label: 'Avg Service Time',   value: `${validatedAvgServiceTime}m`, sub: 'per patient',                                   color: '#7c3aed' },
+    { label: 'Total Users',        value: bookingStats?.totalUsers ?? 0,               sub: `${bookingStats?.activeUsers ?? 0} active`,      color: '#0891b2' },
   ];
 
   const breakdownData = [
@@ -51,15 +51,6 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
       <div className={dashStyles.topKpiGrid}>
         {statCards.map((c) => (
           <div key={c.label} className={dashStyles.topKpiCard}>
-            <div 
-              className={`${dashStyles.topKpiIcon} ${dashStyles.kpiIconWithColor}`}
-              style={{ 
-                '--kpi-bg': `${c.color}18`,
-                '--kpi-color': c.color 
-              }}
-            >
-              {c.icon}
-            </div>
             <div className="dash-kpi-body">
               <div 
                 className={`${dashStyles.topKpiValue} ${dashStyles.kpiValueWithColor}`}
@@ -90,28 +81,24 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
 
             return [
               { 
-                icon: '👥', 
                 label: 'Total Employees', 
                 value: totalPatients, 
                 sub: 'registered', 
                 color: '#6b7280' 
               },
               { 
-                icon: '💚', 
                 label: 'Healthy %', 
                 value: `${healthyPct}%`, 
                 sub: 'Normal BP', 
                 color: '#22c55e' 
               },
               { 
-                icon: '⚠️', 
                 label: 'At-Risk %', 
                 value: `${atRiskPct}%`, 
                 sub: 'Elevated/Stage 1', 
                 color: '#f59e0b' 
               },
               { 
-                icon: '🚨', 
                 label: 'Critical %', 
                 value: `${criticalPct}%`, 
                 sub: 'Stage 2/Crisis', 
@@ -120,15 +107,6 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
             ];
           })().map((c) => (
             <div key={c.label} className={dashStyles.healthKpiCard}>
-              <div 
-                className={dashStyles.healthKpiIcon}
-                style={{ 
-                  background: `${c.color}15`, 
-                  color: c.color
-                }}
-              >
-                {c.icon}
-              </div>
               <div className="dash-kpi-body">
                 <div 
                   className={dashStyles.healthKpiValue}
@@ -435,7 +413,7 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
               border: usedPct > 85 ? '1px solid #ef4444' : usedPct > 60 ? '1px solid #f59e0b' : '1px solid #22c55e'
             }}
           >
-            {usedPct > 85 ? '🔴 Critical' : usedPct > 60 ? '🟡 Moderate' : '🟢 Normal'}
+            {usedPct > 85 ? 'Critical' : usedPct > 60 ? 'Moderate' : 'Normal'}
           </span>
         </div>
         <div className={styles.capacityRow}>

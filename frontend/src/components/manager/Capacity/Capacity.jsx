@@ -11,7 +11,7 @@ const Capacity = ({ loading, capacityInfo }) => {
     : 0;
 
   const barColor = pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e';
-  const statusLabel = pct > 85 ? '🔴 Critical' : pct > 60 ? '🟡 Moderate' : '🟢 Normal';
+  const statusLabel = pct > 85 ? 'Critical' : pct > 60 ? 'Moderate' : 'Normal';
 
   // Hourly capacity simulation based on real data
   const hours = Array.from({ length: 10 }, (_, i) => {
@@ -26,13 +26,12 @@ const Capacity = ({ loading, capacityInfo }) => {
       {/* Stats Row */}
       <div className={`mgr-kpi-grid ${styles.capacityTabKpiGrid}`}>
         {[
-          { icon: '📊', label: 'Daily Limit',   value: capacityInfo?.dailyLimit    ?? 100, color: '#284394' },
-          { icon: '✅', label: 'Slots Used',    value: capacityInfo?.slotsUsed     ?? 0,   color: '#22c55e' },
-          { icon: '🔓', label: 'Remaining',     value: capacityInfo?.slotsRemaining ?? 0,  color: '#0891b2' },
-          { icon: '📈', label: 'Utilisation',   value: `${pct}%`,                          color: pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e' },
+          { label: 'Daily Limit',   value: capacityInfo?.dailyLimit    ?? 100, color: '#284394' },
+          { label: 'Slots Used',    value: capacityInfo?.slotsUsed     ?? 0,   color: '#22c55e' },
+          { label: 'Remaining',     value: capacityInfo?.slotsRemaining ?? 0,  color: '#0891b2' },
+          { label: 'Utilisation',   value: `${pct}%`,                          color: pct > 85 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#22c55e' },
         ].map(c => (
           <div key={c.label} className="mgr-kpi-card">
-            <div className="mgr-kpi-icon" style={{ background: c.color + '18', color: c.color }}>{c.icon}</div>
             <div className="mgr-kpi-body">
               <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
               <div className="mgr-kpi-label">{c.label}</div>
@@ -168,21 +167,18 @@ const Capacity = ({ loading, capacityInfo }) => {
         <div className="mgr-chart-footer">
           <div className="mgr-hourly-insights">
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">🕘</div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Peak Hours</span>
                 <span className="mgr-insight-value">9:00 - 11:00 AM</span>
               </div>
             </div>
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">📊</div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Avg Utilization</span>
                 <span className="mgr-insight-value">{Math.round(hours.reduce((s,h)=>s+h.used,0)/hours.length)} slots/hr</span>
               </div>
             </div>
             <div className="mgr-insight-card">
-              <div className="mgr-insight-icon">⚡</div>
               <div className="mgr-insight-content">
                 <span className="mgr-insight-label">Efficiency</span>
                 <span className="mgr-insight-value">{Math.round((hours.reduce((s,h)=>s+h.used,0)/(hours.reduce((s,h)=>s+h.used+h.available,0)))*100)}%</span>

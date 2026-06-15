@@ -112,20 +112,14 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
       {/* Enhanced KPI Row with Period-based Metrics */}
       <div className={`mgr-kpi-grid ${styles.analyticsKpiGrid}`}>
         {[
-          { icon: '📊', label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
-          { icon: '✅', label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
-          { icon: '❌', label: `No Show (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
-          { icon: '🩺', label: 'Vitals Recorded', value: metrics.totalVitals, color: '#7c3aed', trend: '+15%' },
-          { icon: '👥', label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
-          { icon: '⚡', label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
+          { label: `Total Appointments (${periodLabel})`, value: metrics.totalAppointments, color: '#284394', trend: '+12%' },
+          { label: `Completed (${metrics.completionRate}%)`, value: metrics.totalCompleted, color: '#22c55e', trend: '+8%' },
+          { label: `No Show (${metrics.noShowRate}%)`, value: metrics.totalNoShow, color: '#ef4444', trend: '-3%' },
+          { label: 'Vitals Recorded', value: metrics.totalVitals, color: '#7c3aed', trend: '+15%' },
+          { label: 'New Users', value: metrics.totalNewUsers, color: '#059669', trend: '+22%' },
+          { label: 'Avg Efficiency', value: `${metrics.avgEfficiency}%`, color: '#f97316', trend: '+5%' },
         ].map(c => (
           <div key={c.label} className={`mgr-kpi-card ${styles.analyticsKpiCard}`}>
-            <div 
-              className="mgr-kpi-icon"
-              style={{ background: c.color + '18', color: c.color }}
-            >
-              {c.icon}
-            </div>
             <div className="mgr-kpi-body">
               <div className="mgr-kpi-value" style={{ color: c.color }}>{c.value}</div>
               <div className="mgr-kpi-label" style={{ fontSize: '0.75rem' }}>{c.label}</div>
@@ -167,7 +161,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
                   className={`${styles.periodBtn} ${period === p ? styles.periodBtnActive : styles.periodBtnInactive}`}
                   onClick={() => setPeriod(p)}
                 >
-                  📅 {p}
+                  {p}
                 </button>
               ))}
             </div>
@@ -178,10 +172,10 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
               onChange={(e) => setSelectedMetric(e.target.value)}
               className={`performance-metric-selector ${styles.metricSelector}`}
             >
-              <option value="appointments" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>📊 Appointments Overview</option>
-              <option value="vitals" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>🩺 Vitals Tracking</option>
-              <option value="users" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>👥 User Growth</option>
-              <option value="efficiency" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>⚡ Efficiency Metrics</option>
+              <option value="appointments" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Appointments Overview</option>
+              <option value="vitals" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Vitals Tracking</option>
+              <option value="users" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>User Growth</option>
+              <option value="efficiency" style={{ background: '#ffffff', color: '#000000', fontWeight: '600' }}>Efficiency Metrics</option>
             </select>
 
             {/* View Mode Toggle */}
@@ -192,7 +186,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
                   onClick={() => setViewMode(mode)}
                   className={`${styles.viewModeBtn} ${viewMode === mode ? styles.viewModeBtnActive : styles.viewModeBtnInactive}`}
                 >
-                  {mode === 'chart' ? '📈 Chart' : '📋 Table'}
+                  {mode === 'chart' ? 'Chart' : 'Table'}
                 </button>
               ))}
             </div>
@@ -207,7 +201,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1 }}>
               <span className="mgr-live-dot" />
               <span className="mgr-dark-title">
-                📈 {selectedMetric === 'appointments' ? 'Appointments & Completion Trends' :
+                {selectedMetric === 'appointments' ? 'Appointments & Completion Trends' :
                      selectedMetric === 'vitals' ? 'Vitals Recording Trends' :
                      selectedMetric === 'users' ? 'User Registration Trends' :
                      'Efficiency Performance Trends'} — {periodLabel}
@@ -366,7 +360,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
           
           <div className={styles.tableViewHeader}>
             <span className={styles.tableViewBadge}>
-              📊 DATA TABLE
+              DATA TABLE
             </span>
             <h3 className={styles.tableViewTitle}>
               Performance Data — {periodLabel}
@@ -378,12 +372,12 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
               <thead>
                 <tr style={{ borderBottom: '2px solid rgba(0,0,0,0.12)', background: '#f8fafc' }}>
                   <th style={{ padding: '1rem', textAlign: 'left', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>Period</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>📊 Total</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>✅ Completed</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>❌ No Show</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>🩺 Vitals</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>👥 New Users</th>
-                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>⚡ Efficiency</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>Total</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>Completed</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>No Show</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>Vitals</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>New Users</th>
+                  <th style={{ padding: '1rem', textAlign: 'center', color: '#1e293b', fontWeight: 700, fontSize: '0.9rem' }}>Efficiency</th>
                 </tr>
               </thead>
               <tbody>
@@ -440,7 +434,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
         {/* Feedback Bars */}
         <div className="mgr-dark-card">
           <div className="mgr-dark-header">
-            <span className="mgr-dark-title">⭐ Patient Satisfaction</span>
+            <span className="mgr-dark-title">Patient Satisfaction</span>
             {(!fs || !fs.total || fs.total === 0) && <span className="mgr-demo-badge" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fbbf24' }}>No Data</span>}
           </div>
           <ResponsiveContainer width="100%" height={200}>

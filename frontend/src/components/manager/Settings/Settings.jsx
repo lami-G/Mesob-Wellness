@@ -25,8 +25,6 @@ const Settings = ({ systemSettings, setSystemSettings }) => {
 
   return (
     <div className="settings-content">
-      <h3>System Settings</h3>
-
       {msg && (
         <div
           className={`alert alert-${msg.type === 'success' ? 'success' : 'error'}`}

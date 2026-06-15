@@ -14,7 +14,6 @@ const Audit = ({ loading, logs }) => {
   return (
     <div className="users-content">
       <div className="users-header">
-        <h3>Audit Trail ({logs.length} recent entries)</h3>
       </div>
 
       {logs.length === 0 ? (

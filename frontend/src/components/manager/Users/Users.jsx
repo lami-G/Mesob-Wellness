@@ -174,7 +174,6 @@ const Users = ({ loading, users, onRefresh }) => {
   return (
     <div className="users-content">
       <div className="users-header">
-        <h3>Staff Management ({users.length} staff)</h3>
         <Button onClick={() => setShowCreateModal(true)}>+ Create Nurse Officer</Button>
       </div>
 

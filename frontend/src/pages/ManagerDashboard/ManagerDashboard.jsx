@@ -116,7 +116,6 @@ const ManagerDashboard = () => {
         return (
           <div className="dashboard-section">
             <div className="section-header">
-              <h2>📊 Center Overview</h2>
               <div className={`capacity-indicator ${styles.capacityIndicator}`} style={{
                 background: capacityColor + '20', 
                 border: `1px solid ${capacityColor}60`,
@@ -135,35 +134,30 @@ const ManagerDashboard = () => {
       case 'capacity':
         return (
           <div className="dashboard-section">
-            <h2>📈 Capacity Management</h2>
             <Capacity loading={loading} capacityInfo={capacityInfo} />
           </div>
         );
       case 'analytics':
         return (
           <div className="dashboard-section">
-            <h2>📊 Analytics & Insights</h2>
             <Analytics loading={loading} queueData={queueData} healthData={healthData} trendsData={trendsData} />
           </div>
         );
       case 'users':
         return (
           <div className="dashboard-section">
-            <h2>👥 Staff Management</h2>
             <Users loading={loading} users={users} onRefresh={loadDashboardData} />
           </div>
         );
       case 'audit':
         return (
           <div className="dashboard-section">
-            <h2>Audit & Activity Logs</h2>
             <Audit loading={loading} logs={auditLogs} />
           </div>
         );
       case 'settings':
         return (
           <div className="dashboard-section">
-            <h2>⚙️ System Settings</h2>
             <Settings systemSettings={systemSettings} setSystemSettings={setSystemSettings} />
           </div>
         );
