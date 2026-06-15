@@ -23,6 +23,7 @@ const ManagerDashboard = () => {
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
   const [lastUpdated, setLastUpdated]   = useState(null);
+  const [dateFilter, setDateFilter]     = useState('today');
   const [capacityInfo, setCapacityInfo] = useState(null);
   const [bookingStats, setBookingStats] = useState(null);
   const [queueData, setQueueData]       = useState(null);
@@ -40,16 +41,25 @@ const ManagerDashboard = () => {
 
   const hasAccess = MANAGER_ROLES.includes(user?.role);
 
-  const loadDashboardData = useCallback(async () => {
+  const loadDashboardData = useCallback(async (filter = 'today') => {
     setLoading(true);
     setError(null);
     try {
+      // Convert filter to dateRange for API
+      const dateRangeMap = {
+        'today': '0',
+        'week': '7',
+        'month': '30',
+        'all': 'all'
+      };
+      const dateRange = dateRangeMap[filter] || '0';
+      
       const [capacity, booking, queue, health, settings, staffUsers, logs, trends] =
         await Promise.allSettled([
           analyticsService.getCapacityInfo(),
           analyticsService.getBookingStats(),
           analyticsService.getQueueAnalytics(),
-          analyticsService.getHealthAnalytics(),
+          analyticsService.getHealthAnalytics({ dateRange }),
           analyticsService.getSystemSettings(),
           analyticsService.getStaffUsers(),
           analyticsService.getAuditLogs(30),
@@ -62,9 +72,11 @@ const ManagerDashboard = () => {
       if (health.status === 'fulfilled')     setHealthData(health.value.data);
       if (settings.status === 'fulfilled')   setSystemSettings(settings.value.data);
       if (staffUsers.status === 'fulfilled') {
-        // Filter to show only NURSE_OFFICER users (exclude admins, federal, regional)
-        const nurseOfficers = staffUsers.value.data.filter(u => u.role === 'NURSE_OFFICER');
-        setUsers(nurseOfficers);
+        // Show NURSE_OFFICER and STAFF users from this center
+        const centerStaff = staffUsers.value.data.filter(u => 
+          u.role === 'NURSE_OFFICER' || u.role === 'STAFF'
+        );
+        setUsers(centerStaff);
       }
       if (logs.status === 'fulfilled')       setAuditLogs(logs.value.data);
       if (trends.status === 'fulfilled')     setTrendsData(trends.value.data);
@@ -78,6 +90,15 @@ const ManagerDashboard = () => {
   }, []);
 
   // Initial load
+  useEffect(() => {
+    if (hasAccess) {
+      loadDashboardData(dateFilter);
+    }
+  }, [hasAccess, dateFilter, loadDashboardData]);
+
+  const handleDateFilterChange = (newFilter) => {
+    setDateFilter(newFilter);
+  };
   useEffect(() => {
     if (hasAccess) {
       loadDashboardData();
@@ -115,20 +136,14 @@ const ManagerDashboard = () => {
       case 'overview':
         return (
           <div className="dashboard-section">
-            <div className="section-header">
-              <div className={`capacity-indicator ${styles.capacityIndicator}`} style={{
-                background: capacityColor + '20', 
-                border: `1px solid ${capacityColor}60`,
-              }}>
-                <span className={styles.capacityIcon}>
-                  {usedPct > 85 ? '🔴' : usedPct > 60 ? '🟡' : '🟢'}
-                </span>
-                <span className={styles.capacityText} style={{ color: capacityColor }}>
-                  Capacity {usedPct}%
-                </span>
-              </div>
-            </div>
-            <Overview loading={loading} capacityInfo={capacityInfo} bookingStats={bookingStats} healthData={healthData} />
+            <Overview 
+              loading={loading} 
+              capacityInfo={capacityInfo} 
+              bookingStats={bookingStats} 
+              healthData={healthData}
+              dateFilter={dateFilter}
+              onDateFilterChange={handleDateFilterChange}
+            />
           </div>
         );
       case 'capacity':

@@ -92,6 +92,9 @@ export async function getBookingStats(req: Request, res: Response) {
     const authReq = req as AuthRequest;
     const roleFilters = await applyRoleBasedFilters(authReq);
     
+    console.log('[BOOKING_STATS] User info:', authReq.user);
+    console.log('[BOOKING_STATS] Role filters applied:', roleFilters);
+    
     const today = new Date();
     const startOfDay  = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const endOfDay    = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
@@ -103,10 +106,14 @@ export async function getBookingStats(req: Request, res: Response) {
     const userWhere: any = {};
     if (roleFilters.center) {
       userWhere.centerId = roleFilters.center;
+      console.log('[BOOKING_STATS] Filtering by center:', roleFilters.center);
     } else if (roleFilters.region) {
       userWhere.center = {
         region: roleFilters.region,
       };
+      console.log('[BOOKING_STATS] Filtering by region:', roleFilters.region);
+    } else {
+      console.log('[BOOKING_STATS] No filtering applied - showing all data');
     }
 
     // Today's appointments
@@ -654,6 +661,7 @@ export async function getStaffUsers(req: AuthRequest, res: Response) {
       role: {
         in: [
           UserRole.NURSE_OFFICER,
+          UserRole.STAFF,
           UserRole.MANAGER,
           UserRole.REGIONAL_OFFICE,
           UserRole.FEDERAL_OFFICE,

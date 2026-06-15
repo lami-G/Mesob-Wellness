@@ -34,8 +34,8 @@ export const analyticsService = {
   },
 
   // ─── Health Analytics ───────────────────────────────────────────────────────
-  async getHealthAnalytics() {
-    const response = await api.get('/api/v1/analytics/health/analytics');
+  async getHealthAnalytics(params = {}) {
+    const response = await api.get('/api/v1/analytics/health/analytics', { params });
     return response.data;
   },
 

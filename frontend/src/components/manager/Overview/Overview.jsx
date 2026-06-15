@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import styles from './Overview.module.css';
 import dashStyles from '../../../pages/ManagerDashboard/ManagerDashboard.module.css';
 
-const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
+const Overview = ({ loading, capacityInfo, bookingStats, healthData, dateFilter, onDateFilterChange }) => {
   if (loading) return <div className="mgr-loading"><div className="mgr-spinner" />Loading dashboard data…</div>;
 
   const usedPct = capacityInfo
@@ -46,7 +46,37 @@ const Overview = ({ loading, capacityInfo, bookingStats, healthData }) => {
   const hasBreakdown = breakdownData.some(d => d.value > 0);
 
   return (
-    <div className="mgr-overview">
+    <div className="mgr-overview" style={{ marginTop: 0 }}>
+      {/* Filter Controls at Top Right */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end', 
+        marginBottom: '1rem',
+        gap: '0.75rem'
+      }}>
+        <select
+          value={dateFilter}
+          onChange={(e) => onDateFilterChange(e.target.value)}
+          style={{
+            background: '#ffffff',
+            border: '2px solid #cbd5e1',
+            borderRadius: '8px',
+            padding: '0.5rem 1rem',
+            color: '#1e293b',
+            fontSize: '0.85rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            outline: 'none',
+            boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)'
+          }}
+        >
+          <option value="today">Today</option>
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+
       {/* KPI Cards — Production-Level Design */}
       <div className={dashStyles.topKpiGrid}>
         {statCards.map((c) => (

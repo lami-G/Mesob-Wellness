@@ -140,8 +140,9 @@
 .topKpiGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1.5rem;
+  gap: 1rem;
   margin-bottom: 1.5rem;
+  margin-top: 0;
 }
 
 @media (max-width: 1400px) {

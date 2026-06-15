@@ -5,6 +5,7 @@ import Button from '../../forms/Button';
 import styles from './Users.module.css';
 
 const Users = ({ loading, users, onRefresh }) => {
+  const [activeTab, setActiveTab] = useState('nurses');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -22,13 +23,25 @@ const Users = ({ loading, users, onRefresh }) => {
     fullName: '', email: '', role: 'NURSE_OFFICER',
   });
 
+  // Filter users based on active tab
+  const filteredUsers = users.filter(u => {
+    if (activeTab === 'nurses') return u.role === 'NURSE_OFFICER';
+    if (activeTab === 'staff') return u.role === 'STAFF';
+    return false;
+  });
+
   // Generate password when create modal opens
   useEffect(() => {
     if (showCreateModal) {
       const newPassword = generateRandomPassword();
       setGeneratedPassword(newPassword);
+      // Set default role based on active tab
+      setNewUser(prev => ({
+        ...prev,
+        role: activeTab === 'nurses' ? 'NURSE_OFFICER' : 'STAFF'
+      }));
     }
-  }, [showCreateModal]);
+  }, [showCreateModal, activeTab]);
 
   const generateRandomPassword = () => {
     const length = 12;
@@ -63,9 +76,9 @@ const Users = ({ loading, users, onRefresh }) => {
       return;
     }
     
-    // Manager can only create NURSE_OFFICER role
-    if (newUser.role !== 'NURSE_OFFICER') {
-      setFormError('Managers can only create Nurse Officer accounts.');
+    // Manager can only create NURSE_OFFICER and STAFF roles
+    if (newUser.role !== 'NURSE_OFFICER' && newUser.role !== 'STAFF') {
+      setFormError('Managers can only create Nurse Officer and Staff accounts.');
       return;
     }
     
@@ -173,13 +186,58 @@ const Users = ({ loading, users, onRefresh }) => {
 
   return (
     <div className="users-content">
-      <div className="users-header">
-        <Button onClick={() => setShowCreateModal(true)}>+ Create Nurse Officer</Button>
+      {/* Header with tabs and create button aligned to the right */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: '0.75rem', 
+        marginBottom: '1.5rem',
+        paddingBottom: '1rem',
+        borderBottom: '2px solid #e5e7eb'
+      }}>
+        <button
+          onClick={() => setActiveTab('nurses')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: activeTab === 'nurses' ? '#37519A' : '#f3f4f6',
+            color: activeTab === 'nurses' ? '#ffffff' : '#6b7280',
+            border: '2px solid',
+            borderColor: activeTab === 'nurses' ? '#37519A' : '#e5e7eb',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            borderRadius: '6px'
+          }}
+        >
+          Nurses ({users.filter(u => u.role === 'NURSE_OFFICER').length})
+        </button>
+        <button
+          onClick={() => setActiveTab('staff')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: activeTab === 'staff' ? '#37519A' : '#f3f4f6',
+            color: activeTab === 'staff' ? '#ffffff' : '#6b7280',
+            border: '2px solid',
+            borderColor: activeTab === 'staff' ? '#37519A' : '#e5e7eb',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            borderRadius: '6px'
+          }}
+        >
+          Staff ({users.filter(u => u.role === 'STAFF').length})
+        </button>
+        <Button onClick={() => setShowCreateModal(true)}>
+          + Create {activeTab === 'nurses' ? 'Nurse' : 'Staff Member'}
+        </Button>
       </div>
 
-      {users.length === 0 ? (
+      {filteredUsers.length === 0 ? (
         <div className={styles.emptyState}>
-          No staff users found. Create one to get started.
+          No {activeTab === 'nurses' ? 'nurses' : 'staff members'} found. Create one to get started.
         </div>
       ) : (
         <div className="users-table">
@@ -195,7 +253,7 @@ const Users = ({ loading, users, onRefresh }) => {
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {filteredUsers.map((u) => (
                 <tr key={u.id}>
                   <td>{u.fullName}</td>
                   <td>{u.email}</td>
@@ -212,13 +270,15 @@ const Users = ({ loading, users, onRefresh }) => {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <Button
-                        size="small"
-                        onClick={() => handleEditClick(u)}
-                        style={{ background: '#37519A', minWidth: '60px' }}
-                      >
-                        ✏️ Edit
-                      </Button>
+                      {u.role === 'NURSE_OFFICER' && (
+                        <Button
+                          size="small"
+                          onClick={() => handleEditClick(u)}
+                          style={{ background: '#37519A', minWidth: '60px' }}
+                        >
+                          ✏️ Edit
+                        </Button>
+                      )}
                       <Button
                         size="small"
                         onClick={() => handleToggle(u.id)}
@@ -229,13 +289,15 @@ const Users = ({ loading, users, onRefresh }) => {
                           ? '…'
                           : u.isActive ? 'Deactivate' : 'Activate'}
                       </Button>
-                      <Button
-                        size="small"
-                        onClick={() => handleDeleteClick(u)}
-                        style={{ background: '#ef4444', minWidth: '70px' }}
-                      >
-                        🗑️ Delete
-                      </Button>
+                      {u.role === 'NURSE_OFFICER' && (
+                        <Button
+                          size="small"
+                          onClick={() => handleDeleteClick(u)}
+                          style={{ background: '#ef4444', minWidth: '70px' }}
+                        >
+                          🗑️ Delete
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -250,7 +312,7 @@ const Users = ({ loading, users, onRefresh }) => {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h3>Create Nurse Officer</h3>
+              <h3>Create {activeTab === 'nurses' ? 'Nurse Officer' : 'Staff Member'}</h3>
               <button onClick={() => { setShowCreateModal(false); setFormError(''); }}>×</button>
             </div>
             <form onSubmit={handleCreate}>
@@ -317,14 +379,17 @@ const Users = ({ loading, users, onRefresh }) => {
                   disabled
                 >
                   <option value="NURSE_OFFICER">Nurse Officer</option>
+                  <option value="STAFF">Staff (Employee)</option>
                 </select>
                 <small className={styles.roleHelp}>
-                  ℹ️ Center Managers can only create Nurse Officer accounts
+                  ℹ️ {activeTab === 'nurses' 
+                    ? 'Nurse Officers can login to manage patients.' 
+                    : 'Staff are employees who receive wellness services.'}
                 </small>
               </div>
               <div className="modal-actions">
                 <Button type="submit" disabled={saving}>
-                  {saving ? 'Creating…' : 'Create Nurse Officer'}
+                  {saving ? 'Creating…' : `Create ${activeTab === 'nurses' ? 'Nurse Officer' : 'Staff Member'}`}
                 </Button>
                 <Button type="button" onClick={() => { setShowCreateModal(false); setFormError(''); }}>
                   Cancel
