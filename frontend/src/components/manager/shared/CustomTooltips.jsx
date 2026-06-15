@@ -33,52 +33,148 @@ export const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
     const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
     
     return (
-      <div className={styles.tooltipLight}>
+      <div style={{
+        background: '#ffffff',
+        border: '3px solid #1f2937',
+        borderRadius: '12px',
+        padding: '16px',
+        boxShadow: '0 12px 48px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+        color: '#111827',
+        minWidth: '280px',
+        maxWidth: '320px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+      }}>
         {/* Header with day */}
-        <div className={styles.tooltipLightHeader}>
-          <span className={styles.tooltipLightHeaderIcon}>📅</span>
-          {label}
+        <div style={{
+          fontSize: '16px',
+          fontWeight: 800,
+          marginBottom: '14px',
+          paddingBottom: '12px',
+          borderBottom: '3px solid #e5e7eb',
+          color: '#111827',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          letterSpacing: '-0.02em',
+        }}>
+          <span style={{ fontSize: '18px' }}>📅</span>
+          <span>{label}</span>
         </div>
 
         {/* Metrics List */}
-        <div className={styles.tooltipMetricsGrid}>
+        <div style={{ display: 'grid', gap: '10px' }}>
           {/* Total Appointments */}
-          <div className={styles.tooltipMetricRow}>
-            <span className={styles.tooltipMetricLabel}>
-              <span className={styles.tooltipMetricIcon}>📊</span> Total
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 0',
+            borderBottom: '1px solid #f3f4f6',
+          }}>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#374151',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ fontSize: '16px' }}>📊</span>
+              <span>Total</span>
             </span>
-            <span className={styles.tooltipMetricValue} style={{ color: '#3b82f6' }}>
+            <span style={{
+              fontSize: '18px',
+              fontWeight: 800,
+              color: '#3b82f6',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            }}>
               {total}
             </span>
           </div>
 
           {/* Completed */}
-          <div className={styles.tooltipMetricRow}>
-            <span className={styles.tooltipMetricLabel}>
-              <span className={styles.tooltipMetricIcon}>✅</span> Completed
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 0',
+            borderBottom: '1px solid #f3f4f6',
+          }}>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#374151',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ fontSize: '16px' }}>✅</span>
+              <span>Completed</span>
             </span>
-            <span className={styles.tooltipMetricValue} style={{ color: '#10b981' }}>
+            <span style={{
+              fontSize: '18px',
+              fontWeight: 800,
+              color: '#10b981',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            }}>
               {completed}
             </span>
           </div>
 
           {/* No-Show */}
-          <div className={styles.tooltipMetricRow}>
-            <span className={styles.tooltipMetricLabel}>
-              <span className={styles.tooltipMetricIcon}>❌</span> No-Show
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 0',
+            borderBottom: pending > 0 ? '1px solid #f3f4f6' : 'none',
+          }}>
+            <span style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#374151',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}>
+              <span style={{ fontSize: '16px' }}>❌</span>
+              <span>No-Show</span>
             </span>
-            <span className={styles.tooltipMetricValue} style={{ color: '#f59e0b' }}>
+            <span style={{
+              fontSize: '18px',
+              fontWeight: 800,
+              color: '#f59e0b',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+            }}>
               {noShow}
             </span>
           </div>
 
           {/* Pending (if any) */}
           {pending > 0 && (
-            <div className={styles.tooltipMetricRow}>
-              <span className={styles.tooltipMetricLabel}>
-                <span className={styles.tooltipMetricIcon}>⏳</span> Pending
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 0',
+            }}>
+              <span style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#374151',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}>
+                <span style={{ fontSize: '16px' }}>⏳</span>
+                <span>Pending</span>
               </span>
-              <span className={styles.tooltipMetricValue} style={{ color: '#8b5cf6' }}>
+              <span style={{
+                fontSize: '18px',
+                fontWeight: 800,
+                color: '#8b5cf6',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+              }}>
                 {pending}
               </span>
             </div>
@@ -86,9 +182,23 @@ export const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
         </div>
 
         {/* Completion Rate */}
-        <div className={styles.tooltipCompletionSection}>
-          <div className={styles.tooltipCompletionHeader}>
-            <span className={styles.tooltipCompletionLabel}>
+        <div style={{
+          marginTop: '14px',
+          paddingTop: '14px',
+          borderTop: '3px solid #e5e7eb',
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '8px',
+          }}>
+            <span style={{
+              fontSize: '13px',
+              fontWeight: 700,
+              color: '#374151',
+              letterSpacing: '-0.01em',
+            }}>
               Completion Rate
             </span>
             <span style={{ 
@@ -99,14 +209,22 @@ export const CustomAppointmentTrendsTooltip = ({ active, payload, label }) => {
               {completionRate}%
             </span>
           </div>
-          <div className={styles.tooltipCompletionBar}>
-            <div 
-              className={styles.tooltipCompletionFill}
-              style={{
-                width: `${completionRate}%`,
-                background: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444',
-              }} 
-            />
+          <div style={{
+            width: '100%',
+            height: '8px',
+            background: '#e5e7eb',
+            borderRadius: '4px',
+            overflow: 'hidden',
+            boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)',
+          }}>
+            <div style={{
+              width: `${completionRate}%`,
+              height: '100%',
+              background: completionRate >= 80 ? '#10b981' : completionRate >= 60 ? '#f59e0b' : '#ef4444',
+              borderRadius: '4px',
+              transition: 'width 0.3s ease',
+              boxShadow: '0 0 8px rgba(0, 0, 0, 0.2)',
+            }} />
           </div>
         </div>
       </div>

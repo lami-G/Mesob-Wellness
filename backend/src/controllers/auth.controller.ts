@@ -205,8 +205,9 @@ export const createUser = async (req: AuthRequest, res: Response): Promise<void>
 
     // Create notification for system admin about new user creation
     try {
-      const { NotificationService } = await import("../services/notifications.service");
-      const admins = await (await import("../config/prisma")).default.user.findMany({
+      const { NotificationService } = await import("../services/notifications.service.js");
+      const { prisma } = await import("../config/prisma.js");
+      const admins = await prisma.user.findMany({
         where: { role: UserRole.SYSTEM_ADMIN },
         select: { id: true },
       });

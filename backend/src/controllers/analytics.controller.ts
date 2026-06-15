@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../config/prisma";
-import { AuthRequest } from "../middleware/auth.middleware";
+import { AuthRequest, applyRoleBasedFilters } from "../middleware/auth.middleware";
 import { AppointmentStatus, UserRole } from "../generated/prisma";
 import bcrypt from "bcryptjs";
 import { generateNextDisplayId } from "../utils/sequentialId";
@@ -39,14 +39,29 @@ export async function updateSystemSettings(req: Request, res: Response) {
 // ─── Capacity Management (real DB) ───────────────────────────────────────────
 export async function getCapacityInfo(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const endOfDay   = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+    // Build user filter for role-based filtering
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+    }
 
     const slotsUsed = await prisma.appointment.count({
       where: {
         scheduledAt: { gte: startOfDay, lte: endOfDay },
         status: { notIn: [AppointmentStatus.CANCELLED] },
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
     });
 
@@ -73,12 +88,26 @@ export async function getCapacityInfo(req: Request, res: Response) {
 // ─── Booking Statistics (real DB) ────────────────────────────────────────────
 export async function getBookingStats(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
     const today = new Date();
     const startOfDay  = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const endOfDay    = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
+
+    // Build user filter for role-based filtering
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+    }
 
     // Today's appointments
     const [
@@ -94,17 +123,17 @@ export async function getBookingStats(req: Request, res: Response) {
       totalUsers,
       activeUsers,
     ] = await Promise.all([
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay } } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.COMPLETED } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.CANCELLED } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.NO_SHOW } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.IN_PROGRESS } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.PENDING } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfWeek } } }),
-      prisma.appointment.count({ where: { scheduledAt: { gte: startOfWeek }, status: AppointmentStatus.NO_SHOW } }),
-      prisma.appointment.count(),
-      prisma.user.count(),
-      prisma.user.count({ where: { isActive: true } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.COMPLETED, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.CANCELLED, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.NO_SHOW, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.IN_PROGRESS, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.PENDING, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfWeek }, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: { scheduledAt: { gte: startOfWeek }, status: AppointmentStatus.NO_SHOW, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) } }),
+      prisma.appointment.count({ where: Object.keys(userWhere).length > 0 ? { user: userWhere } : {} }),
+      prisma.user.count({ where: userWhere }),
+      prisma.user.count({ where: { ...userWhere, isActive: true } }),
     ]);
 
     // Average service time from completed appointments that have startedAt + completedAt
@@ -113,6 +142,7 @@ export async function getBookingStats(req: Request, res: Response) {
         status: AppointmentStatus.COMPLETED,
         startedAt: { not: null },
         completedAt: { not: null },
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
       select: { startedAt: true, completedAt: true },
       take: 100,
@@ -164,9 +194,23 @@ export async function getBookingStats(req: Request, res: Response) {
 // ─── Queue Analytics (real DB) ───────────────────────────────────────────────
 export async function getQueueAnalytics(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const endOfDay   = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+    // Build user filter for role-based filtering
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+    }
 
     // Current queue = PENDING + IN_PROGRESS today
     const [currentQueue, completedToday, totalToday] = await Promise.all([
@@ -174,22 +218,24 @@ export async function getQueueAnalytics(req: Request, res: Response) {
         where: {
           scheduledAt: { gte: startOfDay, lte: endOfDay },
           status: { in: [AppointmentStatus.PENDING, AppointmentStatus.IN_PROGRESS] },
+          ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
         },
       }),
       prisma.appointment.count({
-        where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.COMPLETED },
+        where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, status: AppointmentStatus.COMPLETED, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) },
       }),
       prisma.appointment.count({
         where: {
           scheduledAt: { gte: startOfDay, lte: endOfDay },
           status: { notIn: [AppointmentStatus.CANCELLED] },
+          ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
         },
       }),
     ]);
 
     // Peak hours — count appointments per hour today
     const todayAppointments = await prisma.appointment.findMany({
-      where: { scheduledAt: { gte: startOfDay, lte: endOfDay } },
+      where: { scheduledAt: { gte: startOfDay, lte: endOfDay }, ...(Object.keys(userWhere).length > 0 && { user: userWhere }) },
       select: { scheduledAt: true },
     });
 
@@ -212,6 +258,7 @@ export async function getQueueAnalytics(req: Request, res: Response) {
         confirmedAt: { not: null },
         startedAt: { not: null },
         scheduledAt: { gte: startOfDay, lte: endOfDay },
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
       select: { confirmedAt: true, startedAt: true },
       take: 50,
@@ -252,40 +299,70 @@ export async function getQueueAnalytics(req: Request, res: Response) {
 // ─── Daily Queue Metrics (Appointments, Walk-ins, Patients Served) ──────────
 export async function getDailyQueueMetrics(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
+    console.log('[DAILY_QUEUE_METRICS] Role filters applied:', roleFilters);
+    console.log('[DAILY_QUEUE_METRICS] User info:', authReq.user);
+    
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+    // Build user filter for role-based filtering
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+      console.log('[DAILY_QUEUE_METRICS] Filtering by center:', roleFilters.center);
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+      console.log('[DAILY_QUEUE_METRICS] Filtering by region:', roleFilters.region);
+    } else {
+      console.log('[DAILY_QUEUE_METRICS] No filtering applied - showing all data');
+    }
 
     // Get all completed appointments today
     const completedAppointments = await prisma.appointment.findMany({
       where: {
         scheduledAt: { gte: startOfDay, lte: endOfDay },
         status: AppointmentStatus.COMPLETED,
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
       select: { userId: true, id: true },
     });
 
     const completedCount = completedAppointments.length;
     const completedUserIds = new Set(completedAppointments.map(apt => apt.userId));
+    
+    console.log('[DAILY_QUEUE_METRICS] Completed appointments:', completedCount);
 
     // Get all vital records today
     const vitalsToday = await prisma.vitalRecord.findMany({
       where: {
         recordedAt: { gte: startOfDay, lte: endOfDay },
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
       select: { userId: true },
     });
 
     // Count walk-ins: vital records for users WITHOUT completed appointments on this day
     const walkInCount = vitalsToday.filter(v => !completedUserIds.has(v.userId)).length;
+    
+    console.log('[DAILY_QUEUE_METRICS] Walk-ins:', walkInCount);
 
     // Get total appointments today (all statuses except CANCELLED)
     const totalAppointmentsToday = await prisma.appointment.count({
       where: {
         scheduledAt: { gte: startOfDay, lte: endOfDay },
         status: { not: AppointmentStatus.CANCELLED },
+        ...(Object.keys(userWhere).length > 0 && { user: userWhere }),
       },
     });
+    
+    console.log('[DAILY_QUEUE_METRICS] Total appointments:', totalAppointmentsToday);
 
     // Patients served = completed appointments + walk-ins
     const patientsServed = completedCount + walkInCount;
@@ -309,7 +386,15 @@ export async function getDailyQueueMetrics(req: Request, res: Response) {
 // ─── Health Analytics (real DB) ──────────────────────────────────────────────
 export async function getHealthAnalytics(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
     const { dateRange, center, condition } = req.query;
+    
+    // Override center filter if role-based filter exists
+    const effectiveCenter = roleFilters.center || (center && center !== 'all' ? center : null);
+    const effectiveRegion = roleFilters.region;
     
     // Calculate date filter
     let dateFilter: any = {};
@@ -334,12 +419,22 @@ export async function getHealthAnalytics(req: Request, res: Response) {
 
     // Build center filter for queries
     let centerFilter: any = {};
-    if (center && center !== 'all') {
-      centerFilter = { recorder: { centerId: center as string } };
+    if (effectiveCenter) {
+      centerFilter = { recorder: { centerId: effectiveCenter as string } };
+    } else if (effectiveRegion) {
+      centerFilter = { recorder: { center: { region: effectiveRegion } } };
+    }
+
+    // Build user where clause
+    const userWhere: any = {};
+    if (effectiveCenter) {
+      userWhere.centerId = effectiveCenter as string;
+    } else if (effectiveRegion) {
+      userWhere.center = { region: effectiveRegion };
     }
 
     const totalPatients = await prisma.user.count({
-      where: { role: UserRole.STAFF, ...(center && center !== 'all' ? { centerId: center as string } : {}) },
+      where: { role: UserRole.STAFF, ...userWhere },
     });
 
     // Get patient conditions from patient_conditions table (nurse-approved only)
@@ -350,14 +445,23 @@ export async function getHealthAnalytics(req: Request, res: Response) {
       ...(Object.keys(dateFilter).length > 0 && { calculatedAt: dateFilter }),
     };
 
-    if (center && center !== 'all') {
+    if (effectiveCenter) {
       // Get all patients who have vitals recorded at this center
       const patientsAtCenter = await prisma.vitalRecord.findMany({
-        where: { recorder: { centerId: center as string } },
+        where: { recorder: { centerId: effectiveCenter as string } },
         select: { userId: true },
         distinct: ['userId'],
       });
       const patientIds = patientsAtCenter.map(v => v.userId);
+      patientConditionWhere.patientId = { in: patientIds };
+    } else if (effectiveRegion) {
+      // Get all patients who have vitals recorded in this region
+      const patientsInRegion = await prisma.vitalRecord.findMany({
+        where: { recorder: { center: { region: effectiveRegion } } },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      const patientIds = patientsInRegion.map(v => v.userId);
       patientConditionWhere.patientId = { in: patientIds };
     }
 
@@ -451,7 +555,19 @@ export async function getHealthAnalytics(req: Request, res: Response) {
       _avg: { npsScore: null as number | null, serviceQuality: null as number | null, staffBehavior: null as number | null, cleanliness: null as number | null, waitTime: null as number | null },
     };
     try {
+      // Build feedback where clause with center/region filtering
+      let feedbackWhere: any = {};
+      if (effectiveCenter) {
+        feedbackWhere.user = { centerId: effectiveCenter as string };
+      } else if (effectiveRegion) {
+        feedbackWhere.user = { center: { region: effectiveRegion } };
+      }
+      if (Object.keys(dateFilter).length > 0) {
+        feedbackWhere.createdAt = dateFilter;
+      }
+      
       feedbackStats = await prisma.feedback.aggregate({
+        where: feedbackWhere,
         _avg: {
           npsScore: true,
           serviceQuality: true,
@@ -462,8 +578,17 @@ export async function getHealthAnalytics(req: Request, res: Response) {
         _count: { id: true },
       }) as typeof feedbackStats;
     } catch {
-      // New feedback columns not yet migrated — fall back to basic count
-      const count = await prisma.feedback.count();
+      // New feedback columns not yet migrated — fall back to basic count with filtering
+      let feedbackCountWhere: any = {};
+      if (effectiveCenter) {
+        feedbackCountWhere.user = { centerId: effectiveCenter as string };
+      } else if (effectiveRegion) {
+        feedbackCountWhere.user = { center: { region: effectiveRegion } };
+      }
+      if (Object.keys(dateFilter).length > 0) {
+        feedbackCountWhere.createdAt = dateFilter;
+      }
+      const count = await prisma.feedback.count({ where: feedbackCountWhere });
       feedbackStats._count.id = count;
     }
 
@@ -522,18 +647,32 @@ export async function getHealthAnalytics(req: Request, res: Response) {
 // ─── Staff Users (real DB) ────────────────────────────────────────────────────
 export async function getStaffUsers(req: AuthRequest, res: Response) {
   try {
-    const users = await prisma.user.findMany({
-      where: {
-        role: {
-          in: [
-            UserRole.NURSE_OFFICER,
-            UserRole.MANAGER,
-            UserRole.REGIONAL_OFFICE,
-            UserRole.FEDERAL_OFFICE,
-            UserRole.SYSTEM_ADMIN,
-          ],
-        },
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+    
+    const where: any = {
+      role: {
+        in: [
+          UserRole.NURSE_OFFICER,
+          UserRole.MANAGER,
+          UserRole.REGIONAL_OFFICE,
+          UserRole.FEDERAL_OFFICE,
+          UserRole.SYSTEM_ADMIN,
+        ],
       },
+    };
+    
+    // Apply center/region filters
+    if (roleFilters.center) {
+      where.centerId = roleFilters.center;
+    } else if (roleFilters.region) {
+      where.center = {
+        region: roleFilters.region,
+      };
+    }
+    
+    const users = await prisma.user.findMany({
+      where,
       select: {
         id: true,
         fullName: true,
@@ -714,23 +853,27 @@ export async function updateStaffUser(req: AuthRequest, res: Response) {
 
     // Check if email is being changed and if it's already taken
     if (email && email.toLowerCase() !== user.email) {
-      const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+      const existing = await prisma.user.findUnique({ 
+        where: { email: email.toLowerCase() } 
+      });
       if (existing) {
-        res.status(409).json({ success: false, message: "Email already in use" });
+        res.status(409).json({ 
+          success: false, 
+          message: "Email already in use by another user" 
+        });
         return;
       }
     }
 
-    const updateData: any = {};
-    if (fullName) updateData.fullName = fullName.trim();
-    if (email) updateData.email = email.toLowerCase().trim();
-    if (role) updateData.role = role as UserRole;
-    if (phone !== undefined) updateData.phone = phone || null;
-    if (centerId !== undefined) updateData.centerId = centerId || null;
-
-    const updated = await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: updateData,
+      data: {
+        fullName: fullName?.trim(),
+        email: email?.toLowerCase().trim(),
+        role: role as UserRole,
+        phone: phone || null,
+        centerId: centerId || null,
+      },
       select: {
         id: true,
         fullName: true,
@@ -739,15 +882,101 @@ export async function updateStaffUser(req: AuthRequest, res: Response) {
         isActive: true,
         phone: true,
         centerId: true,
-        lastLoginAt: true,
-        createdAt: true,
+        updatedAt: true,
       },
     });
 
-    res.json({ success: true, data: updated });
+    res.json({ success: true, data: updatedUser });
   } catch (error) {
     console.error("Error updating staff user:", error);
     res.status(500).json({ success: false, message: "Failed to update user" });
+  }
+}
+
+// ─── Delete Staff User (real DB) ─────────────────────────────────────────────
+export async function deleteStaffUser(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
+
+    // Prevent deletion of SYSTEM_ADMIN and FEDERAL_OFFICE users
+    if (user.role === UserRole.SYSTEM_ADMIN || user.role === UserRole.FEDERAL_OFFICE) {
+      res.status(403).json({ 
+        success: false, 
+        message: "Cannot delete System Admin or Federal Office users" 
+      });
+      return;
+    }
+
+    // MANAGER can only delete NURSE_OFFICER
+    if (req.user?.role === UserRole.MANAGER && user.role !== UserRole.NURSE_OFFICER) {
+      res.status(403).json({ 
+        success: false, 
+        message: "Center Managers can only delete Nurse Officer accounts" 
+      });
+      return;
+    }
+
+    // Delete user (cascade will handle related records)
+    await prisma.user.delete({ where: { id: userId } });
+
+    res.json({ 
+      success: true, 
+      message: "User deleted successfully" 
+    });
+  } catch (error) {
+    console.error("Error deleting staff user:", error);
+    res.status(500).json({ success: false, message: "Failed to delete user" });
+  }
+}
+
+// ─── Reset User Password (real DB) ───────────────────────────────────────────
+export async function resetUserPassword(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      res.status(400).json({ success: false, message: "New password is required" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
+
+    // MANAGER can only reset password for NURSE_OFFICER
+    if (req.user?.role === UserRole.MANAGER && user.role !== UserRole.NURSE_OFFICER) {
+      res.status(403).json({ 
+        success: false, 
+        message: "Center Managers can only reset passwords for Nurse Officer accounts" 
+      });
+      return;
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Update user password
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    res.json({ 
+      success: true, 
+      message: "Password reset successfully" 
+    });
+  } catch (error) {
+    console.error("Error resetting user password:", error);
+    res.status(500).json({ success: false, message: "Failed to reset password" });
   }
 }
 
@@ -776,7 +1005,24 @@ export async function getAuditLogs(req: AuthRequest, res: Response) {
 // ─── Daily / Weekly / Monthly Trends (real DB) ───────────────────────────────
 export async function getTrends(req: Request, res: Response) {
   try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
     const now = new Date();
+
+    // Build user filter for role-based filtering
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+    }
+    
+    const appointmentWhere = Object.keys(userWhere).length > 0 ? { user: userWhere } : {};
+    const vitalWhere = Object.keys(userWhere).length > 0 ? { user: userWhere } : {};
 
     // ── Daily: last 7 days ──
     const dailyData = await Promise.all(
@@ -787,9 +1033,9 @@ export async function getTrends(req: Request, res: Response) {
         const end   = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59);
         const label = d.toLocaleDateString('en-US', { weekday: 'short' });
         return Promise.all([
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end } } }),
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.COMPLETED } }),
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.NO_SHOW } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end } } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.COMPLETED } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.NO_SHOW } }),
         ]).then(([total, completed, noShow]) => ({ label, total, completed, noShow }));
       })
     );
@@ -805,9 +1051,9 @@ export async function getTrends(req: Request, res: Response) {
         weekEnd.setHours(23, 59, 59, 999);
         const label = `W${i + 1}`;
         return Promise.all([
-          prisma.appointment.count({ where: { scheduledAt: { gte: weekStart, lte: weekEnd } } }),
-          prisma.appointment.count({ where: { scheduledAt: { gte: weekStart, lte: weekEnd }, status: AppointmentStatus.COMPLETED } }),
-          prisma.user.count({ where: { createdAt: { gte: weekStart, lte: weekEnd } } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: weekStart, lte: weekEnd } } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: weekStart, lte: weekEnd }, status: AppointmentStatus.COMPLETED } }),
+          prisma.user.count({ where: { ...userWhere, createdAt: { gte: weekStart, lte: weekEnd } } }),
         ]).then(([total, completed, newUsers]) => ({ label, total, completed, newUsers }));
       })
     );
@@ -820,11 +1066,11 @@ export async function getTrends(req: Request, res: Response) {
         const end   = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
         const label = d.toLocaleDateString('en-US', { month: 'short' });
         return Promise.all([
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end } } }),
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.COMPLETED } }),
-          prisma.appointment.count({ where: { scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.NO_SHOW } }),
-          prisma.user.count({ where: { createdAt: { gte: start, lte: end } } }),
-          prisma.vitalRecord.count({ where: { recordedAt: { gte: start, lte: end } } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end } } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.COMPLETED } }),
+          prisma.appointment.count({ where: { ...appointmentWhere, scheduledAt: { gte: start, lte: end }, status: AppointmentStatus.NO_SHOW } }),
+          prisma.user.count({ where: { ...userWhere, createdAt: { gte: start, lte: end } } }),
+          prisma.vitalRecord.count({ where: { ...vitalWhere, recordedAt: { gte: start, lte: end } } }),
         ]).then(([total, completed, noShow, newUsers, vitals]) => ({
           label, total, completed, noShow, newUsers, vitals,
         }));

@@ -554,22 +554,13 @@ const AdminService = {
       if (filters.verification)
         where.isVerified = filters.verification === "verified";
       
-      // Handle region and center filters correctly
-      if (filters.region && filters.center) {
-        // Both region and center specified
-        where.AND = [
-          { centerId: filters.center },
-          { center: { region: filters.region } }
-        ];
-      } else if (filters.center) {
-        // Only center specified
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
         where.centerId = filters.center;
       } else if (filters.region) {
-        // Only region specified
+        // Only region filter if center not specified
         where.center = {
-          is: {
-            region: filters.region,
-          }
+          region: filters.region,
         };
       }
       
@@ -684,27 +675,16 @@ const AdminService = {
 
       const where: any = {};
 
-      // Handle region and center filters correctly
-      if (filters.region && filters.center) {
-        // Both region and center specified
-        where.user = { 
-          AND: [
-            { centerId: filters.center },
-            { center: { is: { region: filters.region } } }
-          ]
-        };
-      } else if (filters.center) {
-        // Only center specified
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
         where.user = { 
           centerId: filters.center 
         };
       } else if (filters.region) {
-        // Only region specified
+        // Only region filter if center not specified
         where.user = { 
           center: { 
-            is: { 
-              region: filters.region 
-            } 
+            region: filters.region 
           } 
         };
       }
@@ -766,8 +746,13 @@ const AdminService = {
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.user = { centerId: filters.center };
+      } else if (filters.region) {
+        where.user = { center: { region: filters.region } };
+      }
+      
       if (filters.bmiCategory) where.bmiCategory = filters.bmiCategory;
       if (filters.bpCategory) where.bpCategory = filters.bpCategory;
       if (filters.dateFrom || filters.dateTo) {
@@ -820,24 +805,12 @@ const AdminService = {
 
       const where: any = {};
 
-      const userWhere: any = {};
-      
-      // Handle region and center filters correctly
-      if (filters.region && filters.center) {
-        // Both region and center specified
-        userWhere.AND = [
-          { centerId: filters.center },
-          { center: { is: { region: filters.region } } }
-        ];
-      } else if (filters.center) {
-        // Only center specified
-        userWhere.centerId = filters.center;
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.user = { centerId: filters.center };
       } else if (filters.region) {
-        // Only region specified
-        userWhere.center = { is: { region: filters.region } };
+        where.user = { center: { region: filters.region } };
       }
-      
-      if (Object.keys(userWhere).length > 0) where.user = userWhere;
 
       if (filters.npsScore !== undefined) where.npsScore = filters.npsScore;
       if (filters.feedbackType) where.feedbackType = filters.feedbackType;
@@ -888,19 +861,11 @@ const AdminService = {
 
       const userWhere: any = {};
       
-      // Handle region and center filters correctly
-      if (filters.region && filters.center) {
-        // Both region and center specified
-        userWhere.AND = [
-          { centerId: filters.center },
-          { center: { is: { region: filters.region } } }
-        ];
-      } else if (filters.center) {
-        // Only center specified
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
         userWhere.centerId = filters.center;
       } else if (filters.region) {
-        // Only region specified
-        userWhere.center = { is: { region: filters.region } };
+        userWhere.center = { region: filters.region };
       }
       
       if (filters.role) userWhere.role = filters.role;

@@ -19,6 +19,8 @@ router.get("/health",               authenticate, authorizeMinRole(UserRole.NURS
 router.get("/users/staff",          authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getStaffUsers);
 router.post("/users/staff",         authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.createStaffUser);
 router.put("/users/:userId",        authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.updateStaffUser);
+router.delete("/users/:userId",     authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.deleteStaffUser);
+router.post("/users/:userId/reset-password", authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.resetUserPassword);
 router.patch("/users/:userId/toggle", authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.toggleUserStatus);
 
 // ─── Audit logs ──────────────────────────────────────────────────────────────

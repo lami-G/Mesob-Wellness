@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthRequest } from "../middleware/auth.middleware";
+import { AuthRequest, applyRoleBasedFilters } from "../middleware/auth.middleware";
 import AdminService from "../services/admin.service";
 import prisma from "../config/prisma";
 import { NotificationService } from "../services/notifications.service";
@@ -464,10 +464,13 @@ export const getUsers = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: UserFilters = {
       role: req.query.role as any,
-      region: req.query.region as string,
-      center: req.query.center as string,
+      region: req.query.region as string || roleFilters.region,
+      center: req.query.center as string || roleFilters.center,
       status: req.query.status as "active" | "inactive",
       verification: req.query.verification as "verified" | "unverified",
       search: req.query.search as string,
@@ -508,14 +511,36 @@ export const getCenters = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: CenterFilters = {
-      region: req.query.region as string,
+      region: req.query.region as string || roleFilters.region,
       status: req.query.status as any,
       city: req.query.city as string,
       search: req.query.search as string,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
     };
+
+    // If user is MANAGER, only show their specific center
+    if (roleFilters.center) {
+      // For managers, we need to filter by specific center ID
+      // This requires modifying the service or doing it here
+      const result = await AdminService.getAllCenters(filters);
+      const filteredData = result.data.filter((center: any) => center.id === roleFilters.center);
+      
+      res.status(200).json({
+        status: "success",
+        data: filteredData,
+        pagination: {
+          ...result.pagination,
+          total: filteredData.length,
+          pages: 1,
+        },
+      });
+      return;
+    }
 
     const result = await AdminService.getAllCenters(filters);
 
@@ -550,9 +575,12 @@ export const getAppointments = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: AppointmentFilters = {
-      region: req.query.region as string,
-      center: req.query.center as string,
+      region: req.query.region as string || roleFilters.region,
+      center: req.query.center as string || roleFilters.center,
       status: req.query.status as any,
       dateFrom: req.query.dateFrom
         ? new Date(req.query.dateFrom as string)

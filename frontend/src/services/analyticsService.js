@@ -55,6 +55,16 @@ export const analyticsService = {
     return response.data;
   },
 
+  async deleteStaffUser(userId) {
+    const response = await api.delete(`/api/v1/analytics/users/${userId}`);
+    return response.data;
+  },
+
+  async resetUserPassword(userId, newPassword) {
+    const response = await api.post(`/api/v1/analytics/users/${userId}/reset-password`, { newPassword });
+    return response.data;
+  },
+
   async toggleUserStatus(userId) {
     const response = await api.patch(`/api/v1/analytics/users/${userId}/toggle`);
     return response.data;

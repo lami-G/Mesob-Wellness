@@ -11,49 +11,24 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
 
   if (loading) return <div className="mgr-loading"><div className="mgr-spinner" />Loading analytics…</div>;
 
-  // ── Sample fallback data so charts are never empty/flat ──
-  const SAMPLE_DAILY = [
-    { label: 'Mon', total: 14, completed: 11, noShow: 2, vitals: 13, newUsers: 3, efficiency: 85 },
-    { label: 'Tue', total: 18, completed: 15, noShow: 1, vitals: 17, newUsers: 4, efficiency: 87 },
-    { label: 'Wed', total: 12, completed: 10, noShow: 3, vitals: 11, newUsers: 2, efficiency: 83 },
-    { label: 'Thu', total: 22, completed: 19, noShow: 2, vitals: 20, newUsers: 5, efficiency: 88 },
-    { label: 'Fri', total: 17, completed: 14, noShow: 1, vitals: 16, newUsers: 4, efficiency: 86 },
-    { label: 'Sat', total: 9,  completed: 8,  noShow: 1, vitals: 8,  newUsers: 2, efficiency: 84 },
-    { label: 'Sun', total: 6,  completed: 5,  noShow: 0, vitals: 5,  newUsers: 1, efficiency: 82 },
-  ];
-  const SAMPLE_WEEKLY = [
-    { label: 'W1', total: 68,  completed: 58, noShow: 7,  vitals: 65, newUsers: 12, efficiency: 85 },
-    { label: 'W2', total: 82,  completed: 71, noShow: 9,  vitals: 78, newUsers: 15, efficiency: 87 },
-    { label: 'W3', total: 74,  completed: 63, noShow: 8,  vitals: 70, newUsers: 10, efficiency: 85 },
-    { label: 'W4', total: 91,  completed: 79, noShow: 10, vitals: 85, newUsers: 18, efficiency: 87 },
-    { label: 'W5', total: 85,  completed: 74, noShow: 8,  vitals: 80, newUsers: 14, efficiency: 87 },
-    { label: 'W6', total: 78,  completed: 67, noShow: 9,  vitals: 72, newUsers: 11, efficiency: 86 },
-    { label: 'W7', total: 95,  completed: 83, noShow: 11, vitals: 90, newUsers: 20, efficiency: 87 },
-    { label: 'W8', total: 88,  completed: 76, noShow: 9,  vitals: 82, newUsers: 16, efficiency: 86 },
-  ];
-  const SAMPLE_MONTHLY = [
-    { label: 'Jan', total: 310, completed: 268, noShow: 32, vitals: 290, newUsers: 55, efficiency: 86 },
-    { label: 'Feb', total: 285, completed: 247, noShow: 28, vitals: 265, newUsers: 48, efficiency: 87 },
-    { label: 'Mar', total: 342, completed: 298, noShow: 35, vitals: 318, newUsers: 62, efficiency: 87 },
-    { label: 'Apr', total: 368, completed: 321, noShow: 38, vitals: 344, newUsers: 70, efficiency: 87 },
-    { label: 'May', total: 395, completed: 347, noShow: 40, vitals: 372, newUsers: 78, efficiency: 88 },
-    { label: 'Jun', total: 412, completed: 362, noShow: 42, vitals: 389, newUsers: 85, efficiency: 88 },
-  ];
-
-  // ── Resolve trend data: use real data if available, else sample ──
-  const resolveData = (real, sample) => {
-    if (!real || real.length === 0) return { data: sample, isDemo: true };
+  // ── Resolve trend data: use real data from backend (filtered by role) ──
+  const resolveData = (real) => {
+    // Always use real data from backend (already filtered by center/region)
+    // If no data exists, backend returns empty arrays or zeros
+    if (!real || real.length === 0) {
+      return { data: [], isDemo: false, isEmpty: true };
+    }
     const hasData = real.some(d => (d.total || 0) > 0 || (d.completed || 0) > 0);
-    return { data: real, isDemo: !hasData };
+    return { data: real, isDemo: false, isEmpty: !hasData };
   };
 
   const periodMap = {
-    daily:   { raw: trendsData?.daily   ?? [], sample: SAMPLE_DAILY,   label: 'Last 7 Days',   c1: '#6366f1', c2: '#22d3ee', c3: '#f59e0b' },
-    weekly:  { raw: trendsData?.weekly  ?? [], sample: SAMPLE_WEEKLY,  label: 'Last 8 Weeks',  c1: '#8b5cf6', c2: '#34d399', c3: '#fb923c' },
-    monthly: { raw: trendsData?.monthly ?? [], sample: SAMPLE_MONTHLY, label: 'Last 6 Months', c1: '#3b82f6', c2: '#f472b6', c3: '#a3e635' },
+    daily:   { raw: trendsData?.daily   ?? [], label: 'Last 7 Days',   c1: '#6366f1', c2: '#22d3ee', c3: '#f59e0b' },
+    weekly:  { raw: trendsData?.weekly  ?? [], label: 'Last 8 Weeks',  c1: '#8b5cf6', c2: '#34d399', c3: '#fb923c' },
+    monthly: { raw: trendsData?.monthly ?? [], label: 'Last 6 Months', c1: '#3b82f6', c2: '#f472b6', c3: '#a3e635' },
   };
-  const { raw, sample, label: periodLabel, c1, c2, c3 } = periodMap[period];
-  const { data: trendData, isDemo } = resolveData(raw, sample);
+  const { raw, label: periodLabel, c1, c2, c3 } = periodMap[period];
+  const { data: trendData, isDemo, isEmpty } = resolveData(raw);
 
   // Calculate performance metrics
   const calculateMetrics = () => {
@@ -122,11 +97,11 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
   // ── Feedback ──
   const fs = healthData?.feedbackStats;
   const feedbackDisplay = [
-    { name: 'Service',  score: fs ? Math.round(fs.avgServiceQuality * 20) : 72, fill: '#10b981' },
-    { name: 'Staff',    score: fs ? Math.round(fs.avgStaffBehavior  * 20) : 80, fill: '#06b6d4' },
-    { name: 'Clean',    score: fs ? Math.round(fs.avgCleanliness    * 20) : 68, fill: '#3b82f6' },
-    { name: 'Wait',     score: fs ? Math.round(fs.avgWaitTime       * 20) : 55, fill: '#0ea5e9' },
-    { name: 'NPS',      score: fs ? Math.round(fs.avgNps            * 10) : 78, fill: '#34d399' },
+    { name: 'Service',  score: fs && fs.avgServiceQuality ? Math.round(fs.avgServiceQuality * 20) : 0, fill: '#10b981' },
+    { name: 'Staff',    score: fs && fs.avgStaffBehavior ? Math.round(fs.avgStaffBehavior  * 20) : 0, fill: '#06b6d4' },
+    { name: 'Clean',    score: fs && fs.avgCleanliness ? Math.round(fs.avgCleanliness    * 20) : 0, fill: '#3b82f6' },
+    { name: 'Wait',     score: fs && fs.avgWaitTime ? Math.round(fs.avgWaitTime       * 20) : 0, fill: '#0ea5e9' },
+    { name: 'NPS',      score: fs && fs.avgNps ? Math.round(fs.avgNps            * 10) : 0, fill: '#34d399' },
   ];
 
   const g1 = `ga1-${period}`, g2 = `ga2-${period}`, g3 = `ga3-${period}`;
@@ -237,13 +212,80 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
                      selectedMetric === 'users' ? 'User Registration Trends' :
                      'Efficiency Performance Trends'} — {periodLabel}
               </span>
-              {isDemo && <span className="mgr-demo-badge">Sample View</span>}
+              {isEmpty && <span className="mgr-demo-badge" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fbbf24' }}>No Data</span>}
             </div>
             <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600', background: 'rgba(255,255,255,0.05)', padding: '0.25rem 0.75rem', borderRadius: '12px' }}>
-              Real-time data
+              {isEmpty ? 'No activity recorded' : 'Real-time data'}
             </div>
           </div>
 
+          {isEmpty ? (
+            <ResponsiveContainer width="100%" height={350}>
+              {selectedMetric === 'efficiency' ? (
+                <LineChart data={trendData.length > 0 ? trendData : [{ label: 'No Data', efficiency: 0 }]} margin={{ top: 15, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,85,105,0.8)" horizontal={true} vertical={true} />
+                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis 
+                    domain={[0, 100]} 
+                    tick={{ fontSize: 12, fill: '#94a3b8' }} 
+                    axisLine={false} 
+                    tickLine={false}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip
+                    contentStyle={{ 
+                      background: '#ffffff', 
+                      border: '2px solid rgba(0,0,0,0.1)', 
+                      borderRadius: '8px', 
+                      color: '#1f2937',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      padding: '8px 12px'
+                    }}
+                    labelStyle={{ color: '#1e293b', fontWeight: 700, fontSize: '13px' }}
+                    itemStyle={{ color: '#1e293b', fontWeight: 600, fontSize: '12px' }}
+                    formatter={(value) => [`${value}%`, 'Efficiency']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="efficiency" 
+                    stroke="#f97316" 
+                    strokeWidth={3} 
+                    dot={{ r: 5, fill: '#f97316', strokeWidth: 0 }}
+                    activeDot={{ r: 7, fill: '#f97316' }}
+                  />
+                </LineChart>
+              ) : (
+                <AreaChart data={trendData.length > 0 ? trendData : [{ label: 'No Data', total: 0, completed: 0, noShow: 0 }]} margin={{ top: 15, right: 20, left: 0, bottom: 5 }}>
+                  <defs>
+                    {chartConfig.dataKeys.map((key, index) => (
+                      <linearGradient key={key} id={`grad${key}-${period}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={chartConfig.colors[index]} stopOpacity={0.5} />
+                        <stop offset="100%" stopColor={chartConfig.colors[index]} stopOpacity={0.05} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(71,85,105,0.8)" horizontal={true} vertical={true} />
+                  <XAxis dataKey="label" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomAppointmentTrendsTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
+                  {chartConfig.dataKeys.map((key, index) => (
+                    <Area 
+                      key={key}
+                      type="monotone" 
+                      dataKey={key} 
+                      name={chartConfig.names[index]}
+                      stroke={chartConfig.colors[index]} 
+                      strokeWidth={3} 
+                      fill={`url(#grad${key}-${period})`} 
+                      dot={{ r: 5, fill: chartConfig.colors[index], strokeWidth: 0 }}
+                      activeDot={{ r: 7, fill: chartConfig.colors[index] }}
+                    />
+                  ))}
+                </AreaChart>
+              )}
+            </ResponsiveContainer>
+          ) : (
           <ResponsiveContainer width="100%" height={350}>
             {selectedMetric === 'efficiency' ? (
               <LineChart data={trendData} margin={{ top: 15, right: 20, left: 0, bottom: 5 }}>
@@ -315,6 +357,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
               </AreaChart>
             )}
           </ResponsiveContainer>
+          )}
         </div>
       ) : (
         /* Enhanced Data Table View */
@@ -398,7 +441,7 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
         <div className="mgr-dark-card">
           <div className="mgr-dark-header">
             <span className="mgr-dark-title">⭐ Patient Satisfaction</span>
-            {!fs?.total && <span className="mgr-demo-badge">Sample</span>}
+            {(!fs || !fs.total || fs.total === 0) && <span className="mgr-demo-badge" style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fbbf24' }}>No Data</span>}
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={feedbackDisplay} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
@@ -415,39 +458,32 @@ const Analytics = ({ loading, queueData, healthData, trendsData }) => {
               <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip 
                 contentStyle={{ 
-                  background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)', 
-                  border: '3px solid rgba(255,255,255,0.5)', 
-                  borderRadius: '16px', 
-                  color: '#ffffff',
-                  boxShadow: '0 30px 60px rgba(0,0,0,0.9), 0 0 50px rgba(255,255,255,0.25), inset 0 2px 0 rgba(255,255,255,0.4)',
-                  padding: '16px 20px',
-                  backdropFilter: 'blur(25px)',
-                  minWidth: '200px'
+                  background: '#ffffff', 
+                  border: '2px solid #e5e7eb', 
+                  borderRadius: '8px', 
+                  color: '#1f2937',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  padding: '12px 16px'
                 }} 
                 labelStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 900, 
-                  fontSize: '16px',
-                  marginBottom: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 0 10px rgba(255,255,255,0.5)',
-                  borderBottom: '2px solid rgba(255,255,255,0.3)',
+                  color: '#1f2937', 
+                  fontWeight: 700, 
+                  fontSize: '14px',
+                  marginBottom: '8px',
                   paddingBottom: '8px',
-                  display: 'block'
+                  borderBottom: '2px solid #e5e7eb'
                 }}
                 itemStyle={{ 
-                  color: '#ffffff', 
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  margin: '8px 0',
-                  textShadow: '0 0 8px rgba(255,255,255,0.3)'
+                  color: '#1f2937', 
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  padding: '4px 0'
                 }}
-                formatter={(v) => [
-                  <span style={{ color: '#ffffff', fontWeight: 900, textShadow: '0 0 10px rgba(255,255,255,0.4)' }}>{`${v}%`}</span>,
-                  <span style={{ color: '#e0e0e0', fontWeight: 600, textTransform: 'capitalize' }}>Satisfaction Score</span>
+                formatter={(v, name, props) => [
+                  `${v}%`,
+                  'Satisfaction Score'
                 ]} 
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }} 
+                cursor={{ fill: 'rgba(0,0,0,0.05)' }} 
               />
               <Bar dataKey="score" name="Score" radius={[6, 6, 0, 0]}>
                 {feedbackDisplay.map((d, i) => <Cell key={i} fill={`url(#fb${i})`} />)}

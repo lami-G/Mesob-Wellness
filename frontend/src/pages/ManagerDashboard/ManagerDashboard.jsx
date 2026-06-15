@@ -61,7 +61,11 @@ const ManagerDashboard = () => {
       if (queue.status === 'fulfilled')      setQueueData(queue.value.data);
       if (health.status === 'fulfilled')     setHealthData(health.value.data);
       if (settings.status === 'fulfilled')   setSystemSettings(settings.value.data);
-      if (staffUsers.status === 'fulfilled') setUsers(staffUsers.value.data);
+      if (staffUsers.status === 'fulfilled') {
+        // Filter to show only NURSE_OFFICER users (exclude admins, federal, regional)
+        const nurseOfficers = staffUsers.value.data.filter(u => u.role === 'NURSE_OFFICER');
+        setUsers(nurseOfficers);
+      }
       if (logs.status === 'fulfilled')       setAuditLogs(logs.value.data);
       if (trends.status === 'fulfilled')     setTrendsData(trends.value.data);
       setLastUpdated(new Date());
