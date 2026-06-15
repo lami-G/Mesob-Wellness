@@ -7,6 +7,7 @@ export interface AuthRequest extends Request {
   user?: {
     userId: string;
     role: UserRole;
+    centerId?: string | null;
   };
 }
 
@@ -60,7 +61,17 @@ export const authenticate = async (
     req.user = {
       userId: decoded.userId,
       role: decoded.role,
+      centerId: user.centerId, // Include centerId for data filtering
     };
+
+    // Debug logging for role-based filtering
+    console.log('[AUTH] User authenticated:', {
+      userId: decoded.userId,
+      role: decoded.role,
+      centerId: user.centerId,
+      path: req.path,
+      method: req.method,
+    });
 
     next();
   } catch (error) {
@@ -176,6 +187,69 @@ export const authorizeMinRole = (minRole: UserRole) => {
 
     next();
   };
+};
+
+/**
+ * Get user's region based on their center
+ * Used for filtering data for MANAGER and REGIONAL_OFFICE roles
+ */
+export const getUserRegion = async (centerId: string | null | undefined): Promise<string | null> => {
+  if (!centerId) return null;
+  
+  try {
+    const { prisma } = await import("../config/prisma.js");
+    const center = await prisma.center.findUnique({
+      where: { id: centerId },
+      select: { region: true },
+    });
+    return center?.region || null;
+  } catch (error) {
+    console.error("Error fetching user region:", error);
+    return null;
+  }
+};
+
+/**
+ * Apply role-based data filters
+ * Automatically restricts data based on user's role and assigned center/region
+ */
+export const applyRoleBasedFilters = async (req: AuthRequest): Promise<{ center?: string; region?: string }> => {
+  const filters: { center?: string; region?: string } = {};
+  
+  if (!req.user) {
+    console.log('[FILTER] No user in request');
+    return filters;
+  }
+  
+  const { role, centerId, userId } = req.user;
+  
+  console.log('[FILTER] Applying filters for:', { userId, role, centerId });
+  
+  // MANAGER: Can only see data from their assigned center
+  if (role === UserRole.MANAGER && centerId) {
+    filters.center = centerId;
+    console.log('[FILTER] MANAGER filter applied:', filters);
+  }
+  
+  // NURSE_OFFICER: Can only see data from their assigned center
+  if (role === UserRole.NURSE_OFFICER && centerId) {
+    filters.center = centerId;
+    console.log('[FILTER] NURSE_OFFICER filter applied:', filters);
+  }
+  
+  // REGIONAL_OFFICE: Can see data from all centers in their region
+  if (role === UserRole.REGIONAL_OFFICE && centerId) {
+    const region = await getUserRegion(centerId);
+    if (region) {
+      filters.region = region;
+      console.log('[FILTER] REGIONAL_OFFICE filter applied:', filters);
+    }
+  }
+  
+  // FEDERAL_OFFICE and SYSTEM_ADMIN: No filters (can see all data)
+  console.log('[FILTER] Final filters:', filters);
+  
+  return filters;
 };
 
 /**

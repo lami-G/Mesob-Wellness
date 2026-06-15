@@ -34,7 +34,6 @@
 
 /* Landscape mobile */
 @media (max-width: 768px) and (orientation: landscape) {
-  .admin-sidebar { max-height: 52px !important; }
   .admin-content { padding: 0.5rem 1rem !important; }
   .mgr-kpi-grid { grid-template-columns: repeat(3, 1fr) !important; }
 }

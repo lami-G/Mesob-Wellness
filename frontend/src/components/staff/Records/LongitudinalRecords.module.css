@@ -1,0 +1,224 @@
+/* ========================================
+   LONGITUDINAL RECORDS — CSS MODULE
+   ======================================== */
+
+.longitudinalRecords {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 10px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+}
+
+.longitudinalRecords h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.longitudinalRecords h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.loadingText {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+.emptyText {
+  text-align: center;
+  color: #6b7280;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* --- Metric Filter --- */
+.metricFilter {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.metricFilter label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.metricFilter select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* --- Records Summary --- */
+.recordsSummary {
+  margin: 20px 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.summaryCard {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metricLabel {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.metricValue {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.metricTrend {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.trendUp {
+  color: #ef4444;
+}
+
+.trendDown {
+  color: #10b981;
+}
+
+.trendStable {
+  color: #6b7280;
+}
+
+/* --- Metric Detail --- */
+.metricDetail {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+
+.metricTimeline {
+  display: grid;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 15px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 4px;
+  border-left: 3px solid #10b981;
+}
+
+.timelineDate {
+  font-weight: 600;
+  min-width: 100px;
+  color: #6b7280;
+}
+
+.timelineValue {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.trend {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* --- Records Table --- */
+.recordsTable {
+  margin-top: 20px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.recordsTableContent {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.recordsTableContent thead {
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.recordsTableContent th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+}
+
+.recordsTableContent td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.recordsTableContent tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .recordsTableContent {
+    font-size: 12px;
+  }
+
+  .recordsTableContent th,
+  .recordsTableContent td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .longitudinalRecords {
+    padding: 16px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

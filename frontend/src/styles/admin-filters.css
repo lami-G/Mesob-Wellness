@@ -140,3 +140,25 @@
     flex: 1;
   }
 }
+
+/* Fix for select dropdown options visibility */
+select option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+select.region-select option {
+  color: #1f2937 !important;
+  background-color: #ffffff !important;
+}
+
+/* Global fix for all select dropdowns */
+select {
+  color: #374151;
+}
+
+select option {
+  color: #1f2937;
+  background-color: #ffffff;
+  padding: 0.5rem;
+}

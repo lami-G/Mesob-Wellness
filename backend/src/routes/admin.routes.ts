@@ -16,9 +16,8 @@ router.get("/dashboard/metrics", AdminController.getDashboardMetrics);
  * Regions Management
  */
 router.get("/regions", AdminController.getRegions);
+router.get("/regions/health-comparison", AdminController.getRegionalHealthComparison);
 router.get("/regions/:region/centers", AdminController.getCentersByRegion);
-router.post("/regions/:region/admin", AdminController.upsertRegionAdmin);
-router.get("/regions/:region/admin", AdminController.getRegionAdmin);
 
 /**
  * Users Management
@@ -34,6 +33,7 @@ router.post("/users/:id/unlock", AdminController.unlockUser);
  */
 router.post("/centers", AdminController.createCenter);
 router.get("/centers", AdminController.getCenters);
+router.get("/centers/health-comparison", AdminController.getCenterHealthComparison);
 
 /**
  * Appointments Management

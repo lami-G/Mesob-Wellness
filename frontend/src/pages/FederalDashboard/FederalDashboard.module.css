@@ -1,0 +1,198 @@
+/* ============================================
+   FEDERAL DASHBOARD - CSS MODULE
+   ============================================ */
+
+/* ─── Tooltip Styles ─────────────────────── */
+.tooltipContainer {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  color: #1f2937;
+  padding: 0.75rem 1rem;
+  min-width: 180px;
+}
+
+.tooltipLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.tooltipGrid {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tooltipItemLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltipDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.tooltipItemValue {
+  font-weight: 700;
+  color: #111827;
+}
+
+.tooltipConditions {
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.tooltipConditionsTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.tooltipConditionItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ─── Overview Tab ───────────────────────── */
+.overviewSection {
+  margin-top: 1.5rem;
+}
+
+.overviewTitle {
+  margin-bottom: 1rem;
+}
+
+/* ─── Regions Tab ────────────────────────── */
+.regionsHeader {
+  margin-bottom: 1rem;
+}
+
+.regionsHeaderText {
+  margin-top: 0.25rem;
+  color: #6b7280;
+}
+
+.regionSelect {
+  max-width: 220px;
+}
+
+.regionStatusSelect {
+  max-width: 200px;
+}
+
+.createRegionCard {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.createRegionTitle {
+  margin-bottom: 0.5rem;
+}
+
+.createRegionText {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* ─── Region Modal ────────────────────────── */
+.regionModal {
+  max-width: 640px;
+}
+
+.regionModalAlert {
+  margin-bottom: 0.75rem;
+}
+
+.regionModalInputGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.regionModalActions {
+  margin-top: 1.5rem;
+}
+
+/* ─── Region Summary Cards ─────────────────── */
+.regionSummaryGrid {
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Region Actions ──────────────────────── */
+.regionActionsWrapper {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Region Summary (Single) ──────────────── */
+.regionSingleSummary {
+  padding: 1.5rem;
+}
+
+.regionSingleTitle {
+  margin-bottom: 1rem;
+}
+
+.regionSingleGrid {
+  margin-bottom: 1rem;
+}
+
+.regionSingleText {
+  color: #6b7280;
+}
+
+/* ─── Global Filters ──────────────────────── */
+.filtersCard {
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filtersGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.filterItem {
+  min-width: 180px;
+}
+
+.filterItemWide {
+  min-width: 220px;
+}
+
+.filterItemMedium {
+  min-width: 200px;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}

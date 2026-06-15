@@ -1,0 +1,393 @@
+/* ═══════════════════════════════════════════
+   SYSTEM SETTINGS PAGE
+   ═══════════════════════════════════════════ */
+
+.systemSettingsPage {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: 30px;
+  display: block;
+  width: 100%;
+}
+
+.pageHeader h1 {
+  font-size: 28px;
+  color: #1a1a1a;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.pageHeader p {
+  color: #666;
+  font-size: 14px;
+  display: block;
+}
+
+.successMessage {
+  background: #dcfce7;
+  color: #166534;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 4px solid #22c55e;
+  animation: slideDown 0.3s ease-out;
+}
+
+.errorMessage {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 4px solid #dc2626;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settingsContainer {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  display: block;
+  width: 100%;
+}
+
+.settingsSection {
+  padding: 25px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.settingsSection:last-of-type {
+  border-bottom: none;
+}
+
+.settingsSection h2 {
+  font-size: 18px;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingLabel {
+  flex: 1;
+}
+
+.settingLabel label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.settingDescription {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.toggleSwitch {
+  width: 50px;
+  height: 28px;
+  appearance: none;
+  background: #ddd;
+  border-radius: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s ease;
+  border: none;
+}
+
+.toggleSwitch:checked {
+  background: #7c3aed;
+}
+
+.toggleSwitch:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.toggleSwitch:checked:disabled {
+  background: #d1d5db;
+}
+
+.toggleSwitch::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  top: 2px;
+  left: 2px;
+  transition: left 0.3s ease;
+}
+
+.toggleSwitch:checked::before {
+  left: 24px;
+}
+
+.settingSelect,
+.settingInput {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  min-width: 150px;
+}
+
+.settingSelect:focus,
+.settingInput:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.settingSelect:disabled {
+  background: #f3f4f6;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.settingInput:disabled {
+  background: #f3f4f6;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.systemInfo {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.infoLabel {
+  color: #666;
+  font-weight: 500;
+}
+
+.infoValue {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.settingsActions {
+  padding: 25px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btnSave,
+.btnResetSettings {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btnSave {
+  background: #37519A;
+  color: white;
+}
+
+.btnSave:hover:not(:disabled) {
+  background: #213D8D;
+  color: #f5a623;
+  transform: translateY(-2px);
+}
+
+.btnSave:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btnResetSettings {
+  background: #f3f4f6;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btnResetSettings:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btnResetSettings:disabled {
+  background: #e5e7eb;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* System Health Metrics */
+.healthMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.healthMetricCard {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.healthMetricCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.healthIcon {
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.healthContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.healthLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+
+.healthValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1;
+}
+
+.healthStatus {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 0.25rem;
+  width: fit-content;
+}
+
+.healthStatus.good {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.healthStatus.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.healthStatus.critical {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .healthMetricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .settingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .settingSelect,
+  .settingInput {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .settingsActions {
+    flex-direction: column;
+  }
+
+  .btnSave,
+  .btnResetSettings {
+    width: 100%;
+  }
+
+  .healthMetricsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .healthMetricCard {
+    padding: 1.25rem;
+  }
+}

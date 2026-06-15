@@ -1,0 +1,443 @@
+/* ========================================
+   HEALTH JOURNEY — REDESIGNED (hj- prefix)
+   ======================================== */
+
+.hjPage {
+  background: #f1f5f9;
+  padding: 16px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Section label --- */
+.hjSectionLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #213D8D;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* --- Base card --- */
+.hjCard {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+/* --- Row 1: two-column grid --- */
+.hjRow1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* --- Alert row inside Health Alerts card --- */
+.hjAlertRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #E1F5EE;
+  border: 1px solid #9FE1CB;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.hjAlertRow.hjAlertError {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.hjAlertDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1D9E75;
+  flex-shrink: 0;
+}
+
+.hjDotRed { background: #ef4444; }
+.hjDotGreen { background: #1D9E75; }
+.hjDotAmber { background: #f5a623; }
+
+.hjAlertMsg {
+  font-size: 14px;
+  color: #0F6E56;
+  font-weight: 500;
+}
+
+.hjAlertMsgRed { color: #991b1b; }
+
+/* --- Quick Stats --- */
+.hjQsList { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+
+.hjQsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 14px;
+  color: #64748b;
+}
+.hjQsRow:last-child { border-bottom: none; }
+
+.hjQsVal { font-weight: 700; color: #213D8D; font-size: 14px; }
+
+/* --- Pills / badges --- */
+.hjPill {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hjBadge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hjStatusGreen,
+.hjBadgeNormal {
+  background: #E1F5EE;
+  color: #0F6E56;
+  border: 1px solid #9FE1CB;
+}
+
+.hjStatusYellow,
+.hjBadgeCaution {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.hjStatusRed,
+.hjBadgeDanger {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.hjBadgeInfo {
+  background: #dbeafe;
+  color: #0c4a6e;
+  border: 1px solid #93c5fd;
+}
+
+.hjBadgeGray {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+/* --- Banner --- */
+.hjBanner {
+  background: #213D8D;
+  border-radius: 12px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.hjScoreRing {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid #1D9E75;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hjScoreNum { font-size: 24px; font-weight: 700; color: #fff; line-height: 1; }
+.hjScoreLbl { font-size: 10px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+.hjBannerCenter { flex: 1; min-width: 180px; }
+.hjBannerTitle { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.hjBannerSub { font-size: 13px; color: rgba(255, 255, 255, 0.65); margin-bottom: 10px; }
+
+.hjBannerPills { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.hjPeriodSelect {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+}
+
+.hjPeriodSelect option { background: #213D8D; color: #fff; }
+
+.hjBannerBtns { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+.hjBtnGhost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  border-radius: 7px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: inherit;
+}
+.hjBtnGhost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+.hjBtnGhost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.hjBtnGold {
+  background: #f5a623;
+  border: none;
+  color: #213D8D;
+  border-radius: 7px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+.hjBtnGold:hover { opacity: 0.9; }
+
+.hjBtnPrimary {
+  background: #213D8D;
+  border: none;
+  color: #fff;
+  border-radius: 7px;
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 12px;
+  font-family: inherit;
+}
+.hjBtnPrimary:hover { opacity: 0.9; }
+
+/* --- Section wrap --- */
+.hjSectionWrap { margin-bottom: 16px; }
+
+/* --- Latest Vital Signs --- */
+.hjVitalsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.hjVitalCard {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+.hjVitalLbl {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.hjVitalVal {
+  font-size: 26px;
+  font-weight: 700;
+  color: #213D8D;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.hjVitalUnit {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.hjLastRec { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+
+/* --- Progress Metrics --- */
+.hjProgressGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.hjProgCard {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 16px 18px;
+}
+
+.hjProgTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.hjProgName { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+.hjProgVal { font-size: 15px; font-weight: 700; color: #213D8D; }
+.hjProgNote { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+
+/* --- Progress bars --- */
+.hjPbar { height: 5px; border-radius: 3px; background: #e2e8f0; overflow: hidden; }
+.hjPbarFill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.hjPbarGreen { background: #1D9E75; }
+.hjPbarAmber { background: #f5a623; }
+.hjPbarGray { background: #cbd5e1; }
+
+/* --- Risk Scoring Analysis --- */
+.hjRiskCard { padding: 18px 20px; }
+
+.hjRiskTop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.hjRiskRing {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #213D8D;
+  border: 3px solid #1D9E75;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hjRiskRingNum { font-size: 18px; font-weight: 700; color: #fff; line-height: 1; }
+.hjRiskRingLbl { font-size: 8px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.hjRiskMeta h3 { font-size: 14px; font-weight: 700; color: #213D8D; margin: 0 0 6px; }
+.hjRiskDate { font-size: 11px; color: #94a3b8; margin: 6px 0 0; }
+
+.hjRiskCats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+
+.hjRiskCat {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 12px 14px;
+  background: #f8fafc;
+}
+
+.hjRiskCatLbl { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.hjRiskCatVal { font-size: 20px; font-weight: 700; color: #213D8D; margin-bottom: 6px; }
+
+/* --- Recommendations --- */
+.hjRecCard { padding: 4px 20px; }
+
+.hjRecItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.5;
+}
+.hjRecItem:last-child { border-bottom: none; }
+
+.hjRecDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+/* --- Empty & loading --- */
+.hjLoadingText {
+  text-align: center;
+  color: #94a3b8;
+  padding: 30px 0;
+  font-size: 14px;
+}
+
+.hjEmptyCard { text-align: center; padding: 30px 20px; }
+.hjEmptyText { font-size: 14px; color: #64748b; margin-bottom: 6px; }
+.hjEmptySub { font-size: 12px; color: #94a3b8; }
+
+/* --- Trend charts --- */
+.hjTrendChartCard { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; background: #f8fafc; }
+
+.hjTrendHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.hjTrendHeader h4 { margin: 0; font-size: 0.95rem; color: #1e293b; }
+
+.hjTrendBadge { font-size: 0.75rem; font-weight: 700; border-radius: 999px; padding: 3px 8px; }
+.hjTrendUp { background: #E1F5EE; color: #0F6E56; }
+.hjTrendDown { background: #dbeafe; color: #1d4ed8; }
+.hjTrendStable { background: #f3f4f6; color: #374151; }
+
+.hjTrendSvg { width: 100%; height: 84px; }
+.hjTrendAxis { stroke: #cbd5e1; stroke-width: 1; }
+.hjThresholdLine { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.8; }
+.hjThresholdLabel { fill: #64748b; font-size: 8px; font-weight: 600; }
+.hjThresholdSys { stroke: #7c3aed; }
+.hjThresholdSysHigh { stroke: #6d28d9; }
+.hjThresholdDia { stroke: #f97316; }
+.hjThresholdDiaHigh { stroke: #ea580c; }
+
+.hjTrendSvg path { stroke: #64748b; }
+.hjTrendPoint { fill: #ffffff; stroke-width: 2; }
+
+.hjTrendFooter { margin-top: 8px; display: flex; justify-content: space-between; align-items: baseline; }
+.hjTrendValue { font-weight: 700; color: #0f172a; }
+.hjTrendDate { font-size: 0.8rem; color: #64748b; }
+.hjTrendEmpty { margin: 0; color: #6b7280; font-size: 0.88rem; }
+
+.hjBpLineLegend { margin: 8px 0 0; color: #64748b; font-size: 0.78rem; display: flex; gap: 12px; align-items: center; }
+
+.hjLegendDot { display: inline-block; width: 9px; height: 9px; border-radius: 999px; margin-right: 5px; }
+.hjLegendBpSystolic { background: #7c3aed; }
+.hjLegendBpDiastolic { background: #f97316; }
+
+.hjTrendSvg.hjTrendBpDual .hjBpSystolicLine { stroke: #7c3aed; }
+.hjTrendSvg.hjTrendBpDual .hjBpDiastolicLine { stroke: #f97316; }
+.hjTrendSvg.hjTrendBpDual .hjBpSystolicPoint { fill: #ffffff; stroke: #7c3aed; stroke-width: 2; }
+.hjTrendSvg.hjTrendBpDual .hjBpDiastolicPoint { fill: #ffffff; stroke: #f97316; stroke-width: 2; }
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .hjRow1 { grid-template-columns: 1fr; }
+  .hjVitalsGrid { grid-template-columns: repeat(2, 1fr); }
+  .hjProgressGrid { grid-template-columns: 1fr; }
+  .hjRiskCats { grid-template-columns: 1fr; }
+  .hjBanner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .hjBannerBtns { width: 100%; }
+  .hjBtnGhost, .hjBtnGold { flex: 1; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .hjPage { padding: 12px; }
+  .hjVitalsGrid { grid-template-columns: 1fr 1fr; }
+  .hjVitalVal { font-size: 18px; }
+  .hjBanner { padding: 16px; }
+}

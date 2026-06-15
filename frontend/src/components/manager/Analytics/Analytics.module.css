@@ -1,0 +1,212 @@
+/* ============================================
+   MANAGER ANALYTICS TAB - CSS MODULE
+   ============================================ */
+
+/* Table View Styles */
+.tableView {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 40%, #f1f5f9 70%, #e2e8f0 100%);
+  border-radius: 20px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.tableViewDecoration {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.tableViewHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.tableViewBadge {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #15803d;
+  letter-spacing: 0.05em;
+}
+
+.tableViewTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.tableSummary {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+/* Analytics KPI Grid */
+.analyticsKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.analyticsKpiCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.kpiTrend {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+
+.kpiSparkline {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60%;
+  height: 40%;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Control Panel Styles */
+.controlPanel {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.controlPanelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.controlPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.controlPanelTitleText {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.controlPanelControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.periodSwitcher {
+  background: #e2e8f0;
+  border-radius: 12px;
+  padding: 0.25rem;
+  display: flex;
+}
+
+.periodBtn {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+}
+
+.periodBtnActive {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+.periodBtnInactive {
+  color: #1e293b;
+}
+
+.periodBtnInactive:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.metricSelector {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: #1e293b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.metricSelector:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.viewModeToggle {
+  display: flex;
+  background: #e2e8f0;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.viewModeBtn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewModeBtnActive {
+  background: #284394;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(40, 67, 148, 0.35);
+}
+
+.viewModeBtnInactive {
+  color: #1e293b;
+}
+
+.viewModeBtnInactive:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+

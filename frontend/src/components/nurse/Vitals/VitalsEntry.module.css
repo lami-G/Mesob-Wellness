@@ -1,0 +1,295 @@
+/* Vitals Entry Component */
+.vitalsEntry {
+  background: white;
+}
+
+.vitalsForm {
+  display: grid;
+  gap: 20px;
+}
+
+.vitalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.inputWithAlert {
+  position: relative;
+}
+
+.riskAlert {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+}
+
+.riskLevel {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.riskCategory {
+  font-size: 0.65rem;
+  font-weight: 500;
+  opacity: 0.9;
+  line-height: 1.1;
+}
+
+.riskGreen {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+  border-color: #86efac;
+}
+
+.riskBlue {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border-color: #60a5fa;
+}
+
+.riskOrange {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  color: #92400e;
+  border-color: #fb923c;
+}
+
+.riskRed {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border-color: #f87171;
+  animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+  0%, 100% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+}
+
+.riskYellow {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border-color: #fbbf24;
+}
+
+/* Post-Vitals Actions */
+.postVitalsActions {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: #F0FDF4;
+  border: 2px solid #10B981;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.successMessage {
+  margin: 0 0 1rem 0;
+  color: #065F46;
+  font-weight: 600;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.actionButton {
+  flex: 1;
+  min-width: 200px;
+}
+
+.actionButtonAi {
+  background-color: #F59E0B;
+}
+
+.actionButtonAi:hover:not(:disabled) {
+  background-color: #D97706;
+}
+
+/* Customer Input Group */
+.customerInputGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.customerInputGroup .form-input {
+  width: 300px;
+}
+
+/* Search Button Override for White Background */
+.searchButton {
+  padding: 0.75rem 1.25rem;
+  background: #37519A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(55, 81, 154, 0.3);
+  min-width: 100px;
+}
+
+.searchButton:hover:not(:disabled) {
+  background: #2d4280;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(55, 81, 154, 0.4);
+}
+
+.searchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Inline Search (reused from CustomerHistoryView but scoped here) */
+.inlineSearch {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.searchFormWrapper {
+  margin-bottom: 1rem;
+}
+
+.searchInputGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  max-width: 500px;
+}
+
+.searchInputGroup input[type="text"] {
+  width: 300px;
+}
+
+.searchResultsInline {
+  margin-top: 1rem;
+}
+
+.resultsCount {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.75rem;
+}
+
+.resultsListInline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.resultItemInline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  transition: all 0.2s;
+}
+
+.resultItemInline:hover {
+  border-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.customerInfoInline {
+  flex: 1;
+}
+
+.customerNameInline {
+  font-weight: 600;
+  color: #212529;
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9375rem;
+}
+
+.customerDetailsInline {
+  font-size: 0.8125rem;
+  color: #6c757d;
+  margin: 0.125rem 0;
+}
+
+/* Selected Customer Display */
+.selectedCustomer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e7f3ff;
+  border: 2px solid #2563eb;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.customerInfo {
+  flex: 1;
+}
+
+.customerInfo p {
+  margin: 0.25rem 0;
+}
+
+.glucoseTypeSelect {
+  width: 150px;
+  box-sizing: border-box;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vitalsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+
+  .actionButton {
+    min-width: 100%;
+  }
+}

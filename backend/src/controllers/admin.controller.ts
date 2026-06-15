@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthRequest } from "../middleware/auth.middleware";
+import { AuthRequest, applyRoleBasedFilters } from "../middleware/auth.middleware";
 import AdminService from "../services/admin.service";
 import prisma from "../config/prisma";
 import { NotificationService } from "../services/notifications.service";
@@ -19,7 +19,7 @@ import {
  */
 export const createCenter = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -30,7 +30,15 @@ export const createCenter = async (
       return;
     }
 
-    const { name, region, city, address, phone, email, capacity, managerEmail, managerPassword } = req.body;
+    const {
+      name,
+      region,
+      city,
+      address,
+      phone,
+      email,
+      capacity,
+    } = req.body;
 
     if (!name || !region || !city || !address) {
       res.status(400).json({
@@ -38,30 +46,6 @@ export const createCenter = async (
         message: "name, region, city, and address are required",
       });
       return;
-    }
-
-    let managerId: string | undefined;
-
-    // Create center manager if email and password provided
-    if (managerEmail && managerPassword) {
-      const bcrypt = await import("bcryptjs");
-      const hashedPassword = await bcrypt.default.hash(managerPassword, 10);
-      const { generateNextDisplayId } = await import("../utils/sequentialId.js");
-      const displayId = await generateNextDisplayId();
-
-      const manager = await prisma.user.create({
-        data: {
-          fullName: `${name} Admin`,
-          email: managerEmail,
-          password: hashedPassword,
-          role: "MANAGER" as any,
-          userId: displayId,
-          isActive: true,
-          isVerified: true,
-        },
-      });
-
-      managerId = manager.id;
     }
 
     const center = await AdminService.createCenter({
@@ -73,8 +57,6 @@ export const createCenter = async (
       email,
       capacity,
       status: "ACTIVE",
-      managerId,
-      managerEmail,
     });
 
     res.status(201).json({
@@ -96,7 +78,7 @@ export const createCenter = async (
  */
 export const getRegions = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -128,7 +110,7 @@ export const getRegions = async (
  */
 export const getCentersByRegion = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -161,7 +143,7 @@ export const getCentersByRegion = async (
  */
 export const getDashboardMetrics = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -173,7 +155,12 @@ export const getDashboardMetrics = async (
     }
 
     const timePeriod = req.query.timePeriod as string | undefined;
-    const metrics = await AdminService.getDashboardMetrics(timePeriod);
+    const region = req.query.region as string | undefined;
+    const center = req.query.center as string | undefined;
+    const metrics = await AdminService.getDashboardMetrics(timePeriod, {
+      region,
+      center,
+    });
 
     res.status(200).json({
       status: "success",
@@ -194,7 +181,7 @@ export const getDashboardMetrics = async (
  */
 export const updateUser = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -262,7 +249,7 @@ export const updateUser = async (
       message: "User updated successfully",
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       res.status(400).json({
         status: "error",
         message: "Email already exists",
@@ -283,7 +270,7 @@ export const updateUser = async (
  */
 export const createUser = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -361,12 +348,15 @@ export const createUser = async (
           "HIGH",
           "New User Created",
           `New ${role} created by admin: ${fullName} (${email})`,
-          newUser.id
+          newUser.id,
         );
       }
     } catch (notificationError) {
       // Log but don't fail user creation if notification creation fails
-      console.warn("Failed to create user creation notification:", notificationError);
+      console.warn(
+        "Failed to create user creation notification:",
+        notificationError,
+      );
     }
 
     res.status(201).json({
@@ -375,7 +365,7 @@ export const createUser = async (
       message: "User created successfully",
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       res.status(400).json({
         status: "error",
         message: "User with this email already exists",
@@ -396,7 +386,7 @@ export const createUser = async (
  */
 export const deleteUser = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -425,7 +415,7 @@ export const deleteUser = async (
       });
       return;
     }
-    
+
     // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -463,7 +453,7 @@ export const deleteUser = async (
  */
 export const getUsers = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -474,12 +464,15 @@ export const getUsers = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: UserFilters = {
       role: req.query.role as any,
-      region: req.query.region as string,
-      center: req.query.center as string,
-      status: req.query.status as 'active' | 'inactive',
-      verification: req.query.verification as 'verified' | 'unverified',
+      region: req.query.region as string || roleFilters.region,
+      center: req.query.center as string || roleFilters.center,
+      status: req.query.status as "active" | "inactive",
+      verification: req.query.verification as "verified" | "unverified",
       search: req.query.search as string,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
@@ -507,7 +500,7 @@ export const getUsers = async (
  */
 export const getCenters = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -518,14 +511,36 @@ export const getCenters = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: CenterFilters = {
-      region: req.query.region as string,
+      region: req.query.region as string || roleFilters.region,
       status: req.query.status as any,
       city: req.query.city as string,
       search: req.query.search as string,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
     };
+
+    // If user is MANAGER, only show their specific center
+    if (roleFilters.center) {
+      // For managers, we need to filter by specific center ID
+      // This requires modifying the service or doing it here
+      const result = await AdminService.getAllCenters(filters);
+      const filteredData = result.data.filter((center: any) => center.id === roleFilters.center);
+      
+      res.status(200).json({
+        status: "success",
+        data: filteredData,
+        pagination: {
+          ...result.pagination,
+          total: filteredData.length,
+          pages: 1,
+        },
+      });
+      return;
+    }
 
     const result = await AdminService.getAllCenters(filters);
 
@@ -549,7 +564,7 @@ export const getCenters = async (
  */
 export const getAppointments = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -560,12 +575,19 @@ export const getAppointments = async (
       return;
     }
 
+    // Apply role-based filters
+    const roleFilters = await applyRoleBasedFilters(req);
+
     const filters: AppointmentFilters = {
-      region: req.query.region as string,
-      center: req.query.center as string,
+      region: req.query.region as string || roleFilters.region,
+      center: req.query.center as string || roleFilters.center,
       status: req.query.status as any,
-      dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
-      dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined,
+      dateFrom: req.query.dateFrom
+        ? new Date(req.query.dateFrom as string)
+        : undefined,
+      dateTo: req.query.dateTo
+        ? new Date(req.query.dateTo as string)
+        : undefined,
       search: req.query.search as string,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
@@ -593,7 +615,7 @@ export const getAppointments = async (
  */
 export const getVitals = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -607,8 +629,12 @@ export const getVitals = async (
     const filters: VitalFilters = {
       region: req.query.region as string,
       center: req.query.center as string,
-      dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
-      dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined,
+      dateFrom: req.query.dateFrom
+        ? new Date(req.query.dateFrom as string)
+        : undefined,
+      dateTo: req.query.dateTo
+        ? new Date(req.query.dateTo as string)
+        : undefined,
       bmiCategory: req.query.bmiCategory as any,
       bpCategory: req.query.bpCategory as any,
       search: req.query.search as string,
@@ -638,7 +664,7 @@ export const getVitals = async (
  */
 export const getFeedback = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -652,9 +678,15 @@ export const getFeedback = async (
     const filters: FeedbackFilters = {
       region: req.query.region as string,
       center: req.query.center as string,
-      npsScore: req.query.npsScore ? parseInt(req.query.npsScore as string) : undefined,
-      dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
-      dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined,
+      npsScore: req.query.npsScore
+        ? parseInt(req.query.npsScore as string)
+        : undefined,
+      dateFrom: req.query.dateFrom
+        ? new Date(req.query.dateFrom as string)
+        : undefined,
+      dateTo: req.query.dateTo
+        ? new Date(req.query.dateTo as string)
+        : undefined,
       feedbackType: req.query.feedbackType as string,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
@@ -682,7 +714,7 @@ export const getFeedback = async (
  */
 export const getAuditLogs = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -700,8 +732,12 @@ export const getAuditLogs = async (
       action: req.query.action as string,
       resource: req.query.resource as string,
       role: req.query.role as any,
-      dateFrom: req.query.dateFrom ? new Date(req.query.dateFrom as string) : undefined,
-      dateTo: req.query.dateTo ? new Date(req.query.dateTo as string) : undefined,
+      dateFrom: req.query.dateFrom
+        ? new Date(req.query.dateFrom as string)
+        : undefined,
+      dateTo: req.query.dateTo
+        ? new Date(req.query.dateTo as string)
+        : undefined,
       page: req.query.page ? parseInt(req.query.page as string) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
     };
@@ -728,7 +764,7 @@ export const getAuditLogs = async (
  */
 export const unlockUser = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -741,7 +777,7 @@ export const unlockUser = async (
 
     const { id } = req.params;
 
-    if (!id || typeof id !== 'string') {
+    if (!id || typeof id !== "string") {
       res.status(400).json({
         status: "error",
         message: "User ID is required",
@@ -787,13 +823,15 @@ export const unlockUser = async (
   }
 };
 
+
+
 /**
- * POST /api/v1/admin/regions/:region/admin
- * Create or update region admin
+ * GET /api/v1/admin/regions/health-comparison
+ * Get regional staff health comparison
  */
-export const upsertRegionAdmin = async (
+export const getRegionalHealthComparison = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -804,120 +842,30 @@ export const upsertRegionAdmin = async (
       return;
     }
 
-    const { region } = req.params;
-    const regionStr = Array.isArray(region) ? region[0] : region;
-    const { email, password } = req.body;
+    const timePeriod = req.query.timePeriod as string | undefined;
 
-    if (!regionStr) {
-      res.status(400).json({
-        status: "error",
-        message: "Region is required",
-      });
-      return;
-    }
-
-    if (!email) {
-      res.status(400).json({
-        status: "error",
-        message: "Email is required",
-      });
-      return;
-    }
-
-    // Check if region admin already exists
-    const existingRegionAdmin = await prisma.regionAdmin.findUnique({
-      where: { region: regionStr },
-    });
-
-    let adminId: string | undefined = existingRegionAdmin?.adminId || undefined;
-
-    // If adminId exists, verify the user still exists
-    if (adminId) {
-      const userExists = await prisma.user.findUnique({
-        where: { id: adminId },
-      });
-      if (!userExists) {
-        // User was deleted, clear the adminId
-        adminId = undefined;
-      }
-    }
-
-    // If password provided, create or update the user
-    if (password) {
-      const bcrypt = await import("bcryptjs");
-      const hashedPassword = await bcrypt.default.hash(password, 10);
-
-      if (adminId) {
-        // Update existing admin user
-        await prisma.user.update({
-          where: { id: adminId },
-          data: {
-            email,
-            password: hashedPassword,
-          },
-        });
-      } else {
-        // Create new admin user
-        const { generateNextDisplayId } = await import("../utils/sequentialId.js");
-        const displayId = await generateNextDisplayId();
-
-        const admin = await prisma.user.create({
-          data: {
-            fullName: `${regionStr} Admin`,
-            email,
-            password: hashedPassword,
-            role: "REGIONAL_OFFICE" as any,
-            userId: displayId,
-            isActive: true,
-            isVerified: true,
-          },
-        });
-
-        adminId = admin.id;
-      }
-    } else if (adminId) {
-      // Update email only
-      await prisma.user.update({
-        where: { id: adminId },
-        data: { email },
-      });
-    }
-
-    // Upsert region admin record
-    const regionAdmin = await prisma.regionAdmin.upsert({
-      where: { region: regionStr },
-      create: {
-        region: regionStr,
-        adminId,
-        email,
-      },
-      update: {
-        adminId,
-        email,
-      },
-    });
+    const data = await AdminService.getRegionalHealthComparison(timePeriod);
 
     res.status(200).json({
       status: "success",
-      data: regionAdmin,
-      message: "Region admin updated successfully",
+      data,
     });
-  } catch (error: any) {
-    console.error("Upsert region admin error:", error);
+  } catch (error) {
+    console.error("Get regional health comparison error:", error);
     res.status(500).json({
       status: "error",
-      message: "Failed to update region admin",
+      message: "Failed to retrieve regional health comparison",
     });
   }
 };
 
 /**
- * GET /api/v1/admin/regions/:region/admin
- * Get region admin
+ * GET /api/v1/admin/centers/health-comparison
+ * Get center staff health comparison
  */
-export const getRegionAdmin = async (
+export const getCenterHealthComparison = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     if (!req.user) {
@@ -928,22 +876,20 @@ export const getRegionAdmin = async (
       return;
     }
 
-    const { region } = req.params;
-    const regionStr = Array.isArray(region) ? region[0] : region;
+    const timePeriod = req.query.timePeriod as string | undefined;
+    const region = req.query.region as string | undefined;
 
-    const regionAdmin = await prisma.regionAdmin.findUnique({
-      where: { region: regionStr },
-    });
+    const data = await AdminService.getCenterHealthComparison(timePeriod, region);
 
     res.status(200).json({
       status: "success",
-      data: regionAdmin,
+      data,
     });
   } catch (error) {
-    console.error("Get region admin error:", error);
+    console.error("Get center health comparison error:", error);
     res.status(500).json({
       status: "error",
-      message: "Failed to retrieve region admin",
+      message: "Failed to retrieve center health comparison",
     });
   }
 };

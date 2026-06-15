@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api } from "../../services/adminService";
-import "../../styles/admin-settings.css";
+import styles from "./shared/PasswordModal.module.css";
 
 function ChangePasswordModal({ isOpen, onClose, userName }) {
   const [formData, setFormData] = useState({
@@ -81,27 +81,27 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
           <h2>Change Password</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <button className={styles.modalClose} onClick={onClose}>✕</button>
         </div>
 
         {success && (
-          <div className="success-message">
+          <div className={styles.successMessage}>
             ✓ Password changed successfully!
           </div>
         )}
 
         {error && (
-          <div className="error-message">
+          <div className={styles.errorMessage}>
             ✗ {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className={styles.modalForm}>
+          <div className={styles.formGroup}>
             <label htmlFor="currentPassword">Current Password</label>
             <input
               type="password"
@@ -111,11 +111,11 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
               onChange={handleChange}
               placeholder="Enter your current password"
               disabled={loading}
-              className="form-input"
+              className={styles.formInput}
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="newPassword">New Password</label>
             <input
               type="password"
@@ -125,11 +125,11 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
               onChange={handleChange}
               placeholder="Enter new password (min 8 characters)"
               disabled={loading}
-              className="form-input"
+              className={styles.formInput}
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="confirmPassword">Confirm New Password</label>
             <input
               type="password"
@@ -139,14 +139,14 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
               onChange={handleChange}
               placeholder="Confirm new password"
               disabled={loading}
-              className="form-input"
+              className={styles.formInput}
             />
           </div>
 
-          <div className="modal-actions">
+          <div className={styles.modalActions}>
             <button
               type="button"
-              className="btn-cancel"
+              className={styles.btnCancel}
               onClick={onClose}
               disabled={loading}
             >
@@ -154,7 +154,7 @@ function ChangePasswordModal({ isOpen, onClose, userName }) {
             </button>
             <button
               type="submit"
-              className="btn-save"
+              className={styles.btnSave}
               disabled={loading}
             >
               {loading ? "Changing..." : "Change Password"}

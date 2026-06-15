@@ -1,0 +1,78 @@
+/* ═══════════════════════════════════════════
+   DASHBOARD CHARTS
+   ═══════════════════════════════════════════ */
+
+.dashboardCharts {
+  margin-bottom: 2rem;
+}
+
+.dashboardCharts p {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.chartCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.chartCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.chartCard h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chartContainer {
+  width: 100%;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chartContainer p {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .chartCard {
+    padding: 1rem;
+  }
+
+  .chartCard h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .chartContainer {
+    min-height: 200px;
+  }
+}

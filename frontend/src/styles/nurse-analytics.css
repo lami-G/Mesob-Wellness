@@ -307,11 +307,6 @@
   margin-bottom: 0.5rem;
 }
 
-.trend-chart-title::before {
-  content: '📈';
-  font-size: 1.5rem;
-}
-
 /* Delta Cards Styling */
 .delta-cards-container {
   display: grid;

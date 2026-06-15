@@ -1,0 +1,254 @@
+/* ========================================
+   WELLNESS PLAN COMPONENT
+   ======================================== */
+
+.wellnessPlan {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.wellnessPlanHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.wellnessPlanHeader h2 {
+  margin: 0;
+  flex: 1;
+  color: #2563eb;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.wellnessPlanHeader .btn {
+  white-space: nowrap;
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.alert {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alertError {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* ========================================
+   LOADING & EMPTY STATES
+   ======================================== */
+
+.loadingText,
+.emptyText {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+}
+
+.emptyText {
+  color: #999;
+}
+
+/* ========================================
+   PLANS LIST
+   ======================================== */
+
+.plansList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.planCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f9fafb;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.planHeader h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.planStatus {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.planStatus.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.planStatus.inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.planDescription {
+  color: #666;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* ========================================
+   PLAN SECTIONS
+   ======================================== */
+
+.planSections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.planSection {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.planSection h4 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.planSection p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ========================================
+   GOALS SECTION
+   ======================================== */
+
+.goalsSection {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 15px;
+}
+
+.goalsSection h4 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 10px 0;
+}
+
+.goalsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goalItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.goalCheckbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.goalText {
+  color: #333;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.goalText.completed {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.planDuration {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+  margin-top: 15px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .wellnessPlanHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wellnessPlanHeader .btn {
+    width: 100%;
+  }
+
+  .planSections {
+    grid-template-columns: 1fr;
+  }
+}

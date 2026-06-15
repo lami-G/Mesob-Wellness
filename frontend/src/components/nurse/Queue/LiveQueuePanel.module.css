@@ -1,0 +1,228 @@
+/* Live Queue Panel Component */
+.liveQueuePanel {
+  background: white;
+}
+
+.queueControls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.searchInput {
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filterTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  color: #666;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: #f9fafb;
+  border-color: #37519A;
+  color: #37519A;
+}
+
+.filterBtn.active {
+  background: #37519A;
+  color: white;
+  border-color: #37519A;
+}
+
+.loadingText {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+}
+
+.emptyText {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+}
+
+.queueList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queueItem {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+}
+
+.queueItem:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #2563eb;
+}
+
+.queueItem.statusWaiting {
+  border-left: 4px solid #3b82f6;
+}
+
+.queueItem.statusInProgress {
+  border-left: 4px solid #8b5cf6;
+  background: #faf5ff;
+}
+
+.queueItem.statusInService {
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.queueItem.statusCompleted {
+  border-left: 4px solid #10b981;
+  background: #f0fdf4;
+}
+
+.queueItem.statusNoShow {
+  border-left: 4px solid #ef4444;
+  background: #fef2f2;
+}
+
+.queueItemHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.queueNumber {
+  background: #2563eb;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.customerName {
+  font-weight: bold;
+  color: #333;
+  flex: 1;
+  min-width: 150px;
+}
+
+.customerId {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.appointmentType {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.statusBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.statusBadge.statusWaiting {
+  background: #dbeafe;
+  color: #0c4a6e;
+}
+
+.statusBadge.statusInProgress {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.statusBadge.statusInService {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.statusBadge.statusCompleted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusBadge.statusNoShow {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.queueItemDetails {
+  margin-bottom: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+}
+
+.queueItemDetails p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.queueItemDetails strong {
+  color: #333;
+}
+
+.queueItemActions {
+  display: flex;
+  gap: 8px;
+}
+
+.btnRefresh {
+  margin-top: 15px;
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .queueItemHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .customerName {
+    min-width: 100%;
+  }
+
+  .queueItemActions {
+    flex-direction: column;
+  }
+
+  .queueItemActions .btn {
+    width: 100%;
+  }
+}

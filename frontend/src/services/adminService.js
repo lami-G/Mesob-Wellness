@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1` : "http://localhost:5000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/v1`
+  : "http://localhost:5000/api/v1";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -25,9 +27,11 @@ export { api };
 
 export const adminService = {
   // Dashboard
-  getDashboardMetrics: async (timePeriod) => {
+  getDashboardMetrics: async (timePeriod, filters = {}) => {
     const params = new URLSearchParams();
     if (timePeriod) params.append("timePeriod", timePeriod);
+    if (filters.region) params.append("region", filters.region);
+    if (filters.center) params.append("center", filters.center);
     const response = await api.get(`/admin/dashboard/metrics?${params}`);
     return response.data.data;
   },
@@ -39,7 +43,8 @@ export const adminService = {
     if (filters.region) params.append("region", filters.region);
     if (filters.center) params.append("center", filters.center);
     if (filters.status) params.append("status", filters.status);
-    if (filters.verification) params.append("verification", filters.verification);
+    if (filters.verification)
+      params.append("verification", filters.verification);
     if (filters.search) params.append("search", filters.search);
     if (filters.page) params.append("page", filters.page);
     if (filters.limit) params.append("limit", filters.limit);
@@ -100,10 +105,12 @@ export const adminService = {
     const params = new URLSearchParams();
     if (filters.region) params.append("region", filters.region);
     if (filters.center) params.append("center", filters.center);
-    if (filters.npsScore !== undefined) params.append("npsScore", filters.npsScore);
+    if (filters.npsScore !== undefined)
+      params.append("npsScore", filters.npsScore);
     if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
     if (filters.dateTo) params.append("dateTo", filters.dateTo);
-    if (filters.feedbackType) params.append("feedbackType", filters.feedbackType);
+    if (filters.feedbackType)
+      params.append("feedbackType", filters.feedbackType);
     if (filters.page) params.append("page", filters.page);
     if (filters.limit) params.append("limit", filters.limit);
 
@@ -119,6 +126,7 @@ export const adminService = {
     if (filters.user) params.append("user", filters.user);
     if (filters.action) params.append("action", filters.action);
     if (filters.resource) params.append("resource", filters.resource);
+    if (filters.role) params.append("role", filters.role);
     if (filters.dateFrom) params.append("dateFrom", filters.dateFrom);
     if (filters.dateTo) params.append("dateTo", filters.dateTo);
     if (filters.page) params.append("page", filters.page);
@@ -249,14 +257,21 @@ export const adminService = {
     }
   },
 
-  // Region Admin
-  upsertRegionAdmin: async (region, data) => {
-    const response = await api.post(`/admin/regions/${region}/admin`, data);
+  // Regional Health Comparison
+  getRegionalHealthComparison: async (timePeriod = "monthly") => {
+    const params = new URLSearchParams();
+    if (timePeriod) params.append("timePeriod", timePeriod);
+    const response = await api.get(`/admin/regions/health-comparison?${params}`);
     return response.data.data;
   },
 
-  getRegionAdmin: async (region) => {
-    const response = await api.get(`/admin/regions/${region}/admin`);
+  // Center Health Comparison
+  getCenterHealthComparison: async (timePeriod = "monthly", region = "all") => {
+    const params = new URLSearchParams();
+    if (timePeriod) params.append("timePeriod", timePeriod);
+    if (region && region !== "all") params.append("region", region);
+    const response = await api.get(`/admin/centers/health-comparison?${params}`);
     return response.data.data;
   },
 };
+

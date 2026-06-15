@@ -1,0 +1,507 @@
+/* Nurse Analytics Component */
+.analyticsContainer {
+  padding: 1.5rem;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.controls {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.periodSelect {
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+  background-color: #FFFFFF;
+  font-weight: 600;
+  fontSize: 0.8rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.periodSelect:focus {
+  outline: none;
+  border-color: #37519A;
+  box-shadow: 0 0 0 3px rgba(55, 81, 154, 0.1);
+}
+
+.datePickerGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.datePickerGroup label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.8rem;
+}
+
+.datePicker {
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  border: 1px solid #D1D5DB;
+  font-size: 0.8rem;
+}
+
+.datePicker:focus {
+  outline: none;
+  border-color: #37519A;
+  box-shadow: 0 0 0 3px rgba(55, 81, 154, 0.1);
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  color: #666;
+}
+
+/* Overview Cards */
+.analyticsCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.analyticsCard {
+  background: linear-gradient(135deg, #213D8D 0%, #1a3270 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 6px rgba(33, 61, 141, 0.15);
+  transition: transform 0.2s;
+}
+
+.analyticsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(33, 61, 141, 0.25);
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.cardLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.cardValue {
+  margin: 0.25rem 0 0 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Metrics Grid */
+.analyticsMetricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metricsCard {
+  padding: 1.5rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.metricsCard h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #284394;
+  font-size: 1.1rem;
+}
+
+.breakdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.95rem;
+}
+
+.breakdownItem:last-child {
+  border-bottom: none;
+}
+
+.breakdownValue {
+  font-weight: bold;
+  color: #284394;
+  font-size: 1.2rem;
+}
+
+/* Health Conditions Chart */
+.healthConditionsCard {
+  margin-top: 2rem;
+  padding: 2rem;
+}
+
+.healthConditionsHeader {
+  margin-bottom: 2rem;
+}
+
+.healthConditionsTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.healthConditionsTitle h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.healthConditionsSubtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.chartArea {
+  margin-top: 2rem;
+  position: relative;
+  padding-left: 3rem;
+}
+
+.yAxisLabel {
+  position: absolute;
+  left: 0;
+  top: 175px;
+  transform: rotate(-90deg);
+  transform-origin: left center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.chartFlex {
+  display: flex;
+  gap: 1rem;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 350px;
+  padding-right: 1rem;
+  border-right: 2px solid #e5e7eb;
+}
+
+.yAxisTick {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.chartContainer {
+  flex: 1;
+  position: relative;
+}
+
+.gridLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 350px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.gridLine {
+  height: 1px;
+  background-color: #e5e7eb;
+  width: 100%;
+}
+
+.barsContainer {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 350px;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.barWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  max-width: 120px;
+  position: relative;
+  cursor: pointer;
+}
+
+.barTooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.barWrapper:hover .barTooltip {
+  opacity: 1;
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipColorBox {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.tooltipValue {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+}
+
+.barWrapper:hover .bar {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.xAxisLabels {
+  display: flex;
+  margin-top: 1rem;
+  margin-left: 4rem;
+}
+
+.xAxisLabelsInner {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.xAxisLabel {
+  flex: 1;
+  max-width: 120px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+  word-break: break-word;
+}
+
+.noDataMessage {
+  text-align: center;
+  color: #9ca3af;
+  padding: 2rem;
+}
+
+/* Trend Chart */
+.trendChartCard {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.trendChartCard:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.trendChartHeader {
+  margin-bottom: 2rem;
+}
+
+.trendChartTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.trendChartSubtitle {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.trendChartContainer {
+  height: 400px;
+  position: relative;
+}
+
+/* Monthly Comparison Table */
+.comparisonTable {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.comparisonTableTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table thead tr {
+  background-color: #284394;
+  color: #ffffff;
+}
+
+.table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.table th.center {
+  text-align: center;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table td {
+  padding: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.table td.center {
+  text-align: center;
+}
+
+.table td.gray {
+  color: #6b7280;
+  font-weight: normal;
+}
+
+.table td.blue {
+  color: #284394;
+}
+
+.trendBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.trendUp {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.trendDown {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.trendStable {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .analyticsCardsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .analyticsMetricsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartArea {
+    padding-left: 2rem;
+  }
+
+  .xAxisLabels {
+    margin-left: 2rem;
+  }
+}

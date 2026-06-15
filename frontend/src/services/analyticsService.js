@@ -34,8 +34,8 @@ export const analyticsService = {
   },
 
   // ─── Health Analytics ───────────────────────────────────────────────────────
-  async getHealthAnalytics() {
-    const response = await api.get('/api/v1/analytics/health/analytics');
+  async getHealthAnalytics(params = {}) {
+    const response = await api.get('/api/v1/analytics/health/analytics', { params });
     return response.data;
   },
 
@@ -52,6 +52,16 @@ export const analyticsService = {
 
   async updateStaffUser(userId, userData) {
     const response = await api.put(`/api/v1/analytics/users/${userId}`, userData);
+    return response.data;
+  },
+
+  async deleteStaffUser(userId) {
+    const response = await api.delete(`/api/v1/analytics/users/${userId}`);
+    return response.data;
+  },
+
+  async resetUserPassword(userId, newPassword) {
+    const response = await api.post(`/api/v1/analytics/users/${userId}/reset-password`, { newPassword });
     return response.data;
   },
 

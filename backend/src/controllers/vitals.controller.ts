@@ -408,12 +408,12 @@ export async function getVitalsHistoryHandler(
   res: Response,
 ): Promise<void> {
   try {
-    const userId = req.params.userId;
+    const rawUserId = req.params.userId;
     const limit = req.query.limit
       ? parseInt(req.query.limit as string, 10)
       : 50;
 
-    if (!userId || typeof userId !== "string") {
+    if (!rawUserId || typeof rawUserId !== "string") {
       res.status(400).json({
         status: "error",
         message: "userId is required",
@@ -421,17 +421,29 @@ export async function getVitalsHistoryHandler(
       return;
     }
 
-    const history = await getVitalsHistory(userId, limit);
+    // Resolve the userId (could be 4-digit display ID or UUID)
+    const resolvedUserId = await resolvePatientUserId(rawUserId);
+    
+    if (!resolvedUserId) {
+      res.status(404).json({
+        status: "error",
+        message: "Customer not found",
+      });
+      return;
+    }
+
+    const history = await getVitalsHistory(resolvedUserId, limit);
 
     res.status(200).json({
       status: "success",
       data: {
-        userId,
+        userId: rawUserId,
         count: history.length,
         records: history,
       },
     });
   } catch (error) {
+    console.error("Get vitals history error:", error);
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve vitals history",
@@ -444,9 +456,9 @@ export async function getLatestVitalsHandler(
   res: Response,
 ): Promise<void> {
   try {
-    const userId = req.params.userId;
+    const rawUserId = req.params.userId;
 
-    if (!userId || typeof userId !== "string") {
+    if (!rawUserId || typeof rawUserId !== "string") {
       res.status(400).json({
         status: "error",
         message: "userId is required",
@@ -454,7 +466,18 @@ export async function getLatestVitalsHandler(
       return;
     }
 
-    const latest = await getLatestVitals(userId);
+    // Resolve the userId (could be 4-digit display ID or UUID)
+    const resolvedUserId = await resolvePatientUserId(rawUserId);
+    
+    if (!resolvedUserId) {
+      res.status(404).json({
+        status: "error",
+        message: "Customer not found",
+      });
+      return;
+    }
+
+    const latest = await getLatestVitals(resolvedUserId);
 
     if (!latest) {
       res.status(404).json({
@@ -469,6 +492,7 @@ export async function getLatestVitalsHandler(
       data: latest,
     });
   } catch (error) {
+    console.error("Get latest vitals error:", error);
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve latest vitals",
@@ -478,9 +502,9 @@ export async function getLatestVitalsHandler(
 
 export async function getRiskScoreHandler(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const userId = req.params.userId;
+    const rawUserId = req.params.userId;
 
-    if (!userId || typeof userId !== "string") {
+    if (!rawUserId || typeof rawUserId !== "string") {
       res.status(400).json({
         status: "error",
         message: "userId is required",
@@ -488,7 +512,18 @@ export async function getRiskScoreHandler(req: AuthRequest, res: Response): Prom
       return;
     }
 
-    const latest = await getLatestVitals(userId);
+    // Resolve the userId (could be 4-digit display ID or UUID)
+    const resolvedUserId = await resolvePatientUserId(rawUserId);
+    
+    if (!resolvedUserId) {
+      res.status(404).json({
+        status: "error",
+        message: "Customer not found",
+      });
+      return;
+    }
+
+    const latest = await getLatestVitals(resolvedUserId);
 
     if (!latest) {
       res.status(404).json({
@@ -515,6 +550,7 @@ export async function getRiskScoreHandler(req: AuthRequest, res: Response): Prom
       data: scores,
     });
   } catch (error) {
+    console.error("Get risk score error:", error);
     res.status(500).json({
       status: "error",
       message: "Failed to calculate risk scores",

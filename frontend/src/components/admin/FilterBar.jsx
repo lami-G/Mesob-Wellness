@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { adminService } from "../../services/adminService";
+import styles from "./FilterBar.module.css";
 
 const normalizeFilters = (filters = {}) => ({
   region: filters.region || "",
@@ -8,6 +9,7 @@ const normalizeFilters = (filters = {}) => ({
   dateFrom: filters.dateFrom || "",
   dateTo: filters.dateTo || "",
   role: filters.role || "",
+  timePeriod: filters.timePeriod || "",
 });
 
 const areFiltersEqual = (left = {}, right = {}) => {
@@ -23,6 +25,7 @@ function FilterBar({
   showRegionFilter = true,
   showCenterFilter = true,
   showDateFilter = false,
+  showTimePeriodFilter = false,
   showRoleFilter = false,
   initialFilters = {},
 }) {
@@ -99,16 +102,17 @@ function FilterBar({
       dateFrom: "",
       dateTo: "",
       role: "",
+      timePeriod: "",
     };
     setFilters(resetFilters);
     onFilterChange(resetFilters);
   };
 
   return (
-    <div className="filter-bar">
-      <div className="filter-container">
+    <div className={styles.filterBar}>
+      <div className={styles.filterContainer}>
         {/* Search */}
-        <div className="filter-group">
+        <div className={styles.filterGroup}>
           <label htmlFor="search">Search</label>
           <input
             id="search"
@@ -116,19 +120,19 @@ function FilterBar({
             placeholder="Search..."
             value={filters.search}
             onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="filter-input"
+            className={styles.filterInput}
           />
         </div>
 
         {/* Region Filter */}
         {showRegionFilter && (
-          <div className="filter-group">
+          <div className={styles.filterGroup}>
             <label htmlFor="region">Region</label>
             <select
               id="region"
               value={filters.region}
               onChange={(e) => handleFilterChange("region", e.target.value)}
-              className="filter-select"
+              className={styles.filterSelect}
               disabled={loadingRegions}
             >
               <option value="">All Regions</option>
@@ -143,13 +147,13 @@ function FilterBar({
 
         {/* Center Filter */}
         {showCenterFilter && (
-          <div className="filter-group">
+          <div className={styles.filterGroup}>
             <label htmlFor="center">Center</label>
             <select
               id="center"
               value={filters.center}
               onChange={(e) => handleFilterChange("center", e.target.value)}
-              className="filter-select"
+              className={styles.filterSelect}
               disabled={!filters.region || loadingCenters}
             >
               <option value="">All Centers</option>
@@ -164,13 +168,13 @@ function FilterBar({
 
         {/* Role Filter */}
         {showRoleFilter && (
-          <div className="filter-group">
+          <div className={styles.filterGroup}>
             <label htmlFor="role">Role</label>
             <select
               id="role"
               value={filters.role}
               onChange={(e) => handleFilterChange("role", e.target.value)}
-              className="filter-select"
+              className={styles.filterSelect}
             >
               <option value="">All Roles</option>
               <option value="SYSTEM_ADMIN">System Admin</option>
@@ -187,33 +191,51 @@ function FilterBar({
         {/* Date Range Filter */}
         {showDateFilter && (
           <>
-            <div className="filter-group">
+            <div className={styles.filterGroup}>
               <label htmlFor="dateFrom">From</label>
               <input
                 id="dateFrom"
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => handleFilterChange("dateFrom", e.target.value)}
-                className="filter-input"
+                className={styles.filterInput}
               />
             </div>
 
-            <div className="filter-group">
+            <div className={styles.filterGroup}>
               <label htmlFor="dateTo">To</label>
               <input
                 id="dateTo"
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => handleFilterChange("dateTo", e.target.value)}
-                className="filter-input"
+                className={styles.filterInput}
               />
             </div>
           </>
         )}
 
+        {/* Time Period Filter */}
+        {showTimePeriodFilter && (
+          <div className={styles.filterGroup}>
+            <label htmlFor="timePeriod">Period</label>
+            <select
+              id="timePeriod"
+              value={filters.timePeriod}
+              onChange={(e) => handleFilterChange("timePeriod", e.target.value)}
+              className={styles.filterSelect}
+            >
+              <option value="">All Time</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+        )}
+
         {/* Action Buttons */}
-        <div className="filter-actions">
-          <button className="btn-reset" onClick={handleReset}>
+        <div className={styles.filterActions}>
+          <button className={styles.btnReset} onClick={handleReset}>
             Reset
           </button>
         </div>

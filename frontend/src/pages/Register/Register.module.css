@@ -1,0 +1,416 @@
+/* ========================================
+   MESOB BRAND THEME - REGISTRATION PAGE
+   Based on dashboard.mesobcenter.et
+   CSS Module Version - Preserving 100% of original styles
+   ======================================== */
+
+/* Starry Background Pattern */
+.wrapper {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a1428 0%, #1a2d5c 50%, #2E4998 100%);
+  position: relative;
+  overflow: hidden;
+  background-image: 
+    linear-gradient(0deg, transparent 24%, rgba(100, 150, 200, 0.08) 25%, rgba(100, 150, 200, 0.08) 26%, transparent 27%, transparent 74%, rgba(100, 150, 200, 0.08) 75%, rgba(100, 150, 200, 0.08) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(100, 150, 200, 0.08) 25%, rgba(100, 150, 200, 0.08) 26%, transparent 27%, transparent 74%, rgba(100, 150, 200, 0.08) 75%, rgba(100, 150, 200, 0.08) 76%, transparent 77%, transparent);
+  background-size: 50px 50px;
+}
+
+/* Auth Container - Fixed for viewport overflow */
+.container {
+  min-height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Auth Card - Reduced size and better viewport fit */
+.card {
+  background: #3550A0;
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 520px;
+  width: 100%;
+  padding: 1.75rem;
+  animation: slideUp 0.5s ease-out;
+  box-sizing: border-box;
+  margin: auto;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logo Section - Reduced spacing */
+.logoSection {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.logoCircle {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoCircle img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.titleAmharic {
+  font-size: 0.85rem;
+  color: #FFFFFF;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.titleEnglish {
+  font-size: 0.75rem;
+  color: #FFFFFF;
+  margin-bottom: 0.4rem;
+}
+
+.serviceTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.4rem;
+}
+
+.welcome {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #F59E0B;
+  margin-bottom: 0.2rem;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+/* Form Styles - Tighter spacing */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formGroup {
+  margin-bottom: 0.25rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 0.4rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: #FFFFFF;
+  transition: all 0.3s ease;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.formInput:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.formInput.error {
+  border-color: #ef4444;
+}
+
+.formError {
+  display: block;
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.formSuccess {
+  display: block;
+  color: #059669;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+.formHint {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #FFFFFF;
+  margin-left: 0.25rem;
+}
+
+/* HR Lookup Section - Reduced spacing */
+.hrSection {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.inputWithButton {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.inputWithButton .formInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+}
+
+.inputWithButton button {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  min-width: auto;
+  border-radius: 8px;
+}
+
+/* Buttons - Adjusted sizing */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  background: #FFFFFF;
+  color: #3550A0;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+.btnSecondary {
+  background: #2B4C7E;
+  color: white;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: #1e3a5f;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  background-color: #d1d5db !important;
+  color: #6b7280 !important;
+}
+
+/* Alerts - Reduced spacing */
+.alert {
+  padding: 0.625rem 0.875rem;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.alertError {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.alertSuccess {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+/* Footer Links - Reduced spacing */
+.footer {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footerText {
+  font-size: 0.8rem;
+  color: #FFFFFF;
+}
+
+.link {
+  color: #FFA500;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: #FFB84D;
+  text-decoration: underline;
+}
+
+/* Scrollable Form Container - Better height management */
+.formScroll {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formScroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formScroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.formScroll::-webkit-scrollbar-thumb {
+  background: #F59E0B;
+  border-radius: 10px;
+}
+
+.formScroll::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
+/* Select Dropdown - Adjusted sizing */
+.formSelect {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.formSelect:focus {
+  outline: none;
+  border-color: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.formSelect:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.formSelect.error {
+  border-color: #ef4444;
+}
+
+/* Required Mark */
+.required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+/* Responsive - Mobile adjustments */
+@media (max-width: 640px) {
+  .card {
+    padding: 1.25rem;
+    max-height: calc(100vh - 1rem);
+  }
+
+  .logoCircle {
+    width: 60px;
+    height: 60px;
+  }
+
+  .serviceTitle {
+    font-size: 1rem;
+  }
+
+  .inputWithButton {
+    flex-direction: column;
+  }
+
+  .inputWithButton button {
+    width: 100%;
+  }
+
+  .formScroll {
+    max-height: 45vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+    max-height: calc(100vh - 1rem);
+  }
+
+  .logoCircle {
+    width: 50px;
+    height: 50px;
+  }
+
+  .formScroll {
+    max-height: 40vh;
+  }
+}

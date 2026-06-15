@@ -1,0 +1,301 @@
+/* Register Walk-In Component */
+.registerWalkin {
+  /* Main container uses global .card class */
+}
+
+/* Alert Messages */
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid;
+}
+
+.alertError {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border-color: #FECACA;
+}
+
+.alertSuccess {
+  background-color: #D1FAE5;
+  color: #065F46;
+  border-color: #6EE7B7;
+}
+
+.alertInfo {
+  background-color: #DBEAFE;
+  color: #0C4A6E;
+  border-color: #93C5FD;
+}
+
+/* Search Section */
+.searchHeader {
+  margin: 0 0 1.5rem 0;
+  color: #3550A0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.searchForm {
+  display: inline-flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.searchInput {
+  width: 300px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.searchButton {
+  min-width: 100px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.registerButton {
+  min-width: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.75rem 1rem;
+}
+
+/* Search Results */
+.searchResults {
+  margin-bottom: 1.5rem;
+}
+
+.resultsHeader {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background-color: #F9FAFB;
+}
+
+.patientInfo {
+  flex: 1;
+}
+
+.patientName {
+  margin: 0 0 0.25rem 0;
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.patientContact {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.patientId {
+  margin: 0.25rem 0;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.patientBadge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeExternal {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.badgeStaff {
+  background-color: #DBEAFE;
+  color: #0C4A6E;
+}
+
+.selectButton {
+  min-width: 150px;
+}
+
+/* Empty State */
+.emptyState {
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.emptyStateText {
+  margin: 0;
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   REGISTRATION MODAL
+   Rendered via ReactDOM.createPortal into document.body so it
+   is completely outside the layout tree and cannot be clipped
+   by any ancestor overflow:hidden / overflow-y:auto.
+   ───────────────────────────────────────────────────────────── */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;        /* was center — shift left with margin */
+  z-index: 99999;
+  padding: 0;
+  overflow: hidden;
+}
+
+.modalContent {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100000;
+  margin-left: 20%;                /* ← push it left of center */
+  margin-right: auto;
+}
+
+/* Scrollbar styling for the modal card */
+.modalContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: #c0c7d4;
+  border-radius: 4px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: #8892a4;
+}
+
+/* ─── Modal internals ──────────────────────────────────────── */
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalTitle {
+  margin: 0;
+  color: #3550A0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6B7280;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalClose:hover {
+  color: #374151;
+}
+
+.modalForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.formGroup {
+  /* Form group container */
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #3550A0;
+  font-size: 0.875rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  outline: none;
+}
+
+.formInput:focus {
+  border-color: #3550A0;
+}
+
+.formInputError {
+  border-color: #EF4444;
+}
+
+.formInputError:focus {
+  border-color: #EF4444;
+}
+
+.formError {
+  font-size: 0.8rem;
+  color: #EF4444;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modalButtonPrimary {
+  flex: 1;
+}
+
+.modalButtonSecondary {
+  flex: 1;
+}

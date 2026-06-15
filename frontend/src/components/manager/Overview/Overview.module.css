@@ -1,0 +1,89 @@
+/* ============================================
+   MANAGER OVERVIEW TAB - CSS MODULE
+   ============================================ */
+
+/* Capacity Bar Section */
+.capacityCard {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.capacityCardHeader {
+  position: relative;
+  z-index: 1;
+}
+
+.capacityCardTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.capacityStatusBadge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  /* background, color, border are dynamic based on usedPct - keep inline */
+}
+
+.capacityRow {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.capacityStat {
+  text-align: center;
+  min-width: 80px;
+}
+
+.capacityStatValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  display: block;
+  /* color is dynamic - keep inline */
+}
+
+.capacityStatLabel {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.capacityBarWrap {
+  flex: 1;
+}
+
+.capacityTrack {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.capacityFill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+  /* width and background are dynamic - keep inline */
+}
+
+.capacityPct {
+  font-size: 1.5rem;
+  font-weight: 800;
+  min-width: 60px;
+  text-align: right;
+  /* color is dynamic - keep inline */
+}

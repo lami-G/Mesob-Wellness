@@ -39,6 +39,7 @@ export interface AuthResponse {
     isActive: boolean;
     profilePicture?: string | null;
     userId?: string;
+    centerId?: string | null;
   };
   token: string;
 }
@@ -398,6 +399,7 @@ export class AuthService {
         isActive: user.isActive,
         profilePicture: user.profilePicture,
         userId: user.userId, // Include display ID
+        centerId: user.centerId, // Include center ID for filtering
       },
       token,
     };
@@ -530,6 +532,7 @@ export class AuthService {
         phone: true,
         profilePicture: true,
         userId: true, // Include display ID
+        centerId: true, // Include center ID for filtering
       },
     });
   }

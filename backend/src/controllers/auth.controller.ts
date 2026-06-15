@@ -203,6 +203,33 @@ export const createUser = async (req: AuthRequest, res: Response): Promise<void>
     // Create user
     const result = await AuthService.register(registerInput, auditContext);
 
+    // Create notification for system admin about new user creation
+    try {
+      const { NotificationService } = await import("../services/notifications.service.js");
+      const { prisma } = await import("../config/prisma.js");
+      const admins = await prisma.user.findMany({
+        where: { role: UserRole.SYSTEM_ADMIN },
+        select: { id: true },
+      });
+
+      for (const admin of admins) {
+        await NotificationService.createNotification(
+          admin.id,
+          "USER_REGISTRATION" as any,
+          "HIGH" as any,
+          "New User Created",
+          `New ${role} created by ${creatorRole}: ${fullName} (${email})`,
+          result.user.id,
+        );
+      }
+    } catch (notificationError) {
+      // Log but don't fail user creation if notification creation fails
+      console.warn(
+        "Failed to create user creation notification:",
+        notificationError,
+      );
+    }
+
     res.status(201).json({
       status: "success",
       message: "User created successfully",

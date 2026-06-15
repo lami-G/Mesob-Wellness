@@ -1,0 +1,23 @@
+/* ============================================
+   MANAGER AUDIT TAB - CSS MODULE
+   ============================================ */
+
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.timestampCell {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.actionLabel {
+  font-weight: 600;
+  /* color is dynamic based on action type - kept inline */
+}
+
+.ipCell {
+  font-size: 0.8rem;
+}

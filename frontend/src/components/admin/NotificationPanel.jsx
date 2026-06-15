@@ -182,7 +182,10 @@ function NotificationPanel({ isOpen, onClose }) {
                   {!notification.isRead && (
                     <button
                       className="action-btn read-btn"
-                      onClick={() => handleMarkAsRead(notification.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMarkAsRead(notification.id);
+                      }}
                       title="Mark as read"
                     >
                       ✓
@@ -190,8 +193,13 @@ function NotificationPanel({ isOpen, onClose }) {
                   )}
                   <button
                     className="action-btn delete-btn"
-                    onClick={() => handleDelete(notification.id)}
-                    title="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm('Delete this notification?')) {
+                        handleDelete(notification.id);
+                      }
+                    }}
+                    title="Delete notification"
                   >
                     🗑️
                   </button>

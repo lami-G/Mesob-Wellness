@@ -1,0 +1,53 @@
+:root {
+  /* Primary Colors */
+  --color-primary: #37519A;
+  --color-primary-hover: #213D8D;
+  --color-primary-hover-text: #f5a623;
+  --color-primary-light: #e8edf7;
+  --color-primary-dark: #1f2d5a;
+  
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-hover: #059669;
+  --color-success-light: #D1FAE5;
+  
+  --color-error: #EF4444;
+  --color-error-hover: #DC2626;
+  --color-error-light: #FEE2E2;
+  
+  --color-warning: #F59E0B;
+  --color-warning-hover: #D97706;
+  --color-warning-light: #FEF3C7;
+  
+  --color-info: #3B82F6;
+  --color-info-hover: #2563EB;
+  --color-info-light: #DBEAFE;
+  
+  /* Neutral Colors */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-disabled: #D1D5DB;
+  
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  
+  --color-border: #E5E7EB;
+  --color-border-hover: #D1D5DB;
+  --color-border-focus: #3B82F6;
+  
+  /* Role-based Colors */
+  --color-admin: #8B5CF6;
+  --color-nurse: #10B981;
+  --color-manager: #F59E0B;
+  --color-regional: #3B82F6;
+  --color-federal: #6366F1;
+  
+  /* Semantic Colors */
+  --color-completed: #10B981;
+  --color-waiting: #F59E0B;
+  --color-in-service: #3B82F6;
+  --color-no-show: #EF4444;
+  --color-cancelled: #6B7280;
+}

@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import MainLayout from "../components/MainLayout";
 import RoleBasedRoute from "../components/RoleBasedRoute";
 import MaintenanceMode from "../components/MaintenanceMode";
 import api from "../services/api";
-import Dashboard from "../pages/Dashboard";
-import NurseDashboard from "../pages/NurseDashboard";
-import ManagerDashboard from "../pages/ManagerDashboard";
-import RegionalDashboard from "../pages/RegionalDashboard";
+import StaffDashboard from "../pages/StaffDashboard/StaffDashboard";
+import NurseDashboard from "../pages/NurseDashboard/NurseDashboard";
+import ManagerDashboard from "../pages/ManagerDashboard/ManagerDashboard";
+import RegionalDashboard from "../pages/RegionalDashboard/RegionalDashboard";
 import ManagerDashboardProfile from "../pages/ManagerDashboardProfile";
 import RegionalDashboardProfile from "../pages/RegionalDashboardProfile";
 import FederalDashboardProfile from "../pages/FederalDashboardProfile";
-import FederalDashboard from "../pages/FederalDashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
+import FederalDashboard from "../pages/FederalDashboard/FederalDashboard";
+import AdminDashboard from "../pages/AdminDashboard/AdminDashboard";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 
@@ -91,9 +90,7 @@ function AppRouter() {
         path="/dashboard"
         element={
           <RoleBasedRoute allowedRoles={["STAFF"]}>
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
+            <StaffDashboard />
           </RoleBasedRoute>
         }
       />
@@ -101,9 +98,7 @@ function AppRouter() {
         path="/nurse"
         element={
           <RoleBasedRoute allowedRoles={["NURSE_OFFICER"]}>
-            <MainLayout>
-              <NurseDashboard />
-            </MainLayout>
+            <NurseDashboard />
           </RoleBasedRoute>
         }
       />

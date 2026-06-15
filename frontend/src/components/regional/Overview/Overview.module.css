@@ -1,0 +1,95 @@
+/* ============================================
+   REGIONAL DASHBOARD - OVERVIEW TAB
+   ============================================ */
+
+/* KPI Grid - Production-Level Design (matching Manager Overview) */
+.topKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.topKpiCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.topKpiCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #d1d5db;
+}
+
+.topKpiCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.topKpiCard:hover::before {
+  opacity: 1;
+}
+
+.topKpiIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  /* background and color set via inline CSS variables */
+}
+
+.kpiIconWithColor {
+  background: var(--kpi-bg);
+  color: var(--kpi-color);
+}
+
+.topKpiCard:hover .topKpiIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.topKpiValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+  color: #213d8d;
+}
+
+.kpiValueWithColor {
+  color: #213d8d;
+}
+
+.topKpiLabel {
+  font-size: 0.9rem;
+  color: #213d8d;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.topKpiSub {
+  font-size: 0.75rem;
+  color: #213d8d;
+  font-weight: 500;
+  opacity: 0.85;
+}

@@ -17,7 +17,11 @@ import {
  * @param startDate Start date for calculation
  * @param endDate End date for calculation
  */
-async function calculateQueueMetrics(startDate: Date, endDate: Date) {
+async function calculateQueueMetrics(
+  startDate: Date,
+  endDate: Date,
+  userWhere?: any,
+) {
   try {
     const appointmentStatuses: AppointmentStatus[] = [
       AppointmentStatus.WAITING,
@@ -34,18 +38,19 @@ async function calculateQueueMetrics(startDate: Date, endDate: Date) {
       where: {
         scheduledAt: { gte: startDate, lte: endDate },
         status: { in: appointmentStatuses },
+        ...(userWhere ? { user: userWhere } : {}),
       },
       select: { userId: true, status: true, scheduledAt: true },
     });
 
     const totalAppointments = appointments.length;
     const completedAppointmentsCount = appointments.filter(
-      apt => apt.status === "COMPLETED"
+      (apt) => apt.status === "COMPLETED",
     ).length;
 
     // Map of userId -> set of appointment dates (YYYY-MM-DD) in range
     const appointmentDateMap = new Map<string, Set<string>>();
-    appointments.forEach(apt => {
+    appointments.forEach((apt) => {
       const dayKey = apt.scheduledAt.toISOString().split("T")[0];
       const existing = appointmentDateMap.get(apt.userId) || new Set<string>();
       existing.add(dayKey);
@@ -56,12 +61,13 @@ async function calculateQueueMetrics(startDate: Date, endDate: Date) {
     const wellnessPlans = await prisma.wellnessPlan.findMany({
       where: {
         createdAt: { gte: startDate, lte: endDate },
+        ...(userWhere ? { user: userWhere } : {}),
       },
       select: { userId: true, createdAt: true },
     });
 
     let walkInCount = 0;
-    wellnessPlans.forEach(plan => {
+    wellnessPlans.forEach((plan) => {
       const planDayKey = plan.createdAt.toISOString().split("T")[0];
       const userAppointments = appointmentDateMap.get(plan.userId);
       if (!userAppointments || !userAppointments.has(planDayKey)) {
@@ -108,7 +114,7 @@ const AdminService = {
         select: { region: true },
         distinct: ["region"],
       });
-      return centers.map(c => c.region).sort();
+      return centers.map((c) => c.region).sort();
     } catch (error) {
       console.error("Error getting regions:", error);
       throw error;
@@ -139,34 +145,73 @@ const AdminService = {
   /**
    * Get system-wide dashboard metrics
    */
-  async getDashboardMetrics(timePeriod?: string): Promise<DashboardMetrics> {
+  async getDashboardMetrics(
+    timePeriod?: string,
+    filters?: { region?: string; center?: string },
+  ): Promise<DashboardMetrics> {
     try {
+      const regionFilter = filters?.region;
+      const centerFilter = filters?.center;
+      const centerWhere: any = {};
+      if (regionFilter) centerWhere.region = regionFilter;
+      if (centerFilter) centerWhere.id = centerFilter;
+
+      const userWhere: any = {};
+      if (centerFilter) userWhere.centerId = centerFilter;
+      if (regionFilter) userWhere.center = { region: regionFilter };
+      const hasUserFilter = Object.keys(userWhere).length > 0;
+
+      const baseUserWhere = hasUserFilter ? userWhere : {};
+      const baseCenterWhere =
+        Object.keys(centerWhere).length > 0 ? centerWhere : undefined;
+      const baseCenterWhereSpread = baseCenterWhere || {};
+
       // Calculate date range based on time period
       const now = new Date();
       let dateFrom: Date | undefined;
-      
-      if (timePeriod === 'daily') {
-        dateFrom = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-      } else if (timePeriod === 'weekly') {
+
+      if (timePeriod === "daily") {
+        dateFrom = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+      } else if (timePeriod === "weekly") {
         dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      } else if (timePeriod === 'monthly') {
+      } else if (timePeriod === "monthly") {
         dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
       }
 
       // Get user stats (not filtered by date)
       const users = await prisma.user.groupBy({
         by: ["role"],
+        where: baseUserWhere,
         _count: true,
       });
 
       const userStats = {
-        total: await prisma.user.count(),
-        active: await prisma.user.count({ where: { isActive: true } }),
-        inactive: await prisma.user.count({ where: { isActive: false } }),
-        verified: await prisma.user.count({ where: { isVerified: true } }),
-        unverified: await prisma.user.count({ where: { isVerified: false } }),
-        externalPatients: await prisma.user.count({ where: { role: "EXTERNAL_PATIENT" } }),
-        staff: await prisma.user.count({ where: { role: "STAFF" } }),
+        total: await prisma.user.count({ where: baseUserWhere }),
+        active: await prisma.user.count({
+          where: { ...baseUserWhere, isActive: true },
+        }),
+        inactive: await prisma.user.count({
+          where: { ...baseUserWhere, isActive: false },
+        }),
+        verified: await prisma.user.count({
+          where: { ...baseUserWhere, isVerified: true },
+        }),
+        unverified: await prisma.user.count({
+          where: { ...baseUserWhere, isVerified: false },
+        }),
+        externalPatients: await prisma.user.count({
+          where: { ...baseUserWhere, role: "EXTERNAL_PATIENT" },
+        }),
+        staff: await prisma.user.count({
+          where: { ...baseUserWhere, role: "STAFF" },
+        }),
         byRole: users.reduce((acc: any, u: any) => {
           acc[u.role] = u._count;
           return acc;
@@ -177,14 +222,21 @@ const AdminService = {
       // Get center stats (not filtered by date)
       const centers = await prisma.center.groupBy({
         by: ["region"],
+        where: baseCenterWhere,
         _count: true,
       });
 
       const centerStats = {
-        total: await prisma.center.count(),
-        active: await prisma.center.count({ where: { status: "ACTIVE" } }),
-        inactive: await prisma.center.count({ where: { status: "INACTIVE" } }),
-        maintenance: await prisma.center.count({ where: { status: "MAINTENANCE" } }),
+        total: await prisma.center.count({ where: baseCenterWhere }),
+        active: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "ACTIVE" },
+        }),
+        inactive: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "INACTIVE" },
+        }),
+        maintenance: await prisma.center.count({
+          where: { ...baseCenterWhereSpread, status: "MAINTENANCE" },
+        }),
         byRegion: centers.reduce((acc: any, c: any) => {
           acc[c.region] = c._count;
           return acc;
@@ -192,9 +244,12 @@ const AdminService = {
       };
 
       // Get appointment stats with date filter
-      const appointmentWhere: any = dateFrom ? { 
-        scheduledAt: { gte: dateFrom } 
-      } : {};
+      const appointmentWhere: any = dateFrom
+        ? {
+            scheduledAt: { gte: dateFrom },
+          }
+        : {};
+      if (hasUserFilter) appointmentWhere.user = userWhere;
 
       const appointments = await prisma.appointment.groupBy({
         by: ["status"],
@@ -204,12 +259,24 @@ const AdminService = {
 
       const appointmentStats = {
         total: await prisma.appointment.count({ where: appointmentWhere }),
-        waiting: await prisma.appointment.count({ where: { ...appointmentWhere, status: "WAITING" } }),
-        inProgress: await prisma.appointment.count({ where: { ...appointmentWhere, status: "IN_PROGRESS" } }),
-        inService: await prisma.appointment.count({ where: { ...appointmentWhere, status: "IN_SERVICE" } }),
-        completed: await prisma.appointment.count({ where: { ...appointmentWhere, status: "COMPLETED" } }),
-        cancelled: await prisma.appointment.count({ where: { ...appointmentWhere, status: "CANCELLED" } }),
-        noShow: await prisma.appointment.count({ where: { ...appointmentWhere, status: "NO_SHOW" } }),
+        waiting: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "WAITING" },
+        }),
+        inProgress: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "IN_PROGRESS" },
+        }),
+        inService: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "IN_SERVICE" },
+        }),
+        completed: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "COMPLETED" },
+        }),
+        cancelled: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "CANCELLED" },
+        }),
+        noShow: await prisma.appointment.count({
+          where: { ...appointmentWhere, status: "NO_SHOW" },
+        }),
         byRegion: {},
         byStatus: appointments.reduce((acc: any, a: any) => {
           acc[a.status] = a._count;
@@ -218,9 +285,12 @@ const AdminService = {
       };
 
       // Get vital stats with date filter
-      const vitalWhere: any = dateFrom ? { 
-        recordedAt: { gte: dateFrom } 
-      } : {};
+      const vitalWhere: any = dateFrom
+        ? {
+            recordedAt: { gte: dateFrom },
+          }
+        : {};
+      if (hasUserFilter) vitalWhere.user = userWhere;
 
       const vitals = await prisma.vitalRecord.findMany({
         where: vitalWhere,
@@ -238,31 +308,65 @@ const AdminService = {
 
       const vitalStats = {
         total: vitals.length,
-        averageBMI: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.bmi || 0), 0) / vitals.length : 0,
-        averageSystolic: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.systolic || 0), 0) / vitals.length : 0,
-        averageDiastolic: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.diastolic || 0), 0) / vitals.length : 0,
-        averageHeartRate: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.heartRate || 0), 0) / vitals.length : 0,
-        averageTemperature: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) / vitals.length : 0,
-        averageOxygenSaturation: vitals.length > 0 ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) / vitals.length : 0,
+        averageBMI:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.bmi || 0), 0) / vitals.length
+            : 0,
+        averageSystolic:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.systolic || 0), 0) /
+              vitals.length
+            : 0,
+        averageDiastolic:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.diastolic || 0), 0) /
+              vitals.length
+            : 0,
+        averageHeartRate:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.heartRate || 0), 0) /
+              vitals.length
+            : 0,
+        averageTemperature:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.temperature || 0), 0) /
+              vitals.length
+            : 0,
+        averageOxygenSaturation:
+          vitals.length > 0
+            ? vitals.reduce((sum, v) => sum + (v.oxygenSaturation || 0), 0) /
+              vitals.length
+            : 0,
         byBmiCategory: {
-          UNDERWEIGHT: vitals.filter(v => v.bmiCategory === 'UNDERWEIGHT').length,
-          NORMAL: vitals.filter(v => v.bmiCategory === 'NORMAL').length,
-          OVERWEIGHT: vitals.filter(v => v.bmiCategory === 'OVERWEIGHT').length,
-          OBESITY: vitals.filter(v => v.bmiCategory === 'OBESITY').length,
+          UNDERWEIGHT: vitals.filter((v) => v.bmiCategory === "UNDERWEIGHT")
+            .length,
+          NORMAL: vitals.filter((v) => v.bmiCategory === "NORMAL").length,
+          OVERWEIGHT: vitals.filter((v) => v.bmiCategory === "OVERWEIGHT")
+            .length,
+          OBESITY: vitals.filter((v) => v.bmiCategory === "OBESITY").length,
         },
         byBpCategory: {
-          NORMAL: vitals.filter(v => v.bpCategory === 'NORMAL').length,
-          ELEVATED: vitals.filter(v => v.bpCategory === 'ELEVATED').length,
-          HYPERTENSION_STAGE_1: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_1').length,
-          HYPERTENSION_STAGE_2: vitals.filter(v => v.bpCategory === 'HYPERTENSION_STAGE_2').length,
-          HYPERTENSIVE_CRISIS: vitals.filter(v => v.bpCategory === 'HYPERTENSIVE_CRISIS').length,
+          NORMAL: vitals.filter((v) => v.bpCategory === "NORMAL").length,
+          ELEVATED: vitals.filter((v) => v.bpCategory === "ELEVATED").length,
+          HYPERTENSION_STAGE_1: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSION_STAGE_1",
+          ).length,
+          HYPERTENSION_STAGE_2: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSION_STAGE_2",
+          ).length,
+          HYPERTENSIVE_CRISIS: vitals.filter(
+            (v) => v.bpCategory === "HYPERTENSIVE_CRISIS",
+          ).length,
         },
       };
 
       // Get feedback stats with date filter
-      const feedbackWhere: any = dateFrom ? { 
-        createdAt: { gte: dateFrom } 
-      } : {};
+      const feedbackWhere: any = dateFrom
+        ? {
+            createdAt: { gte: dateFrom },
+          }
+        : {};
+      if (hasUserFilter) feedbackWhere.user = userWhere;
 
       const feedback = await prisma.feedback.findMany({
         where: feedbackWhere,
@@ -277,11 +381,31 @@ const AdminService = {
 
       const feedbackStats = {
         total: feedback.length,
-        averageNPS: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.npsScore || 0), 0) / feedback.length : 0,
-        averageServiceQuality: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.serviceQuality || 0), 0) / feedback.length : 0,
-        averageStaffBehavior: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.staffBehavior || 0), 0) / feedback.length : 0,
-        averageCleanliness: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.cleanliness || 0), 0) / feedback.length : 0,
-        averageWaitTime: feedback.length > 0 ? feedback.reduce((sum, f) => sum + (f.waitTime || 0), 0) / feedback.length : 0,
+        averageNPS:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.npsScore || 0), 0) /
+              feedback.length
+            : 0,
+        averageServiceQuality:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.serviceQuality || 0), 0) /
+              feedback.length
+            : 0,
+        averageStaffBehavior:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.staffBehavior || 0), 0) /
+              feedback.length
+            : 0,
+        averageCleanliness:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.cleanliness || 0), 0) /
+              feedback.length
+            : 0,
+        averageWaitTime:
+          feedback.length > 0
+            ? feedback.reduce((sum, f) => sum + (f.waitTime || 0), 0) /
+              feedback.length
+            : 0,
         npsDistribution: {},
         byRegion: {},
       };
@@ -290,17 +414,19 @@ const AdminService = {
       const regions = await prisma.center.findMany({
         select: { region: true },
         distinct: ["region"],
+        where: baseCenterWhere,
       });
 
       const regionStats = {
         total: regions.length,
-        regions: regions.map(r => r.region),
+        regions: regions.map((r) => r.region),
       };
 
       // Get patients (users with STAFF or EXTERNAL_PATIENT role) - not filtered by date
       const patientStats = {
         total: await prisma.user.count({
           where: {
+            ...baseUserWhere,
             role: { in: ["STAFF", "EXTERNAL_PATIENT"] },
           },
         }),
@@ -311,10 +437,25 @@ const AdminService = {
       let queueStartDate: Date;
       let queueEndDate = new Date();
 
-      if (timePeriod === 'daily') {
-        queueStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-        queueEndDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-      } else if (timePeriod === 'weekly') {
+      if (timePeriod === "daily") {
+        queueStartDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+        queueEndDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          23,
+          59,
+          59,
+          999,
+        );
+      } else if (timePeriod === "weekly") {
         const day = now.getDay();
         const diff = now.getDate() - day + (day === 0 ? -6 : 1);
         queueStartDate = new Date(now);
@@ -323,16 +464,36 @@ const AdminService = {
         queueEndDate = new Date(queueStartDate);
         queueEndDate.setDate(queueStartDate.getDate() + 6);
         queueEndDate.setHours(23, 59, 59, 999);
-      } else if (timePeriod === 'monthly') {
-        queueStartDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-        queueEndDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      } else if (timePeriod === "monthly") {
+        queueStartDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+          0,
+          0,
+          0,
+          0,
+        );
+        queueEndDate = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          0,
+          23,
+          59,
+          59,
+          999,
+        );
       } else {
         // all time
-        queueStartDate = new Date('2020-01-01');
+        queueStartDate = new Date("2020-01-01");
         queueEndDate = new Date(now);
       }
 
-      const queueMetrics = await calculateQueueMetrics(queueStartDate, queueEndDate);
+      const queueMetrics = await calculateQueueMetrics(
+        queueStartDate,
+        queueEndDate,
+        hasUserFilter ? userWhere : undefined,
+      );
 
       const walkInStats = { total: queueMetrics.walkIns };
       const patientsServedStats = { total: queueMetrics.patientsServed };
@@ -342,14 +503,21 @@ const AdminService = {
       appointmentStats.completed = queueMetrics.completedAppointments;
 
       // Get wellness plans stats with date filter
-      const wellnessWhere: any = dateFrom ? { 
-        createdAt: { gte: dateFrom } 
-      } : {};
+      const wellnessWhere: any = dateFrom
+        ? {
+            createdAt: { gte: dateFrom },
+          }
+        : {};
+      if (hasUserFilter) wellnessWhere.user = userWhere;
 
       const wellnessStats = {
         total: await prisma.wellnessPlan.count({ where: wellnessWhere }),
-        active: await prisma.wellnessPlan.count({ where: { ...wellnessWhere, isActive: true } }),
-        inactive: await prisma.wellnessPlan.count({ where: { ...wellnessWhere, isActive: false } }),
+        active: await prisma.wellnessPlan.count({
+          where: { ...wellnessWhere, isActive: true },
+        }),
+        inactive: await prisma.wellnessPlan.count({
+          where: { ...wellnessWhere, isActive: false },
+        }),
       };
 
       return {
@@ -382,14 +550,20 @@ const AdminService = {
       const where: any = {};
 
       if (filters.role) where.role = filters.role;
-      if (filters.status) where.isActive = filters.status === 'active';
-      if (filters.verification) where.isVerified = filters.verification === 'verified';
-      if (filters.region) {
+      if (filters.status) where.isActive = filters.status === "active";
+      if (filters.verification)
+        where.isVerified = filters.verification === "verified";
+      
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.centerId = filters.center;
+      } else if (filters.region) {
+        // Only region filter if center not specified
         where.center = {
           region: filters.region,
         };
       }
-      if (filters.center) where.centerId = filters.center;
+      
       if (filters.search) {
         where.OR = [
           { email: { contains: filters.search, mode: "insensitive" } },
@@ -463,7 +637,6 @@ const AdminService = {
             region: true,
             city: true,
             status: true,
-            managerEmail: true,
             createdAt: true,
             _count: {
               select: {
@@ -493,15 +666,29 @@ const AdminService = {
   /**
    * Get all appointments with filters
    */
-  async getAllAppointments(filters: AppointmentFilters): Promise<PaginatedResponse<any>> {
+  async getAllAppointments(
+    filters: AppointmentFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.user = { 
+          centerId: filters.center 
+        };
+      } else if (filters.region) {
+        // Only region filter if center not specified
+        where.user = { 
+          center: { 
+            region: filters.region 
+          } 
+        };
+      }
+      
       if (filters.status) where.status = filters.status;
       if (filters.dateFrom || filters.dateTo) {
         where.scheduledAt = {};
@@ -510,8 +697,14 @@ const AdminService = {
       }
       if (filters.search) {
         where.OR = [
-          { user: { fullName: { contains: filters.search, mode: "insensitive" } } },
-          { user: { email: { contains: filters.search, mode: "insensitive" } } },
+          {
+            user: {
+              fullName: { contains: filters.search, mode: "insensitive" },
+            },
+          },
+          {
+            user: { email: { contains: filters.search, mode: "insensitive" } },
+          },
           { reason: { contains: filters.search, mode: "insensitive" } },
         ];
       }
@@ -553,8 +746,13 @@ const AdminService = {
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.user = { centerId: filters.center };
+      } else if (filters.region) {
+        where.user = { center: { region: filters.region } };
+      }
+      
       if (filters.bmiCategory) where.bmiCategory = filters.bmiCategory;
       if (filters.bpCategory) where.bpCategory = filters.bpCategory;
       if (filters.dateFrom || filters.dateTo) {
@@ -598,15 +796,22 @@ const AdminService = {
   /**
    * Get all feedback with filters
    */
-  async getAllFeedback(filters: FeedbackFilters): Promise<PaginatedResponse<any>> {
+  async getAllFeedback(
+    filters: FeedbackFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
 
       const where: any = {};
 
-      if (filters.region) where.user = { center: { region: filters.region } };
-      if (filters.center) where.user = { centerId: filters.center };
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        where.user = { centerId: filters.center };
+      } else if (filters.region) {
+        where.user = { center: { region: filters.region } };
+      }
+
       if (filters.npsScore !== undefined) where.npsScore = filters.npsScore;
       if (filters.feedbackType) where.feedbackType = filters.feedbackType;
       if (filters.dateFrom || filters.dateTo) {
@@ -645,17 +850,30 @@ const AdminService = {
   /**
    * Get all audit logs with filters
    */
-  async getAllAuditLogs(filters: AuditFilters): Promise<PaginatedResponse<any>> {
+  async getAllAuditLogs(
+    filters: AuditFilters,
+  ): Promise<PaginatedResponse<any>> {
     try {
       const skip = ((filters.page || 1) - 1) * (filters.limit || 20);
       const take = filters.limit || 20;
 
       const where: any = {};
 
+      const userWhere: any = {};
+      
+      // Handle center filter (takes priority if specified)
+      if (filters.center) {
+        userWhere.centerId = filters.center;
+      } else if (filters.region) {
+        userWhere.center = { region: filters.region };
+      }
+      
+      if (filters.role) userWhere.role = filters.role;
+      if (Object.keys(userWhere).length > 0) where.user = userWhere;
+
       if (filters.user) where.userId = filters.user;
       if (filters.action) where.action = filters.action;
       if (filters.resource) where.resource = filters.resource;
-      if (filters.role) where.user = { role: filters.role };
       if (filters.dateFrom || filters.dateTo) {
         where.timestamp = {};
         if (filters.dateFrom) where.timestamp.gte = filters.dateFrom;
@@ -669,7 +887,9 @@ const AdminService = {
           take,
           orderBy: { timestamp: "desc" },
           include: {
-            user: { select: { fullName: true, email: true, userId: true, role: true } },
+            user: {
+              select: { fullName: true, email: true, userId: true, role: true },
+            },
           },
         }),
         prisma.auditLog.count({ where }),
@@ -686,6 +906,383 @@ const AdminService = {
       };
     } catch (error) {
       console.error("Error getting audit logs:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get regional staff health comparison
+   * Only includes STAFF role users, excludes EXTERNAL_PATIENT
+   */
+  async getRegionalHealthComparison(
+    timePeriod?: string,
+  ): Promise<any> {
+    try {
+      // Calculate date range
+      const now = new Date();
+      let dateFrom: Date | undefined;
+
+      if (timePeriod === "daily") {
+        dateFrom = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+      } else if (timePeriod === "weekly") {
+        dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (timePeriod === "monthly") {
+        dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      }
+
+      // Get all regions
+      const regions = await prisma.center.findMany({
+        select: { region: true },
+        distinct: ["region"],
+      });
+
+      const regionList = regions.map((r) => r.region);
+
+      // Process each region
+      const regionHealthData = await Promise.all(
+        regionList.map(async (region) => {
+          // Get staff users in this region (STAFF role only)
+          const staffUsers = await prisma.user.findMany({
+            where: {
+              center: { region },
+              role: "STAFF",
+            },
+            select: { id: true },
+          });
+
+          const staffUserIds = staffUsers.map((u) => u.id);
+          const totalStaff = staffUserIds.length;
+
+          if (totalStaff === 0) {
+            return {
+              region,
+              totalStaff: 0,
+              healthScore: 0,
+              healthyPercent: 0,
+              atRiskPercent: 0,
+              criticalPercent: 0,
+              conditions: {},
+              vitalsRecorded: 0,
+            };
+          }
+
+          // Get wellness plans with conditions (staff only)
+          const wellnessWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) wellnessWhere.createdAt = { gte: dateFrom };
+
+          const wellnessPlans = await prisma.wellnessPlan.findMany({
+            where: wellnessWhere,
+            select: {
+              conditions: true,
+            },
+          });
+
+          // Count conditions
+          const conditionCounts: Record<string, number> = {};
+          wellnessPlans.forEach((plan) => {
+            if (plan.conditions && Array.isArray(plan.conditions)) {
+              plan.conditions.forEach((condition: any) => {
+                const key = String(condition).toLowerCase().replace(/ /g, "_");
+                conditionCounts[key] = (conditionCounts[key] || 0) + 1;
+              });
+            }
+          });
+
+          // Get vital records (staff only)
+          const vitalsWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) vitalsWhere.recordedAt = { gte: dateFrom };
+
+          const vitals = await prisma.vitalRecord.findMany({
+            where: vitalsWhere,
+            select: {
+              bmiCategory: true,
+              bpCategory: true,
+              heartRate: true,
+              temperature: true,
+              oxygenSaturation: true,
+            },
+          });
+
+          // Calculate risk levels based on vitals
+          let healthyCount = 0;
+          let atRiskCount = 0;
+          let criticalCount = 0;
+
+          vitals.forEach((vital) => {
+            // Check BMI risk
+            const bmiRisk =
+              vital.bmiCategory === "OBESITY" ||
+              vital.bmiCategory === "OVERWEIGHT";
+
+            // Check BP risk
+            const bpRisk =
+              vital.bpCategory === "HYPERTENSION_STAGE_2" ||
+              vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check critical BP
+            const bpCritical = vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check other vitals
+            const heartRateAbnormal =
+              (vital.heartRate && (vital.heartRate < 60 || vital.heartRate > 100));
+            const tempAbnormal =
+              (vital.temperature &&
+                (vital.temperature < 36.1 || vital.temperature > 37.2));
+            const o2Abnormal =
+              (vital.oxygenSaturation && vital.oxygenSaturation < 95);
+
+            if (bpCritical || o2Abnormal) {
+              criticalCount++;
+            } else if (bmiRisk || bpRisk || heartRateAbnormal || tempAbnormal) {
+              atRiskCount++;
+            } else {
+              healthyCount++;
+            }
+          });
+
+          const vitalsRecorded = vitals.length;
+          const healthyPercent =
+            vitalsRecorded > 0
+              ? Math.round((healthyCount / vitalsRecorded) * 100)
+              : 100;
+          const atRiskPercent =
+            vitalsRecorded > 0
+              ? Math.round((atRiskCount / vitalsRecorded) * 100)
+              : 0;
+          const criticalPercent =
+            vitalsRecorded > 0
+              ? Math.round((criticalCount / vitalsRecorded) * 100)
+              : 0;
+
+          // Calculate health score (0-100)
+          // Based on: healthy %, low at-risk %, low critical %
+          const healthScore = Math.round(
+            healthyPercent * 0.7 +
+              (100 - atRiskPercent) * 0.2 +
+              (100 - criticalPercent) * 0.1,
+          );
+
+          return {
+            region,
+            totalStaff,
+            healthScore,
+            healthyPercent,
+            atRiskPercent,
+            criticalPercent,
+            conditions: conditionCounts,
+            vitalsRecorded,
+          };
+        }),
+      );
+
+      return regionHealthData;
+    } catch (error) {
+      console.error("Error getting regional health comparison:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get center staff health comparison
+   * Only includes STAFF role users, excludes EXTERNAL_PATIENT
+   */
+  async getCenterHealthComparison(
+    timePeriod?: string,
+    regionFilter?: string,
+  ): Promise<any> {
+    try {
+      // Calculate date range
+      const now = new Date();
+      let dateFrom: Date | undefined;
+
+      if (timePeriod === "daily") {
+        dateFrom = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          0,
+          0,
+          0,
+        );
+      } else if (timePeriod === "weekly") {
+        dateFrom = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else if (timePeriod === "monthly") {
+        dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      }
+
+      // Get all centers (optionally filtered by region)
+      const centerWhere: any = {};
+      if (regionFilter && regionFilter !== "all") {
+        centerWhere.region = regionFilter;
+      }
+
+      const centers = await prisma.center.findMany({
+        where: centerWhere,
+        select: { 
+          id: true,
+          name: true,
+          region: true,
+        },
+      });
+
+      // Process each center
+      const centerHealthData = await Promise.all(
+        centers.map(async (center) => {
+          // Get staff users in this center (STAFF role only)
+          const staffUsers = await prisma.user.findMany({
+            where: {
+              centerId: center.id,
+              role: "STAFF",
+            },
+            select: { id: true },
+          });
+
+          const staffUserIds = staffUsers.map((u) => u.id);
+          const totalStaff = staffUserIds.length;
+
+          if (totalStaff === 0) {
+            return {
+              centerId: center.id,
+              centerName: center.name,
+              region: center.region,
+              totalStaff: 0,
+              healthScore: 0,
+              healthyPercent: 0,
+              atRiskPercent: 0,
+              criticalPercent: 0,
+              conditions: {},
+              vitalsRecorded: 0,
+            };
+          }
+
+          // Get wellness plans with conditions (staff only)
+          const wellnessWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) wellnessWhere.createdAt = { gte: dateFrom };
+
+          const wellnessPlans = await prisma.wellnessPlan.findMany({
+            where: wellnessWhere,
+            select: {
+              conditions: true,
+            },
+          });
+
+          // Count conditions
+          const conditionCounts: Record<string, number> = {};
+          wellnessPlans.forEach((plan) => {
+            if (plan.conditions && Array.isArray(plan.conditions)) {
+              plan.conditions.forEach((condition: any) => {
+                const key = String(condition).toLowerCase().replace(/ /g, "_");
+                conditionCounts[key] = (conditionCounts[key] || 0) + 1;
+              });
+            }
+          });
+
+          // Get vital records (staff only)
+          const vitalsWhere: any = {
+            userId: { in: staffUserIds },
+          };
+          if (dateFrom) vitalsWhere.recordedAt = { gte: dateFrom };
+
+          const vitals = await prisma.vitalRecord.findMany({
+            where: vitalsWhere,
+            select: {
+              bmiCategory: true,
+              bpCategory: true,
+              heartRate: true,
+              temperature: true,
+              oxygenSaturation: true,
+            },
+          });
+
+          // Calculate risk levels based on vitals
+          let healthyCount = 0;
+          let atRiskCount = 0;
+          let criticalCount = 0;
+
+          vitals.forEach((vital) => {
+            // Check BMI risk
+            const bmiRisk =
+              vital.bmiCategory === "OBESITY" ||
+              vital.bmiCategory === "OVERWEIGHT";
+
+            // Check BP risk
+            const bpRisk =
+              vital.bpCategory === "HYPERTENSION_STAGE_2" ||
+              vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check critical BP
+            const bpCritical = vital.bpCategory === "HYPERTENSIVE_CRISIS";
+
+            // Check other vitals
+            const heartRateAbnormal =
+              (vital.heartRate && (vital.heartRate < 60 || vital.heartRate > 100));
+            const tempAbnormal =
+              (vital.temperature &&
+                (vital.temperature < 36.1 || vital.temperature > 37.2));
+            const o2Abnormal =
+              (vital.oxygenSaturation && vital.oxygenSaturation < 95);
+
+            if (bpCritical || o2Abnormal) {
+              criticalCount++;
+            } else if (bmiRisk || bpRisk || heartRateAbnormal || tempAbnormal) {
+              atRiskCount++;
+            } else {
+              healthyCount++;
+            }
+          });
+
+          const vitalsRecorded = vitals.length;
+          const healthyPercent =
+            vitalsRecorded > 0
+              ? Math.round((healthyCount / vitalsRecorded) * 100)
+              : 100;
+          const atRiskPercent =
+            vitalsRecorded > 0
+              ? Math.round((atRiskCount / vitalsRecorded) * 100)
+              : 0;
+          const criticalPercent =
+            vitalsRecorded > 0
+              ? Math.round((criticalCount / vitalsRecorded) * 100)
+              : 0;
+
+          // Calculate health score (0-100)
+          const healthScore = Math.round(
+            healthyPercent * 0.7 +
+              (100 - atRiskPercent) * 0.2 +
+              (100 - criticalPercent) * 0.1,
+          );
+
+          return {
+            centerId: center.id,
+            centerName: center.name,
+            region: center.region,
+            totalStaff,
+            healthScore,
+            healthyPercent,
+            atRiskPercent,
+            criticalPercent,
+            conditions: conditionCounts,
+            vitalsRecorded,
+          };
+        }),
+      );
+
+      return centerHealthData;
+    } catch (error) {
+      console.error("Error getting center health comparison:", error);
       throw error;
     }
   },
