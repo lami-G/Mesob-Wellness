@@ -290,8 +290,8 @@ export const STAFF_CONFIG = {
   sections: [
     {
       items: [
-        { id: "appointments", label: "Appointments", icon: Icons.appointments },
         { id: "health", label: "Health", icon: Icons.health },
+        { id: "appointments", label: "Appointments", icon: Icons.appointments },
         { id: "wellness", label: "Wellness", icon: Icons.wellness },
         { id: "records", label: "Records", icon: Icons.records },
         { id: "feedback", label: "Feedback", icon: Icons.feedback },

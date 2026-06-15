@@ -13,16 +13,16 @@ import LongitudinalRecords from "../../components/staff/Records/LongitudinalReco
 function StaffDashboard() {
   const { user, logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState("appointments");
+  const [activeTab, setActiveTab] = useState("health");
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    const allowedTabs = ["appointments", "health", "wellness", "profile", "feedback", "records"];
+    const allowedTabs = ["health", "appointments", "wellness", "profile", "feedback", "records"];
     if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
       return;
     }
-    setActiveTab("appointments");
+    setActiveTab("health");
   }, [searchParams]);
 
   // Listen for profile click from dropdown

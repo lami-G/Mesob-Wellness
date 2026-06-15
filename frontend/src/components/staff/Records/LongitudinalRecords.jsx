@@ -83,7 +83,7 @@ function LongitudinalRecords() {
   if (records.length === 0) {
     return (
       <div className={clsx('card', styles.longitudinalRecords)}>
-        <h3>📊 Longitudinal Health Records</h3>
+        <h3>Longitudinal Health Records</h3>
         <p className={styles.emptyText}>No health records yet. Visit a nurse to start tracking your health.</p>
       </div>
     );
@@ -91,7 +91,7 @@ function LongitudinalRecords() {
 
   return (
     <div className={clsx('card', styles.longitudinalRecords)}>
-      <h3>📊 Longitudinal Health Records</h3>
+      <h3>Longitudinal Health Records</h3>
       
       <div className={styles.metricFilter}>
         <label>View Metric:</label>

@@ -115,7 +115,7 @@ function WellnessPlan() {
   return (
     <div className={clsx('card', styles.wellnessPlan)}>
       <div className={styles.wellnessPlanHeader}>
-        <h2>🎯 Wellness Plans</h2>
+        <h2>Wellness Plans</h2>
         <button
           type="button"
           className="btn btn-secondary"
