@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { notificationService } from "../../services/notificationService";
-import NotificationPanel from "./NotificationPanel";
 import styles from "./AdminHeader.module.css";
 
 function AdminHeader({ 
@@ -41,7 +40,8 @@ function AdminHeader({
   };
 
   const handleNotificationClick = () => {
-    setShowNotifications(true);
+    // Notification dropdown is already handled in the bell button click
+    // Just mark all as read when clicking the bell
     if (unreadCount > 0) {
       notificationService.markAllAsRead().then(() => {
         setUnreadCount(0);
@@ -188,7 +188,6 @@ function AdminHeader({
             )}
           </div>
         </div>
-        <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
       </>
     );
   }
@@ -381,7 +380,6 @@ function AdminHeader({
           </div>
         </div>
       </header>
-      <NotificationPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
     </>
   );
 }

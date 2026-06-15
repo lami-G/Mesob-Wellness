@@ -270,15 +270,13 @@ const Users = ({ loading, users, onRefresh }) => {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      {u.role === 'NURSE_OFFICER' && (
-                        <Button
-                          size="small"
-                          onClick={() => handleEditClick(u)}
-                          style={{ background: '#37519A', minWidth: '60px' }}
-                        >
-                          ✏️ Edit
-                        </Button>
-                      )}
+                      <Button
+                        size="small"
+                        onClick={() => handleEditClick(u)}
+                        style={{ background: '#37519A', minWidth: '60px' }}
+                      >
+                        ✏️ Edit
+                      </Button>
                       <Button
                         size="small"
                         onClick={() => handleToggle(u.id)}
@@ -289,15 +287,13 @@ const Users = ({ loading, users, onRefresh }) => {
                           ? '…'
                           : u.isActive ? 'Deactivate' : 'Activate'}
                       </Button>
-                      {u.role === 'NURSE_OFFICER' && (
-                        <Button
-                          size="small"
-                          onClick={() => handleDeleteClick(u)}
-                          style={{ background: '#ef4444', minWidth: '70px' }}
-                        >
-                          🗑️ Delete
-                        </Button>
-                      )}
+                      <Button
+                        size="small"
+                        onClick={() => handleDeleteClick(u)}
+                        style={{ background: '#ef4444', minWidth: '70px' }}
+                      >
+                        🗑️ Delete
+                      </Button>
                     </div>
                   </td>
                 </tr>

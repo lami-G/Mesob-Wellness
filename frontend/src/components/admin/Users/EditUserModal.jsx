@@ -36,9 +36,14 @@ function EditUserModal({
   const roles =
     allowedRoles && allowedRoles.length ? allowedRoles : defaultRoles;
   const isRestrictedRole = disallowEditRoles?.includes(formData.role);
-  const displayRoles = roles.includes(formData.role)
-    ? roles
-    : [formData.role, ...roles].filter(Boolean);
+  
+  // Check if editing an external patient
+  const isExternalPatient = user?.role === 'EXTERNAL_PATIENT';
+  
+  // Filter out EXTERNAL_PATIENT from dropdown unless user is already EXTERNAL_PATIENT
+  const displayRoles = isExternalPatient 
+    ? ['EXTERNAL_PATIENT'] 
+    : roles.filter(r => r !== 'EXTERNAL_PATIENT');
 
   useEffect(() => {
     if (user && isOpen) {
@@ -191,112 +196,149 @@ function EditUserModal({
             </div>
           )}
 
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="role">Role *</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              disabled={isRestrictedRole}
-            >
-              <option value="">Select Role</option>
-              {displayRoles.map((role) => (
-                <option
-                  key={role}
-                  value={role}
-                  disabled={!roles.includes(role)}
-                >
-                  {role}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="isActive">
-              <input
-                id="isActive"
-                type="checkbox"
-                name="isActive"
-                checked={formData.isActive}
+          {!isExternalPatient && (
+            <div className={modalStyles.formGroup}>
+              <label htmlFor="role">Role *</label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
                 onChange={handleChange}
-              />
-              Active
-            </label>
-          </div>
-
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="newPassword">Password</label>
-            <div className={modalStyles.passwordInputContainer}>
-              <input
-                id="newPassword"
-                type={showPassword ? "text" : "password"}
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
-                placeholder={user?.password ? "••••••••" : "No password set"}
-                className={modalStyles.passwordInput}
-              />
-              {user?.password && (
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  title={showPassword ? "Hide password" : "Show password"}
-                  className={modalStyles.passwordToggleBtn}
-                >
-                  {showPassword ? "👁️" : "👁️‍🗨️"}
-                </button>
-              )}
+                required
+                disabled={isRestrictedRole}
+              >
+                <option value="">Select Role</option>
+                {displayRoles.map((role) => (
+                  <option
+                    key={role}
+                    value={role}
+                  >
+                    {role}
+                  </option>
+                ))}
+              </select>
             </div>
-            {showPassword && user?.password && (
-              <small className={modalStyles.helperText}>
-                Current password visible
+          )}
+
+          {isExternalPatient && (
+            <div className={modalStyles.formGroup}>
+              <label htmlFor="role">Role</label>
+              <input
+                type="text"
+                value="EXTERNAL_PATIENT"
+                disabled
+                style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
+              />
+              <small style={{ color: '#6b7280', marginTop: '0.25rem', display: 'block' }}>
+                External patients cannot change roles or have passwords
               </small>
-            )}
-          </div>
-
-          <div className={modalStyles.formGroup}>
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <div className={modalStyles.passwordInputContainer}>
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm password"
-                disabled={!formData.newPassword}
-                className={modalStyles.passwordInput}
-              />
-              {formData.newPassword && (
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  title={
-                    showConfirmPassword ? "Hide password" : "Show password"
-                  }
-                  className={modalStyles.passwordToggleBtn}
-                >
-                  {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
-                </button>
-              )}
             </div>
-          </div>
+          )}
+
+          {!isExternalPatient && (
+            <>
+              <div className={modalStyles.formGroup}>
+                <label htmlFor="isActive">
+                  <input
+                    id="isActive"
+                    type="checkbox"
+                    name="isActive"
+                    checked={formData.isActive}
+                    onChange={handleChange}
+                  />
+                  Active
+                </label>
+              </div>
+
+              <div className={modalStyles.formGroup}>
+                <label htmlFor="newPassword">Password</label>
+                <div className={modalStyles.passwordInputContainer}>
+                  <input
+                    id="newPassword"
+                    type={showPassword ? "text" : "password"}
+                    name="newPassword"
+                    value={formData.newPassword}
+                    onChange={handleChange}
+                    placeholder={user?.password ? "••••••••" : "No password set"}
+                    className={modalStyles.passwordInput}
+                  />
+                  {user?.password && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? "Hide password" : "Show password"}
+                      className={modalStyles.passwordToggleBtn}
+                    >
+                      {showPassword ? "👁️" : "👁️‍🗨️"}
+                    </button>
+                  )}
+                </div>
+                {showPassword && user?.password && (
+                  <small className={modalStyles.helperText}>
+                    Current password visible
+                  </small>
+                )}
+              </div>
+
+              <div className={modalStyles.formGroup}>
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className={modalStyles.passwordInputContainer}>
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm password"
+                    disabled={!formData.newPassword}
+                    className={modalStyles.passwordInput}
+                  />
+                  {formData.newPassword && (
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      title={
+                        showConfirmPassword ? "Hide password" : "Show password"
+                      }
+                      className={modalStyles.passwordToggleBtn}
+                    >
+                      {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {isExternalPatient && (
+            <div className={modalStyles.formGroup}>
+              <label htmlFor="isActive">
+                <input
+                  id="isActive"
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={handleChange}
+                />
+                Active
+              </label>
+            </div>
+          )}
 
           <div className={modalStyles.modalActions}>
             <button type="button" className={modalStyles.btnSecondary} onClick={onClose}>
               Cancel
             </button>
-            <button
-              type="button"
-              className={modalStyles.btnSecondary}
-              onClick={generateTempPassword}
-              title="Generate a temporary password for the user"
-            >
-              Reset Password
-            </button>
+            {!isExternalPatient && (
+              <button
+                type="button"
+                className={modalStyles.btnSecondary}
+                onClick={generateTempPassword}
+                title="Generate a temporary password for the user"
+              >
+                Reset Password
+              </button>
+            )}
             <button type="submit" className={modalStyles.btnPrimary} disabled={loading}>
               {loading ? "Updating..." : "Update User"}
             </button>

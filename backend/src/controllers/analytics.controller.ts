@@ -744,6 +744,7 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
 
     const allowedRoles: string[] = [
       UserRole.NURSE_OFFICER,
+      UserRole.STAFF,
       UserRole.MANAGER,
       UserRole.REGIONAL_OFFICE,
       UserRole.FEDERAL_OFFICE,
@@ -755,11 +756,11 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
       return;
     }
 
-    // CRITICAL: Center Managers can ONLY create NURSE_OFFICER accounts
-    if (req.user?.role === UserRole.MANAGER && role !== UserRole.NURSE_OFFICER) {
+    // CRITICAL: Center Managers can ONLY create NURSE_OFFICER and STAFF accounts
+    if (req.user?.role === UserRole.MANAGER && role !== UserRole.NURSE_OFFICER && role !== UserRole.STAFF) {
       res.status(403).json({ 
         success: false, 
-        message: "Center Managers can only create Nurse Officer accounts" 
+        message: "Center Managers can only create Nurse Officer and Staff accounts" 
       });
       return;
     }
@@ -795,6 +796,14 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Determine the centerId to assign
+    let assignedCenterId = centerId;
+    
+    // IMPORTANT: If manager is creating a user, automatically assign their center
+    if (req.user?.role === UserRole.MANAGER && req.user?.centerId) {
+      assignedCenterId = req.user.centerId;
+    }
+
     const newUser = await prisma.$transaction(async (tx) => {
       // Generate sequential userId
       const displayId = await generateNextDisplayId();
@@ -807,7 +816,7 @@ export async function createStaffUser(req: AuthRequest, res: Response) {
           role: role as UserRole,
           isActive: true,
           phone: phone || null,
-          centerId: centerId || null,
+          centerId: assignedCenterId || null,
           userId: displayId,
         },
         select: {

@@ -211,16 +211,12 @@ function Header({ title, onToggleSidebar, dashboardType }) {
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
                         style={{
                           padding: '0.75rem 1rem',
                           borderBottom: '1px solid #f3f4f6',
-                          cursor: 'pointer',
                           backgroundColor: notification.isRead ? '#ffffff' : '#f0f9ff',
                           transition: 'background-color 0.15s'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = notification.isRead ? '#ffffff' : '#f0f9ff'}
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                           {!notification.isRead && (
@@ -233,7 +229,10 @@ function Header({ title, onToggleSidebar, dashboardType }) {
                               marginTop: '0.25rem'
                             }} />
                           )}
-                          <div style={{ flex: 1 }}>
+                          <div 
+                            style={{ flex: 1, cursor: 'pointer' }}
+                            onClick={() => handleNotificationClick(notification)}
+                          >
                             <div style={{ fontSize: '0.875rem', color: '#111827', fontWeight: notification.isRead ? '500' : '600', marginBottom: '0.25rem' }}>
                               {notification.title}
                             </div>
@@ -243,6 +242,54 @@ function Header({ title, onToggleSidebar, dashboardType }) {
                             <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>
                               {formatNotificationTime(notification.createdAt)}
                             </div>
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
+                            {!notification.isRead && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  markAsRead(notification.id);
+                                }}
+                                style={{
+                                  background: 'none',
+                                  border: '1px solid #d1d5db',
+                                  padding: '0.25rem 0.5rem',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.875rem',
+                                  color: '#16a34a'
+                                }}
+                                title="Mark as read"
+                              >
+                                ✓
+                              </button>
+                            )}
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  await api.delete(`/api/v1/notifications/${notification.id}`);
+                                  setNotifications(prev => prev.filter(n => n.id !== notification.id));
+                                  if (!notification.isRead) {
+                                    setUnreadCount(prev => Math.max(0, prev - 1));
+                                  }
+                                } catch (error) {
+                                  console.error('Failed to delete notification:', error);
+                                }
+                              }}
+                              style={{
+                                background: 'none',
+                                border: '1px solid #d1d5db',
+                                padding: '0.25rem 0.5rem',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.875rem',
+                                color: '#ef4444'
+                              }}
+                              title="Delete"
+                            >
+                              🗑️
+                            </button>
                           </div>
                         </div>
                       </div>
