@@ -108,6 +108,24 @@ function WellnessPlan() {
     return Math.round((completed / plan.goals.length) * 100);
   };
 
+  const getPlanStatus = (plan) => {
+    // If manually set to inactive, respect that
+    if (!plan.isActive) {
+      return { label: "Inactive", className: styles.inactive };
+    }
+    
+    // Check if all goals are completed
+    if (plan.goals && plan.goals.length > 0) {
+      const allCompleted = plan.goals.every((g) => g.completed);
+      if (allCompleted) {
+        return { label: "Completed", className: styles.completed };
+      }
+    }
+    
+    // Default to active
+    return { label: "Active", className: styles.active };
+  };
+
   const handleBackToHealthJourney = () => {
     navigate('/dashboard?tab=health');
   };
@@ -141,12 +159,9 @@ function WellnessPlan() {
               <div className={styles.planHeader}>
                 <h3>{plan.title || "Wellness Plan"}</h3>
                 <span
-                  className={clsx(styles.planStatus, {
-                    [styles.active]: plan.isActive,
-                    [styles.inactive]: !plan.isActive
-                  })}
+                  className={clsx(styles.planStatus, getPlanStatus(plan).className)}
                 >
-                  {plan.isActive ? "Active" : "Inactive"}
+                  {getPlanStatus(plan).label}
                 </span>
               </div>
 

@@ -259,11 +259,14 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'weekly') {
-        // Last 7 days (including today) - use UTC dates
+        // Current week: Monday to Today (calendar week)
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
-        startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
+        const currentDay = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        
+        startDate = new Date(Date.UTC(year, month, date - daysToMonday, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'monthly') {
         // From 1st of current month to today - use UTC dates
@@ -431,12 +434,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = null;
         endDate = null;
       } else if (viewPeriod === 'weekly') {
-        // Get start of week (Monday)
-        const day = startDate.getDay();
-        const diff = startDate.getDate() - day + (day === 0 ? -6 : 1);
-        startDate.setDate(diff);
-        // End of week (Sunday)
-        endDate.setDate(startDate.getDate() + 6);
+        // Current week: Monday to Today (calendar week)
+        const currentDay = selectedDateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        startDate.setDate(selectedDateObj.getDate() - daysToMonday);
+        // End date is today (or selected date)
+        endDate = new Date(selectedDateObj);
       } else if (viewPeriod === 'monthly') {
         // Start of month
         startDate.setDate(1);
@@ -850,21 +853,36 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       <div className={styles.analyticsCardsGrid}>
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>Total Appointments</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Appointments Today' : 
+               viewPeriod === 'weekly' ? 'Appointments This Week' :
+               viewPeriod === 'monthly' ? 'Appointments This Month' :
+               'Total Appointments'}
+            </p>
             <p className={styles.cardValue}>{analytics.totalAppointments}</p>
           </div>
         </div>
 
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>{viewPeriod === 'all' ? 'Patients Total' : 'Patients Today'}</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Patients Today' : 
+               viewPeriod === 'weekly' ? 'Patients This Week' :
+               viewPeriod === 'monthly' ? 'Patients This Month' :
+               'Total Patients'}
+            </p>
             <p className={styles.cardValue}>{analytics.totalPatientsToday}</p>
           </div>
         </div>
 
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>Walk-in Completed</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Walk-ins Today' : 
+               viewPeriod === 'weekly' ? 'Walk-ins This Week' :
+               viewPeriod === 'monthly' ? 'Walk-ins This Month' :
+               'Total Walk-ins'}
+            </p>
             <p className={styles.cardValue}>{analytics.walkinAppointments}</p>
           </div>
         </div>
@@ -874,24 +892,44 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       <div className={styles.analyticsMetricsGrid}>
         <div className={styles.metricsCard}>
           <div className={styles.breakdownItem}>
-            <span>Completed</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Completed Today' : 
+               viewPeriod === 'weekly' ? 'Completed This Week' :
+               viewPeriod === 'monthly' ? 'Completed This Month' :
+               'Total Completed'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.completedAppointments}</span>
           </div>
 
           <div className={styles.breakdownItem}>
-            <span>Absent</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Absent Today' : 
+               viewPeriod === 'weekly' ? 'Absent This Week' :
+               viewPeriod === 'monthly' ? 'Absent This Month' :
+               'Total Absent'}
+            </span>
             <span className={styles.breakdownValue} title="Patient didn't show up for scheduled appointment">{analytics.absentAppointments}</span>
           </div>
         </div>
 
         <div className={styles.metricsCard}>
           <div className={styles.breakdownItem}>
-            <span>Vitals Recorded</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Vitals Today' : 
+               viewPeriod === 'weekly' ? 'Vitals This Week' :
+               viewPeriod === 'monthly' ? 'Vitals This Month' :
+               'Total Vitals'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.vitalsRecorded}</span>
           </div>
 
           <div className={styles.breakdownItem}>
-            <span>Wellness Plans</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Plans Today' : 
+               viewPeriod === 'weekly' ? 'Plans This Week' :
+               viewPeriod === 'monthly' ? 'Plans This Month' :
+               'Total Plans'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.wellnessPlansCreated}</span>
           </div>
         </div>
@@ -908,7 +946,14 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
               </h3>
               <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
                 {viewPeriod === 'daily' && 'Patients with each condition recorded today'}
-                {viewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {viewPeriod === 'weekly' && (() => {
+                  const today = new Date();
+                  const currentDay = today.getUTCDay();
+                  const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+                  const mondayDate = new Date(today);
+                  mondayDate.setUTCDate(today.getUTCDate() - daysToMonday);
+                  return `This week (${mondayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+                })()}
                 {viewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
                 {viewPeriod === 'all' && 'All-time cumulative patient conditions'}
               </p>
