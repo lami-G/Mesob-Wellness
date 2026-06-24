@@ -185,6 +185,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       
       const dataPoints = await Promise.all(dataPointsPromises);
       
+      console.log('📊 Line chart data points received:', dataPoints.map((dp, i) => ({
+        label: labels[i],
+        conditionsCount: dp.length,
+        conditions: dp
+      })));
+      
       const lineDatasets = rankedConditions.map((condition, index) => {
         const conditionData = dataPoints.map(conditionsInPeriod => {
           const conditionMap = {};
@@ -201,6 +207,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           const baseValue = conditionMap[condition.key] || 0;
           return baseValue + (index * 0.01);
         });
+        
+        console.log(`📈 Condition "${condition.label}" data:`, conditionData);
         
         return {
           label: condition.label,
@@ -512,11 +520,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const absent = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
-      // Walk-ins = wellness plans created for users WITHOUT appointments on that specific day
-      // For weekly view: sum daily walk-ins (each day checked independently)
-      // For daily view: check that single day
+      // Walk-ins = patients who got wellness plans WITHOUT any appointment on that day
+      // This matches Admin dashboard logic: if you have appointment today, you're NOT a walk-in
       try {
-        console.log('=== COUNTING WALK-INS ===');
+        console.log('=== COUNTING WALK-INS (Admin Logic) ===');
         
         // Get all wellness plans created in the period (or all time)
         const vitalsParams = viewPeriod === 'all' ? {} : {
@@ -535,7 +542,25 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           const vitalsUserIds = [...new Set(vitalsRecords.map(v => v.userId).filter(Boolean))];
           console.log('Users with vitals:', vitalsUserIds);
           
-          // For each user with vitals, count their completed wellness plans in the period
+          // Build map of userId -> set of appointment dates
+          const appointmentDateMap = new Map();
+          mappedAppointments.forEach(apt => {
+            const aptDate = new Date(apt.scheduledAt);
+            aptDate.setHours(0, 0, 0, 0);
+            const dayKey = aptDate.getTime();
+            
+            if (!appointmentDateMap.has(apt.customerId)) {
+              appointmentDateMap.set(apt.customerId, new Set());
+            }
+            appointmentDateMap.get(apt.customerId).add(dayKey);
+          });
+          
+          console.log('Appointment date map:', Array.from(appointmentDateMap.entries()).map(([userId, dates]) => ({
+            userId: userId.substring(0, 8) + '...',
+            appointmentDates: Array.from(dates).map(d => new Date(d).toDateString())
+          })));
+          
+          // For each user with vitals, check their wellness plans
           for (const userId of vitalsUserIds) {
             try {
               const plansRes = await api.get(`/api/v1/plans/${userId}`);
@@ -550,27 +575,27 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       return pDate >= startDate && pDate <= endDate;
                     });
                 
-                // For each wellness plan, check if user had an appointment on that specific day
+                // For each wellness plan, check if user had ANY appointment on that day
                 for (const plan of periodPlans) {
                   const planDate = new Date(plan.createdAt);
                   planDate.setHours(0, 0, 0, 0);
+                  const planDayKey = planDate.getTime();
                   
-                  // Check if user has appointment on the SAME DAY as the wellness plan
-                  const hasAppointmentOnDay = mappedAppointments.some(apt => {
-                    const aptDate = new Date(apt.scheduledAt);
-                    aptDate.setHours(0, 0, 0, 0);
-                    return apt.customerId === userId && aptDate.getTime() === planDate.getTime();
-                  });
+                  // Check if user has ANY appointment on this day
+                  const userAppointmentDates = appointmentDateMap.get(userId);
+                  const hasAppointmentOnDay = userAppointmentDates && userAppointmentDates.has(planDayKey);
                   
-                  // Only count as walk-in if NO appointment on that specific day
-                  // This allows staff without appointments on that day to be counted as walk-ins
+                  // Admin logic: If user has appointment on this day, NONE of their plans are walk-ins
                   if (!hasAppointmentOnDay) {
                     walkin++;
+                    console.log(`  ✓ Walk-in counted for user ${userId.substring(0, 8)}... on ${planDate.toDateString()}`);
+                  } else {
+                    console.log(`  ⚠️  User ${userId.substring(0, 8)}... has appointment on ${planDate.toDateString()}, NOT counting as walk-in`);
                   }
                 }
                 
                 if (periodPlans.length > 0) {
-                  console.log(`✓ User ${userId}: ${periodPlans.length} wellness plans checked for daily walk-in status`);
+                  console.log(`✓ User ${userId.substring(0, 8)}...: ${periodPlans.length} wellness plans checked`);
                 }
               }
             } catch (err) {
@@ -672,7 +697,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         inProgressAppointments: inProgress,
         inServiceAppointments: inService,
         absentAppointments: absent,
-        totalPatientsToday: completed + walkin, // Walk-ins + Completed appointments
+        totalPatientsToday: completed + walkin, // Patients Served = Completed Appointments + Walk-ins (Admin logic)
         capacityUtilization: utilizationPct,
         averageWaitTime: averageWaitTime,
         completionRate: completionRate,
