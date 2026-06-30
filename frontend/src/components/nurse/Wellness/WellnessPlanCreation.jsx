@@ -710,10 +710,17 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
 
         <button
           type="submit"
-          className="btn btn-primary btn-large"
+          className={styles.createButton}
           disabled={loading || !selectedCustomerId}
         >
-          {loading ? 'Creating...' : 'Create Wellness Plan'}
+          {loading ? (
+            <>
+              <span className={styles.spinner}></span>
+              Creating...
+            </>
+          ) : (
+            'Create Plan'
+          )}
         </button>
       </form>
     </div>

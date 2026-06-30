@@ -117,7 +117,7 @@ function Header({ title, onToggleSidebar, dashboardType }) {
 
   return (
     <header className="mesob-header">
-      {/* Left Section - Toggle + Branding */}
+      {/* Left Section - Toggle + Logo */}
       <div className="mesob-header-left">
         <button
           className="mesob-header-toggle"
@@ -138,19 +138,24 @@ function Header({ title, onToggleSidebar, dashboardType }) {
           </svg>
         </button>
 
-        {/* Government Branding */}
-        <div className="mesob-header-brand">
-          <div className="mesob-header-brand-line">
-            Ethiopian Federal Ministry of Health
-          </div>
-          <div className="mesob-header-brand-line mesob-header-brand-amharic">
-            የኢትዮጵያ ፌዴራላዊ ሪፐብሊክ ጤና ሚኒስቴር
-          </div>
+        {/* MESOB Logo */}
+        <div className="mesob-header-logo">
+          <img 
+            src="/FDRE Mesob - Profile Asset 11Logo.png" 
+            alt="MESOB Logo" 
+            className="mesob-header-logo-img"
+          />
         </div>
       </div>
 
-      {/* Center - Dashboard Title */}
-      <h1 className="mesob-header-title">{title || 'MESOB Wellness'}</h1>
+      {/* Center - Wellness Center Title */}
+      <h1 className="mesob-header-title">
+        {user?.center?.name 
+          ? `${user.center.name} Wellness Center` 
+          : user?.center?.region 
+          ? `${user.center.region} Wellness Center`
+          : 'MESOB Wellness Center'}
+      </h1>
 
       {/* Right Section - Language, Notifications, User */}
       <div className="mesob-header-right">

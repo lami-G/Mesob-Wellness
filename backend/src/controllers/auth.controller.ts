@@ -349,6 +349,13 @@ export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<v
           phone: user.phone,
           role: user.role,
           profilePicture: user.profilePicture,
+          centerId: user.centerId,
+          center: user.center ? {
+            id: user.center.id,
+            name: user.center.name,
+            region: user.center.region,
+            city: user.center.city,
+          } : null,
         }
       },
     });
