@@ -94,14 +94,19 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
 
   const handleSendEmail = async (appointmentId, customerName, customerEmail) => {
     try {
-      await api.post(`/api/v1/appointments/${appointmentId}/send-reminder`, {
-        type: 'email',
-        email: customerEmail,
-      });
-      alert(`✅ Email reminder sent to ${customerEmail}`);
+      const response = await api.post(`/api/v1/appointments/${appointmentId}/send-reminder`);
+      
+      if (response.data.status === 'success') {
+        alert(`✅ Email reminder sent successfully to ${customerName}${customerEmail ? ` (${customerEmail})` : ''}`);
+      } else {
+        alert(`⚠️ ${response.data.message || 'Failed to send email reminder'}`);
+      }
     } catch (err) {
-      alert("❌ Failed to send email reminder");
-      console.error(err);
+      console.error('Send email error:', err);
+      
+      // Show specific error message from server if available
+      const errorMessage = err?.response?.data?.message || 'Failed to send email reminder';
+      alert(`❌ ${errorMessage}`);
     }
   };
 

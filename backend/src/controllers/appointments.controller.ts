@@ -238,9 +238,28 @@ export async function sendReminderHandler(req: AuthRequest, res: Response): Prom
       return;
     }
 
+    // Check if user and email exist
+    if (!appointment.user) {
+      console.error(`❌ User not found for appointment ${appointmentId}`);
+      res.status(400).json({
+        status: "error",
+        message: "Patient information not found for this appointment",
+      });
+      return;
+    }
+
+    if (!appointment.user.email || appointment.user.email.trim() === "") {
+      console.error(`❌ Email not found for user ${appointment.user.fullName}`);
+      res.status(400).json({
+        status: "error",
+        message: `No email address found for patient ${appointment.user.fullName}`,
+      });
+      return;
+    }
+
     // Send email reminder
     const emailSent = await sendAppointmentReminder(
-      appointment.user.email || "",
+      appointment.user.email,
       appointment.user.fullName,
       appointmentId,
       new Date(appointment.scheduledAt).toLocaleString(),
@@ -280,7 +299,7 @@ export async function sendReminderHandler(req: AuthRequest, res: Response): Prom
     console.error('Send reminder error:', error);
     res.status(500).json({
       status: "error",
-      message: "Failed to send reminder",
+      message: error instanceof Error ? error.message : "Failed to send reminder",
     });
   }
 }

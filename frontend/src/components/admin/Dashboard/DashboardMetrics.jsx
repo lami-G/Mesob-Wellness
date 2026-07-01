@@ -3,9 +3,6 @@ import { adminService } from "../../../services/adminService";
 import api from "../../../services/api";
 import HealthConditionTrendsPanel from "../../analytics/HealthConditionTrendsPanel";
 import {
-  PieChart,
-  Pie,
-  Cell,
   AreaChart,
   Area,
   XAxis,
@@ -46,8 +43,9 @@ function DashboardMetrics({
   const [, setVitalsTrends] = useState(null);
   const [, setCenterData] = useState(null);
   const [healthLoading, setHealthLoading] = useState(false);
-  const [selectedCondition, setSelectedCondition] = useState("all");
+  const [selectedRegion, setSelectedRegion] = useState("all");
   const [centers, setCenters] = useState([]);
+  const [regions, setRegions] = useState([]);
 
   const effectivePeriod = externalTimePeriod || timePeriod;
   const effectiveCenter =
@@ -63,6 +61,7 @@ function DashboardMetrics({
   useEffect(() => {
     fetchMetrics();
     fetchCenters();
+    fetchRegions();
     fetchHealthData();
     const interval = setInterval(() => {
       fetchMetrics();
@@ -78,7 +77,7 @@ function DashboardMetrics({
     effectiveRegion,
     effectiveDateRange.start,
     effectiveDateRange.end,
-    selectedCondition,
+    selectedRegion,
   ]);
 
   const fetchMetrics = async () => {
@@ -142,7 +141,7 @@ function DashboardMetrics({
             };
       if (effectiveCenter !== "all") params.center = effectiveCenter;
       if (effectiveRegion !== "all") params.region = effectiveRegion;
-      if (selectedCondition !== "all") params.condition = selectedCondition;
+      if (selectedRegion !== "all") params.region = selectedRegion;
       const response = await api.get("/api/v1/conditions/period", { params });
       const conditions = response.data.data || [];
       const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
@@ -247,6 +246,15 @@ function DashboardMetrics({
       setCenters(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch centers:", err);
+    }
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const response = await api.get("/api/v1/admin/regions");
+      setRegions(response.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch regions:", err);
     }
   };
 
@@ -383,17 +391,17 @@ function DashboardMetrics({
         <h3>Workplace Health Analytics</h3>
         <div className={styles.healthFilters}>
           <div className={styles.filterGroup}>
-            <label>Condition type</label>
+            <label>Region</label>
             <select
-              value={selectedCondition}
-              onChange={(e) => setSelectedCondition(e.target.value)}
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
             >
-              <option value="all">All Conditions</option>
-              <option value="hypertension">Hypertension</option>
-              <option value="obesity">Obesity</option>
-              <option value="diabetes">Diabetes</option>
-              <option value="heart_issues">Heart Issues</option>
-              <option value="respiratory_issues">Respiratory Issues</option>
+              <option value="all">All Regions</option>
+              {regions.map((region) => (
+                <option key={region} value={region}>
+                  {region}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -482,48 +490,6 @@ function DashboardMetrics({
             </div>
 
             <div className={styles.healthChartsGrid}>
-              {healthData.patientConditions?.filter((c) => c.count > 0).length >
-                0 && (
-                <div className={styles.healthChartCard}>
-                  <h4>Condition Distribution</h4>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie
-                        data={healthData.patientConditions
-                          .filter((c) => c.count > 0)
-                          .slice(0, 6)
-                          .map((item, i) => ({
-                            name: item.label,
-                            value: item.count + i * 0.01,
-                            color: item.color,
-                            originalCount: item.count,
-                          }))}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, originalCount }) =>
-                          `${name}: ${originalCount}`
-                        }
-                        outerRadius={70}
-                        dataKey="value"
-                      >
-                        {healthData.patientConditions
-                          .filter((c) => c.count > 0)
-                          .slice(0, 6)
-                          .map((item, i) => (
-                            <Cell key={`cell-${i}`} fill={item.color} />
-                          ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value, name, props) => [
-                          props.payload.originalCount,
-                          "Count",
-                        ]}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
               {healthData.patientConditions?.filter((c) => c.count > 0).length >
                 0 && (
                 <div className={styles.healthChartCard}>

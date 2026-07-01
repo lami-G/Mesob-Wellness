@@ -1120,43 +1120,67 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         </div>
       </div>
 
-      {/* Health Condition Trends Line Chart */}
+      {/* Health Condition Trends Pie Chart */}
       <div className={styles.trendChartCard}>
         <div style={{ marginBottom: '2rem' }}>
           <h3 className="trend-chart-title" style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#111' }}>
             Health Condition Trends
           </h3>
           <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
-            {viewPeriod === 'daily' && 'Condition trends over the last 7 days (today highlighted)'}
-            {viewPeriod === 'weekly' && 'Condition trends over the last 8 weeks (this week highlighted)'}
-            {viewPeriod === 'monthly' && 'All 12 months up to now (current month counts data up to today only)'}
-            {viewPeriod === 'all' && 'Historical condition trends (up to 12 months)'}
+            {viewPeriod === 'daily' && 'Condition distribution for today'}
+            {viewPeriod === 'weekly' && 'Condition distribution for this week'}
+            {viewPeriod === 'monthly' && 'Condition distribution for this month'}
+            {viewPeriod === 'all' && 'Total condition distribution across all time'}
           </p>
         </div>
 
-        {chartData.conditionTrends ? (
-          <div style={{ height: '400px', position: 'relative' }}>
-            <Line
-              data={chartData.conditionTrends}
+        {healthConditions.filter(c => c.count > 0).length > 0 ? (
+          <div style={{ height: '400px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Pie
+              data={{
+                labels: healthConditions.filter(c => c.count > 0).map(c => c.label),
+                datasets: [{
+                  label: 'Patients',
+                  data: healthConditions.filter(c => c.count > 0).map(c => c.count),
+                  backgroundColor: healthConditions.filter(c => c.count > 0).map(c => c.color),
+                  borderColor: healthConditions.filter(c => c.count > 0).map(c => c.color),
+                  borderWidth: 2,
+                }]
+              }}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                   legend: {
-                    position: 'bottom',
+                    position: 'right',
                     labels: {
-                      padding: 15,
+                      padding: 20,
                       font: {
-                        size: 12,
+                        size: 13,
                         weight: '500',
                       },
                       usePointStyle: true,
                       pointStyle: 'circle',
+                      generateLabels: (chart) => {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                          return data.labels.map((label, i) => {
+                            const value = data.datasets[0].data[i];
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return {
+                              text: `${label}: ${value} (${percentage}%)`,
+                              fillStyle: data.datasets[0].backgroundColor[i],
+                              hidden: false,
+                              index: i
+                            };
+                          });
+                        }
+                        return [];
+                      }
                     },
                   },
                   tooltip: {
-                    mode: 'index',
-                    intersect: false,
                     backgroundColor: 'rgba(0, 0, 0, 0.9)',
                     padding: 12,
                     titleFont: {
@@ -1167,83 +1191,22 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       size: 13,
                     },
                     callbacks: {
-                      title: function(context) {
-                        const label = context[0].label;
-                        const isHighlighted = context[0].dataIndex === chartData.conditionTrends.highlightedIndex;
-                        return isHighlighted ? `${label} (Current)` : label;
-                      },
                       label: function(context) {
-                        const label = context.dataset.label || '';
-                        // Round to remove the tiny offset we added for visibility
-                        const value = Math.round(context.parsed.y);
-                        const isHighlighted = context.dataIndex === chartData.conditionTrends.highlightedIndex;
-                        
-                        // Show "patients" for highlighted (current) period, "total" for historical
-                        const suffix = isHighlighted ? ' patients' : ' patients';
-                        return `${label}: ${value}${suffix}`;
+                        const label = context.label || '';
+                        const value = context.parsed;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${label}: ${value} patients (${percentage}%)`;
                       }
                     }
                   },
-                },
-                scales: {
-                  x: {
-                    grid: {
-                      display: true,
-                      color: (context) => {
-                        return context.index === chartData.conditionTrends.highlightedIndex ? '#fbbf24' : '#e5e7eb';
-                      },
-                      lineWidth: (context) => {
-                        return context.index === chartData.conditionTrends.highlightedIndex ? 2 : 1;
-                      },
-                    },
-                    ticks: {
-                      font: {
-                        size: 11,
-                        weight: (context) => {
-                          return context.index === chartData.conditionTrends.highlightedIndex ? '700' : '500';
-                        },
-                      },
-                      color: (context) => {
-                        return context.index === chartData.conditionTrends.highlightedIndex ? '#f59e0b' : '#6b7280';
-                      },
-                    },
-                  },
-                  y: {
-                    beginAtZero: true,
-                    grid: {
-                      color: '#e5e7eb',
-                      drawBorder: false,
-                    },
-                    ticks: {
-                      font: {
-                        size: 11,
-                        weight: '500',
-                      },
-                      color: '#6b7280',
-                      precision: 0,
-                    },
-                    title: {
-                      display: true,
-                      text: viewPeriod === 'weekly' ? 'Avg Daily Patients' : 'Number of Patients',
-                      font: {
-                        size: 12,
-                        weight: '600',
-                      },
-                      color: '#374151',
-                    },
-                  },
-                },
-                interaction: {
-                  mode: 'nearest',
-                  axis: 'x',
-                  intersect: false,
                 },
               }}
             />
           </div>
         ) : (
           <p style={{ textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>
-            Loading trend data...
+            No condition data available for this period.
           </p>
         )}
 

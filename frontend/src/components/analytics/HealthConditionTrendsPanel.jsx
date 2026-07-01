@@ -6,11 +6,12 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Tooltip,
   Legend,
   Filler,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Line, Pie } from "react-chartjs-2";
 import "../../styles/nurse-analytics.css";
 
 ChartJS.register(
@@ -18,6 +19,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Tooltip,
   Legend,
   Filler,
@@ -331,12 +333,24 @@ export default function HealthConditionTrendsPanel({
 
   const trendSubtitle =
     effectivePeriod === "all"
-      ? "All time overview (12-month trend)"
+      ? "Total condition distribution across all time"
       : effectivePeriod === "daily"
-        ? "Condition trends over the last 7 days (today highlighted)"
+        ? "Condition distribution for today"
         : effectivePeriod === "weekly"
-          ? "Condition trends over the last 8 weeks — this week highlighted"
-          : "All 12 months up to now (current month to date)";
+          ? "Condition distribution for this week"
+          : "Condition distribution for this month";
+
+  // Generate pie chart data from health conditions
+  const pieChartData = healthConditions.filter(c => c.count > 0).length > 0 ? {
+    labels: healthConditions.filter(c => c.count > 0).map(c => c.label),
+    datasets: [{
+      label: 'Patients',
+      data: healthConditions.filter(c => c.count > 0).map(c => c.count),
+      backgroundColor: healthConditions.filter(c => c.count > 0).map(c => c.color),
+      borderColor: healthConditions.filter(c => c.count > 0).map(c => c.color),
+      borderWidth: 2,
+    }]
+  } : null;
 
   return (
     <div
@@ -650,97 +664,62 @@ export default function HealthConditionTrendsPanel({
           </p>
         </div>
 
-        {conditionTrends ? (
-          <div style={{ height: "400px", position: "relative" }}>
-            <Line
-              data={conditionTrends}
+        {pieChartData ? (
+          <div style={{ height: "400px", position: "relative", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <Pie
+              data={pieChartData}
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                   legend: {
-                    position: "bottom",
+                    position: "right",
                     labels: {
-                      padding: 15,
-                      font: { size: 12, weight: "500" },
+                      padding: 20,
+                      font: { size: 13, weight: "500" },
                       usePointStyle: true,
                       pointStyle: "circle",
+                      generateLabels: (chart) => {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                          return data.labels.map((label, i) => {
+                            const value = data.datasets[0].data[i];
+                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return {
+                              text: `${label}: ${value} (${percentage}%)`,
+                              fillStyle: data.datasets[0].backgroundColor[i],
+                              hidden: false,
+                              index: i
+                            };
+                          });
+                        }
+                        return [];
+                      }
                     },
                   },
                   tooltip: {
-                    mode: "index",
-                    intersect: false,
                     backgroundColor: "rgba(0, 0, 0, 0.9)",
                     padding: 12,
                     titleFont: { size: 14, weight: "bold" },
                     bodyFont: { size: 13 },
                     callbacks: {
-                      title(ctx) {
-                        const label = ctx[0].label;
-                        const hi = conditionTrends.highlightedIndex;
-                        return ctx[0].dataIndex === hi ? `${label} ⭐` : label;
-                      },
                       label(ctx) {
-                        const label = ctx.dataset.label || "";
-                        const value = Math.round(ctx.parsed.y);
-                        const suffix =
-                          viewPeriod === "weekly" ? " avg daily" : " patients";
-                        return `${label}: ${value}${suffix}`;
+                        const label = ctx.label || "";
+                        const value = ctx.parsed;
+                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${label}: ${value} patients (${percentage}%)`;
                       },
                     },
                   },
                 },
-                scales: {
-                  x: {
-                    grid: {
-                      display: true,
-                      color: (ctx) =>
-                        ctx.index === conditionTrends.highlightedIndex
-                          ? "#fbbf24"
-                          : "#e5e7eb",
-                      lineWidth: (ctx) =>
-                        ctx.index === conditionTrends.highlightedIndex ? 2 : 1,
-                    },
-                    ticks: {
-                      font: {
-                        size: 11,
-                        weight: (ctx) =>
-                          ctx.index === conditionTrends.highlightedIndex
-                            ? "700"
-                            : "500",
-                      },
-                      color: (ctx) =>
-                        ctx.index === conditionTrends.highlightedIndex
-                          ? "#f59e0b"
-                          : "#6b7280",
-                    },
-                  },
-                  y: {
-                    beginAtZero: true,
-                    grid: { color: "#e5e7eb", drawBorder: false },
-                    ticks: {
-                      font: { size: 11, weight: "500" },
-                      color: "#6b7280",
-                      precision: 0,
-                    },
-                    title: {
-                      display: true,
-                      text:
-                        viewPeriod === "weekly"
-                          ? "Avg Daily Patients"
-                          : "Number of Patients",
-                      font: { size: 12, weight: "600" },
-                      color: "#374151",
-                    },
-                  },
-                },
-                interaction: { mode: "nearest", axis: "x", intersect: false },
               }}
             />
           </div>
         ) : (
           <p style={{ textAlign: "center", color: "#9ca3af", padding: "2rem" }}>
-            Loading trend data...
+            No condition data available for this period.
           </p>
         )}
       </div>
