@@ -305,6 +305,8 @@
 .hjPbarFill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 .hjPbarGreen { background: #1D9E75; }
 .hjPbarAmber { background: #f5a623; }
+.hjPbarOrange { background: #fb923c; }
+.hjPbarRed { background: #ef4444; }
 .hjPbarGray { background: #cbd5e1; }
 
 /* --- Risk Scoring Analysis --- */
@@ -334,6 +336,14 @@
 .hjRiskRingLbl { font-size: 8px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.04em; }
 
 .hjRiskMeta h3 { font-size: 14px; font-weight: 700; color: #213D8D; margin: 0 0 6px; }
+.hjRiskAssessmentLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #213D8D;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
 .hjRiskDate { font-size: 11px; color: #94a3b8; margin: 6px 0 0; }
 
 .hjRiskCats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -347,6 +357,12 @@
 
 .hjRiskCatLbl { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
 .hjRiskCatVal { font-size: 20px; font-weight: 700; color: #213D8D; margin-bottom: 6px; }
+
+/* Risk value color variants */
+.hjRiskValGreen { color: #1D9E75; }
+.hjRiskValAmber { color: #f5a623; }
+.hjRiskValOrange { color: #fb923c; }
+.hjRiskValRed { color: #ef4444; }
 
 /* --- Recommendations --- */
 .hjRecCard { padding: 4px 20px; }

@@ -660,26 +660,73 @@ function HealthJourney() {
                   <span className={styles.hjRiskRingLbl}>score</span>
                 </div>
                 <div className={styles.hjRiskMeta}>
-                  <h3>Overall risk assessment</h3>
-                  <span className={clsx(styles.hjPill, styles.hjStatusGreen)}>{getRiskLabel(overallRisk)}</span>
+                  <div className={styles.hjRiskAssessmentLabel}>Overall risk assessment</div>
+                  <span className={clsx(
+                    styles.hjPill,
+                    overallRisk <= 3 ? styles.hjStatusGreen :
+                    overallRisk <= 6 ? styles.hjStatusYellow :
+                    styles.hjStatusRed
+                  )}>{getRiskLabel(overallRisk)}</span>
                   <p className={styles.hjRiskDate}>Based on latest vitals &middot; {latest ? new Date(latest.recordedAt).toLocaleDateString() : "—"}</p>
                 </div>
               </div>
               <div className={styles.hjRiskCats}>
                 <div className={styles.hjRiskCat}>
                   <div className={styles.hjRiskCatLbl}>Hypertension risk</div>
-                  <div className={styles.hjRiskCatVal}>{hypertensionRisk}%</div>
-                  <div className={styles.hjPbar}><div className={clsx(styles.hjPbarFill, styles.hjPbarGray)} style={{ width: `${hypertensionRisk}%` }}></div></div>
+                  <div className={clsx(
+                    styles.hjRiskCatVal,
+                    hypertensionRisk < 20 ? styles.hjRiskValGreen :
+                    hypertensionRisk < 40 ? styles.hjRiskValAmber :
+                    hypertensionRisk < 60 ? styles.hjRiskValOrange :
+                    styles.hjRiskValRed
+                  )}>{hypertensionRisk}%</div>
+                  <div className={styles.hjPbar}>
+                    <div className={clsx(
+                      styles.hjPbarFill,
+                      hypertensionRisk < 20 ? styles.hjPbarGreen :
+                      hypertensionRisk < 40 ? styles.hjPbarAmber :
+                      hypertensionRisk < 60 ? styles.hjPbarOrange :
+                      styles.hjPbarRed
+                    )} style={{ width: `${hypertensionRisk}%` }}></div>
+                  </div>
                 </div>
                 <div className={styles.hjRiskCat}>
                   <div className={styles.hjRiskCatLbl}>Diabetes risk</div>
-                  <div className={styles.hjRiskCatVal}>{diabetesRisk}%</div>
-                  <div className={styles.hjPbar}><div className={clsx(styles.hjPbarFill, styles.hjPbarGray)} style={{ width: `${diabetesRisk}%` }}></div></div>
+                  <div className={clsx(
+                    styles.hjRiskCatVal,
+                    diabetesRisk < 20 ? styles.hjRiskValGreen :
+                    diabetesRisk < 40 ? styles.hjRiskValAmber :
+                    diabetesRisk < 60 ? styles.hjRiskValOrange :
+                    styles.hjRiskValRed
+                  )}>{diabetesRisk}%</div>
+                  <div className={styles.hjPbar}>
+                    <div className={clsx(
+                      styles.hjPbarFill,
+                      diabetesRisk < 20 ? styles.hjPbarGreen :
+                      diabetesRisk < 40 ? styles.hjPbarAmber :
+                      diabetesRisk < 60 ? styles.hjPbarOrange :
+                      styles.hjPbarRed
+                    )} style={{ width: `${diabetesRisk}%` }}></div>
+                  </div>
                 </div>
                 <div className={styles.hjRiskCat}>
                   <div className={styles.hjRiskCatLbl}>Obesity risk</div>
-                  <div className={styles.hjRiskCatVal}>{obesityRisk}%</div>
-                  <div className={styles.hjPbar}><div className={clsx(styles.hjPbarFill, styles.hjPbarGray)} style={{ width: `${obesityRisk}%` }}></div></div>
+                  <div className={clsx(
+                    styles.hjRiskCatVal,
+                    obesityRisk < 20 ? styles.hjRiskValGreen :
+                    obesityRisk < 40 ? styles.hjRiskValAmber :
+                    obesityRisk < 60 ? styles.hjRiskValOrange :
+                    styles.hjRiskValRed
+                  )}>{obesityRisk}%</div>
+                  <div className={styles.hjPbar}>
+                    <div className={clsx(
+                      styles.hjPbarFill,
+                      obesityRisk < 20 ? styles.hjPbarGreen :
+                      obesityRisk < 40 ? styles.hjPbarAmber :
+                      obesityRisk < 60 ? styles.hjPbarOrange :
+                      styles.hjPbarRed
+                    )} style={{ width: `${obesityRisk}%` }}></div>
+                  </div>
                 </div>
               </div>
             </div>

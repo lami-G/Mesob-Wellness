@@ -818,13 +818,15 @@ function VitalsEntry({ customerId, appointmentId, onSuccess, onNavigateToWellnes
           />
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary btn-large"
-          disabled={loading}
-        >
-          {loading ? "Recording..." : "Submit Vitals"}
-        </button>
+        <div className={styles.submitButtonContainer}>
+          <button
+            type="submit"
+            className={clsx("btn btn-primary btn-large", styles.submitButton)}
+            disabled={loading}
+          >
+            {loading ? "Recording..." : "Submit Vitals"}
+          </button>
+        </div>
       </form>
 
       {/* Post-Vitals Action Buttons */}

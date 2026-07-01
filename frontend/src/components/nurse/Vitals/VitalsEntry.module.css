@@ -279,6 +279,18 @@
   box-sizing: border-box;
 }
 
+/* Submit Button Container */
+.submitButtonContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.submitButton {
+  max-width: 250px;
+  min-width: 200px;
+  width: auto;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .vitalsGrid {
@@ -291,5 +303,14 @@
 
   .actionButton {
     min-width: 100%;
+  }
+  
+  .submitButtonContainer {
+    justify-content: stretch;
+  }
+  
+  .submitButton {
+    max-width: 100%;
+    width: 100%;
   }
 }
