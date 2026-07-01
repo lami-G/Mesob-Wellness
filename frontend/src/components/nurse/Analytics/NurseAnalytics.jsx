@@ -185,6 +185,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       
       const dataPoints = await Promise.all(dataPointsPromises);
       
+      console.log('📊 Line chart data points received:', dataPoints.map((dp, i) => ({
+        label: labels[i],
+        conditionsCount: dp.length,
+        conditions: dp
+      })));
+      
       const lineDatasets = rankedConditions.map((condition, index) => {
         const conditionData = dataPoints.map(conditionsInPeriod => {
           const conditionMap = {};
@@ -201,6 +207,8 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           const baseValue = conditionMap[condition.key] || 0;
           return baseValue + (index * 0.01);
         });
+        
+        console.log(`📈 Condition "${condition.label}" data:`, conditionData);
         
         return {
           label: condition.label,
@@ -259,11 +267,14 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = new Date(Date.UTC(year, month, date, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'weekly') {
-        // Last 7 days (including today) - use UTC dates
+        // Current week: Monday to Today (calendar week)
         const year = today.getUTCFullYear();
         const month = today.getUTCMonth();
         const date = today.getUTCDate();
-        startDate = new Date(Date.UTC(year, month, date - 6, 0, 0, 0));
+        const currentDay = today.getUTCDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        
+        startDate = new Date(Date.UTC(year, month, date - daysToMonday, 0, 0, 0));
         endDate = new Date(Date.UTC(year, month, date, 23, 59, 59));
       } else if (period === 'monthly') {
         // From 1st of current month to today - use UTC dates
@@ -431,12 +442,12 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         startDate = null;
         endDate = null;
       } else if (viewPeriod === 'weekly') {
-        // Get start of week (Monday)
-        const day = startDate.getDay();
-        const diff = startDate.getDate() - day + (day === 0 ? -6 : 1);
-        startDate.setDate(diff);
-        // End of week (Sunday)
-        endDate.setDate(startDate.getDate() + 6);
+        // Current week: Monday to Today (calendar week)
+        const currentDay = selectedDateObj.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const daysToMonday = currentDay === 0 ? 6 : currentDay - 1; // Days to go back to Monday
+        startDate.setDate(selectedDateObj.getDate() - daysToMonday);
+        // End date is today (or selected date)
+        endDate = new Date(selectedDateObj);
       } else if (viewPeriod === 'monthly') {
         // Start of month
         startDate.setDate(1);
@@ -509,11 +520,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const absent = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
       // Count walk-ins separately from appointments
-      // Walk-ins = wellness plans created for users WITHOUT appointments on that specific day
-      // For weekly view: sum daily walk-ins (each day checked independently)
-      // For daily view: check that single day
+      // Walk-ins = patients who got wellness plans WITHOUT any appointment on that day
+      // This matches Admin dashboard logic: if you have appointment today, you're NOT a walk-in
       try {
-        console.log('=== COUNTING WALK-INS ===');
+        console.log('=== COUNTING WALK-INS (Admin Logic) ===');
         
         // Get all wellness plans created in the period (or all time)
         const vitalsParams = viewPeriod === 'all' ? {} : {
@@ -532,7 +542,25 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
           const vitalsUserIds = [...new Set(vitalsRecords.map(v => v.userId).filter(Boolean))];
           console.log('Users with vitals:', vitalsUserIds);
           
-          // For each user with vitals, count their completed wellness plans in the period
+          // Build map of userId -> set of appointment dates
+          const appointmentDateMap = new Map();
+          mappedAppointments.forEach(apt => {
+            const aptDate = new Date(apt.scheduledAt);
+            aptDate.setHours(0, 0, 0, 0);
+            const dayKey = aptDate.getTime();
+            
+            if (!appointmentDateMap.has(apt.customerId)) {
+              appointmentDateMap.set(apt.customerId, new Set());
+            }
+            appointmentDateMap.get(apt.customerId).add(dayKey);
+          });
+          
+          console.log('Appointment date map:', Array.from(appointmentDateMap.entries()).map(([userId, dates]) => ({
+            userId: userId.substring(0, 8) + '...',
+            appointmentDates: Array.from(dates).map(d => new Date(d).toDateString())
+          })));
+          
+          // For each user with vitals, check their wellness plans
           for (const userId of vitalsUserIds) {
             try {
               const plansRes = await api.get(`/api/v1/plans/${userId}`);
@@ -547,27 +575,27 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                       return pDate >= startDate && pDate <= endDate;
                     });
                 
-                // For each wellness plan, check if user had an appointment on that specific day
+                // For each wellness plan, check if user had ANY appointment on that day
                 for (const plan of periodPlans) {
                   const planDate = new Date(plan.createdAt);
                   planDate.setHours(0, 0, 0, 0);
+                  const planDayKey = planDate.getTime();
                   
-                  // Check if user has appointment on the SAME DAY as the wellness plan
-                  const hasAppointmentOnDay = mappedAppointments.some(apt => {
-                    const aptDate = new Date(apt.scheduledAt);
-                    aptDate.setHours(0, 0, 0, 0);
-                    return apt.customerId === userId && aptDate.getTime() === planDate.getTime();
-                  });
+                  // Check if user has ANY appointment on this day
+                  const userAppointmentDates = appointmentDateMap.get(userId);
+                  const hasAppointmentOnDay = userAppointmentDates && userAppointmentDates.has(planDayKey);
                   
-                  // Only count as walk-in if NO appointment on that specific day
-                  // This allows staff without appointments on that day to be counted as walk-ins
+                  // Admin logic: If user has appointment on this day, NONE of their plans are walk-ins
                   if (!hasAppointmentOnDay) {
                     walkin++;
+                    console.log(`  ✓ Walk-in counted for user ${userId.substring(0, 8)}... on ${planDate.toDateString()}`);
+                  } else {
+                    console.log(`  ⚠️  User ${userId.substring(0, 8)}... has appointment on ${planDate.toDateString()}, NOT counting as walk-in`);
                   }
                 }
                 
                 if (periodPlans.length > 0) {
-                  console.log(`✓ User ${userId}: ${periodPlans.length} wellness plans checked for daily walk-in status`);
+                  console.log(`✓ User ${userId.substring(0, 8)}...: ${periodPlans.length} wellness plans checked`);
                 }
               }
             } catch (err) {
@@ -669,7 +697,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         inProgressAppointments: inProgress,
         inServiceAppointments: inService,
         absentAppointments: absent,
-        totalPatientsToday: completed + walkin, // Walk-ins + Completed appointments
+        totalPatientsToday: completed + walkin, // Patients Served = Completed Appointments + Walk-ins (Admin logic)
         capacityUtilization: utilizationPct,
         averageWaitTime: averageWaitTime,
         completionRate: completionRate,
@@ -850,21 +878,36 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       <div className={styles.analyticsCardsGrid}>
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>Total Appointments</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Appointments Today' : 
+               viewPeriod === 'weekly' ? 'Appointments This Week' :
+               viewPeriod === 'monthly' ? 'Appointments This Month' :
+               'Total Appointments'}
+            </p>
             <p className={styles.cardValue}>{analytics.totalAppointments}</p>
           </div>
         </div>
 
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>{viewPeriod === 'all' ? 'Patients Total' : 'Patients Today'}</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Patients Today' : 
+               viewPeriod === 'weekly' ? 'Patients This Week' :
+               viewPeriod === 'monthly' ? 'Patients This Month' :
+               'Total Patients'}
+            </p>
             <p className={styles.cardValue}>{analytics.totalPatientsToday}</p>
           </div>
         </div>
 
         <div className={styles.analyticsCard}>
           <div className={styles.cardContent}>
-            <p className={styles.cardLabel}>Walk-in Completed</p>
+            <p className={styles.cardLabel}>
+              {viewPeriod === 'daily' ? 'Walk-ins Today' : 
+               viewPeriod === 'weekly' ? 'Walk-ins This Week' :
+               viewPeriod === 'monthly' ? 'Walk-ins This Month' :
+               'Total Walk-ins'}
+            </p>
             <p className={styles.cardValue}>{analytics.walkinAppointments}</p>
           </div>
         </div>
@@ -874,24 +917,44 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       <div className={styles.analyticsMetricsGrid}>
         <div className={styles.metricsCard}>
           <div className={styles.breakdownItem}>
-            <span>Completed</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Completed Today' : 
+               viewPeriod === 'weekly' ? 'Completed This Week' :
+               viewPeriod === 'monthly' ? 'Completed This Month' :
+               'Total Completed'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.completedAppointments}</span>
           </div>
 
           <div className={styles.breakdownItem}>
-            <span>Absent</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Absent Today' : 
+               viewPeriod === 'weekly' ? 'Absent This Week' :
+               viewPeriod === 'monthly' ? 'Absent This Month' :
+               'Total Absent'}
+            </span>
             <span className={styles.breakdownValue} title="Patient didn't show up for scheduled appointment">{analytics.absentAppointments}</span>
           </div>
         </div>
 
         <div className={styles.metricsCard}>
           <div className={styles.breakdownItem}>
-            <span>Vitals Recorded</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Vitals Today' : 
+               viewPeriod === 'weekly' ? 'Vitals This Week' :
+               viewPeriod === 'monthly' ? 'Vitals This Month' :
+               'Total Vitals'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.vitalsRecorded}</span>
           </div>
 
           <div className={styles.breakdownItem}>
-            <span>Wellness Plans</span>
+            <span>
+              {viewPeriod === 'daily' ? 'Plans Today' : 
+               viewPeriod === 'weekly' ? 'Plans This Week' :
+               viewPeriod === 'monthly' ? 'Plans This Month' :
+               'Total Plans'}
+            </span>
             <span className={styles.breakdownValue}>{analytics.wellnessPlansCreated}</span>
           </div>
         </div>
@@ -908,7 +971,14 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
               </h3>
               <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
                 {viewPeriod === 'daily' && 'Patients with each condition recorded today'}
-                {viewPeriod === 'weekly' && `Total patients this week (${new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                {viewPeriod === 'weekly' && (() => {
+                  const today = new Date();
+                  const currentDay = today.getUTCDay();
+                  const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+                  const mondayDate = new Date(today);
+                  mondayDate.setUTCDate(today.getUTCDate() - daysToMonday);
+                  return `This week (${mondayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+                })()}
                 {viewPeriod === 'monthly' && `Total patients this month (${new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
                 {viewPeriod === 'all' && 'All-time cumulative patient conditions'}
               </p>

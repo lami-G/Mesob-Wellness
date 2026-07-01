@@ -100,6 +100,35 @@ function Header({ title, onToggleSidebar, dashboardType }) {
   // Determine which roles should see notifications
   const showNotificationBell = ['SYSTEM_ADMIN', 'MANAGER', 'REGIONAL_OFFICE', 'FEDERAL_OFFICE'].includes(dashboardType);
 
+  // Get appropriate title based on user role
+  const getHeaderTitle = () => {
+    // Federal Office - Show FDRE
+    if (user?.role === 'FEDERAL_OFFICE' || dashboardType === 'FEDERAL_OFFICE') {
+      return 'FDRE Wellness Management System';
+    }
+    
+    // Regional Office - Show Region name
+    if (user?.role === 'REGIONAL_OFFICE' || dashboardType === 'REGIONAL_OFFICE') {
+      if (user?.center?.region) {
+        return `${user.center.region} Regional Wellness Center`;
+      }
+      return 'Regional Wellness Center';
+    }
+    
+    // Center Manager or Staff - Show Center name
+    if (user?.center?.name) {
+      return `${user.center.name} Wellness Center`;
+    }
+    
+    // Fallback to region if center name not available
+    if (user?.center?.region) {
+      return `${user.center.region} Wellness Center`;
+    }
+    
+    // Default fallback
+    return 'MESOB Wellness Center';
+  };
+
   const formatNotificationTime = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -117,7 +146,7 @@ function Header({ title, onToggleSidebar, dashboardType }) {
 
   return (
     <header className="mesob-header">
-      {/* Left Section - Toggle + Branding */}
+      {/* Left Section - Toggle + Logo */}
       <div className="mesob-header-left">
         <button
           className="mesob-header-toggle"
@@ -138,19 +167,20 @@ function Header({ title, onToggleSidebar, dashboardType }) {
           </svg>
         </button>
 
-        {/* Government Branding */}
-        <div className="mesob-header-brand">
-          <div className="mesob-header-brand-line">
-            Ethiopian Federal Ministry of Health
-          </div>
-          <div className="mesob-header-brand-line mesob-header-brand-amharic">
-            የኢትዮጵያ ፌዴራላዊ ሪፐብሊክ ጤና ሚኒስቴር
-          </div>
+        {/* MESOB Logo */}
+        <div className="mesob-header-logo">
+          <img 
+            src="/FDRE Mesob - Profile Asset 11Logo.png" 
+            alt="MESOB Logo" 
+            className="mesob-header-logo-img"
+          />
         </div>
       </div>
 
-      {/* Center - Dashboard Title */}
-      <h1 className="mesob-header-title">{title || 'MESOB Wellness'}</h1>
+      {/* Center - Wellness Center Title */}
+      <h1 className="mesob-header-title">
+        {getHeaderTitle()}
+      </h1>
 
       {/* Right Section - Language, Notifications, User */}
       <div className="mesob-header-right">

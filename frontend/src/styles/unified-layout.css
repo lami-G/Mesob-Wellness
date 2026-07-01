@@ -171,7 +171,7 @@
   z-index: 1;
 }
 
-/* Left Section - Government Branding */
+/* Left Section - Logo */
 .mesob-header-left {
   display: flex;
   align-items: center;
@@ -240,35 +240,35 @@
   transform: rotate(180deg) translateX(-2px);
 }
 
-.mesob-header-brand {
+/* MESOB Logo Styling - Significantly Larger */
+.mesob-header-logo {
   display: flex;
-  flex-direction: column;
-  line-height: 1.3;
+  align-items: center;
+  height: 75px;
+  padding: 4px 0;
 }
 
-.mesob-header-brand-line {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 400;
+.mesob-header-logo-img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(1.1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.mesob-header-brand-amharic {
-  font-weight: 600;
-  color: white;
-}
-
-/* Center - Dashboard Title */
+/* Center - Wellness Center Title - Larger and More Prominent */
 .mesob-header-title {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-bold);
+  font-size: 1.5rem;
+  font-weight: 700;
   color: white;
   letter-spacing: 0.025em;
   text-align: center;
   white-space: nowrap;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Right Section */
@@ -765,11 +765,11 @@
   .mesob-header-title {
     position: static;
     transform: none;
-    font-size: var(--font-size-base);
+    font-size: 1.15rem;
   }
   
-  .mesob-header-brand {
-    display: none;
+  .mesob-header-logo {
+    height: 65px;
   }
 }
 
@@ -803,7 +803,13 @@
   }
   
   .mesob-header-title {
-    font-size: var(--font-size-sm);
+    font-size: 0.9rem;
+    white-space: normal;
+    line-height: 1.2;
+  }
+  
+  .mesob-header-logo {
+    height: 50px;
   }
 }
 

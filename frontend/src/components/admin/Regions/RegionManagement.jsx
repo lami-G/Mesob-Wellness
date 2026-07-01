@@ -280,7 +280,15 @@ function RegionManagement() {
                 {filteredRegions
                   .slice((regionCardsPage - 1) * cardsPerPage, regionCardsPage * cardsPerPage)
                   .map((region) => (
-                  <div key={region} className="region-card">
+                  <div 
+                    key={region} 
+                    className="region-card"
+                    onClick={() => {
+                      setSelectedRegion(region);
+                      setShowDetailView(true);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="region-card-header">
                       <div className="region-title">
                         <h4>{region}</h4>

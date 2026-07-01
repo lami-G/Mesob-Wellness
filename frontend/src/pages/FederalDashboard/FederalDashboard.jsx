@@ -518,94 +518,93 @@ function FederalDashboard() {
     >
       {/* Show filters for overview tab */}
       {(activeTab === "overview") && (
-        <div className={`card ${styles.filtersCard}`}>
-          <div className={styles.filtersGrid}>
-            <div className={styles.filterItem}>
-              <label className={styles.filterLabel}>
-                Region
-              </label>
-              <select
-                value={globalFilters.region}
-                onChange={(e) =>
-                  setGlobalFilters((prev) => ({
-                    ...prev,
-                    region: e.target.value,
-                    center: "",
-                  }))
-                }
-                className="form-input"
-              >
-                <option value="all">All Regions</option>
-                {regions.map((region) => (
-                  <option key={region} value={region}>
-                    {region}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterItemWide}>
-              <label className={styles.filterLabel}>
-                Center
-              </label>
-              <select
-                value={globalFilters.center}
-                onChange={(e) =>
-                  setGlobalFilters((prev) => ({
-                    ...prev,
-                    center: e.target.value,
-                  }))
-                }
-                className="form-input"
-                disabled={availableCenters.length === 0}
-              >
-                <option value="">All Centers</option>
-                {availableCenters.map((center) => (
-                  <option key={center.id} value={center.id}>
-                    {center.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterItemMedium}>
-              <label className={styles.filterLabel}>
-                Time Period
-              </label>
-              <select
-                value={timePeriod}
-                onChange={(e) => setTimePeriod(e.target.value)}
-                className="time-period-select"
-              >
-                <option value="all">All</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
-            </div>
-            {statusOptions.length > 0 && (
-              <div className={styles.filterItemMedium}>
-                <label className={styles.filterLabel}>
-                  {statusLabel}
-                </label>
-                <select
-                  value={globalFilters.status}
-                  onChange={(e) =>
-                    setGlobalFilters((prev) => ({
-                      ...prev,
-                      status: e.target.value,
-                    }))
-                  }
-                  className="form-input"
-                >
-                  <option value="">All Status</option>
-                  {statusOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-          </div>
+        <div style={{ 
+          display: 'inline-flex', 
+          alignItems: 'center', 
+          marginBottom: '1rem', 
+          flexWrap: 'wrap', 
+          gap: '0.625rem', 
+          padding: '0.625rem 0.875rem', 
+          backgroundColor: '#f9fafb', 
+          borderRadius: '8px', 
+          border: '1px solid #e5e7eb' 
+        }}>
+          <select
+            value={globalFilters.region}
+            onChange={(e) =>
+              setGlobalFilters((prev) => ({
+                ...prev,
+                region: e.target.value,
+                center: "",
+              }))
+            }
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Regions</option>
+            {regions.map((region) => (
+              <option key={region} value={region}>
+                {region}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={globalFilters.center}
+            onChange={(e) =>
+              setGlobalFilters((prev) => ({
+                ...prev,
+                center: e.target.value,
+              }))
+            }
+            disabled={availableCenters.length === 0}
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: availableCenters.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: availableCenters.length === 0 ? 0.6 : 1,
+            }}
+          >
+            <option value="">All Centers</option>
+            {availableCenters.map((center) => (
+              <option key={center.id} value={center.id}>
+                {center.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={timePeriod}
+            onChange={(e) => setTimePeriod(e.target.value)}
+            style={{
+              padding: '0.375rem 0.75rem',
+              borderRadius: '6px',
+              border: '1px solid #D1D5DB',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+              color: '#374151',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
         </div>
       )}
       {renderContent()}

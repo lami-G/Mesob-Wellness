@@ -111,6 +111,11 @@
   color: #166534;
 }
 
+.planStatus.completed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
 .planStatus.inactive {
   background: #f3f4f6;
   color: #6b7280;

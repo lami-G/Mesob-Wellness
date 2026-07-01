@@ -339,6 +339,7 @@ function RegisterWalkIn({ onSuccess }) {
                   value={registerForm.dateOfBirth}
                   onChange={handleRegisterFormChange}
                   disabled={registering}
+                  max={new Date().toISOString().split('T')[0]}
                   className={clsx('form-input', styles.formInput, registerErrors.dateOfBirth && styles.formInputError)}
                 />
                 {registerErrors.dateOfBirth && (

@@ -40,6 +40,12 @@ export interface AuthResponse {
     profilePicture?: string | null;
     userId?: string;
     centerId?: string | null;
+    center?: {
+      id: string;
+      name: string;
+      region: string;
+      city: string;
+    } | null;
   };
   token: string;
 }
@@ -263,6 +269,16 @@ export class AuthService {
     // Step A: Verification
     const user = await prisma.user.findUnique({
       where: { email: input.email.toLowerCase() },
+      include: {
+        center: {
+          select: {
+            id: true,
+            name: true,
+            region: true,
+            city: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -400,6 +416,12 @@ export class AuthService {
         profilePicture: user.profilePicture,
         userId: user.userId, // Include display ID
         centerId: user.centerId, // Include center ID for filtering
+        center: user.center ? {
+          id: user.center.id,
+          name: user.center.name,
+          region: user.center.region,
+          city: user.center.city,
+        } : null,
       },
       token,
     };
@@ -533,6 +555,14 @@ export class AuthService {
         profilePicture: true,
         userId: true, // Include display ID
         centerId: true, // Include center ID for filtering
+        center: {
+          select: {
+            id: true,
+            name: true,
+            region: true,
+            city: true,
+          },
+        },
       },
     });
   }

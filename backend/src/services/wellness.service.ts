@@ -14,6 +14,19 @@ export interface CreateWellnessPlanInput {
 export async function createWellnessPlan(input: CreateWellnessPlanInput, nurseId?: string) {
   // Use transaction to ensure both wellness plan and conditions are saved atomically
   return prisma.$transaction(async (tx) => {
+    // STEP 1: Deactivate all previous active plans for this user
+    await tx.wellnessPlan.updateMany({
+      where: {
+        userId: input.userId,
+        isActive: true,
+      },
+      data: {
+        isActive: false,
+        updatedAt: new Date(),
+      },
+    });
+
+    // STEP 2: Create the new active plan
     const plan = await tx.wellnessPlan.create({
       data: {
         userId: input.userId,
@@ -25,7 +38,7 @@ export async function createWellnessPlan(input: CreateWellnessPlanInput, nurseId
       },
     });
 
-    // If conditions are provided, update patient_conditions with nurse approval
+    // STEP 3: If conditions are provided, update patient_conditions with nurse approval
     if (input.conditions && input.conditions.length > 0 && nurseId) {
       await upsertPatientConditions(
         input.userId,

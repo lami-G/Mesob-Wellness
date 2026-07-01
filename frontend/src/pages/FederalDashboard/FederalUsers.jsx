@@ -118,9 +118,9 @@ function FederalUsers() {
       return;
     }
 
-    // Require center for NURSE_OFFICER and MANAGER roles
-    if ((createFormData.role === "NURSE_OFFICER" || createFormData.role === "MANAGER") && !createFormData.centerId) {
-      setCreateError(`Center is required for ${createFormData.role === "MANAGER" ? "Managers" : "Nurse Officers"}`);
+    // Require center for NURSE_OFFICER, MANAGER, and STAFF roles
+    if ((createFormData.role === "NURSE_OFFICER" || createFormData.role === "MANAGER" || createFormData.role === "STAFF") && !createFormData.centerId) {
+      setCreateError(`Center is required for ${createFormData.role === "MANAGER" ? "Managers" : createFormData.role === "STAFF" ? "Staff" : "Nurse Officers"}`);
       return;
     }
 
@@ -287,6 +287,7 @@ function FederalUsers() {
       NURSE_OFFICER: "Nurse Officer",
       MANAGER: "Manager",
       REGIONAL_OFFICE: "Regional Office",
+      STAFF: "Staff",
     };
     return labels[role] || role;
   };
@@ -317,6 +318,12 @@ function FederalUsers() {
             onClick={() => handleUserTypeChange("REGIONAL_OFFICE")}
           >
             Regional
+          </button>
+          <button
+            className={`btn ${userType === "STAFF" ? "btn-primary" : "btn-secondary"}`}
+            onClick={() => handleUserTypeChange("STAFF")}
+          >
+            Staff
           </button>
           <button
             className="btn btn-primary"
@@ -477,10 +484,11 @@ function FederalUsers() {
                   <option value="NURSE_OFFICER">Nurse Officer</option>
                   <option value="MANAGER">Manager</option>
                   <option value="REGIONAL_OFFICE">Regional Office</option>
+                  <option value="STAFF">Staff</option>
                 </select>
               </div>
 
-              {(createFormData.role === "NURSE_OFFICER" || createFormData.role === "MANAGER") && (
+              {(createFormData.role === "NURSE_OFFICER" || createFormData.role === "MANAGER" || createFormData.role === "STAFF") && (
                 <>
                   <div className="form-group">
                     <label>Region *</label>
