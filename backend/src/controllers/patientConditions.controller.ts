@@ -262,7 +262,8 @@ export async function getConditionsByPeriod(
       return;
     }
 
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, region, center } = req.query;
+    const userCenterId = req.user.centerId;
 
     // If no dates provided, fetch all time data
     let start: Date | null = null;
@@ -281,8 +282,28 @@ export async function getConditionsByPeriod(
       }
     }
 
-    // Get all wellness plans within the date range (or all time)
-    const conditions = await PatientConditionsService.getConditionsByDateRange(start, end);
+    // Priority: Query params (region/center) > User's assigned center
+    let filterCenterId: string | null = null;
+    let filterRegion: string | null = null;
+
+    if (center && typeof center === 'string') {
+      filterCenterId = center;
+      console.log(`Filtering conditions by center (query param): ${center}`);
+    } else if (region && typeof region === 'string') {
+      filterRegion = region;
+      console.log(`Filtering conditions by region (query param): ${region}`);
+    } else if (userCenterId) {
+      filterCenterId = userCenterId;
+      console.log(`Filtering conditions by user's center: ${userCenterId}`);
+    }
+
+    // Get all wellness plans within the date range (or all time), filtered by center or region
+    const conditions = await PatientConditionsService.getConditionsByDateRange(
+      start, 
+      end, 
+      filterCenterId, 
+      filterRegion
+    );
 
     // Total wellness plans count (unique patients)
     const totalWellnessPlans = conditions.reduce((sum, c) => sum + c.count, 0);
@@ -292,6 +313,8 @@ export async function getConditionsByPeriod(
       condition: c.condition,
       count: c.count,
     }));
+
+    console.log(`Conditions fetched for user ${req.user.userId} (region: ${filterRegion || 'none'}, center: ${filterCenterId || 'all'}): ${result.length} condition types`);
 
     res.status(200).json({
       status: 'success',

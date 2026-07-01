@@ -325,7 +325,7 @@ export async function updateAppointmentStatus(
 }
 
 
-export async function getQueueAppointments(dateString?: string) {
+export async function getQueueAppointments(dateString?: string, centerId?: string) {
   let whereClause: any = {
     status: {
       in: [
@@ -340,6 +340,14 @@ export async function getQueueAppointments(dateString?: string) {
       ],
     },
   };
+
+  // Filter by center if centerId is provided
+  if (centerId) {
+    whereClause.user = {
+      centerId: centerId,
+    };
+    console.log(`Filtering queue appointments for center: ${centerId}`);
+  }
 
   if (dateString) {
     // Parse the provided date string (YYYY-MM-DD format)
@@ -370,6 +378,14 @@ export async function getQueueAppointments(dateString?: string) {
           phone: true,
           userId: true,
           isExternal: true,
+          centerId: true,
+          center: {
+            select: {
+              id: true,
+              name: true,
+              region: true,
+            },
+          },
         },
       },
     },
@@ -393,6 +409,9 @@ export async function getQueueAppointments(dateString?: string) {
     status: apt.status === AppointmentStatus.PENDING ? 'WAITING' : apt.status, // Map legacy PENDING to WAITING
     type: 'ONLINE', // Default to ONLINE, can be enhanced later
     notes: apt.notes || undefined,
+    centerId: apt.user.centerId,
+    centerName: apt.user.center?.name,
+    centerRegion: apt.user.center?.region,
   }));
 }
 

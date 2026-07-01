@@ -456,10 +456,27 @@ export async function getConditionTrends(period: string) {
  */
 export async function getConditionsByDateRange(
   startDate: Date | null,
-  endDate: Date | null
+  endDate: Date | null,
+  centerId?: string | null,
+  region?: string | null
 ) {
   // Build where clause for vitals records
   const vitalsWhereClause: any = {};
+  
+  // Filter by center or region if provided
+  if (centerId) {
+    vitalsWhereClause.user = {
+      centerId: centerId,
+    };
+    console.log(`[getConditionsByDateRange] Filtering by center: ${centerId}`);
+  } else if (region) {
+    vitalsWhereClause.user = {
+      center: {
+        region: region,
+      },
+    };
+    console.log(`[getConditionsByDateRange] Filtering by region: ${region}`);
+  }
   
   if (startDate && endDate) {
     vitalsWhereClause.recordedAt = {

@@ -918,6 +918,8 @@ const AdminService = {
     timePeriod?: string,
   ): Promise<any> {
     try {
+      console.log("[getRegionalHealthComparison] Starting with timePeriod:", timePeriod);
+      
       // Calculate date range
       const now = new Date();
       let dateFrom: Date | undefined;
@@ -937,17 +939,22 @@ const AdminService = {
         dateFrom = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
       }
 
+      console.log("[getRegionalHealthComparison] Date range:", { dateFrom });
+
       // Get all regions
+      console.log("[getRegionalHealthComparison] Fetching regions...");
       const regions = await prisma.center.findMany({
         select: { region: true },
         distinct: ["region"],
       });
 
       const regionList = regions.map((r) => r.region);
+      console.log("[getRegionalHealthComparison] Found regions:", regionList);
 
       // Process each region
       const regionHealthData = await Promise.all(
         regionList.map(async (region) => {
+          console.log(`[getRegionalHealthComparison] Processing region: ${region}`);
           // Get staff users in this region (STAFF role only)
           const staffUsers = await prisma.user.findMany({
             where: {
@@ -959,6 +966,7 @@ const AdminService = {
 
           const staffUserIds = staffUsers.map((u) => u.id);
           const totalStaff = staffUserIds.length;
+          console.log(`[getRegionalHealthComparison] Region ${region}: ${totalStaff} staff`);
 
           if (totalStaff === 0) {
             return {
@@ -1086,9 +1094,10 @@ const AdminService = {
         }),
       );
 
+      console.log("[getRegionalHealthComparison] Completed. Returning data for", regionHealthData.length, "regions");
       return regionHealthData;
     } catch (error) {
-      console.error("Error getting regional health comparison:", error);
+      console.error("[getRegionalHealthComparison] Error getting regional health comparison:", error);
       throw error;
     }
   },

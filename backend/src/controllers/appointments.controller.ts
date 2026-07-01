@@ -308,7 +308,24 @@ export async function sendReminderHandler(req: AuthRequest, res: Response): Prom
 export async function getQueueHandler(req: AuthRequest, res: Response): Promise<void> {
   try {
     const date = req.query.date as string | undefined;
-    const queue = await getQueueAppointments(date);
+    const user = req.user;
+
+    if (!user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    // Get the nurse's center ID
+    const centerId = user.centerId;
+
+    // If nurse has a center, filter appointments by that center
+    // Otherwise (for system admins), show all appointments
+    const queue = await getQueueAppointments(date, centerId || undefined);
+
+    console.log(`Queue fetched for user ${user.userId} (center: ${centerId || 'all'}): ${queue.length} appointments`);
 
     res.status(200).json({
       status: "success",

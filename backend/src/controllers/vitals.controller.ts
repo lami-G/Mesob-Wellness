@@ -562,8 +562,43 @@ export async function getAllVitalsHandler(req: AuthRequest, res: Response): Prom
   try {
     const startDate = req.query.startDate as string | undefined;
     const endDate = req.query.endDate as string | undefined;
+    const region = req.query.region as string | undefined;
+    const center = req.query.center as string | undefined;
+    const user = req.user;
+
+    if (!user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
 
     const whereClause: any = {};
+
+    // Priority: Query params > User's assigned center
+    // This allows admins to filter by region/center via query params
+    if (center) {
+      // Specific center filter from query param
+      whereClause.user = {
+        centerId: center,
+      };
+      console.log(`Filtering vitals by center (query param): ${center}`);
+    } else if (region) {
+      // Region filter from query param
+      whereClause.user = {
+        center: {
+          region: region,
+        },
+      };
+      console.log(`Filtering vitals by region (query param): ${region}`);
+    } else if (user.centerId) {
+      // Fall back to user's assigned center if no query params
+      whereClause.user = {
+        centerId: user.centerId,
+      };
+      console.log(`Filtering vitals by user's center: ${user.centerId}`);
+    }
 
     if (startDate && endDate) {
       whereClause.recordedAt = {
@@ -589,6 +624,8 @@ export async function getAllVitalsHandler(req: AuthRequest, res: Response): Prom
         recordedAt: 'desc',
       },
     });
+
+    console.log(`Found ${vitals.length} vitals records (region: ${region || 'none'}, center: ${center || user.centerId || 'all'})`);
 
     res.status(200).json({
       status: "success",

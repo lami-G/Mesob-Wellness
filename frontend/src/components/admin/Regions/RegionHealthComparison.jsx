@@ -216,20 +216,9 @@ function RegionHealthComparison() {
                   <YAxis stroke="#6B7280" domain={[0, 100]} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d0d7ea",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                      padding: "12px",
-                    }}
-                    labelStyle={{
-                      color: "#213d8d",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                    }}
-                    itemStyle={{
-                      color: "#1f2937",
-                      padding: "4px 0",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      boxShadow: "none",
                     }}
                   />
                   <Bar dataKey="healthScore" fill="#213D8D" radius={[8, 8, 0, 0]}>
@@ -261,20 +250,9 @@ function RegionHealthComparison() {
                   <YAxis dataKey="region" type="category" stroke="#6B7280" width={100} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d0d7ea",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                      padding: "12px",
-                    }}
-                    labelStyle={{
-                      color: "#213d8d",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                    }}
-                    itemStyle={{
-                      color: "#1f2937",
-                      padding: "4px 0",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      boxShadow: "none",
                     }}
                   />
                   <Legend />
@@ -296,20 +274,9 @@ function RegionHealthComparison() {
                   <YAxis stroke="#6B7280" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d0d7ea",
-                      borderRadius: "8px",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                      padding: "12px",
-                    }}
-                    labelStyle={{
-                      color: "#213d8d",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                    }}
-                    itemStyle={{
-                      color: "#1f2937",
-                      padding: "4px 0",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      boxShadow: "none",
                     }}
                   />
                   <Legend />

@@ -58,6 +58,9 @@ export default function HealthConditionTrendsPanel({
   periodSwitcherClassName = "mgr-period-switcher",
   viewPeriod: externalPeriod,
   showPeriodSwitcher = true,
+  selectedCenter,
+  selectedRegion,
+  dateRange,
 }) {
   const [viewPeriod, setViewPeriod] = useState("daily");
   const [healthConditions, setHealthConditions] = useState([]);
@@ -214,7 +217,13 @@ export default function HealthConditionTrendsPanel({
         let startDate;
         let endDate;
 
-        if (period === "all") {
+        // Use custom date range if provided
+        if (dateRange && dateRange.start && dateRange.end) {
+          startDate = new Date(dateRange.start);
+          startDate.setHours(0, 0, 0, 0);
+          endDate = new Date(dateRange.end);
+          endDate.setHours(23, 59, 59, 999);
+        } else if (period === "all") {
           startDate = null;
           endDate = null;
         } else if (period === "daily") {
@@ -266,12 +275,21 @@ export default function HealthConditionTrendsPanel({
         }
 
         const params =
-          period === "all"
+          period === "all" && (!dateRange || !dateRange.start)
             ? {}
             : {
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString(),
               };
+        
+        // Add center and region filters
+        if (selectedCenter && selectedCenter !== "all") {
+          params.center = selectedCenter;
+        }
+        if (selectedRegion && selectedRegion !== "all") {
+          params.region = selectedRegion;
+        }
+        
         const response = await api.get("/api/v1/conditions/period", { params });
         const conditions = response.data.data || [];
         const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
@@ -313,7 +331,7 @@ export default function HealthConditionTrendsPanel({
         setConditionTrends(null);
       }
     },
-    [generateDynamicLineChart],
+    [generateDynamicLineChart, selectedCenter, selectedRegion, dateRange],
   );
 
   const effectivePeriod = externalPeriod || viewPeriod;

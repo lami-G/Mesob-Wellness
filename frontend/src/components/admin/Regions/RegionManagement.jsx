@@ -3,6 +3,7 @@ import { adminService } from "../../../services/adminService";
 import { regionalService } from "../../../services/regionalService";
 import RegionEditModal from "./RegionEditModal";
 import RegionHealthComparison from "./RegionHealthComparison";
+import EthiopiaHealthMap from "./EthiopiaHealthMap";
 import styles from "./RegionManagement.module.css";
 import "../../../styles/admin-regions.css";
 
@@ -28,6 +29,7 @@ function RegionManagement() {
   const [regionStats, setRegionStats] = useState({});
   const [regionCardsPage, setRegionCardsPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [timePeriod, setTimePeriod] = useState("monthly");
   const cardsPerPage = 8;
 
   // Filter regions based on search query
@@ -225,6 +227,26 @@ function RegionManagement() {
             <div className="regions-list-header">
               <h3>Existing Regions ({filteredRegions.length})</h3>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                {/* Time Period Filter */}
+                <select
+                  value={timePeriod}
+                  onChange={(e) => setTimePeriod(e.target.value)}
+                  style={{
+                    padding: '0.375rem 0.625rem',
+                    borderRadius: '6px',
+                    border: '1px solid #D1D5DB',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    color: '#374151',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="all">All Time</option>
+                </select>
                 {/* Search Input */}
                 <input
                   type="text"
@@ -721,6 +743,14 @@ function RegionManagement() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Ethiopia Health Map - Only show in card view */}
+      {!showDetailView && (
+        <EthiopiaHealthMap 
+          timePeriod={timePeriod}
+          selectedRegion={selectedRegion}
+        />
       )}
 
       {/* Regional Staff Health Comparison - Only show in card view */}

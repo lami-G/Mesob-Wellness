@@ -142,16 +142,25 @@ function DashboardMetrics({
       if (effectiveCenter !== "all") params.center = effectiveCenter;
       if (effectiveRegion !== "all") params.region = effectiveRegion;
       if (selectedRegion !== "all") params.region = selectedRegion;
+      
       const response = await api.get("/api/v1/conditions/period", { params });
       const conditions = response.data.data || [];
       const totalWellnessPlans = response.data.meta?.totalWellnessPlans || 0;
+      
+      // Build vitals params with same filters
       const vitalsParams =
-        effectivePeriod === "all"
+        effectivePeriod === "all" && !effectiveDateRange.start
           ? {}
           : {
               startDate: startDate.toISOString(),
               endDate: endDate.toISOString(),
             };
+      
+      // Apply the same region/center filters to vitals
+      if (effectiveCenter !== "all") vitalsParams.center = effectiveCenter;
+      if (effectiveRegion !== "all") vitalsParams.region = effectiveRegion;
+      if (selectedRegion !== "all") vitalsParams.region = selectedRegion;
+      
       const vitalsRes = await api.get("/api/v1/vitals/all", {
         params: vitalsParams,
       });
@@ -567,6 +576,9 @@ function DashboardMetrics({
       <HealthConditionTrendsPanel
         viewPeriod={effectivePeriod}
         showPeriodSwitcher={false}
+        selectedCenter={effectiveCenter}
+        selectedRegion={effectiveRegion}
+        dateRange={effectiveDateRange}
       />
     </div>
   );
