@@ -64,15 +64,38 @@ function getOptionalPort(name: string): number {
   return port;
 }
 
+function parseDatabaseUrl(databaseUrl: string): URL {
+  try {
+    return new URL(databaseUrl);
+  } catch {
+    throw new Error(
+      "DATABASE_URL is not a valid URL. Use postgresql://USER:PASSWORD@HOST:PORT/DATABASE (see .env.example).",
+    );
+  }
+}
+
+const databaseUrl = getRequiredEnv("DATABASE_URL");
+const parsedDatabaseUrl = parseDatabaseUrl(databaseUrl);
+
+const databaseUser = process.env.DB_USER?.trim() || decodeURIComponent(parsedDatabaseUrl.username || "");
+const databasePass = process.env.DB_PASS?.trim() || decodeURIComponent(parsedDatabaseUrl.password || "");
+const databaseHost = process.env.DB_HOST?.trim() || parsedDatabaseUrl.hostname || "localhost";
+const databasePort = (() => {
+  const value = process.env.DB_PORT?.trim() || parsedDatabaseUrl.port;
+  const parsed = Number.parseInt(value || "5432", 10);
+  return Number.isNaN(parsed) ? 5432 : parsed;
+})();
+const databaseName = process.env.DB_NAME?.trim() || parsedDatabaseUrl.pathname.replace(/^\//, "").split("/")[0] || "mesob_wellness";
+
 export const env = Object.freeze({
   NODE_ENV: getNodeEnv(),
   PORT: getRequiredPort("PORT"),
-  DB_HOST: getRequiredEnv("DB_HOST"),
-  DB_PORT: getRequiredPort("DB_PORT"),
-  DB_USER: getRequiredEnv("DB_USER"),
-  DB_PASS: getRequiredEnv("DB_PASS"),
-  DB_NAME: getRequiredEnv("DB_NAME"),
-  DATABASE_URL: getRequiredEnv("DATABASE_URL"),
+  DB_HOST: databaseHost,
+  DB_PORT: databasePort,
+  DB_USER: databaseUser,
+  DB_PASS: databasePass,
+  DB_NAME: databaseName,
+  DATABASE_URL: databaseUrl,
   JWT_SECRET: getRequiredEnv("JWT_SECRET"),
   JWT_EXPIRES_IN: getRequiredEnv("JWT_EXPIRES_IN"),
   SMTP_HOST: getOptionalEnv("SMTP_HOST"),
@@ -84,16 +107,6 @@ export const env = Object.freeze({
 
 if (!env.DATABASE_URL.startsWith("postgresql://")) {
   throw new Error("DATABASE_URL must use the postgresql:// connection protocol.");
-}
-
-const isLocalDatabase =
-  env.DATABASE_URL.includes("@localhost") ||
-  env.DATABASE_URL.includes("@127.0.0.1");
-
-if (!isLocalDatabase) {
-  throw new Error(
-    "DATABASE_URL must point to a local PostgreSQL instance (localhost or 127.0.0.1).",
-  );
 }
 
 /** Prisma CLI reads DATABASE_URL; the app uses DB_* for the driver pool — they must describe the same database. */
@@ -161,14 +174,9 @@ assertDatabaseUrlMatchesDiscreteCredentials(
 
 /** Pool uses DB_PASS; Prisma CLI uses DATABASE_URL — different passwords cause P1010 at runtime. */
 function assertDatabaseUrlPasswordMatchesDbPass(databaseUrl: string, dbPass: string): void {
-  let parsed: URL;
-  try {
-    parsed = new URL(databaseUrl);
-  } catch {
-    return;
-  }
+  const parsed = parseDatabaseUrl(databaseUrl);
   const urlPassword = parsed.password;
-  if (urlPassword !== dbPass) {
+  if (urlPassword && urlPassword !== dbPass) {
     throw new Error(
       "DATABASE_URL password and DB_PASS must be exactly the same (raw password in DB_PASS; percent-encoding only in DATABASE_URL). If they differ, Prisma often reports P1010 \"User was denied access on the database\" on the first query.",
     );

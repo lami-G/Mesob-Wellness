@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import AnimatedWaveBackground from "../../components/AnimatedWaveBackground";
+import { getApiUrl } from "../../services/apiBase";
 import styles from "./Register.module.css";
 
 export const AMHARIC_HEADER_LINES = [
@@ -60,7 +61,7 @@ function Register() {
   const fetchRegions = async () => {
     setRegionsLoading(true);
     try {
-      const url = `${import.meta.env.VITE_API_URL}/api/v1/regions`;
+      const url = getApiUrl("/api/v1/regions");
       console.log('Fetching regions from:', url);
       const response = await fetch(url);
       const data = await response.json();
@@ -81,14 +82,13 @@ function Register() {
   const fetchCenters = async (region) => {
     setCentersLoading(true);
     try {
-      const url = `${import.meta.env.VITE_API_URL}/api/v1/centers?region=${encodeURIComponent(region)}`;
+      const url = getApiUrl(`/api/v1/centers?region=${encodeURIComponent(region)}`);
       console.log('Fetching centers from:', url);
       const response = await fetch(url);
       const data = await response.json();
       console.log('Centers response:', data);
       if (data.status === "success" && Array.isArray(data.data)) {
         setCenters(data.data);
-        console.log('Centers loaded:', data.data);
       } else {
         console.error('Invalid centers response format:', data);
         setCenters([]);
@@ -113,7 +113,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/hr/employee/${formData.employeeId}`,
+        getApiUrl(`/api/v1/hr/employee/${formData.employeeId}`),
       );
       const data = await response.json();
 
@@ -121,9 +121,8 @@ function Register() {
         throw new Error(data.message || "Employee not found in HR system");
       }
 
-      // Auto-fill form with HR data
       const employee = data.data;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         fullName: employee.fullName || prev.fullName,
         email: employee.email || prev.email,
@@ -289,26 +288,23 @@ function Register() {
     setSuccessMessage("");
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/auth/register`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fullName: formData.fullName,
-            email: formData.email,
-            password: formData.password,
-            phone: formData.phone,
-            dateOfBirth: formData.dateOfBirth,
-            gender: formData.gender,
-            centerId: formData.centerId,
-            emergencyContactName: formData.emergencyContactName,
-            emergencyContactPhone: formData.emergencyContactPhone,
-          }),
+      const response = await fetch(getApiUrl("/api/v1/auth/register"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender,
+          centerId: formData.centerId,
+          emergencyContactName: formData.emergencyContactName,
+          emergencyContactPhone: formData.emergencyContactPhone,
+        }),
+      });
 
       const data = await response.json();
 

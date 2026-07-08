@@ -24,6 +24,14 @@ async function hash(pw) {
   return bcrypt.hash(pw, 10);
 }
 
+async function nextDisplayId() {
+  const result = await pool.query(
+    "SELECT nextval('user_display_id_seq') AS nextval",
+  );
+
+  return String(result.rows[0].nextval).padStart(4, '0');
+}
+
 async function main() {
   console.log("🌱 Seeding test users...");
   console.log("   Connecting to:", process.env.DATABASE_URL);
@@ -69,21 +77,23 @@ async function main() {
 
   for (const u of users) {
     const hashedPassword = await hash(u.password);
+    const userId = await nextDisplayId();
     await pool.query(
       `
-      INSERT INTO users (id, email, password, "fullName", role, "isActive", "isVerified", "createdAt", "updatedAt")
-      VALUES (gen_random_uuid(), $1, $2, $3, $4::\"UserRole\", true, true, NOW(), NOW())
+      INSERT INTO users (id, email, password, "fullName", role, "userId", "isActive", "isVerified", "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), $1, $2, $3, $4::\"UserRole\", $5, true, true, NOW(), NOW())
       ON CONFLICT (email) DO UPDATE SET
         password = EXCLUDED.password,
         "fullName" = EXCLUDED."fullName",
         role = EXCLUDED.role,
+        "userId" = EXCLUDED."userId",
         "isActive" = true,
         "isVerified" = true,
         "updatedAt" = NOW()
     `,
-      [u.email, hashedPassword, u.fullName, u.role],
+      [u.email, hashedPassword, u.fullName, u.role, userId],
     );
-    console.log(`  ✅ ${u.role.padEnd(16)} → ${u.email}`);
+    console.log(`  ✅ ${u.role.padEnd(16)} → ${u.email} (${userId})`);
   }
 
   console.log("\n✅ Done! Test users updated with role passwords.");

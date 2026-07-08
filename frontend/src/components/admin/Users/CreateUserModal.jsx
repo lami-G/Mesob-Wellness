@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../../services/adminService";
+import { getApiUrl } from "../../../services/apiBase";
 import modalStyles from "../shared/Modal.module.css";
 
 function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
@@ -62,8 +63,7 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
   const fetchRegions = async () => {
     setRegionsLoading(true);
     try {
-      const url = `${import.meta.env.VITE_API_URL}/api/v1/regions`;
-      const response = await fetch(url);
+      const response = await fetch(getApiUrl("/api/v1/regions"));
       const data = await response.json();
       if (data.status === "success" && Array.isArray(data.data)) {
         setRegions(data.data);
@@ -80,8 +80,9 @@ function CreateUserModal({ isOpen, onClose, onSuccess, allowedRoles }) {
   const fetchCenters = async (region) => {
     setCentersLoading(true);
     try {
-      const url = `${import.meta.env.VITE_API_URL}/api/v1/centers?region=${encodeURIComponent(region)}`;
-      const response = await fetch(url);
+      const response = await fetch(
+        getApiUrl(`/api/v1/centers?region=${encodeURIComponent(region)}`),
+      );
       const data = await response.json();
       if (data.status === "success" && Array.isArray(data.data)) {
         setCenters(data.data);
