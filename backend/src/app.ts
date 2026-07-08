@@ -55,6 +55,20 @@ app.get("/health", (_req: Request, res: Response) => {
   });
 });
 
+app.get("/", (_req: Request, res: Response) => {
+  res.status(200).json({
+    status: "success",
+    message: "Welcome to Mesob Wellness API",
+    version: "1.0.0",
+    endpoints: {
+      health: "/health",
+      apiHealth: "/api/health",
+      api: "/api/v1",
+    },
+    documentation: "Visit /api/v1 for API endpoints",
+  });
+});
+
 app.use("/api/v1", apiRoutes);
 
 app.use((_req: Request, res: Response) => {
