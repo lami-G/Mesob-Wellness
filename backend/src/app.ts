@@ -59,7 +59,7 @@ app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     status: "success",
     message: "Welcome to Mesob Wellness API",
-    version: "1.0.0",
+    version: "1.0.1",
     endpoints: {
       health: "/health",
       apiHealth: "/api/health",
