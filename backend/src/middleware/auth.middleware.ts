@@ -9,6 +9,14 @@ export interface AuthRequest extends Request {
     role: UserRole;
     centerId?: string | null;
   };
+  body: any;
+  params: any;
+  query: any;
+  headers: any;
+  ip?: string;
+  path: string;
+  method: string;
+  get(name: string): string | undefined;
 }
 
 /**
