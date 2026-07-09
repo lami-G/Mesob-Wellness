@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { UserRole } from "../generated/prisma";
 import { AuthService } from "../services/auth.service";
 
@@ -9,6 +9,10 @@ export interface AuthRequest extends Request {
     role: UserRole;
     centerId?: string | null;
   };
+  body: any;
+  params: any;
+  query: any;
+  headers: any;
 }
 
 /**
