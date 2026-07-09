@@ -10,7 +10,6 @@
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
     "noImplicitThis": false,
-    "suppressImplicitAnyIndexErrors": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
