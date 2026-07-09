@@ -103,6 +103,7 @@ export const env = Object.freeze({
   SMTP_USER: getOptionalEnv("SMTP_USER"),
   SMTP_PASS: getOptionalEnv("SMTP_PASS"),
   SMTP_FROM: getOptionalEnv("SMTP_FROM") || "noreply@mesob.com",
+  SEED_SECRET_KEY: getOptionalEnv("SEED_SECRET_KEY"),
 });
 
 if (!env.DATABASE_URL.startsWith("postgresql://")) {
