@@ -4,6 +4,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "prisma generate && tsc -p tsconfig.json && npm run copy:prisma",
+    "postinstall": "prisma generate",
     "copy:prisma": "node -e \"require('fs').cpSync('src/generated', 'dist/generated', {recursive: true})\"",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "start": "node dist/server.js",
