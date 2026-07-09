@@ -6,16 +6,7 @@ import AnimatedWaveBackground from "../../components/AnimatedWaveBackground";
 import Card from "../../components/shared/Card";
 import styles from "./Login.module.css";
 
-const CACHED_CREDENTIALS_KEY = "mesob_cached_credentials";
-
-const DEFAULT_CREDENTIALS = {
-  "staff@mesob.et": "Staff123!",
-  "nurse@mesob.et": "Nurse123!",
-  "manager@mesob.et": "Manager123!",
-  "regional@mesob.et": "Regional123!",
-  "federal@mesob.et": "Federal123!",
-  "admin@mesob.et": "Admin123!",
-};
+// Credentials management removed for production security
 
 function Login() {
   const navigate = useNavigate();
@@ -25,34 +16,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [cachedCredentials, setCachedCredentials] = useState({});
-
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem(CACHED_CREDENTIALS_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        setCachedCredentials({ ...DEFAULT_CREDENTIALS, ...parsed });
-      } else {
-        setCachedCredentials(DEFAULT_CREDENTIALS);
-      }
-    } catch (error) {
-      console.error("Error loading cached credentials:", error);
-      setCachedCredentials(DEFAULT_CREDENTIALS);
-    }
-  }, []);
-
-  const cacheCredentials = (email, password) => {
-    try {
-      const cached = localStorage.getItem(CACHED_CREDENTIALS_KEY);
-      const existing = cached ? JSON.parse(cached) : {};
-      const updated = { ...existing, [email]: password };
-      localStorage.setItem(CACHED_CREDENTIALS_KEY, JSON.stringify(updated));
-      setCachedCredentials({ ...DEFAULT_CREDENTIALS, ...updated });
-    } catch (error) {
-      console.error("Error caching credentials:", error);
-    }
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -72,13 +35,7 @@ function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const nextFormData = { ...formData, [name]: value };
-    if (name === "email") {
-      const emailLower = value.trim().toLowerCase();
-      const cachedPassword = cachedCredentials[emailLower];
-      if (cachedPassword) nextFormData.password = cachedPassword;
-    }
-    setFormData(nextFormData);
+    setFormData({ ...formData, [name]: value });
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     setServerError("");
   };
@@ -90,7 +47,6 @@ function Login() {
     setServerError("");
     const result = await login(formData.email, formData.password);
     if (result.success) {
-      cacheCredentials(formData.email.toLowerCase(), formData.password);
       const roleRoutes = {
         EXTERNAL_PATIENT: "/dashboard",
         STAFF: "/dashboard",
@@ -148,15 +104,9 @@ function Login() {
                   placeholder="Username"
                   disabled={loading}
                   autoComplete="username email"
-                  list="mesob-email-suggestions"
                   className={`${styles.input} ${errors.email ? styles.inputError : ""} ${loading ? styles.inputDisabled : ""}`}
                 />
               </div>
-              <datalist id="mesob-email-suggestions">
-                {Object.keys(cachedCredentials).map((email) => (
-                  <option key={email} value={email} />
-                ))}
-              </datalist>
               {errors.email && (
                 <span className={styles.errorText}>{errors.email}</span>
               )}
