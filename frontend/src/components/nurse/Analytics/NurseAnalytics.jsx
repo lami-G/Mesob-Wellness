@@ -683,10 +683,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
             value={viewPeriod}
             onChange={(e) => setViewPeriod(e.target.value)}
             className={styles.periodSelect}
-            style={{
-              padding: '0.375rem 0.625rem',
-              fontSize: '0.8rem',
-            }}
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -701,22 +697,10 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className={`form-input ${styles.datePicker}`}
-                style={{
-                  padding: '0.375rem 0.625rem',
-                  fontSize: '0.8rem',
-                }}
+                className={styles.datePicker}
               />
             </div>
           )}
-          
-          <button 
-            onClick={fetchAnalytics}
-            className="btn btn-secondary"
-            disabled={loading}
-          >
-            Refresh
-          </button>
         </div>
       </div>
 
@@ -809,15 +793,15 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       </div>
 
       {/* Health Conditions Ranked Chart */}
-      <div className={`card ${styles.healthConditionsCard}`}>
+      <div className={styles.healthConditionsCard}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+        <div className={styles.healthConditionsHeader}>
+          <div className={styles.healthConditionsTitleRow}>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '600', color: '#111' }}>
+              <h3 className={styles.healthConditionsTitle}>
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
               </h3>
-              <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', color: '#666' }}>
+              <p className={styles.healthConditionsSubtitle}>
                 {viewPeriod === 'daily' && 'Patients with each condition recorded today'}
                 {viewPeriod === 'weekly' && (() => {
                   const today = new Date();

@@ -175,7 +175,7 @@ function RegisterWalkIn({ onSuccess }) {
           Search Patient
         </h3>
 
-        <form onSubmit={handleSearch} className={styles.searchForm} style={{ maxWidth: '500px' }}>
+        <form onSubmit={handleSearch} className={styles.searchForm}>
           <input
             type="text"
             value={searchTerm}
