@@ -115,6 +115,7 @@ model VitalRecord {
 model Appointment {
   id                 String            @id @default(uuid()) @db.Uuid
   userId             String            @db.Uuid
+  centerId           String            @db.Uuid
   scheduledAt        DateTime          @db.Timestamptz(3)
   reason             String
   status             AppointmentStatus @default(WAITING)
@@ -133,12 +134,16 @@ model Appointment {
   createdAt          DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime          @updatedAt @db.Timestamptz(3)
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  center             Center            @relation(fields: [centerId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([centerId])
   @@index([scheduledAt])
   @@index([status])
   @@index([isWalkIn])
   @@index([userId, status])
+  @@index([centerId, scheduledAt])
+  @@index([centerId, status])
   @@index([scheduledAt, status])
   @@index([isWalkIn, status])
   @@map("appointments")
@@ -184,20 +189,21 @@ model Feedback {
 }
 
 model Center {
-  id           String       @id @default(uuid()) @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   name         String
   region       String
   city         String
   address      String
   phone        String?
   email        String?
-  status       CenterStatus @default(ACTIVE)
+  status       CenterStatus  @default(ACTIVE)
   capacity     Int?
-  managerId    String?      @db.Uuid
+  managerId    String?       @db.Uuid
   managerEmail String?
-  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(3)
   staff        User[]
+  appointments Appointment[]
 
   @@index([region])
   @@index([status])

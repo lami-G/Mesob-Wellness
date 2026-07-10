@@ -3,6 +3,7 @@ import { prisma } from "../config/prisma";
 
 interface AppointmentInput {
   patientId: string; // UUID string
+  centerId: string; // UUID string - center where appointment is booked
   scheduledAt: string;
   reason: string;
 }
@@ -103,9 +104,10 @@ export async function createAppointment(input: AppointmentInput): Promise<Appoin
     throw new Error('Appointment time must be on 15-minute intervals (e.g., 8:30, 8:45, 9:00)');
   }
 
-  // Check if this exact time slot is already booked
+  // Check if this exact time slot is already booked AT THIS CENTER
   const existingAppointment = await prisma.appointment.findFirst({
     where: {
+      centerId: input.centerId, // Check availability at this specific center
       scheduledAt: appointmentDateTime,
       status: {
         notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW],
@@ -114,14 +116,15 @@ export async function createAppointment(input: AppointmentInput): Promise<Appoin
   });
 
   if (existingAppointment) {
-    throw new Error('This time slot is already booked. Please choose another time.');
+    throw new Error('This time slot is already booked at this center. Please choose another time.');
   }
 
-  console.log(`[createAppointment] Booking appointment at: ${appointmentDateTime.toISOString()}`);
+  console.log(`[createAppointment] Booking appointment at center ${input.centerId} for: ${appointmentDateTime.toISOString()}`);
 
   const appointment = await prisma.appointment.create({
     data: {
       userId: input.patientId,
+      centerId: input.centerId,
       scheduledAt: appointmentDateTime,
       reason: input.reason,
       status: AppointmentStatus.WAITING,
@@ -138,18 +141,19 @@ export async function createAppointment(input: AppointmentInput): Promise<Appoin
   };
 }
 
-export async function getAvailableTimeSlots(dateString: string): Promise<string[]> {
+export async function getAvailableTimeSlots(dateString: string, centerId: string): Promise<string[]> {
   // Parse the date (YYYY-MM-DD format)
   const [year, month, day] = dateString.split('-').map(Number);
   const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999));
 
-  console.log(`[getAvailableTimeSlots] Querying for date: ${dateString}`);
+  console.log(`[getAvailableTimeSlots] Querying for date: ${dateString}, center: ${centerId}`);
   console.log(`[getAvailableTimeSlots] UTC range: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`);
 
-  // Get all booked appointments for this date
+  // Get all booked appointments for this date AT THIS SPECIFIC CENTER
   const bookedAppointments = await prisma.appointment.findMany({
     where: {
+      centerId: centerId, // Filter by center
       scheduledAt: {
         gte: startOfDay,
         lte: endOfDay,
@@ -161,12 +165,13 @@ export async function getAvailableTimeSlots(dateString: string): Promise<string[
     select: {
       scheduledAt: true,
       userId: true,
+      centerId: true,
     },
   });
 
-  console.log(`[getAvailableTimeSlots] Found ${bookedAppointments.length} booked appointments`);
+  console.log(`[getAvailableTimeSlots] Found ${bookedAppointments.length} booked appointments at center ${centerId}`);
   bookedAppointments.forEach(apt => {
-    console.log(`  - Appointment at ${apt.scheduledAt.toISOString()} for user ${apt.userId}`);
+    console.log(`  - Appointment at ${apt.scheduledAt.toISOString()} for user ${apt.userId} at center ${apt.centerId}`);
   });
 
   // Create set of booked times for quick lookup

@@ -17,6 +17,7 @@ import { prisma } from "../config/prisma";
 
 interface AppointmentRequestBody {
   patientId: unknown;
+  centerId: unknown;
   scheduledAt: unknown;
   reason: unknown;
 }
@@ -56,11 +57,12 @@ export async function getAppointments(req: AuthRequest, res: Response): Promise<
 }
 
 export async function postAppointment(req: AuthRequest, res: Response): Promise<void> {
-  const { patientId, scheduledAt, reason } =
+  const { patientId, centerId, scheduledAt, reason } =
     req.body as Partial<AppointmentRequestBody>;
 
   // Use authenticated user's ID if patientId is not provided or is invalid
   const userId = req.user?.userId;
+  const userCenterId = req.user?.centerId;
 
   if (!userId) {
     res.status(401).json({
@@ -70,7 +72,18 @@ export async function postAppointment(req: AuthRequest, res: Response): Promise<
     return;
   }
 
-  console.log(`[postAppointment] Received request - scheduledAt: ${scheduledAt}, reason: ${reason}`);
+  console.log(`[postAppointment] Received request - centerId: ${centerId}, scheduledAt: ${scheduledAt}, reason: ${reason}`);
+
+  // Use provided centerId or fall back to user's centerId
+  const appointmentCenterId = isNonEmptyString(centerId) ? centerId : userCenterId;
+
+  if (!appointmentCenterId) {
+    res.status(400).json({
+      status: "error",
+      message: "centerId is required. Either provide it in the request or ensure user has a center assigned.",
+    });
+    return;
+  }
 
   if (!isNonEmptyString(scheduledAt) || Number.isNaN(Date.parse(scheduledAt))) {
     res.status(400).json({
@@ -91,11 +104,12 @@ export async function postAppointment(req: AuthRequest, res: Response): Promise<
   try {
     const appointment = await createAppointment({
       patientId: userId, // Use authenticated user's ID
+      centerId: appointmentCenterId,
       scheduledAt,
       reason: reason.trim(),
     });
 
-    console.log(`[postAppointment] Appointment created successfully: ${appointment.id}`);
+    console.log(`[postAppointment] Appointment created successfully at center ${appointmentCenterId}: ${appointment.id}`);
 
     res.status(201).json({
       status: "success",
@@ -342,12 +356,14 @@ export async function getQueueHandler(req: AuthRequest, res: Response): Promise<
 
 
 /**
- * GET /api/v1/appointments/available-slots?date=YYYY-MM-DD
- * Get available time slots for a specific date
+ * GET /api/v1/appointments/available-slots?date=YYYY-MM-DD&centerId=uuid
+ * Get available time slots for a specific date at a specific center
  */
 export async function getAvailableSlotsHandler(req: AuthRequest, res: Response): Promise<void> {
   try {
     const date = req.query.date as string;
+    const centerId = req.query.centerId as string;
+    const userCenterId = req.user?.centerId;
 
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       res.status(400).json({
@@ -357,12 +373,24 @@ export async function getAvailableSlotsHandler(req: AuthRequest, res: Response):
       return;
     }
 
-    const availableSlots = await getAvailableTimeSlots(date);
+    // Use provided centerId or fall back to user's centerId
+    const queryCenter = centerId || userCenterId;
+
+    if (!queryCenter) {
+      res.status(400).json({
+        status: 'error',
+        message: 'centerId is required. Either provide it as a query parameter or ensure user has a center assigned.',
+      });
+      return;
+    }
+
+    const availableSlots = await getAvailableTimeSlots(date, queryCenter);
 
     res.status(200).json({
       status: 'success',
       data: {
         date,
+        centerId: queryCenter,
         availableSlots,
         totalSlots: availableSlots.length,
       },

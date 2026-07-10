@@ -85,6 +85,13 @@ function BookingCalendar() {
     const daysInMonth = getDaysInMonth(currentDate);
     const newCache = {};
 
+    // Get user's centerId for filtering slots
+    const centerId = user?.centerId;
+    if (!centerId) {
+      console.warn('User has no centerId assigned');
+      return;
+    }
+
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(
         currentDate.getFullYear(),
@@ -100,7 +107,7 @@ function BookingCalendar() {
         const dateString = `${year}-${month}-${dayStr}`;
 
         try {
-          const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}`);
+          const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}&centerId=${centerId}`);
           const slots = response.data.data.availableSlots || [];
           newCache[dateString] = slots.length;
         } catch (err) {
@@ -130,7 +137,15 @@ function BookingCalendar() {
       const day = String(date.getDate()).padStart(2, '0');
       const dateString = `${year}-${month}-${day}`;
       
-      const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}`);
+      // Get user's centerId for filtering slots
+      const centerId = user?.centerId;
+      if (!centerId) {
+        setError('User has no center assigned. Please contact administrator.');
+        setLoadingSlots(false);
+        return;
+      }
+      
+      const response = await api.get(`/api/v1/appointments/available-slots?date=${dateString}&centerId=${centerId}`);
       let slots = response.data.data.availableSlots || [];
       
       // Filter out past time slots if booking for today
@@ -187,12 +202,25 @@ function BookingCalendar() {
       return;
     }
 
+    // Get user's centerId
+    const centerId = user?.centerId;
+    if (!centerId) {
+      setError('User has no center assigned. Please contact administrator.');
+      setTimeout(() => {
+        if (errorRef.current) {
+          errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+      return;
+    }
+
     try {
       setBookingLoading(true);
       
-      console.log(`Booking appointment for: ${selectedTime}`);
+      console.log(`Booking appointment at center ${centerId} for: ${selectedTime}`);
       
       const response = await api.post("/api/v1/appointments", {
+        centerId: centerId, // Include centerId in the booking request
         scheduledAt: selectedTime, // Send the ISO string with time
         reason: bookingReason,
       });
