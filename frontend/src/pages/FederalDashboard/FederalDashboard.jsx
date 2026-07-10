@@ -521,7 +521,6 @@ function FederalDashboard() {
         <div className={styles.filtersCard}>
           <div className={styles.filtersGrid}>
             <div className={styles.filterItem}>
-              <label className={styles.filterLabel}>Region</label>
               <select
                 value={globalFilters.region}
                 onChange={(e) =>
@@ -531,17 +530,7 @@ function FederalDashboard() {
                     center: "",
                   }))
                 }
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  color: '#374151',
-                  cursor: 'pointer',
-                  width: '100%',
-                }}
+                className="filter-select"
               >
                 <option value="all">All Regions</option>
                 {regions.map((region) => (
@@ -553,7 +542,6 @@ function FederalDashboard() {
             </div>
 
             <div className={styles.filterItem}>
-              <label className={styles.filterLabel}>Center</label>
               <select
                 value={globalFilters.center}
                 onChange={(e) =>
@@ -563,18 +551,7 @@ function FederalDashboard() {
                   }))
                 }
                 disabled={availableCenters.length === 0}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  color: '#374151',
-                  cursor: availableCenters.length === 0 ? 'not-allowed' : 'pointer',
-                  opacity: availableCenters.length === 0 ? 0.6 : 1,
-                  width: '100%',
-                }}
+                className="filter-select"
               >
                 <option value="">All Centers</option>
                 {availableCenters.map((center) => (
@@ -586,21 +563,10 @@ function FederalDashboard() {
             </div>
 
             <div className={styles.filterItem}>
-              <label className={styles.filterLabel}>Time Period</label>
               <select
                 value={timePeriod}
                 onChange={(e) => setTimePeriod(e.target.value)}
-                style={{
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '6px',
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  color: '#374151',
-                  cursor: 'pointer',
-                  width: '100%',
-                }}
+                className="filter-select"
               >
                 <option value="all">All Time</option>
                 <option value="daily">Daily</option>

@@ -162,3 +162,94 @@ select option {
   background-color: #ffffff;
   padding: 0.5rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN - FILTER BAR MOBILE OPTIMIZATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .filter-bar {
+    padding: 1.25rem;
+  }
+  
+  .filter-group {
+    min-width: 180px;
+  }
+  
+  .filter-container {
+    gap: 0.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-bar {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .filter-container {
+    gap: 0.75rem;
+  }
+  
+  .filter-group {
+    flex: 1 1 calc(50% - 0.375rem);
+    min-width: 0;
+  }
+  
+  .filter-group label {
+    font-size: 0.8125rem;
+  }
+  
+  .filter-input,
+  .filter-select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  
+  .filter-select {
+    padding-right: 2.25rem;
+  }
+  
+  .filter-actions {
+    flex: 1 1 100%;
+    justify-content: stretch;
+  }
+  
+  .btn-reset,
+  .btn-apply {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-bar {
+    padding: 0.875rem;
+    border-radius: 8px;
+  }
+  
+  .filter-container {
+    gap: 0.625rem;
+  }
+  
+  .filter-group {
+    flex: 1 1 100%;
+  }
+  
+  .filter-group label {
+    font-size: 0.75rem;
+  }
+  
+  .filter-input,
+  .filter-select {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-reset,
+  .btn-apply {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.75rem;
+  }
+}

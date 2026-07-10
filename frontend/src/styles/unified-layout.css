@@ -847,10 +847,10 @@
     bottom: 0;
     z-index: calc(var(--z-sticky) + 10);
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 240px;
-    max-width: 75vw;
+    width: 200px;
+    max-width: 65vw;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
-    padding: 1rem 0.75rem;
+    padding: 0.75rem 0.5rem;
   }
   
   /* Open state - slide in */
@@ -863,8 +863,8 @@
   .admin-sidebar.collapsed,
   .mesob-sidebar.collapsed {
     left: -100%;
-    width: 240px;
-    max-width: 75vw;
+    width: 200px;
+    max-width: 65vw;
   }
   
   .admin-sidebar.collapsed.mobile-open,
@@ -889,15 +889,7 @@
   }
   
   .mesob-header-title {
-    font-size: 0.875rem;
-    white-space: normal;
-    line-height: 1.3;
-    max-width: none;
-    text-align: left;
-    padding: 0 0.5rem;
-    word-wrap: break-word;
-    flex: 1;
-    min-width: 0;
+    display: none;
   }
   
   .mesob-header-right {
@@ -927,39 +919,63 @@
   .admin-sidebar .nav-item,
   .mesob-sidebar .nav-item {
     justify-content: flex-start !important;
-    padding: 10px 12px !important;
-    width: calc(100% - 12px) !important;
-    font-size: 0.9375rem !important;
-    gap: 10px !important;
+    padding: 8px 10px !important;
+    width: calc(100% - 8px) !important;
+    margin: 2px 4px !important;
+    font-size: 0.875rem !important;
+    gap: 8px !important;
   }
   
   .admin-sidebar .nav-item svg,
   .mesob-sidebar .nav-item svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
   }
   
   .admin-sidebar .sidebar-logo-section,
   .mesob-sidebar .sidebar-logo-section {
-    padding: 0.75rem 0.5rem !important;
-    margin-bottom: 0.75rem !important;
+    padding: 12px 8px !important;
+    margin-bottom: 8px !important;
+    gap: 8px !important;
+  }
+  
+  .admin-sidebar .sidebar-logo-emblem,
+  .mesob-sidebar .sidebar-logo-emblem {
+    width: 48px !important;
+    height: 48px !important;
   }
   
   .admin-sidebar .sidebar-logo-emblem img,
   .mesob-sidebar .sidebar-logo-emblem img {
-    max-width: 50px !important;
-    max-height: 50px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
   }
   
   .admin-sidebar .sidebar-logo-tagline,
   .mesob-sidebar .sidebar-logo-tagline {
-    font-size: 0.75rem !important;
+    font-size: 0.6875rem !important;
+    line-height: 1.2 !important;
   }
   
   .admin-sidebar .nav-section-label,
   .mesob-sidebar .nav-section-label {
-    font-size: 0.6875rem !important;
-    padding: 8px 12px 4px !important;
+    font-size: 0.625rem !important;
+    padding: 6px 10px 3px !important;
+    margin-top: 4px !important;
+  }
+  
+  /* Compact footer on mobile */
+  .admin-sidebar .sidebar-footer,
+  .mesob-sidebar .sidebar-footer {
+    padding: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
+  
+  .admin-sidebar .sidebar-footer .version,
+  .mesob-sidebar .sidebar-footer .version {
+    font-size: 0.625rem !important;
+    padding: 0.25rem 0 !important;
   }
 }
 

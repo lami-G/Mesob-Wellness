@@ -298,37 +298,46 @@ function FederalUsers() {
 
   return (
     <div className="management-section">
-      <div className="section-header">
-        <h2>👥 User Management</h2>
-        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+      <div className="section-header" style={{ padding: "1rem 1.5rem", background: "#f8fafc", borderBottom: "1px solid #e2e8f0" }}>
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gap: "0.5rem", 
+          width: "100%",
+          alignItems: "center"
+        }}>
           <button
             className={`btn ${userType === "NURSE_OFFICER" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handleUserTypeChange("NURSE_OFFICER")}
+            style={{ width: "100%" }}
           >
             Nurses
           </button>
           <button
             className={`btn ${userType === "MANAGER" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handleUserTypeChange("MANAGER")}
+            style={{ width: "100%" }}
           >
             Managers
           </button>
           <button
             className={`btn ${userType === "REGIONAL_OFFICE" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handleUserTypeChange("REGIONAL_OFFICE")}
+            style={{ width: "100%" }}
           >
             Regional
           </button>
           <button
             className={`btn ${userType === "STAFF" ? "btn-primary" : "btn-secondary"}`}
             onClick={() => handleUserTypeChange("STAFF")}
+            style={{ width: "100%" }}
           >
             Staff
           </button>
           <button
             className="btn btn-primary"
             onClick={handleCreateUser}
-            style={{ marginLeft: "1rem" }}
+            style={{ width: "100%" }}
           >
             + Create User
           </button>
