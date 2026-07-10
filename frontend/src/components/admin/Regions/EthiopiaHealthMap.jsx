@@ -297,10 +297,10 @@ function EthiopiaHealthMap({ timePeriod = "monthly", selectedRegion = "all" }) {
         <MapContainer
           bounds={ethiopiaBounds}
           style={{ height: "100%", width: "100%", background: "#f8fafc" }}
-          scrollWheelZoom={true}
-          doubleClickZoom={true}
+          scrollWheelZoom={false}
+          doubleClickZoom={false}
           dragging={true}
-          zoomControl={true}
+          zoomControl={false}
           className={styles.leafletContainer}
         >
           {/* Optional: Add a subtle base map */}
