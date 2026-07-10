@@ -262,18 +262,19 @@ function AuditLogs({ baseFilters = {} }) {
         </button>
       </div>
 
-      <table className={styles.dataTable}>
-        <thead>
-          <tr>
-            <th>Timestamp</th>
-            <th>User</th>
-            <th>Role</th>
-            <th>Action</th>
-            <th>Resource</th>
-            <th>Details</th>
-            <th>IP Address</th>
-          </tr>
-        </thead>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>User</th>
+              <th>Role</th>
+              <th>Action</th>
+              <th>Resource</th>
+              <th>Details</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
         <tbody>
           {paginatedLogs.map((log) => (
             <tr key={log.id}>
@@ -299,6 +300,7 @@ function AuditLogs({ baseFilters = {} }) {
           ))}
         </tbody>
       </table>
+      </div>
 
       {paginatedLogs.length === 0 && (
         <div className={styles.emptyState}>

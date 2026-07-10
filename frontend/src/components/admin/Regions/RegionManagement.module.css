@@ -207,6 +207,56 @@
   margin-bottom: 1.5rem;
 }
 
+.analyticsCardsGrid3Col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+/* Analytics Card */
+.analyticsCard {
+  background: #213d8d;
+  border-radius: 12px;
+  padding: 1.25rem;
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(33, 61, 141, 0.15);
+}
+
+.analyticsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 61, 141, 0.3);
+}
+
+.analyticsCard .cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.analyticsCard .cardLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.analyticsCard .cardValue {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.analyticsCardsGrid3Col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .usersTable {
   width: 100%;
   overflow-x: auto;
@@ -256,11 +306,40 @@
   color: #1f2937;
 }
 
-.analyticsCardsGrid3Col {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 1.5rem;
+/* Analytics Card */
+.analyticsCard {
+  background: #213d8d;
+  border-radius: 12px;
+  padding: 1.25rem;
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(33, 61, 141, 0.15);
+}
+
+.analyticsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 61, 141, 0.3);
+}
+
+.analyticsCard .cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.analyticsCard .cardLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.analyticsCard .cardValue {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
 }
 
 @media (max-width: 1024px) {
@@ -271,12 +350,44 @@
   .analyticsCardsGrid3Col {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .analyticsCardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .toggleViewBtn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
+  .managementSection {
+    padding: 0;
+  }
+  
+  .sectionHeader h2 {
+    font-size: 1.25rem;
+  }
+  
+  .toggleViewBtn {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
   .usersHeader {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .usersHeader h3 {
+    font-size: 1.125rem;
   }
 
   .formInput {
@@ -284,12 +395,130 @@
     width: 100%;
   }
 
-  .analyticsCardsGrid3Col {
-    grid-template-columns: 1fr;
+  .analyticsCardsGrid3Col,
+  .analyticsCardsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem;
+  }
+  
+  .analyticsCard {
+    padding: 1rem;
+  }
+  
+  .analyticsCard .cardLabel {
+    font-size: 0.6875rem;
+  }
+  
+  .analyticsCard .cardValue {
+    font-size: 1.5rem;
   }
 
   .actionButtons {
     flex-direction: column;
+    width: 100%;
+  }
+  
+  .actionButtons button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .dashboardSection {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .card h4 {
+    font-size: 1rem;
+  }
+  
+  .modal {
+    width: 95%;
+    max-height: 85vh;
+  }
+  
+  .modalHeader {
+    padding: 1rem;
+  }
+  
+  .modalHeader h3 {
+    font-size: 1.125rem;
+  }
+  
+  .modalBody {
+    padding: 1rem;
+  }
+  
+  .usersTable {
+    overflow-x: auto;
+  }
+  
+  .usersTable table {
+    min-width: 600px;
+  }
+  
+  .usersTable th,
+  .usersTable td {
+    padding: 0.625rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionHeader h2 {
+    font-size: 1.125rem;
+  }
+  
+  .toggleViewBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .usersHeader h3 {
+    font-size: 1rem;
+  }
+  
+  .card h4 {
+    font-size: 0.9375rem;
+  }
+  
+  .modalHeader h3 {
+    font-size: 1rem;
+  }
+  
+  .usersTable table {
+    min-width: 550px;
+  }
+  
+  .usersTable th,
+  .usersTable td {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.75rem;
+  }
+  
+  .actionButtons .btn-secondary,
+  .actionButtons .btn-reset,
+  .actionButtons .btn-danger {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  
+  .analyticsCardsGrid3Col,
+  .analyticsCardsGrid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .analyticsCard {
+    padding: 0.875rem;
+  }
+  
+  .analyticsCard .cardValue {
+    font-size: 1.25rem;
   }
 }
 

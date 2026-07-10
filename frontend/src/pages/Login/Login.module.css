@@ -110,7 +110,7 @@
 
 .input {
   width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
   border: 1px solid #cdd9f1;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -132,7 +132,7 @@
 }
 
 .inputPassword {
-  padding-right: 2.5rem;
+  padding-right: 3rem;
 }
 
 .inputError {
@@ -244,6 +244,24 @@
   }
   .headerImage img { max-width: 240px; }
   .welcome { font-size: 1.2rem; }
+  
+  /* Fix icon overlap on mobile */
+  .input {
+    padding-left: 3.5rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .inputPassword {
+    padding-right: 3.5rem !important;
+  }
+  
+  .inputIcon {
+    left: 16px;
+  }
+  
+  .passwordToggle {
+    right: 14px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -253,4 +271,23 @@
     max-height: calc(100vh - 1rem);
   }
   .headerImage img { max-width: 200px; }
+  
+  /* Additional padding for very small screens */
+  .input {
+    padding-left: 3.75rem !important;
+    padding-right: 1rem !important;
+    font-size: 0.9375rem;
+  }
+  
+  .inputPassword {
+    padding-right: 3.75rem !important;
+  }
+  
+  .inputIcon {
+    left: 18px;
+  }
+  
+  .passwordToggle {
+    right: 16px;
+  }
 }

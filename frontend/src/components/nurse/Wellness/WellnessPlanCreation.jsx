@@ -273,23 +273,14 @@ function WellnessPlanCreation({ customerId, onSuccess, appointmentId, onBackToQu
         await api.patch(`/api/v1/appointments/${appointmentId}`, {
           status: 'COMPLETED',
         });
+        
+        setSuccess('Patient marked as completed!');
       } else {
-        // For walk-in patients: create a temporary appointment record and mark as completed
-        const response = await api.post('/api/v1/appointments', {
-          patientId: selectedCustomerId,
-          scheduledAt: new Date().toISOString(),
-          reason: 'Walk-in Service',
-        });
-
-        const walkInAppointmentId = response.data.data.id;
-
-        // Mark the walk-in appointment as COMPLETED
-        await api.patch(`/api/v1/appointments/${walkInAppointmentId}`, {
-          status: 'COMPLETED',
-        });
+        // For walk-in patients: DO NOT create an appointment
+        // The wellness plan alone is sufficient to count as a walk-in
+        // Walk-in logic: If user has wellness plan but NO appointment on same day = walk-in
+        setSuccess('Walk-in service completed!');
       }
-
-      setSuccess('Patient marked as completed!');
       
       // Trigger queue refresh immediately
       if (onStatusChanged) {

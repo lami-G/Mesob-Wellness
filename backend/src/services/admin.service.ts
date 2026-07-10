@@ -16,6 +16,7 @@ import {
  * Same logic used by nurse analytics dashboard
  * @param startDate Start date for calculation
  * @param endDate End date for calculation
+ * @param userWhere Optional filter for users (center/region based)
  */
 async function calculateQueueMetrics(
   startDate: Date,
@@ -58,11 +59,50 @@ async function calculateQueueMetrics(
     });
 
     // Walk-ins: wellness plans created in range with no appointment same day
+    // For center-filtered requests, we need to check:
+    // 1. User has no appointment same day
+    // 2. If userWhere filter exists (nurse filtering by center), 
+    //    include walk-ins where the patient belongs to that center OR
+    //    where the vitals were recorded by someone from that center
+    
+    let wellnessWhere: any = {
+      createdAt: { gte: startDate, lte: endDate },
+    };
+    
+    // For nurse center filtering, we need to include patients from that center
+    // OR wellness plans created based on vitals recorded at that center
+    if (userWhere) {
+      // Get wellness plans where either:
+      // - Patient belongs to the filtered center/region
+      // - OR vitals were recorded by someone from the filtered center/region
+      
+      // First, get user IDs who have vitals recorded by someone matching the filter
+      const vitalsWithRecorderFilter = await prisma.vitalRecord.findMany({
+        where: {
+          recordedAt: { gte: startDate, lte: endDate },
+          recorder: userWhere, // Filter by recorder's center/region
+        },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      
+      const userIdsFromFilteredCenter = vitalsWithRecorderFilter.map(v => v.userId);
+      
+      // Include wellness plans where:
+      // 1. User matches the filter (their center/region)
+      // 2. OR user had vitals recorded by someone from the filtered center
+      if (userIdsFromFilteredCenter.length > 0) {
+        wellnessWhere.OR = [
+          { user: userWhere },
+          { userId: { in: userIdsFromFilteredCenter } }
+        ];
+      } else {
+        wellnessWhere.user = userWhere;
+      }
+    }
+
     const wellnessPlans = await prisma.wellnessPlan.findMany({
-      where: {
-        createdAt: { gte: startDate, lte: endDate },
-        ...(userWhere ? { user: userWhere } : {}),
-      },
+      where: wellnessWhere,
       select: { userId: true, createdAt: true },
     });
 
@@ -89,6 +129,9 @@ async function calculateQueueMetrics(
     throw error;
   }
 }
+
+// Export the shared helper so nurse analytics can use it directly
+export { calculateQueueMetrics };
 
 const AdminService = {
   /**
@@ -502,23 +545,59 @@ const AdminService = {
       appointmentStats.total = queueMetrics.totalAppointments;
       appointmentStats.completed = queueMetrics.completedAppointments;
 
-      // Get wellness plans stats with date filter
-      const wellnessWhere: any = dateFrom
-        ? {
-            createdAt: { gte: dateFrom },
-          }
-        : {};
-      if (hasUserFilter) wellnessWhere.user = userWhere;
-
-      const wellnessStats = {
-        total: await prisma.wellnessPlan.count({ where: wellnessWhere }),
-        active: await prisma.wellnessPlan.count({
-          where: { ...wellnessWhere, isActive: true },
-        }),
-        inactive: await prisma.wellnessPlan.count({
-          where: { ...wellnessWhere, isActive: false },
-        }),
-      };
+      // Get wellness plans stats with date filter - use recorder-based filtering
+      let wellnessStats: any;
+      if (hasUserFilter) {
+        // Get user IDs who have vitals recorded by someone matching the filter
+        const vitalsWithRecorderFilter = await prisma.vitalRecord.findMany({
+          where: {
+            ...(dateFrom ? { recordedAt: { gte: dateFrom } } : {}),
+            recorder: userWhere, // Filter by recorder's center/region
+          },
+          select: { userId: true },
+          distinct: ['userId'],
+        });
+        
+        const userIdsFromFilteredCenter = vitalsWithRecorderFilter.map(v => v.userId);
+        
+        if (userIdsFromFilteredCenter.length > 0) {
+          const wellnessWhere: any = {
+            ...(dateFrom ? { createdAt: { gte: dateFrom } } : {}),
+            userId: { in: userIdsFromFilteredCenter },
+          };
+          
+          wellnessStats = {
+            total: await prisma.wellnessPlan.count({ where: wellnessWhere }),
+            active: await prisma.wellnessPlan.count({
+              where: { ...wellnessWhere, isActive: true },
+            }),
+            inactive: await prisma.wellnessPlan.count({
+              where: { ...wellnessWhere, isActive: false },
+            }),
+          };
+        } else {
+          wellnessStats = {
+            total: 0,
+            active: 0,
+            inactive: 0,
+          };
+        }
+      } else {
+        // No filtering - count all wellness plans
+        const wellnessWhere: any = dateFrom
+          ? { createdAt: { gte: dateFrom } }
+          : {};
+        
+        wellnessStats = {
+          total: await prisma.wellnessPlan.count({ where: wellnessWhere }),
+          active: await prisma.wellnessPlan.count({
+            where: { ...wellnessWhere, isActive: true },
+          }),
+          inactive: await prisma.wellnessPlan.count({
+            where: { ...wellnessWhere, isActive: false },
+          }),
+        };
+      }
 
       return {
         users: userStats,
@@ -737,7 +816,7 @@ const AdminService = {
   },
 
   /**
-   * Get all vitals with filters
+   * Get all vitals with filters - use recorder-based filtering
    */
   async getAllVitals(filters: VitalFilters): Promise<PaginatedResponse<any>> {
     try {
@@ -746,11 +825,11 @@ const AdminService = {
 
       const where: any = {};
 
-      // Handle center filter (takes priority if specified)
+      // Handle center filter (takes priority if specified) - filter by recorder, not patient
       if (filters.center) {
-        where.user = { centerId: filters.center };
+        where.recorder = { centerId: filters.center };
       } else if (filters.region) {
-        where.user = { center: { region: filters.region } };
+        where.recorder = { center: { region: filters.region } };
       }
       
       if (filters.bmiCategory) where.bmiCategory = filters.bmiCategory;
@@ -773,6 +852,7 @@ const AdminService = {
           take,
           include: {
             user: { select: { fullName: true, email: true, userId: true } },
+            recorder: { select: { fullName: true, email: true } },
           },
         }),
         prisma.vitalRecord.count({ where }),

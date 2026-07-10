@@ -22,16 +22,17 @@ const Audit = ({ loading, logs }) => {
         </div>
       ) : (
         <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>Resource</th>
-                <th>IP</th>
-              </tr>
-            </thead>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Resource</th>
+                  <th>IP</th>
+                </tr>
+              </thead>
             <tbody>
               {logs.map((log) => (
                 <tr key={log.id}>
@@ -53,6 +54,7 @@ const Audit = ({ loading, logs }) => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

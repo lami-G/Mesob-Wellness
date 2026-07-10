@@ -134,21 +134,12 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
       {/* Header with inline filters */}
       <div className={styles.tableHeader}>
         {onFilterChange && (
-          <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className={styles.filterContainer}>
             {/* Time Period Filter */}
             <select
               value={filters?.timePeriod || 'all'}
               onChange={(e) => handleFilterChange('timePeriod', e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#374151',
-                cursor: 'pointer',
-              }}
+              className={styles.filterSelect}
             >
               <option value="all">All Time</option>
               <option value="daily">Daily</option>
@@ -160,16 +151,7 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
             <select
               value={filters?.region || ''}
               onChange={(e) => handleFilterChange('region', e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#374151',
-                cursor: 'pointer',
-              }}
+              className={styles.filterSelect}
             >
               <option value="">All Regions</option>
               {regions.map((region) => (
@@ -184,16 +166,7 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
               value={filters?.center || ''}
               onChange={(e) => handleFilterChange('center', e.target.value)}
               disabled={!filters?.region}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: filters?.region ? '#FFFFFF' : '#F3F4F6',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#374151',
-                cursor: filters?.region ? 'pointer' : 'not-allowed',
-              }}
+              className={styles.filterSelect}
             >
               <option value="">All Centers</option>
               {centers.map((center) => (
@@ -207,16 +180,7 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
             <select
               value={filters?.status || ''}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#374151',
-                cursor: 'pointer',
-              }}
+              className={styles.filterSelect}
             >
               <option value="">All Status</option>
               <option value="PENDING">Pending</option>
@@ -235,40 +199,13 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 500,
-                fontSize: '0.8rem',
-                color: '#374151',
-                minWidth: '150px',
-              }}
+              className={styles.filterInput}
             />
 
             {/* Reset Button */}
             <button
               onClick={handleResetFilters}
-              style={{
-                padding: '0.375rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#6B7280',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#F3F4F6';
-                e.target.style.borderColor = '#9CA3AF';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#FFFFFF';
-                e.target.style.borderColor = '#D1D5DB';
-              }}
+              className={styles.btnReset}
             >
               Reset
             </button>
@@ -276,19 +213,20 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
         )}
       </div>
 
-      <table className={styles.dataTable}>
-        <thead>
-          <tr>
-            <th>Patient ID</th>
-            <th>Patient</th>
-            <th>Reason</th>
-            <th>Scheduled</th>
-            <th>Status</th>
-            <th>Center</th>
-            <th>Region</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Patient</th>
+              <th>Reason</th>
+              <th>Scheduled</th>
+              <th>Status</th>
+              <th>Center</th>
+              <th>Region</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
         <tbody>
           {appointments.length === 0 ? (
             <tr>
@@ -331,6 +269,7 @@ function AppointmentsList({ filters, onDelete, onFilterChange }) {
           )}
         </tbody>
       </table>
+      </div>
 
       {pagination.pages > 1 && (
         <div className={styles.pagination}>

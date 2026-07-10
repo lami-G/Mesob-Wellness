@@ -113,21 +113,12 @@ function CentersList({
       <div className={styles.tableHeader}>
         {/* Inline Filters */}
         {onFilterChange && (
-          <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className={styles.filterContainer}>
             {showRegionFilter && (
               <select
                 value={filters?.region || ''}
                 onChange={(e) => handleFilterChange('region', e.target.value)}
-                style={{
-                  padding: '0.375rem 0.625rem',
-                  borderRadius: '6px',
-                  border: '1px solid #D1D5DB',
-                  backgroundColor: '#FFFFFF',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  color: '#374151',
-                  cursor: 'pointer',
-                }}
+                className={styles.filterSelect}
               >
                 <option value="">All Regions</option>
                 {regions.map((region) => (
@@ -142,16 +133,7 @@ function CentersList({
             <select
               value={filters?.status || ''}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#374151',
-                cursor: 'pointer',
-              }}
+              className={styles.filterSelect}
             >
               <option value="">All Status</option>
               <option value="ACTIVE">Active</option>
@@ -165,16 +147,7 @@ function CentersList({
               placeholder="Search centers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                padding: '0.375rem 0.625rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 500,
-                fontSize: '0.8rem',
-                color: '#374151',
-                minWidth: '150px',
-              }}
+              className={styles.filterInput}
             />
             
             {/* Reset Button */}
@@ -189,25 +162,7 @@ function CentersList({
                   });
                 }
               }}
-              style={{
-                padding: '0.375rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                backgroundColor: '#FFFFFF',
-                fontWeight: 600,
-                fontSize: '0.8rem',
-                color: '#6B7280',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = '#F3F4F6';
-                e.target.style.borderColor = '#9CA3AF';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = '#FFFFFF';
-                e.target.style.borderColor = '#D1D5DB';
-              }}
+              className={styles.btnReset}
             >
               Reset
             </button>
@@ -221,17 +176,18 @@ function CentersList({
         )}
       </div>
       
-      <table className={styles.dataTable}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Region</th>
-            <th>City</th>
-            <th>Status</th>
-            <th>Staff</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Region</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Staff</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
         <tbody>
           {paginatedCenters.length === 0 ? (
             <tr>
@@ -276,6 +232,7 @@ function CentersList({
           )}
         </tbody>
       </table>
+      </div>
 
       {totalPages > 1 && (
         <div className={styles.pagination}>

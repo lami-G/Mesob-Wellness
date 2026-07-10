@@ -467,31 +467,104 @@
 }
 
 @media (max-width: 768px) {
-  .healthCardsGrid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+  /* Top 3 KPI Cards - 2 columns on mobile */
+  .staticTotalsRow {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
   }
   
-  .healthScoreCard {
-    grid-row: auto;
-    grid-column: 1;
+  .staticTotalCard {
+    padding: 0.75rem 0.625rem !important;
+    min-height: 95px !important;
   }
-}
-
-@media (max-width: 768px) {
-  .staticTotalsRow {
-    grid-template-columns: 1fr;
+  
+  .staticValue {
+    font-size: 1.375rem !important;
   }
+  
+  .staticLabel {
+    font-size: 0.5625rem !important;
+  }
+  
+  /* Activity Cards - 2 columns on mobile */
   .metricsGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
   }
+  
+  .metricCard {
+    padding: 0.75rem 0.625rem !important;
+    min-height: 95px !important;
+  }
+  
+  .metricValue {
+    font-size: 1.25rem !important;
+  }
+  
+  .metricTitle {
+    font-size: 0.6875rem !important;
+  }
+  
+  .metricPeriod {
+    font-size: 0.625rem !important;
+  }
+  
+  /* Header responsive */
   .metricsHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.625rem;
+    padding: 0.625rem 0.75rem;
   }
-  .staticValue {
-    font-size: 1.75rem;
+  
+  .metricsTitle h3 {
+    font-size: 0.8125rem !important;
+  }
+  
+  .metricsSubtitle {
+    font-size: 0.625rem !important;
+  }
+  
+  /* Health Cards - 2 columns on mobile */
+  .healthCardsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: auto;
+    gap: 8px !important;
+  }
+  
+  .healthScoreCard {
+    grid-row: 1 / 2 !important;
+    grid-column: 1 / 3 !important;
+    padding: 1rem !important;
+  }
+  
+  .scoreValue {
+    font-size: 2.5rem !important;
+  }
+  
+  .scoreLabel {
+    font-size: 1rem !important;
+  }
+  
+  .healthScoreCard h4 {
+    font-size: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .healthStatCard {
+    padding: 0.75rem 0.625rem !important;
+  }
+  
+  .healthStatCard .statValue {
+    font-size: 1.25rem !important;
+  }
+  
+  .healthStatCard .statLabel {
+    font-size: 0.6875rem !important;
+  }
+  
+  .healthStatCard .statSublabel {
+    font-size: 0.625rem !important;
   }
 }
 

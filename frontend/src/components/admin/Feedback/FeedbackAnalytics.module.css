@@ -158,3 +158,88 @@
 .emptyState {
   color: #999;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .analyticsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .analyticsHeader h2 {
+    font-size: 1.125rem;
+  }
+  
+  .analyticsHeader .filters {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .filterInput {
+    width: 100%;
+  }
+  
+  .analyticsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .analyticsCard {
+    padding: 1rem;
+  }
+  
+  .analyticsCard h3 {
+    font-size: 0.8125rem;
+  }
+  
+  .metricValue {
+    font-size: 1.75rem;
+  }
+  
+  .analyticsCharts {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .chartContainer {
+    padding: 1rem;
+  }
+  
+  .chartContainer h3 {
+    font-size: 0.9375rem;
+  }
+  
+  .barLabel {
+    min-width: 80px;
+    font-size: 0.75rem;
+  }
+  
+  .barValue {
+    font-size: 1rem;
+  }
+  
+  .barPercentage {
+    font-size: 0.6875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .analyticsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .analyticsCard {
+    padding: 0.875rem;
+  }
+  
+  .metricValue {
+    font-size: 1.5rem;
+  }
+  
+  .barLabel {
+    min-width: 70px;
+  }
+}

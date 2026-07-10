@@ -453,6 +453,9 @@ export async function getConditionTrends(period: string) {
  * Queries vitals records to find patients with vitals in the period,
  * then gets their latest wellness plans to determine conditions
  * Returns unique patient count per condition
+ * 
+ * IMPORTANT: Filters by recorder's center/region, not patient's center
+ * This ensures external patients (without centerId) are counted for the center where they received service
  */
 export async function getConditionsByDateRange(
   startDate: Date | null,
@@ -461,21 +464,22 @@ export async function getConditionsByDateRange(
   region?: string | null
 ) {
   // Build where clause for vitals records
+  // Filter by RECORDER's center/region (not patient's center) to include external patients
   const vitalsWhereClause: any = {};
   
   // Filter by center or region if provided
   if (centerId) {
-    vitalsWhereClause.user = {
+    vitalsWhereClause.recorder = {
       centerId: centerId,
     };
-    console.log(`[getConditionsByDateRange] Filtering by center: ${centerId}`);
+    console.log(`[getConditionsByDateRange] Filtering by recorder's center: ${centerId}`);
   } else if (region) {
-    vitalsWhereClause.user = {
+    vitalsWhereClause.recorder = {
       center: {
         region: region,
       },
     };
-    console.log(`[getConditionsByDateRange] Filtering by region: ${region}`);
+    console.log(`[getConditionsByDateRange] Filtering by recorder's region: ${region}`);
   }
   
   if (startDate && endDate) {

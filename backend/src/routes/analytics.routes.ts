@@ -11,9 +11,14 @@ router.put("/settings",      authenticate, authorizeMinRole(UserRole.MANAGER), a
 
 // ─── Manager+ only ───────────────────────────────────────────────────────────
 router.get("/capacity",             authenticate, authorizeMinRole(UserRole.NURSE_OFFICER), analyticsController.getCapacityInfo);
-router.get("/appointments/stats",   authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getBookingStats);router.get("/queue/metrics",        authenticate, authorizeMinRole(UserRole.NURSE_OFFICER), analyticsController.getDailyQueueMetrics);router.get("/queue/analytics",      authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getQueueAnalytics);
+router.get("/appointments/stats",   authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getBookingStats);
+router.get("/queue/metrics",        authenticate, authorizeMinRole(UserRole.NURSE_OFFICER), analyticsController.getDailyQueueMetrics);
+router.get("/queue/analytics",      authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getQueueAnalytics);
 router.get("/health/analytics",     authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getHealthAnalytics);
 router.get("/health",               authenticate, authorizeMinRole(UserRole.NURSE_OFFICER), analyticsController.getHealthAnalytics);
+
+// ─── Nurse Analytics (using shared Admin logic) ─────────────────────────────
+router.get("/nurse/analytics",      authenticate, authorizeMinRole(UserRole.NURSE_OFFICER), analyticsController.getNurseAnalytics);
 
 // ─── Staff / User management ─────────────────────────────────────────────────
 router.get("/users/staff",          authenticate, authorizeMinRole(UserRole.MANAGER), analyticsController.getStaffUsers);

@@ -85,6 +85,7 @@
 @media (max-width: 1024px) {
   .controlButtons {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .displayName {
@@ -94,14 +95,48 @@
 
 @media (max-width: 768px) {
   .displayScreen {
-    padding: 20px;
+    padding: 20px 15px;
   }
 
   .displayName {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
   }
 
   .displayId {
     font-size: 1rem;
+  }
+
+  .displayTime {
+    font-size: 0.9375rem;
+  }
+
+  .controlButtons {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .controlButtons button {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+
+  .customerInfo {
+    padding: 12px;
+  }
+
+  .customerInfo p {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .displayName {
+    font-size: 1.125rem;
+  }
+
+  .displayId,
+  .displayTime {
+    font-size: 0.875rem;
   }
 }

@@ -257,9 +257,7 @@
 
 /* Center - Wellness Center Title - Larger and More Prominent */
 .mesob-header-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex: 1;
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
@@ -267,8 +265,11 @@
   letter-spacing: 0.025em;
   text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 0 1rem;
 }
 
 /* Right Section */
@@ -763,8 +764,6 @@
 
 @media (max-width: 1024px) {
   .mesob-header-title {
-    position: static;
-    transform: none;
     font-size: 1.15rem;
   }
   
@@ -773,43 +772,194 @@
   }
 }
 
+/* Tablet breakpoint - reduce title size */
+@media (max-width: 900px) {
+  .mesob-header-title {
+    font-size: 1rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE NAVIGATION - SLIDE IN SIDEBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile Backdrop Overlay */
+.mesob-mobile-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: calc(var(--z-sticky) + 9);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mesob-mobile-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Mobile Hamburger Menu Icon - Show only on mobile */
+.mesob-header-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mesob-header-hamburger:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mesob-header-hamburger svg {
+  transition: transform 0.3s ease;
+}
+
 @media (max-width: 768px) {
+  /* Show hamburger, hide desktop toggle */
+  .mesob-header-hamburger {
+    display: flex;
+  }
+  
+  .mesob-header-toggle {
+    display: none;
+  }
+  
+  /* Sidebar slides in from left - reduced width for mobile */
   .admin-sidebar,
   .mesob-sidebar {
     position: fixed;
     left: -100%;
+    top: 0;
+    bottom: 0;
     z-index: calc(var(--z-sticky) + 10);
-    transition: left var(--transition-base);
-    width: 130px;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 240px;
+    max-width: 75vw;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    padding: 1rem 0.75rem;
   }
   
-  .admin-sidebar.open,
-  .mesob-sidebar.open {
+  /* Open state - slide in */
+  .admin-sidebar.mobile-open,
+  .mesob-sidebar.mobile-open {
     left: 0;
   }
   
+  /* Collapsed state doesn't apply on mobile */
   .admin-sidebar.collapsed,
   .mesob-sidebar.collapsed {
-    left: -52px;
+    left: -100%;
+    width: 240px;
+    max-width: 75vw;
   }
   
-  .mesob-app-content {
+  .admin-sidebar.collapsed.mobile-open,
+  .mesob-sidebar.collapsed.mobile-open {
+    left: 0;
+  }
+  
+  .mesob-app-content,
+  .mesob-layout-content {
     padding: var(--space-md);
   }
   
   .mesob-header {
     height: 64px;
     padding: 0 var(--space-md);
+    gap: 0.5rem;
+  }
+  
+  .mesob-header-left {
+    flex: 0 0 auto;
+    min-width: 0;
   }
   
   .mesob-header-title {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     white-space: normal;
-    line-height: 1.2;
+    line-height: 1.3;
+    max-width: none;
+    text-align: left;
+    padding: 0 0.5rem;
+    word-wrap: break-word;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .mesob-header-right {
+    flex: 0 0 auto;
+    gap: 0.5rem;
   }
   
   .mesob-header-logo {
     height: 50px;
+  }
+  
+  /* Hide language selector on mobile */
+  .mesob-header-language {
+    display: none;
+  }
+  
+  /* Mobile sidebar always shows labels */
+  .admin-sidebar .nav-label,
+  .mesob-sidebar .nav-label,
+  .admin-sidebar .nav-section-label,
+  .mesob-sidebar .nav-section-label,
+  .admin-sidebar .sidebar-logo-text,
+  .mesob-sidebar .sidebar-logo-text {
+    display: block !important;
+  }
+  
+  .admin-sidebar .nav-item,
+  .mesob-sidebar .nav-item {
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+    width: calc(100% - 12px) !important;
+    font-size: 0.9375rem !important;
+    gap: 10px !important;
+  }
+  
+  .admin-sidebar .nav-item svg,
+  .mesob-sidebar .nav-item svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .admin-sidebar .sidebar-logo-section,
+  .mesob-sidebar .sidebar-logo-section {
+    padding: 0.75rem 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .admin-sidebar .sidebar-logo-emblem img,
+  .mesob-sidebar .sidebar-logo-emblem img {
+    max-width: 50px !important;
+    max-height: 50px !important;
+  }
+  
+  .admin-sidebar .sidebar-logo-tagline,
+  .mesob-sidebar .sidebar-logo-tagline {
+    font-size: 0.75rem !important;
+  }
+  
+  .admin-sidebar .nav-section-label,
+  .mesob-sidebar .nav-section-label {
+    font-size: 0.6875rem !important;
+    padding: 8px 12px 4px !important;
   }
 }
 
@@ -985,3 +1135,186 @@
 }
 
 /* END OF UNIFIED LAYOUT SYSTEM */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE FILTER CONTROLS - INLINE STYLES
+   Utility classes for inline filter controls across dashboards
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Mobile-responsive filter container */
+@media (max-width: 768px) {
+  /* Inline filter wrappers need to be full-width and stack */
+  div[style*="display: inline-flex"],
+  div[style*="display: flex"][style*="flexWrap: wrap"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  /* Inline select elements need full-width */
+  div[style*="display: inline-flex"] select,
+  div[style*="display: flex"][style*="flexWrap: wrap"] select {
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9375rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  div[style*="display: inline-flex"] select,
+  div[style*="display: flex"][style*="flexWrap: wrap"] select {
+    font-size: 1rem !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOUCH TARGET SIZES - MOBILE ACCESSIBILITY
+   Ensure all interactive elements meet 44x44px minimum size
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Buttons */
+  button,
+  .btn,
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+  
+  /* Small buttons need explicit sizing */
+  button.btn-small,
+  .btn-small {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  
+  /* Icon-only buttons */
+  button[aria-label]:not([aria-label=""]),
+  .btn-icon {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+  
+  /* Form inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  input[type="url"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  textarea,
+  select {
+    min-height: 44px;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+  
+  /* Checkboxes and radio buttons */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+    /* Increase clickable area with padding on parent label */
+  }
+  
+  /* Labels for checkboxes/radios should have padding */
+  label:has(input[type="checkbox"]),
+  label:has(input[type="radio"]) {
+    padding: 10px 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* Links that act as buttons */
+  a.btn,
+  a[role="button"] {
+    min-height: 44px;
+    padding: 12px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Navigation links */
+  nav a,
+  .nav-link,
+  .nav-item {
+    min-height: 44px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* Tab buttons */
+  [role="tab"],
+  .tab-button,
+  .filter-tab {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+  
+  /* Dropdown selects */
+  select {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  
+  /* Action buttons in cards */
+  .card button,
+  .card .btn {
+    min-height: 44px;
+  }
+  
+  /* Modal/Dialog buttons */
+  .modal button,
+  .dialog button,
+  .modal .btn,
+  .dialog .btn {
+    min-height: 48px;
+    padding: 12px 20px;
+  }
+  
+  /* Close buttons */
+  button[aria-label*="close"],
+  button[aria-label*="Close"],
+  .close-button,
+  .btn-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Additional specificity for smaller screens */
+@media (max-width: 480px) {
+  /* Ensure even smaller screens have adequate touch targets */
+  button,
+  .btn,
+  input[type="button"],
+  input[type="submit"] {
+    min-height: 48px;
+    padding: 14px 18px;
+    font-size: 1rem;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 48px;
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+}

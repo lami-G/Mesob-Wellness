@@ -329,6 +329,19 @@
 @media (max-width: 768px) {
   .healthComparisonSection {
     padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .header {
+    gap: 1rem;
+  }
+  
+  .headerText h2 {
+    font-size: 1.25rem;
+  }
+  
+  .headerText p {
+    font-size: 0.8125rem;
   }
 
   .displayToggle {
@@ -337,6 +350,22 @@
 
   .toggleBtn {
     flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+  
+  .chartCard,
+  .tableCard {
+    padding: 1rem;
+  }
+  
+  .table {
+    font-size: 0.75rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.625rem 0.5rem;
   }
 
   .tablePagination {
@@ -346,5 +375,33 @@
 
   .paginationBtn {
     width: 100%;
+  }
+  
+  .tableFooter {
+    padding-top: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .healthComparisonSection {
+    padding: 0.75rem;
+  }
+  
+  .headerText h2 {
+    font-size: 1.125rem;
+  }
+  
+  .chartCard,
+  .tableCard {
+    padding: 0.875rem;
+  }
+  
+  .table {
+    font-size: 0.6875rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem 0.375rem;
   }
 }

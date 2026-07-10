@@ -689,11 +689,13 @@
 @media (max-width: 1024px) {
   .queue-section {
     grid-template-columns: 1fr;
+    gap: 15px;
   }
 
   .queue-sidebar {
     grid-template-columns: repeat(2, 1fr);
     display: grid;
+    gap: 15px;
   }
 
   .capacity-tracker {
@@ -721,10 +723,31 @@
   .vitals-grid {
     grid-template-columns: 1fr;
   }
+  
+  .queue-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .queue-sidebar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 
   .queue-item-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .queue-item-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .queue-item-actions button {
+    width: 100%;
+    min-height: 44px;
   }
 
   /* From nurse-dashboard-new.css */

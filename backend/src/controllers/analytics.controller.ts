@@ -4,6 +4,7 @@ import { AuthRequest, applyRoleBasedFilters } from "../middleware/auth.middlewar
 import { AppointmentStatus, UserRole } from "../generated/prisma";
 import bcrypt from "bcryptjs";
 import { generateNextDisplayId } from "../utils/sequentialId";
+import AdminService, { calculateQueueMetrics } from "../services/admin.service";
 
 // ─── System Settings ──────────────────────────────────────────────────────────
 export async function getSystemSettings(req: Request, res: Response) {
@@ -1217,5 +1218,186 @@ export async function getVitalsTrends(req: Request, res: Response) {
   } catch (error) {
     console.error('Error fetching vitals trends:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch vitals trends' });
+  }
+}
+
+
+// ─── Nurse Analytics (using shared Admin logic) ──────────────────────────────
+export async function getNurseAnalytics(req: Request, res: Response) {
+  try {
+    // Apply role-based filters
+    const authReq = req as AuthRequest;
+    const roleFilters = await applyRoleBasedFilters(authReq);
+    
+    const { timePeriod = 'daily', startDate: startDateParam, endDate: endDateParam } = req.query;
+    
+    console.log('[NURSE_ANALYTICS] Period:', timePeriod);
+    console.log('[NURSE_ANALYTICS] Role filters:', roleFilters);
+    console.log('[NURSE_ANALYTICS] User:', authReq.user);
+    
+    // Calculate date range
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date = new Date();
+
+    if (startDateParam && endDateParam) {
+      // Use provided dates
+      startDate = new Date(startDateParam as string);
+      endDate = new Date(endDateParam as string);
+    } else if (timePeriod === 'daily') {
+      // Today only
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    } else if (timePeriod === 'weekly') {
+      // Current week: Monday to Today
+      const currentDay = now.getDay();
+      const daysToMonday = currentDay === 0 ? 6 : currentDay - 1;
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - daysToMonday);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(now);
+      endDate.setHours(23, 59, 59, 999);
+    } else if (timePeriod === 'monthly') {
+      // From 1st of current month to today
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+      endDate = new Date(now);
+      endDate.setHours(23, 59, 59, 999);
+    } else {
+      // All time
+      startDate = new Date('2020-01-01');
+      endDate = new Date(now);
+    }
+
+    console.log('[NURSE_ANALYTICS] Date range:', startDate, 'to', endDate);
+
+    // Build user filter for role-based filtering (same as Admin dashboard)
+    const userWhere: any = {};
+    if (roleFilters.center) {
+      userWhere.centerId = roleFilters.center;
+      console.log('[NURSE_ANALYTICS] Filtering by center:', roleFilters.center);
+    } else if (roleFilters.region) {
+      userWhere.center = {
+        region: roleFilters.region,
+      };
+      console.log('[NURSE_ANALYTICS] Filtering by region:', roleFilters.region);
+    } else {
+      console.log('[NURSE_ANALYTICS] No filtering - showing all data');
+    }
+
+    // Use the SAME shared function as Admin dashboard
+    // Pass undefined if no user filter (System Admin sees all)
+    const queueMetrics = await calculateQueueMetrics(
+      startDate,
+      endDate,
+      Object.keys(userWhere).length > 0 ? userWhere : undefined,
+    );
+
+    console.log('[NURSE_ANALYTICS] Queue metrics result:', queueMetrics);
+
+    // Get vitals count - filter by recorder's center (same as walk-ins and conditions)
+    const vitalsWhere: any = {
+      recordedAt: { gte: startDate, lte: endDate },
+    };
+    if (Object.keys(userWhere).length > 0) {
+      vitalsWhere.recorder = userWhere; // ✅ Changed from user to recorder
+    }
+
+    const vitalsRecorded = await prisma.vitalRecord.count({
+      where: vitalsWhere,
+    });
+
+    console.log('[NURSE_ANALYTICS] Vitals recorded:', vitalsRecorded);
+
+    // Get wellness plans count - filter by users who had vitals recorded at this center
+    let wellnessPlansCreated = 0;
+    if (Object.keys(userWhere).length > 0) {
+      // Get user IDs who have vitals recorded by someone matching the filter
+      const vitalsWithRecorderFilter = await prisma.vitalRecord.findMany({
+        where: {
+          recordedAt: { gte: startDate, lte: endDate },
+          recorder: userWhere, // Filter by recorder's center/region
+        },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      
+      const userIdsFromFilteredCenter = vitalsWithRecorderFilter.map(v => v.userId);
+      
+      if (userIdsFromFilteredCenter.length > 0) {
+        // Count wellness plans for these users
+        wellnessPlansCreated = await prisma.wellnessPlan.count({
+          where: {
+            createdAt: { gte: startDate, lte: endDate },
+            userId: { in: userIdsFromFilteredCenter },
+          },
+        });
+      }
+    } else {
+      // No filtering - count all wellness plans
+      wellnessPlansCreated = await prisma.wellnessPlan.count({
+        where: {
+          createdAt: { gte: startDate, lte: endDate },
+        },
+      });
+    }
+
+    console.log('[NURSE_ANALYTICS] Wellness plans created:', wellnessPlansCreated);
+
+    // Get appointment breakdown
+    const appointmentWhere: any = {
+      scheduledAt: { gte: startDate, lte: endDate },
+    };
+    if (Object.keys(userWhere).length > 0) {
+      appointmentWhere.user = userWhere;
+    }
+
+    const [
+      waitingAppointments,
+      inProgressAppointments,
+      inServiceAppointments,
+      absentAppointments,
+    ] = await Promise.all([
+      prisma.appointment.count({ 
+        where: { ...appointmentWhere, status: AppointmentStatus.WAITING } 
+      }),
+      prisma.appointment.count({ 
+        where: { ...appointmentWhere, status: AppointmentStatus.IN_PROGRESS } 
+      }),
+      prisma.appointment.count({ 
+        where: { ...appointmentWhere, status: AppointmentStatus.IN_SERVICE } 
+      }),
+      prisma.appointment.count({ 
+        where: { ...appointmentWhere, status: AppointmentStatus.NO_SHOW } 
+      }),
+    ]);
+
+    const finalResult = {
+      // Use the same data as Admin dashboard from shared function
+      totalAppointments: queueMetrics.totalAppointments,
+      completedAppointments: queueMetrics.completedAppointments,
+      walkIns: queueMetrics.walkIns,
+      patientsServed: queueMetrics.patientsServed,
+      vitalsRecorded,
+      wellnessPlansCreated,
+      // Additional metrics
+      waitingAppointments,
+      inProgressAppointments,
+      inServiceAppointments,
+      absentAppointments,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('[NURSE_ANALYTICS] Final result:', finalResult);
+
+    res.json({
+      success: true,
+      data: finalResult,
+    });
+  } catch (error) {
+    console.error('[NURSE_ANALYTICS] Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch nurse analytics' 
+    });
   }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
-function Header({ title, onToggleSidebar, dashboardType }) {
+function Header({ title, onToggleSidebar, dashboardType, isMobileSidebarOpen, onToggleMobileSidebar }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -146,8 +146,40 @@ function Header({ title, onToggleSidebar, dashboardType }) {
 
   return (
     <header className="mesob-header">
+      {/* Mobile Backdrop */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="mesob-mobile-backdrop active"
+          onClick={onToggleMobileSidebar}
+          aria-hidden="true"
+        />
+      )}
+      
       {/* Left Section - Toggle + Logo */}
       <div className="mesob-header-left">
+        {/* Mobile Hamburger Menu */}
+        <button
+          className="mesob-header-hamburger"
+          onClick={onToggleMobileSidebar}
+          aria-label="Toggle Mobile Menu"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
+        {/* Desktop Toggle Button */}
         <button
           className="mesob-header-toggle"
           onClick={onToggleSidebar}

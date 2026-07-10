@@ -7,7 +7,7 @@ import morgan from "morgan";
 import prisma from "./config/prisma";
 import maintenanceMiddleware from "./middleware/maintenance.middleware";
 import apiRoutes from "./routes";
-import seedRoutes from "./routes/seed.routes.js";
+import seedRoutes from "./routes/seed.routes";
 
 const app = express();
 

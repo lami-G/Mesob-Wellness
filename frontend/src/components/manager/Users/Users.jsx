@@ -241,17 +241,18 @@ const Users = ({ loading, users, onRefresh }) => {
         </div>
       ) : (
         <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Last Login</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
             <tbody>
               {filteredUsers.map((u) => (
                 <tr key={u.id}>
@@ -300,6 +301,7 @@ const Users = ({ loading, users, onRefresh }) => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

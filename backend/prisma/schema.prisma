@@ -118,6 +118,7 @@ model Appointment {
   scheduledAt        DateTime          @db.Timestamptz(3)
   reason             String
   status             AppointmentStatus @default(WAITING)
+  isWalkIn           Boolean           @default(false)
   notes              String?
   diagnosis          String?
   prescription       String?
@@ -136,8 +137,10 @@ model Appointment {
   @@index([userId])
   @@index([scheduledAt])
   @@index([status])
+  @@index([isWalkIn])
   @@index([userId, status])
   @@index([scheduledAt, status])
+  @@index([isWalkIn, status])
   @@map("appointments")
 }
 

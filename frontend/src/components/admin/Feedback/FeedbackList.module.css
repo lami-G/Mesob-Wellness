@@ -42,6 +42,13 @@
   flex-wrap: wrap;
 }
 
+/* Desktop - keep flex */
+@media (min-width: 769px) {
+  .filters {
+    display: flex !important;
+  }
+}
+
 .filterInput,
 .filterSelect {
   padding: 8px 12px;
@@ -218,4 +225,125 @@
 
 .loading {
   color: #666;
+}
+
+/* Responsive - Mobile optimized */
+@media (max-width: 768px) {
+  .listHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .listHeader h2 {
+    font-size: 1.125rem;
+  }
+  
+  .btnExport {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+  
+  /* Filters - 2 columns grid on mobile */
+  .filters {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  /* All filters take 1 column each */
+  
+  .filterInput,
+  .filterSelect {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+  
+  .filterSelect:disabled {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+  }
+  
+  .btnReset {
+    width: 100%;
+    padding: 0.75rem;
+    min-height: 44px;
+    font-size: 0.875rem;
+  }
+  
+  .dataTable {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .dataTable table {
+    min-width: 800px;
+  }
+  
+  .dataTable th,
+  .dataTable td {
+    padding: 0.625rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+  
+  .rating {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+  
+  .btnView {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+  
+  .pagination {
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .btnPrev,
+  .btnNext {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.625rem 1rem;
+  }
+  
+  .pageInfo {
+    min-width: auto;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .listHeader h2 {
+    font-size: 1rem;
+  }
+  
+  /* Filters - 1 column on small mobile */
+  .filters {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .dataTable table {
+    min-width: 700px;
+  }
+  
+  .dataTable th,
+  .dataTable td {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.6875rem;
+  }
 }

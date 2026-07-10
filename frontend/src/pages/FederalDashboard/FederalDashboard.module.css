@@ -196,3 +196,85 @@
   color: #6b7280;
   margin-bottom: 0.25rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN - MOBILE & TABLET
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .filtersGrid {
+    gap: 0.75rem;
+  }
+
+  .filterItem,
+  .filterItemWide,
+  .filterItemMedium {
+    min-width: 150px;
+    flex: 1 1 calc(50% - 0.375rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .filtersCard {
+    padding: 0.75rem;
+  }
+
+  .filtersGrid {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .filterItem,
+  .filterItemWide,
+  .filterItemMedium {
+    min-width: unset;
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .regionSelect,
+  .regionStatusSelect {
+    max-width: none;
+    width: 100%;
+  }
+
+  .createRegionCard {
+    padding: 1rem;
+  }
+
+  .regionModalInputGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .regionActionsWrapper {
+    flex-direction: column;
+  }
+
+  .regionActionsWrapper button {
+    width: 100%;
+  }
+
+  .overviewSection {
+    margin-top: 1rem;
+  }
+
+  .regionSingleSummary {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tooltipContainer {
+    min-width: 150px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .tooltipLabel {
+    font-size: 0.8rem;
+  }
+
+  .tooltipItem,
+  .tooltipConditionItem {
+    font-size: 0.75rem;
+  }
+}

@@ -104,6 +104,30 @@
   }
 
   .capacityInfo {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .capacityInfo {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .capacityStat {
+    padding: 12px;
+  }
+
+  .statLabel {
+    font-size: 0.8125rem;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .capacityBar {
+    height: 20px;
   }
 }

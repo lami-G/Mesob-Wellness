@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import AnimatedWaveBackground from "../../components/AnimatedWaveBackground";
 import Card from "../../components/shared/Card";
@@ -80,7 +80,7 @@ function Login() {
           {/* ── Welcome ── */}
           <div className={styles.welcomeSection}>
             <h1 className={styles.welcome}>Welcome</h1>
-            <p className={styles.subtitle}>Access the Mesob wellness Center System</p>
+            <p className={styles.subtitle}> Mesob wellness Center</p>
           </div>
 
           {/* ── Server error ── */}
@@ -95,13 +95,13 @@ function Login() {
             {/* Email */}
             <div className={styles.formGroup}>
               <div className={styles.inputWrapper}>
-                <User className={styles.inputIcon} size={18} />
+                <Mail className={styles.inputIcon} size={18} />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Username"
+                  placeholder="email"
                   disabled={loading}
                   autoComplete="username email"
                   className={`${styles.input} ${errors.email ? styles.inputError : ""} ${loading ? styles.inputDisabled : ""}`}

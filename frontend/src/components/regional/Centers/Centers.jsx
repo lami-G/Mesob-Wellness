@@ -414,31 +414,32 @@ const Centers = ({ loading, centers, selectedCenter, onRefresh }) => {
         </div>
       ) : (
         <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th
-                  onClick={() => handleSort("name")}
-                  style={{ cursor: "pointer" }}
-                >
-                  Center Name{" "}
-                  {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th>Code</th>
-                <th>Region</th>
-                <th>City</th>
-                <th
-                  onClick={() => handleSort("staff")}
-                  style={{ cursor: "pointer" }}
-                >
-                  Staff{" "}
-                  {sortBy === "staff" && (sortOrder === "asc" ? "↑" : "↓")}
-                </th>
-                <th
-                  onClick={() => handleSort("capacity")}
-                  style={{ cursor: "pointer" }}
-                >
-                  Capacity{" "}
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th
+                    onClick={() => handleSort("name")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Center Name{" "}
+                    {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+                  </th>
+                  <th>Code</th>
+                  <th>Region</th>
+                  <th>City</th>
+                  <th
+                    onClick={() => handleSort("staff")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Staff{" "}
+                    {sortBy === "staff" && (sortOrder === "asc" ? "↑" : "↓")}
+                  </th>
+                  <th
+                    onClick={() => handleSort("capacity")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Capacity{" "}
                   {sortBy === "capacity" && (sortOrder === "asc" ? "↑" : "↓")}
                 </th>
                 <th
@@ -531,6 +532,7 @@ const Centers = ({ loading, centers, selectedCenter, onRefresh }) => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

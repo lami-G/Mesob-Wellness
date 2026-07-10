@@ -365,18 +365,38 @@
    RESPONSIVE
    ======================================== */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .npsScale {
-    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .feedbackForm {
+    padding: 16px;
+  }
+
+  .npsScale {
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 6px;
+  }
+  
+  .npsButton {
+    min-height: 44px;
+    font-size: 1rem;
   }
 
   .ratingButtons {
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .ratingButton {
-    min-width: 60px;
-    padding: 0.6rem;
+    min-width: 70px;
+    min-height: 44px;
+    padding: 10px 12px;
+    flex: 1 1 calc(33.333% - 0.5rem);
   }
 
   .feedbackHeader h2 {
@@ -390,7 +410,44 @@
   }
 
   .btnLarge {
-    min-width: 150px;
-    padding: 0.75rem 1.5rem;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 20px;
+  }
+  
+  .feedbackActions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .feedbackActions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedbackForm {
+    padding: 12px;
+  }
+
+  .npsScale {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+  
+  .npsButton {
+    font-size: 0.875rem;
+    min-height: 40px;
+  }
+
+  .ratingButton {
+    min-width: 60px;
+    font-size: 0.875rem;
+  }
+
+  .npsSection,
+  .ratingsSection,
+  .commentsSection {
+    padding: 1rem;
   }
 }

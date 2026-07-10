@@ -599,3 +599,275 @@
   grid-template-columns: repeat(4, 1fr);
   margin-bottom: 1.5rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN - MOBILE & TABLET
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  .healthKpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .analyticsKpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .capacityTabKpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .chartCard {
+    padding: 1.5rem;
+  }
+
+  .capacityCard {
+    padding: 1.5rem;
+  }
+
+  .capacityRow {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .controlPanel {
+    padding: 1.25rem;
+  }
+
+  .controlPanelHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controlPanelControls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .periodSwitcher,
+  .viewModeToggle {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .metricSelector {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .healthKpiGrid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+
+  .analyticsKpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+  }
+
+  .capacityTabKpiGrid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+
+  .topKpiCard,
+  .healthKpiCard,
+  .analyticsKpiCard {
+    padding: 1.25rem;
+  }
+
+  .topKpiValue,
+  .healthKpiValue {
+    font-size: 1.5rem;
+  }
+
+  .topKpiIcon,
+  .healthKpiIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .chartCard {
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .chartTitle {
+    font-size: 1.125rem;
+  }
+
+  .capacityCard {
+    padding: 1.25rem;
+  }
+
+  .capacityRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .capacityStat {
+    min-width: unset;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  .capacityStatValue {
+    font-size: 1.5rem;
+  }
+
+  .capacityBarWrap {
+    width: 100%;
+  }
+
+  .capacityPct {
+    text-align: left;
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+  }
+
+  .controlPanel {
+    padding: 1rem;
+  }
+
+  .controlPanelTitleText {
+    font-size: 1.125rem;
+  }
+
+  .periodBtn,
+  .viewModeBtn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    min-height: 44px;
+  }
+
+  .metricSelector {
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    min-height: 44px;
+  }
+
+  .chartsRow {
+    gap: 1rem;
+  }
+
+  /* Tooltips on mobile */
+  .tooltipLight {
+    min-width: 200px;
+    padding: 12px;
+  }
+
+  .tooltipLightHeader {
+    font-size: 0.875rem;
+  }
+
+  .tooltipMetricRow {
+    padding: 4px 0;
+  }
+
+  .tooltipMetricLabel {
+    font-size: 0.75rem;
+  }
+
+  .tooltipMetricValue {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .topKpiCard,
+  .healthKpiCard,
+  .analyticsKpiCard {
+    padding: 1rem;
+  }
+
+  .topKpiValue,
+  .healthKpiValue {
+    font-size: 1.375rem;
+  }
+
+  .topKpiLabel,
+  .healthKpiLabel {
+    font-size: 0.8125rem;
+  }
+
+  .topKpiSub,
+  .healthKpiSub {
+    font-size: 0.6875rem;
+  }
+
+  .chartCard {
+    padding: 1rem;
+  }
+
+  .chartTitle {
+    font-size: 1rem;
+  }
+
+  .chartSubtitle {
+    font-size: 0.8125rem;
+  }
+
+  .capacityCard {
+    padding: 1rem;
+  }
+
+  .capacityCardTitle {
+    font-size: 1rem;
+  }
+
+  .statusBadge,
+  .capacityStatusBadge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .capacityStat {
+    padding: 0.625rem;
+  }
+
+  .capacityStatValue {
+    font-size: 1.25rem;
+  }
+
+  .capacityStatLabel {
+    font-size: 0.75rem;
+  }
+
+  .controlPanel {
+    padding: 0.875rem;
+  }
+
+  .controlPanelTitleText {
+    font-size: 1rem;
+  }
+
+  .periodSwitcher {
+    padding: 0.2rem;
+  }
+
+  .periodBtn,
+  .viewModeBtn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .analyticsKpiGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tooltipDark,
+  .tooltipLight {
+    padding: 10px;
+    min-width: 180px;
+  }
+}

@@ -372,22 +372,49 @@
    RESPONSIVE
    ======================================== */
 
+@media (max-width: 1024px) {
+  .appointmentStatusSection {
+    gap: 1rem;
+  }
+}
+
 @media (max-width: 768px) {
   .appointmentStatusSection {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
   }
 
   .btnCancelSmall {
     width: 100%;
     text-align: center;
+    min-height: 44px;
+    padding: 12px 16px;
   }
 
   .appointmentHeader {
     flex-direction: column;
     align-items: flex-start;
+    gap: 10px;
   }
 
   .statusBadge {
-    margin-top: 10px;
+    margin-top: 0;
+  }
+  
+  .appointmentActions {
+    width: 100%;
+  }
+  
+  .appointmentActions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statusBadge {
+    font-size: 0.8125rem;
+    padding: 6px 10px;
   }
 }

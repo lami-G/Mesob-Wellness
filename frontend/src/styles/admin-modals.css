@@ -70,16 +70,41 @@
 }
 
 /* Mobile */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 60px 0.75rem 0.75rem;
+  }
+
+  .modal-content,
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 70px);
+    border-radius: 12px;
+  }
+}
+
 @media (max-width: 640px) {
   .modal-overlay {
-    padding-top: 70px;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding: 70px 0.5rem 0.5rem;
   }
 
   .modal-content,
   .modal {
     width: 100%;
     max-height: calc(100vh - 80px);
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 60px 0.375rem 0.375rem;
+  }
+
+  .modal-content,
+  .modal {
+    max-height: calc(100vh - 70px);
+    border-radius: 8px;
   }
 }

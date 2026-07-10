@@ -122,21 +122,65 @@
   }
 
   .filterContainer {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .filterGroup {
     width: 100%;
     min-width: unset;
+    grid-column: span 1;
+  }
+  
+  /* Make search and reset full width */
+  .filterGroup:first-child,
+  .filterActions {
+    grid-column: span 2;
+  }
+
+  .filterInput,
+  .filterSelect {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    /* Increase touch target for mobile */
+    min-height: 44px;
+  }
+
+  .filterSelect {
+    background-position: right 1rem center;
   }
 
   .filterActions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: stretch;
+    gap: 0.5rem;
   }
 
   .btnReset,
   .btnApply {
     flex: 1;
+    min-height: 44px;
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterBar {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .filterContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .filterGroup:first-child,
+  .filterActions {
+    grid-column: span 1;
+  }
+
+  .filterGroup label {
+    font-size: 0.8125rem;
   }
 }

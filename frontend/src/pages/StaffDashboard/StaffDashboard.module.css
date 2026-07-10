@@ -45,8 +45,30 @@
    RESPONSIVE
    ======================================== */
 
+@media (max-width: 1024px) {
+  .dashboardContainer {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardContainer {
+    padding: 12px;
+    gap: 1.25rem;
+  }
+
+  .dashboardContent {
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 480px) {
   .dashboardContainer {
     padding: 10px;
+    gap: 1rem;
+  }
+
+  .dashboardContent {
+    gap: 1rem;
   }
 }

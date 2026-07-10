@@ -342,18 +342,19 @@ function FederalUsers() {
       )}
 
       <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Verified</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Verified</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
@@ -403,6 +404,7 @@ function FederalUsers() {
             )}
           </tbody>
         </table>
+        </div>
 
         {pagination.pages > 1 && (
           <div className="pagination">

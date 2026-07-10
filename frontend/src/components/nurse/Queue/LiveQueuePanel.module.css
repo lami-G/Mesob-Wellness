@@ -209,20 +209,104 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  .queueControls {
+    gap: 12px;
+  }
+
+  .searchInput {
+    font-size: 1rem;
+    padding: 12px 15px;
+    /* Ensure adequate touch target */
+    min-height: 44px;
+  }
+
+  .filterTabs {
+    gap: 6px;
+  }
+
+  .filterBtn {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+    flex: 1 1 auto;
+    min-width: calc(50% - 3px);
+    min-height: 40px;
+    text-align: center;
+  }
+
+  .queueList {
+    gap: 10px;
+  }
+
+  .queueItem {
+    padding: 12px;
+  }
+
   .queueItemHeader {
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
 
   .customerName {
     min-width: 100%;
+    font-size: 1rem;
+  }
+
+  .customerId,
+  .appointmentType {
+    font-size: 0.8125rem;
+  }
+
+  .queueNumber {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .statusBadge {
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+  }
+
+  .queueItemDetails {
+    padding: 12px;
+  }
+
+  .queueItemDetails p {
+    font-size: 0.875rem;
+    margin: 6px 0;
   }
 
   .queueItemActions {
     flex-direction: column;
+    gap: 8px;
   }
 
-  .queueItemActions .btn {
+  .queueItemActions .btn,
+  .queueItemActions button {
     width: 100%;
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 0.9375rem;
+  }
+
+  .btnRefresh {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .queueItem {
+    padding: 10px;
+  }
+
+  .filterBtn {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+  }
+
+  .queueItemDetails p {
+    font-size: 0.8125rem;
   }
 }

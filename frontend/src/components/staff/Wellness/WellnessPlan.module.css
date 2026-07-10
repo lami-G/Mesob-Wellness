@@ -243,17 +243,52 @@
    RESPONSIVE
    ======================================== */
 
+@media (max-width: 1024px) {
+  .planSections {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
+  .wellnessPlan {
+    padding: 16px;
+  }
+
   .wellnessPlanHeader {
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
   }
 
-  .wellnessPlanHeader .btn {
+  .wellnessPlanHeader .btn,
+  .wellnessPlanHeader button {
     width: 100%;
+    min-height: 44px;
   }
 
   .planSections {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .sectionActions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sectionActions button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wellnessPlan {
+    padding: 12px;
+  }
+
+  .planSections {
+    gap: 0.875rem;
   }
 }

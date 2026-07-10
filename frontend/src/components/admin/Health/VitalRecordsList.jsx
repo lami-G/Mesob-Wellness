@@ -174,21 +174,22 @@ function VitalRecordsList() {
         </button>
       </div>
 
-      <table className={styles.dataTable}>
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>Weight (kg)</th>
-            <th>Height (cm)</th>
-            <th>BMI</th>
-            <th>BP (Sys/Dia)</th>
-            <th>Heart Rate</th>
-            <th>Temperature</th>
-            <th>O2 Sat</th>
-            <th>Recorded At</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Weight (kg)</th>
+              <th>Height (cm)</th>
+              <th>BMI</th>
+              <th>BP (Sys/Dia)</th>
+              <th>Heart Rate</th>
+              <th>Temperature</th>
+              <th>O2 Sat</th>
+              <th>Recorded At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
         <tbody>
           {vitals.map((vital) => {
             const bmiCategoryClass = {
@@ -221,6 +222,7 @@ function VitalRecordsList() {
           })}
         </tbody>
       </table>
+      </div>
 
       {vitals.length === 0 && (
         <div className={styles.emptyState}>No vital records found</div>

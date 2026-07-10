@@ -265,15 +265,51 @@
    RESPONSIVE
    ======================================== */
 
+@media (max-width: 1024px) {
+  .calendarHeader {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .monthNavigation {
+    justify-content: center;
+  }
+}
+
 @media (max-width: 768px) {
+  .bookingCalendar {
+    padding: 16px;
+  }
+
   .calendarGrid {
     grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  
+  .calendarDay {
+    min-height: 60px;
+    padding: 6px 4px;
+  }
+  
+  .dayNumber {
+    font-size: 0.875rem;
+  }
+  
+  .slotsBadge {
+    font-size: 0.6875rem;
+    padding: 2px 6px;
+  }
+  
+  .monthNavButton {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 
 @media (max-width: 480px) {
   .bookingCalendar {
-    padding: 15px;
+    padding: 12px;
   }
 
   .calendarGrid {
@@ -282,7 +318,8 @@
   }
 
   .calendarDay {
-    padding: 4px;
+    padding: 4px 2px;
+    min-height: 50px;
   }
 
   .dayNumber {
@@ -290,6 +327,12 @@
   }
 
   .slotsBadge {
-    font-size: 0.65rem;
+    font-size: 0.625rem;
+    padding: 2px 4px;
+  }
+  
+  .weekdayHeader {
+    font-size: 0.6875rem;
+    padding: 6px 2px;
   }
 }

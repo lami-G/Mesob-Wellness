@@ -6,6 +6,8 @@ function Sidebar({
   onTabChange,
   isOpen,
   user,
+  isMobileOpen,
+  onMobileClose,
   // Optional widgets data
   capacityInfo,
   staffCount,
@@ -19,9 +21,18 @@ function Sidebar({
     ? Math.round((capacityInfo.slotsUsed / (capacityInfo.dailyLimit || 1)) * 100)
     : 0;
   const capColor = usedPct > 85 ? '#ef4444' : usedPct > 60 ? '#f59e0b' : '#22c55e';
+  
+  // Handle tab change and close mobile sidebar
+  const handleTabChange = (tabId) => {
+    onTabChange(tabId);
+    // Close mobile sidebar after selecting an item
+    if (onMobileClose) {
+      onMobileClose();
+    }
+  };
 
   return (
-    <aside className={`admin-sidebar mesob-sidebar ${!isOpen ? 'collapsed' : ''}`}>
+    <aside className={`admin-sidebar mesob-sidebar ${!isOpen ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
       
       {/* ── Logo Block - Centered, Stacked Layout ── */}
       <div className="sidebar-logo-section">
@@ -47,7 +58,7 @@ function Sidebar({
               <button
                 key={item.id}
                 className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-                onClick={() => onTabChange(item.id)}
+                onClick={() => handleTabChange(item.id)}
                 title={!isOpen ? item.label : undefined}
               >
                 {item.icon}
@@ -73,7 +84,7 @@ function Sidebar({
           <button
             key={item.id}
             className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-            onClick={() => onTabChange(item.id)}
+            onClick={() => handleTabChange(item.id)}
             title={!isOpen ? item.label : undefined}
           >
             {item.icon}

@@ -198,27 +198,60 @@
 /* ========================================
    RESPONSIVE
    ======================================== */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .summaryGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .recordsTableContent {
-    font-size: 12px;
-  }
-
-  .recordsTableContent th,
-  .recordsTableContent td {
-    padding: 8px;
+    gap: 12px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .longitudinalRecords {
     padding: 16px;
   }
 
   .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .recordsTableContent {
+    font-size: 0.8125rem;
+  }
+
+  .recordsTableContent th,
+  .recordsTableContent td {
+    padding: 10px 8px;
+  }
+  
+  .filterControls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filterControls select,
+  .filterControls input {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .longitudinalRecords {
+    padding: 12px;
+  }
+
+  .summaryGrid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .recordsTableContent {
+    font-size: 0.75rem;
+  }
+
+  .recordsTableContent th,
+  .recordsTableContent td {
+    padding: 8px 6px;
   }
 }

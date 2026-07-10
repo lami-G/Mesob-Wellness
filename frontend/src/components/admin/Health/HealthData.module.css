@@ -181,3 +181,123 @@
 .distributionCardFull {
   grid-column: 1 / -1;
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .healthDataPage {
+    padding: 1rem;
+  }
+  
+  .pageHeader {
+    margin-bottom: 1.5rem;
+  }
+  
+  .pageHeader h1 {
+    font-size: 1.5rem;
+  }
+  
+  .pageHeader p {
+    font-size: 0.8125rem;
+  }
+  
+  .timePeriodSelector {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .periodBtn {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+    flex: 1;
+  }
+  
+  /* Stats grid - 2 columns on mobile */
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .statCard {
+    padding: 1rem;
+  }
+  
+  .statCard h3 {
+    font-size: 0.75rem;
+  }
+  
+  .statValue {
+    font-size: 1.75rem;
+  }
+  
+  .statLabel {
+    font-size: 0.6875rem;
+  }
+  
+  .distributionGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .distributionCard {
+    padding: 1rem;
+  }
+  
+  .distributionCard h3 {
+    font-size: 0.9375rem;
+    margin-bottom: 1rem;
+  }
+  
+  .barLabel {
+    min-width: 60px;
+    font-size: 0.75rem;
+  }
+  
+  .barValue {
+    font-size: 0.75rem;
+  }
+  
+  .confidentialityNotice {
+    padding: 0.875rem;
+  }
+  
+  .confidentialityNotice p {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .healthDataPage {
+    padding: 0.75rem;
+  }
+  
+  .pageHeader h1 {
+    font-size: 1.25rem;
+  }
+  
+  .timePeriodSelector {
+    flex-direction: column;
+  }
+  
+  .periodBtn {
+    width: 100%;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .statCard {
+    padding: 0.875rem;
+  }
+  
+  .statValue {
+    font-size: 1.5rem;
+  }
+  
+  .barLabel {
+    min-width: 50px;
+    font-size: 0.6875rem;
+  }
+}

@@ -261,20 +261,21 @@ function FeedbackList({ baseFilters = {} }) {
         </button>
       </div>
 
-      <table className={styles.dataTable}>
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>NPS Score</th>
-            <th>Service Quality</th>
-            <th>Staff Behavior</th>
-            <th>Cleanliness</th>
-            <th>Wait Time</th>
-            <th>Type</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <table className={styles.dataTable}>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>NPS Score</th>
+              <th>Service Quality</th>
+              <th>Staff Behavior</th>
+              <th>Cleanliness</th>
+              <th>Wait Time</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
         <tbody>
           {feedback.map((item) => (
             <tr key={item.id}>
@@ -312,6 +313,7 @@ function FeedbackList({ baseFilters = {} }) {
           ))}
         </tbody>
       </table>
+      </div>
 
       {feedback.length === 0 && (
         <div className={styles.emptyState}>No feedback found</div>

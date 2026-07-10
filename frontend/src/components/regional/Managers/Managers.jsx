@@ -283,18 +283,19 @@ const Managers = ({ loading, centers, onRefresh }) => {
         </div>
       ) : (
         <div className="users-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Phone</th>
-                <th>Last Login</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Phone</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
             <tbody>
               {filteredManagers.map((manager) => (
                 <tr key={manager.id}>
@@ -371,6 +372,7 @@ const Managers = ({ loading, centers, onRefresh }) => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 

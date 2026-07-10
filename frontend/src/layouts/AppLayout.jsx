@@ -40,6 +40,7 @@ function AppLayout({
 }) {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Get sidebar configuration based on role
   const sidebarConfig = getSidebarConfig(role);
@@ -49,6 +50,21 @@ function AppLayout({
     if (title) return title;
     
     return 'MESOB Wellness';
+  };
+
+  // Handle desktop sidebar toggle
+  const handleToggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  // Handle mobile sidebar toggle
+  const handleToggleMobileSidebar = () => {
+    setMobileSidebarOpen(!mobileSidebarOpen);
+  };
+
+  // Close mobile sidebar
+  const handleCloseMobileSidebar = () => {
+    setMobileSidebarOpen(false);
   };
 
 
@@ -61,6 +77,8 @@ function AppLayout({
         activeTab={activeTab}
         onTabChange={onTabChange}
         isOpen={sidebarOpen}
+        isMobileOpen={mobileSidebarOpen}
+        onMobileClose={handleCloseMobileSidebar}
         user={user}
         // Widget data
         capacityInfo={capacityInfo}
@@ -76,7 +94,9 @@ function AppLayout({
         {/* Header */}
         <Header
           title={getHeaderTitle()}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          onToggleSidebar={handleToggleSidebar}
+          isMobileSidebarOpen={mobileSidebarOpen}
+          onToggleMobileSidebar={handleToggleMobileSidebar}
           dashboardType={role}
         />
 

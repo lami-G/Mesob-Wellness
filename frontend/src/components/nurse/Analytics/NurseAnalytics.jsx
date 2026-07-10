@@ -464,7 +464,19 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
 
       console.log('Fetching analytics for date range:', startDate, 'to', endDate);
 
-      // Fetch appointments from queue endpoint with date parameter
+      // Call the NEW backend endpoint that uses Admin logic
+      const analyticsRes = await api.get('/api/v1/analytics/nurse/analytics', {
+        params: {
+          timePeriod: viewPeriod,
+          ...(startDate && { startDate: startDate.toISOString() }),
+          ...(endDate && { endDate: endDate.toISOString() }),
+        }
+      });
+
+      const analyticsData = analyticsRes.data.data;
+      console.log('✅ Analytics data from backend:', analyticsData);
+
+      // Fetch appointments from queue endpoint for chart data
       const appointmentsRes = await api.get('/api/v1/appointments/queue', {
         params: viewPeriod === 'all' 
           ? {} 
@@ -482,7 +494,6 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
         appointmentsData = appointmentsData.filter(apt => {
           const aptDate = new Date(apt.scheduledAt);
           const isInRange = aptDate >= startDate && aptDate <= endDate;
-          console.log(`Apt ${apt.appointmentId}: date=${aptDate.toDateString()}, inRange=${isInRange}`);
           return isInRange;
         });
 
@@ -492,7 +503,7 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       // Map queue status to appointment status for filtering
       const mappedAppointments = appointmentsData.map(apt => ({
         ...apt,
-        appointmentStatus: apt.status, // Use status directly - no mapping needed
+        appointmentStatus: apt.status,
         customerId: apt.customerId,
         customerName: apt.customerName,
         appointmentId: apt.appointmentId,
@@ -504,113 +515,15 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const capacityRes = await api.get('/api/v1/analytics/capacity');
       const capacityData = capacityRes.data.data || {};
 
-      // Calculate metrics
+      // Calculate additional metrics
       const total = mappedAppointments.length;
       const completed = mappedAppointments.filter(a => a.appointmentStatus === 'COMPLETED').length;
       const waiting = mappedAppointments.filter(a => a.appointmentStatus === 'WAITING').length;
       const inProgress = mappedAppointments.filter(a => a.appointmentStatus === 'IN_PROGRESS').length;
       const inService = mappedAppointments.filter(a => a.appointmentStatus === 'IN_SERVICE').length;
-      const completedAppointments = mappedAppointments.filter(a => a.appointmentStatus === 'COMPLETED');
-      
-      // Count online appointments (all appointments are online bookings)
-      let onlineCount = total;
-      let walkin = 0;
-
-      // NO_SHOW appointments - fetch from queue
       const absent = mappedAppointments.filter(a => a.appointmentStatus === 'NO_SHOW').length;
 
-      // Count walk-ins separately from appointments
-      // Walk-ins = patients who got wellness plans WITHOUT any appointment on that day
-      // This matches Admin dashboard logic: if you have appointment today, you're NOT a walk-in
-      try {
-        console.log('=== COUNTING WALK-INS (Admin Logic) ===');
-        
-        // Get all wellness plans created in the period (or all time)
-        const vitalsParams = viewPeriod === 'all' ? {} : {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        };
-        
-        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
-        
-        const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
-        if (Array.isArray(vitalsData)) {
-          const vitalsRecords = vitalsData;
-          console.log(`Found ${vitalsRecords.length} vitals records in period`);
-          
-          // Get unique user IDs from vitals
-          const vitalsUserIds = [...new Set(vitalsRecords.map(v => v.userId).filter(Boolean))];
-          console.log('Users with vitals:', vitalsUserIds);
-          
-          // Build map of userId -> set of appointment dates
-          const appointmentDateMap = new Map();
-          mappedAppointments.forEach(apt => {
-            const aptDate = new Date(apt.scheduledAt);
-            aptDate.setHours(0, 0, 0, 0);
-            const dayKey = aptDate.getTime();
-            
-            if (!appointmentDateMap.has(apt.customerId)) {
-              appointmentDateMap.set(apt.customerId, new Set());
-            }
-            appointmentDateMap.get(apt.customerId).add(dayKey);
-          });
-          
-          console.log('Appointment date map:', Array.from(appointmentDateMap.entries()).map(([userId, dates]) => ({
-            userId: userId.substring(0, 8) + '...',
-            appointmentDates: Array.from(dates).map(d => new Date(d).toDateString())
-          })));
-          
-          // For each user with vitals, check their wellness plans
-          for (const userId of vitalsUserIds) {
-            try {
-              const plansRes = await api.get(`/api/v1/plans/${userId}`);
-              const plansData = plansRes.data?.data || plansRes.data || [];
-              
-              if (Array.isArray(plansData)) {
-                // Count wellness plans created in this period (or all time)
-                const periodPlans = viewPeriod === 'all' 
-                  ? plansData 
-                  : plansData.filter(p => {
-                      const pDate = new Date(p.createdAt);
-                      return pDate >= startDate && pDate <= endDate;
-                    });
-                
-                // For each wellness plan, check if user had ANY appointment on that day
-                for (const plan of periodPlans) {
-                  const planDate = new Date(plan.createdAt);
-                  planDate.setHours(0, 0, 0, 0);
-                  const planDayKey = planDate.getTime();
-                  
-                  // Check if user has ANY appointment on this day
-                  const userAppointmentDates = appointmentDateMap.get(userId);
-                  const hasAppointmentOnDay = userAppointmentDates && userAppointmentDates.has(planDayKey);
-                  
-                  // Admin logic: If user has appointment on this day, NONE of their plans are walk-ins
-                  if (!hasAppointmentOnDay) {
-                    walkin++;
-                    console.log(`  ✓ Walk-in counted for user ${userId.substring(0, 8)}... on ${planDate.toDateString()}`);
-                  } else {
-                    console.log(`  ⚠️  User ${userId.substring(0, 8)}... has appointment on ${planDate.toDateString()}, NOT counting as walk-in`);
-                  }
-                }
-                
-                if (periodPlans.length > 0) {
-                  console.log(`✓ User ${userId.substring(0, 8)}...: ${periodPlans.length} wellness plans checked`);
-                }
-              }
-            } catch (err) {
-              console.log(`Could not fetch data for user ${userId}:`, err.message);
-            }
-          }
-        }
-        console.log('Total walk-in services completed:', walkin);
-        console.log('=== WALK-IN COUNT COMPLETE ===');
-      } catch (err) {
-        console.error('Failed to count walk-ins:', err);
-        walkin = 0; // Default to 0 if walk-in counting fails
-      }
-
-      // Calculate average wait time from actual data
+      // Average wait time from actual data
       let totalWaitTime = 0;
       let completedWithTimes = 0;
       mappedAppointments.forEach(apt => {
@@ -624,87 +537,22 @@ function NurseAnalytics({ refreshTrigger = 0 }) {
       const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
       const utilizationPct = capacityData.utilizationPct || 0;
 
-      // Calculate vitals recorded for ALL users (appointments + walk-ins) in the period
-      let vitalsRecorded = 0;
-      try {
-        const vitalsParams = viewPeriod === 'all' ? {} : {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        };
-        
-        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
-        
-        const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
-        if (Array.isArray(vitalsData)) {
-          vitalsRecorded = vitalsData.length;
-          console.log(`Total vitals recorded in period: ${vitalsRecorded}`);
-        }
-      } catch (err) {
-        console.error('Failed to fetch vitals:', err);
-        vitalsRecorded = 0; // Default to 0 if vitals fetching fails
-      }
-
-      // Calculate wellness plans created for ALL users (appointments + walk-ins) in the period
-      let wellnessPlansCreated = 0;
-      try {
-        // Get all users who had vitals in the period (both appointments and walk-ins)
-        const vitalsParams = viewPeriod === 'all' ? {} : {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString()
-        };
-        
-        const vitalsRes = await api.get('/api/v1/vitals/all', { params: vitalsParams });
-        
-        const vitalsData = vitalsRes.data?.data || vitalsRes.data || [];
-        if (Array.isArray(vitalsData)) {
-          const allUserIds = [...new Set(vitalsData.map(v => v.userId).filter(Boolean))];
-          console.log('Fetching wellness plans for all users with vitals:', allUserIds);
-          
-          for (const userId of allUserIds) {
-            try {
-              const plansRes = await api.get(`/api/v1/plans/${userId}`);
-              console.log(`Wellness plans response for ${userId}:`, plansRes.data);
-              
-              let plansArray = [];
-              if (plansRes.data?.data && Array.isArray(plansRes.data.data)) {
-                plansArray = plansRes.data.data;
-              }
-              
-              if (Array.isArray(plansArray)) {
-                const periodPlans = viewPeriod === 'all' 
-                  ? plansArray 
-                  : plansArray.filter(p => {
-                      const pDate = new Date(p.createdAt);
-                      return pDate >= startDate && pDate <= endDate;
-                    });
-                console.log(`Found ${periodPlans.length} wellness plans for user ${userId} in period`);
-                wellnessPlansCreated += periodPlans.length;
-              }
-            } catch (err) {
-              console.log(`No wellness plans found for user ${userId}:`, err.message);
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch wellness plans:', err);
-        wellnessPlansCreated = 0; // Default to 0 if wellness plans fetching fails
-      }
-
+      // Set analytics using backend data
       setAnalytics({
-        totalAppointments: onlineCount,
-        completedAppointments: completed,
-        waitingAppointments: waiting,
-        inProgressAppointments: inProgress,
-        inServiceAppointments: inService,
-        absentAppointments: absent,
-        totalPatientsToday: completed + walkin, // Patients Served = Completed Appointments + Walk-ins (Admin logic)
+        totalAppointments: analyticsData.totalAppointments,
+        completedAppointments: analyticsData.completedAppointments,
+        waitingAppointments: analyticsData.waitingAppointments || waiting,
+        inProgressAppointments: analyticsData.inProgressAppointments || inProgress,
+        inServiceAppointments: analyticsData.inServiceAppointments || inService,
+        absentAppointments: analyticsData.absentAppointments || absent,
+        totalPatientsToday: analyticsData.patientsServed, // Patients Served from backend
         capacityUtilization: utilizationPct,
         averageWaitTime: averageWaitTime,
         completionRate: completionRate,
-        onlineAppointments: onlineCount,
-        walkinAppointments: walkin,
-        vitalsRecorded: vitalsRecorded,
-        wellnessPlansCreated: wellnessPlansCreated,
+        onlineAppointments: analyticsData.totalAppointments,
+        walkinAppointments: analyticsData.walkIns, // Walk-ins from backend
+        vitalsRecorded: analyticsData.vitalsRecorded,
+        wellnessPlansCreated: analyticsData.wellnessPlansCreated,
       });
 
       // Generate chart data with all appointments
