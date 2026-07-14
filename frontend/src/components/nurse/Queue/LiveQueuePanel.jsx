@@ -94,10 +94,15 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
 
   const handleSendEmail = async (appointmentId, customerName, customerEmail) => {
     try {
-      const response = await api.post(`/api/v1/appointments/${appointmentId}/send-reminder`);
+      // Increase timeout for email sending (first Redis connection can be slow)
+      const response = await api.post(
+        `/api/v1/appointments/${appointmentId}/send-reminder`,
+        {},
+        { timeout: 30000 } // 30 seconds timeout
+      );
       
       if (response.data.status === 'success') {
-        alert(`✅ Email reminder sent successfully to ${customerName}${customerEmail ? ` (${customerEmail})` : ''}`);
+        alert(`✅ Email reminder queued successfully for ${customerName}${customerEmail ? ` (${customerEmail})` : ''}`);
       } else {
         alert(`⚠️ ${response.data.message || 'Failed to send email reminder'}`);
       }
@@ -105,7 +110,7 @@ function LiveQueuePanel({ refreshTrigger, onNavigateToHistory }) {
       console.error('Send email error:', err);
       
       // Show specific error message from server if available
-      const errorMessage = err?.response?.data?.message || 'Failed to send email reminder';
+      const errorMessage = err?.response?.data?.message || 'Failed to send email reminder. Please try again.';
       alert(`❌ ${errorMessage}`);
     }
   };

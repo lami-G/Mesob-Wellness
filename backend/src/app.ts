@@ -8,6 +8,7 @@ import prisma from "./config/prisma";
 import maintenanceMiddleware from "./middleware/maintenance.middleware";
 import apiRoutes from "./routes";
 import seedRoutes from "./routes/seed.routes";
+import { startReminderScheduler } from "./services/scheduler.service";
 
 const app = express();
 
@@ -72,6 +73,9 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/api/v1", apiRoutes);
 app.use("/api/seed", seedRoutes);
+
+// Start automatic appointment reminder scheduler
+startReminderScheduler();
 
 app.use((_req: Request, res: Response) => {
   res.status(404).json({

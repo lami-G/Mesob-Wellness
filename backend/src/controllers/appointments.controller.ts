@@ -10,10 +10,10 @@ import {
   getStaffActiveAppointment,
   cancelAppointment,
 } from "../services/appointments.service";
-import { sendAppointmentReminder } from "../services/email.service";
 import { AppointmentStatus } from "../generated/prisma";
 import { AuthRequest } from "../middleware/auth.middleware";
 import { prisma } from "../config/prisma";
+import { queueAppointmentReminder } from "../services/queue.service";
 
 interface AppointmentRequestBody {
   patientId: unknown;
@@ -271,44 +271,34 @@ export async function sendReminderHandler(req: AuthRequest, res: Response): Prom
       return;
     }
 
-    // Send email reminder
-    const emailSent = await sendAppointmentReminder(
-      appointment.user.email,
-      appointment.user.fullName,
+    // Queue email reminder (instant response to nurse)
+    const jobId = await queueAppointmentReminder({
       appointmentId,
-      new Date(appointment.scheduledAt).toLocaleString(),
-      appointment.reason
-    );
+      recipientEmail: appointment.user.email,
+      customerName: appointment.user.fullName,
+      scheduledAt: new Date(appointment.scheduledAt).toLocaleString(),
+      reason: appointment.reason,
+    });
 
-    // Update appointment with reminder tracking
+    // Update appointment with tracking (mark that reminder was requested)
     const updatedAppointment = await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
-        reminderSentAt: new Date(),
-        reminderCount: { increment: 1 },
         lastReminderBy: userId,
       },
     });
 
-    if (emailSent) {
-      console.log(`✅ Email reminder sent for appointment ${appointmentId} by user ${userId}`);
-      res.status(200).json({
-        status: "success",
-        message: "Email reminder sent successfully",
-        data: {
-          appointmentId,
-          emailSent: true,
-          reminderCount: updatedAppointment.reminderCount,
-          timestamp: updatedAppointment.reminderSentAt,
-        },
-      });
-    } else {
-      console.warn(`⚠️ Email reminder failed for appointment ${appointmentId}`);
-      res.status(500).json({
-        status: "error",
-        message: "Failed to send email reminder. Please check email configuration.",
-      });
-    }
+    console.log(`✅ Email reminder queued for appointment ${appointmentId} by user ${userId} (Job ID: ${jobId})`);
+    res.status(200).json({
+      status: "success",
+      message: "Email reminder queued successfully and will be sent shortly",
+      data: {
+        appointmentId,
+        queued: true,
+        jobId,
+        recipient: appointment.user.email,
+      },
+    });
   } catch (error) {
     console.error('Send reminder error:', error);
     res.status(500).json({

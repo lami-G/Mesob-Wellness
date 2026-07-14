@@ -54,12 +54,12 @@ function getOptionalEnv(name: string): string {
   return process.env[name]?.trim() || '';
 }
 
-function getOptionalPort(name: string): number {
+function getOptionalPort(name: string, defaultPort: number = 587): number {
   const value = process.env[name]?.trim();
-  if (!value) return 587; // Default SMTP port
+  if (!value) return defaultPort;
   const port = Number.parseInt(value, 10);
   if (Number.isNaN(port) || port <= 0 || port > 65535) {
-    return 587;
+    return defaultPort;
   }
   return port;
 }
@@ -98,11 +98,26 @@ export const env = Object.freeze({
   DATABASE_URL: databaseUrl,
   JWT_SECRET: getRequiredEnv("JWT_SECRET"),
   JWT_EXPIRES_IN: getRequiredEnv("JWT_EXPIRES_IN"),
+  
+  // Legacy SMTP (keeping for backward compatibility)
   SMTP_HOST: getOptionalEnv("SMTP_HOST"),
-  SMTP_PORT: getOptionalPort("SMTP_PORT"),
+  SMTP_PORT: getOptionalPort("SMTP_PORT", 587),
   SMTP_USER: getOptionalEnv("SMTP_USER"),
   SMTP_PASS: getOptionalEnv("SMTP_PASS"),
   SMTP_FROM: getOptionalEnv("SMTP_FROM") || "noreply@mesob.com",
+  
+  // Resend Email Configuration
+  RESEND_API_KEY: getOptionalEnv("RESEND_API_KEY"),
+  EMAIL_FROM: getOptionalEnv("EMAIL_FROM") || "noreply@mesob.et",
+  
+  // Redis Configuration (for job queue)
+  REDIS_HOST: getOptionalEnv("REDIS_HOST") || "localhost",
+  REDIS_PORT: getOptionalPort("REDIS_PORT", 6379),
+  REDIS_PASSWORD: getOptionalEnv("REDIS_PASSWORD"),
+  
+  // Frontend URL (for email links)
+  FRONTEND_URL: getOptionalEnv("FRONTEND_URL") || "http://localhost:3000",
+  
   SEED_SECRET_KEY: getOptionalEnv("SEED_SECRET_KEY"),
 });
 
