@@ -3,12 +3,21 @@ import { UserRole } from "../generated/prisma";
 import { AuthService } from "../services/auth.service";
 
 // Extend Express Request to include user information
+// Explicitly declare properties to avoid type conflicts from cached dependencies
 export interface AuthRequest extends Request {
   user?: {
     userId: string;
     role: UserRole;
     centerId?: string | null;
   };
+  // Explicitly redeclare Express Request properties for Render build compatibility
+  body: any;
+  params: any;
+  query: any;
+  headers: any;
+  ip: string;
+  path: string;
+  method: string;
 }
 
 /**
