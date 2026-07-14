@@ -18,6 +18,7 @@ export interface AuthRequest extends Request {
   ip: string;
   path: string;
   method: string;
+  get(name: any): any;
 }
 
 /**
