@@ -287,8 +287,9 @@ export const getReferral = async (
     }
 
     const { id } = req.params;
+    const referralId = Array.isArray(id) ? id[0] : id;
 
-    const referral = await ReferralService.getReferralById(id);
+    const referral = await ReferralService.getReferralById(referralId);
 
     if (!referral) {
       res.status(404).json({
@@ -346,9 +347,10 @@ export const getPatientReferrals = async (
     }
 
     const { patientId } = req.params;
+    const patientIdStr = Array.isArray(patientId) ? patientId[0] : patientId;
 
     // Resolve patient ID
-    const resolvedPatientId = await resolvePatientUserId(patientId);
+    const resolvedPatientId = await resolvePatientUserId(patientIdStr);
     if (!resolvedPatientId) {
       res.status(404).json({
         status: 'error',
@@ -407,8 +409,9 @@ export const updateReferral = async (
     }
 
     const { id } = req.params;
+    const referralId = Array.isArray(id) ? id[0] : id;
 
-    const existing = await ReferralService.getReferralById(id);
+    const existing = await ReferralService.getReferralById(referralId);
     if (!existing) {
       res.status(404).json({
         status: 'error',
@@ -443,7 +446,7 @@ export const updateReferral = async (
       updateData.expectedReturnDate = new Date(updateData.expectedReturnDate);
     }
 
-    const referral = await ReferralService.updateReferral(id, updateData);
+    const referral = await ReferralService.updateReferral(referralId, updateData);
 
     res.status(200).json({
       status: 'success',
@@ -476,8 +479,9 @@ export const deleteReferral = async (
     }
 
     const { id } = req.params;
+    const referralId = Array.isArray(id) ? id[0] : id;
 
-    const existing = await ReferralService.getReferralById(id);
+    const existing = await ReferralService.getReferralById(referralId);
     if (!existing) {
       res.status(404).json({
         status: 'error',
@@ -501,7 +505,7 @@ export const deleteReferral = async (
       return;
     }
 
-    await ReferralService.deleteReferral(id);
+    await ReferralService.deleteReferral(referralId);
 
     res.status(200).json({
       status: 'success',

@@ -39,7 +39,16 @@ connection.on('error', (err) => {
 
 // Email queue instance
 export const emailQueue = new Queue('emails', { 
-  connection,
+  connection: {
+    host: env.REDIS_HOST,
+    port: env.REDIS_PORT,
+    password: env.REDIS_PASSWORD || undefined,
+    tls: {
+      rejectUnauthorized: false,
+    },
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+  },
   defaultJobOptions: {
     attempts: 3, // Retry failed jobs up to 3 times
     backoff: {

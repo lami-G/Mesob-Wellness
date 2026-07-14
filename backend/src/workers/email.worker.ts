@@ -146,7 +146,16 @@ const emailWorker = new Worker(
     }
   },
   {
-    connection,
+    connection: {
+      host: env.REDIS_HOST,
+      port: env.REDIS_PORT,
+      password: env.REDIS_PASSWORD || undefined,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    },
     concurrency: 5, // Process up to 5 emails concurrently
     limiter: {
       max: 100, // Max 100 jobs

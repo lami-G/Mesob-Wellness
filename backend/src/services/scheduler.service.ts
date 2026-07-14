@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { prisma } from '../config/prisma';
 import { queueAppointmentReminder } from './queue.service';
 
@@ -15,7 +15,7 @@ import { queueAppointmentReminder } from './queue.service';
  * NO daily batch emails are sent for wellness plans.
  */
 
-let schedulerTask: cron.ScheduledTask | null = null;
+let schedulerTask: ReturnType<typeof cron.schedule> | null = null;
 
 /**
  * Find appointments that need reminders
