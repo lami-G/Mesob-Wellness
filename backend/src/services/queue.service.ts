@@ -84,7 +84,24 @@ export interface WellnessPlanEmailData {
   recipientEmail: string;
   patientName: string;
   planTitle: string;
-  pdfBuffer: Buffer;
+  planContent: {
+    nutritionRecommendations?: string;
+    exerciseRecommendations?: string;
+    stressManagementAdvice?: string;
+    goals?: string;
+    duration?: number;
+  };
+  vitalsData?: {
+    bloodPressure?: string;
+    heartRate?: number;
+    temperature?: number;
+    weight?: number;
+    height?: number;
+    bmi?: number;
+    glucose?: number;
+    glucoseType?: string;
+    recordedAt?: Date;
+  };
 }
 
 export interface VitalsEmailData {
@@ -99,6 +116,37 @@ export interface VitalsEmailData {
     glucose?: number;
     glucoseType?: string;
     recordedAt: Date;
+  };
+}
+
+export interface ReferralLetterEmailData {
+  recipientEmail: string;
+  referralData: {
+    patientName: string;
+    patientId: string;
+    dateOfBirth?: string;
+    gender?: string;
+    phone?: string;
+    destinationFacility: string;
+    destinationFacilityType?: string;
+    destinationAddress?: string;
+    destinationPhone?: string;
+    reason: string;
+    urgency: string;
+    specialistType?: string;
+    diagnosis?: string;
+    clinicalSummary?: string;
+    medications?: string;
+    vitalSigns?: string;
+    labResults?: string;
+    imagingResults?: string;
+    appointmentDate?: Date;
+    followUpRequired?: boolean;
+    followUpNotes?: string;
+    notes?: string;
+    referralDate: Date;
+    referringFacility: string;
+    referringDoctorName: string;
   };
 }
 
@@ -179,6 +227,24 @@ export async function queueVitalsEmail(data: VitalsEmailData): Promise<string> {
   } catch (error) {
     console.error('❌ Failed to queue vitals email:', error);
     throw new Error('Failed to queue vitals email');
+  }
+}
+
+/**
+ * 5. Queue Referral Letter Email
+ * Used when creating a referral - sends referral letter to patient
+ */
+export async function queueReferralLetterEmail(data: ReferralLetterEmailData): Promise<string> {
+  try {
+    const job = await emailQueue.add('referral-letter', data, {
+      priority: 1, // High priority (important medical document)
+    });
+    
+    console.log(`📧 Referral letter email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+    return job.id || 'unknown';
+  } catch (error) {
+    console.error('❌ Failed to queue referral letter email:', error);
+    throw new Error('Failed to queue referral letter email');
   }
 }
 

@@ -6,12 +6,14 @@ import {
   sendAppointmentReminder,
   sendWellnessPlanEmail,
   sendVitalsEmail,
+  sendReferralLetterEmail,
 } from '../services/email.service';
 import {
   WelcomeEmailData,
   AppointmentReminderData,
   WellnessPlanEmailData,
   VitalsEmailData,
+  ReferralLetterEmailData,
 } from '../services/queue.service';
 import { prisma } from '../config/prisma';
 
@@ -95,7 +97,8 @@ const emailWorker = new Worker(
             data.recipientEmail,
             data.patientName,
             data.planTitle,
-            data.pdfBuffer
+            data.planContent,
+            data.vitalsData
           );
 
           if (!success) {
@@ -118,6 +121,20 @@ const emailWorker = new Worker(
           }
 
           return { success: true, type: 'vitals-email', recipient: data.recipientEmail };
+        }
+
+        case 'referral-letter': {
+          const data = job.data as ReferralLetterEmailData;
+          const success = await sendReferralLetterEmail(
+            data.recipientEmail,
+            data.referralData
+          );
+
+          if (!success) {
+            throw new Error('Failed to send referral letter email');
+          }
+
+          return { success: true, type: 'referral-letter', recipient: data.recipientEmail };
         }
 
         default:

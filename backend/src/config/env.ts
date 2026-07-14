@@ -118,6 +118,9 @@ export const env = Object.freeze({
   // Frontend URL (for email links)
   FRONTEND_URL: getOptionalEnv("FRONTEND_URL") || "http://localhost:3000",
   
+  // Facility Name (for referral letters)
+  FACILITY_NAME: getOptionalEnv("FACILITY_NAME") || "MESOB Wellness Center",
+  
   SEED_SECRET_KEY: getOptionalEnv("SEED_SECRET_KEY"),
 });
 

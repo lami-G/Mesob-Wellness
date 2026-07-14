@@ -77,6 +77,9 @@ app.use("/api/seed", seedRoutes);
 // Start automatic appointment reminder scheduler
 startReminderScheduler();
 
+// Note: Wellness plan emails are sent immediately on creation/update
+// No daily scheduler needed - emails only sent when plans are created or updated
+
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     status: "error",

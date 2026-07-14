@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware";
 import * as WellnessService from "../services/wellness.service";
 import prisma from "../config/prisma";
+import { queueWellnessPlan } from "../services/queue.service";
 
 /**
  * Helper function to resolve patient user ID from either 4-digit display ID or UUID
@@ -132,6 +133,57 @@ export const createWellnessPlan = async (
       duration,
       conditions: Array.isArray(conditions) ? conditions : undefined,
     }, req.user.userId);
+
+    // Send wellness plan email with vitals to patient
+    try {
+      const patient = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, fullName: true },
+      });
+
+      if (patient?.email) {
+        // Fetch latest vitals for this patient
+        const latestVitals = await prisma.vitalRecord.findFirst({
+          where: { userId },
+          orderBy: { recordedAt: 'desc' },
+        });
+
+        // Prepare vitals data if available
+        const vitalsData = latestVitals ? {
+          bloodPressure: latestVitals.systolic && latestVitals.diastolic 
+            ? `${latestVitals.systolic}/${latestVitals.diastolic}` 
+            : undefined,
+          heartRate: latestVitals.heartRate ?? undefined,
+          temperature: latestVitals.temperature ?? undefined,
+          weight: latestVitals.weightKg ?? undefined,
+          height: latestVitals.heightCm ?? undefined,
+          bmi: latestVitals.bmi ?? undefined,
+          glucose: latestVitals.glucose ?? undefined,
+          glucoseType: latestVitals.glucoseType ?? undefined,
+          recordedAt: latestVitals.recordedAt,
+        } : undefined;
+
+        await queueWellnessPlan({
+          recipientEmail: patient.email,
+          patientName: patient.fullName,
+          planTitle: title || 'Your Wellness Plan',
+          planContent: {
+            nutritionRecommendations,
+            exerciseRecommendations,
+            stressManagementAdvice,
+            goals: goalsString,
+            duration,
+          },
+          vitalsData,
+        });
+        console.log(`📧 Wellness plan email (with vitals) queued for ${patient.email}`);
+      } else {
+        console.warn(`⚠️ Cannot send wellness plan email - patient has no email (userId: ${userId})`);
+      }
+    } catch (emailError) {
+      // Log error but don't fail the request
+      console.error('Failed to queue wellness plan email:', emailError);
+    }
 
     res.status(201).json({
       status: "success",
@@ -373,6 +425,61 @@ export const updateWellnessPlan = async (
       duration: typeof duration === "number" ? duration : undefined,
       isActive: typeof isActive === "boolean" ? isActive : undefined,
     });
+
+    // Send updated wellness plan email with vitals to patient
+    try {
+      const patient = await prisma.user.findUnique({
+        where: { id: updated.userId },
+        select: { email: true, fullName: true },
+      });
+
+      if (patient?.email) {
+        // Fetch latest vitals for this patient
+        const latestVitals = await prisma.vitalRecord.findFirst({
+          where: { userId: updated.userId },
+          orderBy: { recordedAt: 'desc' },
+        });
+
+        // Prepare vitals data if available
+        const vitalsData = latestVitals ? {
+          bloodPressure: latestVitals.systolic && latestVitals.diastolic 
+            ? `${latestVitals.systolic}/${latestVitals.diastolic}` 
+            : undefined,
+          heartRate: latestVitals.heartRate ?? undefined,
+          temperature: latestVitals.temperature ?? undefined,
+          weight: latestVitals.weightKg ?? undefined,
+          height: latestVitals.heightCm ?? undefined,
+          bmi: latestVitals.bmi ?? undefined,
+          glucose: latestVitals.glucose ?? undefined,
+          glucoseType: latestVitals.glucoseType ?? undefined,
+          recordedAt: latestVitals.recordedAt,
+        } : undefined;
+
+        // Parse planText to extract sections (it's formatted as markdown)
+        const planTextStr = updated.planText || '';
+        const nutritionMatch = planTextStr.match(/## 🥗 Nutrition Recommendations\n([\s\S]*?)(?=\n##|$)/);
+        const exerciseMatch = planTextStr.match(/## 🏃 Exercise Recommendations\n([\s\S]*?)(?=\n##|$)/);
+        const stressMatch = planTextStr.match(/## 🧘 Stress Management\n([\s\S]*?)(?=\n##|$)/);
+
+        await queueWellnessPlan({
+          recipientEmail: patient.email,
+          patientName: patient.fullName,
+          planTitle: 'Your Updated Wellness Plan',
+          planContent: {
+            nutritionRecommendations: nutritionMatch ? nutritionMatch[1].trim() : undefined,
+            exerciseRecommendations: exerciseMatch ? exerciseMatch[1].trim() : undefined,
+            stressManagementAdvice: stressMatch ? stressMatch[1].trim() : undefined,
+            goals: updated.goals || undefined,
+            duration: updated.duration ?? undefined,
+          },
+          vitalsData,
+        });
+        console.log(`📧 Updated wellness plan email (with vitals) queued for ${patient.email}`);
+      }
+    } catch (emailError) {
+      // Log error but don't fail the request
+      console.error('Failed to queue updated wellness plan email:', emailError);
+    }
 
     res.status(200).json({
       status: "success",

@@ -41,6 +41,8 @@ model User {
   recordedVitals        VitalRecord[]      @relation("RecordedBy")
   vitalsRecords         VitalRecord[]
   wellnessPlans         WellnessPlan[]
+  referralsAsPatient    Referral[]         @relation("PatientReferrals")
+  referralsCreated      Referral[]         @relation("CreatedByUser")
 
   @@index([email])
   @@index([role])
@@ -273,6 +275,49 @@ model PatientCondition {
   @@index([isNurseApproved])
   @@index([approvedAt])
   @@map("patient_conditions")
+}
+
+model Referral {
+  id                     String          @id @default(uuid()) @db.Uuid
+  patientId              String          @db.Uuid
+  destinationFacility    String
+  destinationFacilityType String?
+  destinationAddress     String?
+  destinationPhone       String?
+  reason                 String
+  urgency                ReferralUrgency @default(ROUTINE)
+  specialistType         String?
+  diagnosis              String?
+  clinicalSummary        String?
+  medications            String?
+  vitalSigns             String?
+  labResults             String?
+  imagingResults         String?
+  referralDate           DateTime        @default(now()) @db.Timestamptz(3)
+  appointmentDate        DateTime?       @db.Timestamptz(3)
+  expectedReturnDate     DateTime?       @db.Timestamptz(3)
+  followUpRequired       Boolean         @default(false)
+  followUpNotes          String?
+  documents              Json?
+  notes                  String?
+  createdBy              String          @db.Uuid
+  createdAt              DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime        @updatedAt @db.Timestamptz(3)
+  patient                User            @relation("PatientReferrals", fields: [patientId], references: [id], onDelete: Cascade)
+  creator                User            @relation("CreatedByUser", fields: [createdBy], references: [id])
+
+  @@index([patientId])
+  @@index([urgency])
+  @@index([createdBy])
+  @@index([referralDate])
+  @@index([createdBy, referralDate])
+  @@map("referrals")
+}
+
+enum ReferralUrgency {
+  ROUTINE
+  URGENT
+  EMERGENCY
 }
 
 enum NotificationType {

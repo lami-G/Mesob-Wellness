@@ -4,8 +4,15 @@ import { queueAppointmentReminder } from './queue.service';
 
 /**
  * Automatic Appointment Reminder Scheduler
- * Runs every hour to check for appointments that need reminders
- * Sends reminders 24 hours before appointment time
+ * 
+ * This scheduler ONLY handles appointment reminders (24 hours before).
+ * 
+ * Wellness plan emails are sent immediately when:
+ * - A wellness plan is created (see wellness.controller.ts)
+ * - A wellness plan is updated (see wellness.controller.ts)
+ * - Vitals are recorded (see vitals.controller.ts)
+ * 
+ * NO daily batch emails are sent for wellness plans.
  */
 
 let schedulerTask: cron.ScheduledTask | null = null;
@@ -46,7 +53,6 @@ async function findAppointmentsNeedingReminders() {
         user: {
           email: {
             not: null,
-            not: '',
           },
         },
       },
@@ -136,7 +142,7 @@ async function processAutomaticReminders() {
  */
 export function startReminderScheduler() {
   if (schedulerTask) {
-    console.log('⚠️ Scheduler is already running');
+    console.log('⚠️ Appointment scheduler is already running');
     return;
   }
 
@@ -185,8 +191,10 @@ export async function triggerManualReminderCheck() {
  */
 export function getSchedulerStatus() {
   return {
-    running: schedulerTask !== null,
-    schedule: '0 * * * * (Every hour)',
-    reminderWindow: '24-25 hours before appointment',
+    appointmentReminders: {
+      running: schedulerTask !== null,
+      schedule: '0 * * * * (Every hour)',
+      reminderWindow: '24-25 hours before appointment',
+    },
   };
 }

@@ -261,6 +261,10 @@ export async function postVitals(
       console.error('Failed to calculate/store conditions:', conditionError);
     }
 
+    // NOTE: Vitals email is NOT sent separately
+    // Vitals are included in the wellness plan email when a plan is created
+    // This avoids sending duplicate/separate emails
+
     res.status(201).json({
       status: "success",
       data: {

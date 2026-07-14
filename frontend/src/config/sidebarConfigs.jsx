@@ -106,6 +106,14 @@ const Icons = {
       <path d="M12 7v5l4 2"/>
     </svg>
   ),
+  referrals: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="8.5" cy="7" r="4"/>
+      <line x1="18" y1="8" x2="23" y2="13"/>
+      <line x1="23" y1="8" x2="18" y2="13"/>
+    </svg>
+  ),
   records: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -265,6 +273,7 @@ export const NURSE_CONFIG = {
         { id: "vitals", label: "Vitals", icon: Icons.vitals },
         { id: "walkin", label: "Walk-In", icon: Icons.walkin },
         { id: "wellness", label: "Wellness", icon: Icons.wellness },
+        { id: "referrals", label: "Referrals", icon: Icons.referrals },
         { id: "history", label: "History", icon: Icons.history },
       ],
     },

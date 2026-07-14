@@ -11,13 +11,14 @@ import CallNextControl from "../../components/nurse/Queue/CallNextControl";
 import WellnessPlanCreation from "../../components/nurse/Wellness/WellnessPlanCreation";
 import CustomerHistoryView from "../../components/nurse/History/CustomerHistoryView";
 import ProfileSection from "../../components/staff/Profile/ProfileSection";
+import Referrals from "../../components/nurse/Referrals/Referrals";
 
 function NurseDashboard() {
   const { user, logout } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get("tab");
-    const allowedTabs = ["analytics", "queue", "vitals", "walkin", "wellness", "history", "profile"];
+    const allowedTabs = ["analytics", "queue", "vitals", "walkin", "wellness", "referrals", "history", "profile"];
     return tab && allowedTabs.includes(tab) ? tab : "analytics";
   });
   const [capacity, setCapacity] = useState(null);
@@ -28,7 +29,7 @@ function NurseDashboard() {
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    const allowedTabs = ["analytics", "queue", "vitals", "walkin", "wellness", "history", "profile"];
+    const allowedTabs = ["analytics", "queue", "vitals", "walkin", "wellness", "referrals", "history", "profile"];
     if (tab && allowedTabs.includes(tab)) {
       setActiveTab(tab);
     } else {
@@ -176,6 +177,13 @@ function NurseDashboard() {
               onBackToQueue={handleBackToQueue}
               onStatusChanged={handleStatusChanged}
             />
+          </div>
+        );
+
+      case "referrals":
+        return (
+          <div className="referrals-section">
+            <Referrals />
           </div>
         );
 
