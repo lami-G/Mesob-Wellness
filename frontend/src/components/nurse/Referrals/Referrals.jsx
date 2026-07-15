@@ -15,6 +15,7 @@ function Referrals() {
   const [filterUrgency, setFilterUrgency] = useState('');
   const [printingReferral, setPrintingReferral] = useState(null);
   const [editingReferral, setEditingReferral] = useState(null);
+  const [showReferralsList, setShowReferralsList] = useState(false);
   const [formData, setFormData] = useState({
     patientId: '',
     destinationFacility: '',
@@ -173,6 +174,7 @@ function Referrals() {
       notes: referral.notes || '',
     });
     setShowForm(true);
+    setShowReferralsList(false); // Hide list when editing
   };
 
   const handlePrintReferral = (referral) => {
@@ -583,123 +585,153 @@ function Referrals() {
         </div>
       )}
 
-      {/* Filters */}
-      <div className={styles.filters}>
-        <select
-          value={filterUrgency}
-          onChange={(e) => setFilterUrgency(e.target.value)}
-          className={styles.filterSelect}
-        >
-          <option value="">All Urgencies</option>
-          <option value="ROUTINE">Routine</option>
-          <option value="URGENT">Urgent</option>
-          <option value="EMERGENCY">Emergency</option>
-        </select>
-
-        {filterUrgency && (
-          <button
-            className={styles.linkButton}
-            onClick={() => setFilterUrgency('')}
+      {/* Filters - Only show when not in form mode */}
+      {!showForm && (
+        <div className={styles.filters}>
+          <select
+            value={filterUrgency}
+            onChange={(e) => setFilterUrgency(e.target.value)}
+            className={styles.filterSelect}
           >
-            Clear Filter
-          </button>
-        )}
-      </div>
+            <option value="">All Urgencies</option>
+            <option value="ROUTINE">Routine</option>
+            <option value="URGENT">Urgent</option>
+            <option value="EMERGENCY">Emergency</option>
+          </select>
 
-      {/* Referrals List */}
-      {loading && !showForm ? (
-        <div className={styles.loading}>Loading referrals...</div>
-      ) : referrals.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p>No referrals found</p>
+          {filterUrgency && (
+            <button
+              className={styles.linkButton}
+              onClick={() => setFilterUrgency('')}
+            >
+              Clear Filter
+            </button>
+          )}
         </div>
-      ) : (
-        <div className={styles.referralsList}>
-          {referrals.map((referral) => (
-            <div key={referral.id} className={styles.referralCard}>
-              <div className={styles.referralHeader}>
-                <div>
-                  <h3>{referral.patient.fullName}</h3>
-                  <p className={styles.patientId}>Patient ID: {referral.patient.userId}</p>
-                </div>
-                <div className={styles.badges}>
-                  <span className={`${styles.badge} ${getUrgencyBadgeClass(referral.urgency)}`}>
-                    {referral.urgency}
-                  </span>
-                </div>
-              </div>
+      )}
 
-              <div className={styles.referralBody}>
-                <div className={styles.infoRow}>
-                  <strong>Destination:</strong> {referral.destinationFacility}
-                  {referral.destinationFacilityType && (
-                    <span className={styles.facilityType}>({referral.destinationFacilityType})</span>
-                  )}
-                </div>
-
-                {referral.specialistType && (
-                  <div className={styles.infoRow}>
-                    <strong>Specialist:</strong> {referral.specialistType}
-                  </div>
-                )}
-
-                <div className={styles.infoRow}>
-                  <strong>Reason:</strong> {referral.reason}
-                </div>
-
-                {referral.diagnosis && (
-                  <div className={styles.infoRow}>
-                    <strong>Diagnosis:</strong> {referral.diagnosis}
-                  </div>
-                )}
-
-                <div className={styles.infoRow}>
-                  <strong>Referral Date:</strong> {new Date(referral.referralDate).toLocaleDateString()}
-                </div>
-
-                {referral.appointmentDate && (
-                  <div className={styles.infoRow}>
-                    <strong>Appointment:</strong> {new Date(referral.appointmentDate).toLocaleString()}
-                  </div>
-                )}
-
-                {referral.followUpRequired && (
-                  <div className={styles.infoRow}>
-                    <strong>⚠️ Follow-up Required</strong>
-                    {referral.followUpNotes && <p>{referral.followUpNotes}</p>}
-                  </div>
-                )}
-
-                <div className={styles.infoRow}>
-                  <strong>Created by:</strong> {referral.creator.fullName} ({referral.creator.role})
-                </div>
-              </div>
-
-              <div className={styles.referralActions}>
-                <button
-                  className={styles.actionButton}
-                  onClick={() => handlePrintReferral(referral)}
-                  title="Print referral letter for patient"
-                >
-                  🖨️ Print Letter
-                </button>
-
-                <button
-                  className={styles.actionButton}
-                  onClick={() => handleEdit(referral)}
-                >
-                  Edit
-                </button>
-
-                <button
-                  className={`${styles.actionButton} ${styles.deleteButton}`}
-                  onClick={() => handleDelete(referral.id)}
-                >
-                  Delete
-                </button>
-              </div>
+      {/* Referrals List - Only show when showReferralsList is true and not in form mode */}
+      {!showForm && showReferralsList && (
+        <>
+          {loading ? (
+            <div className={styles.loading}>Loading referrals...</div>
+          ) : referrals.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>No referrals found</p>
             </div>
-          ))}
+          ) : (
+            <div className={styles.referralsList}>
+              {referrals.map((referral) => (
+                <div key={referral.id} className={styles.referralCard}>
+                  <div className={styles.referralHeader}>
+                    <div>
+                      <h3>{referral.patient.fullName}</h3>
+                      <p className={styles.patientId}>Patient ID: {referral.patient.userId}</p>
+                    </div>
+                    <div className={styles.badges}>
+                      <span className={`${styles.badge} ${getUrgencyBadgeClass(referral.urgency)}`}>
+                        {referral.urgency}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.referralBody}>
+                    <div className={styles.infoRow}>
+                      <strong>Destination:</strong> {referral.destinationFacility}
+                      {referral.destinationFacilityType && (
+                        <span className={styles.facilityType}>({referral.destinationFacilityType})</span>
+                      )}
+                    </div>
+
+                    {referral.specialistType && (
+                      <div className={styles.infoRow}>
+                        <strong>Specialist:</strong> {referral.specialistType}
+                      </div>
+                    )}
+
+                    <div className={styles.infoRow}>
+                      <strong>Reason:</strong> {referral.reason}
+                    </div>
+
+                    {referral.diagnosis && (
+                      <div className={styles.infoRow}>
+                        <strong>Diagnosis:</strong> {referral.diagnosis}
+                      </div>
+                    )}
+
+                    <div className={styles.infoRow}>
+                      <strong>Referral Date:</strong> {new Date(referral.referralDate).toLocaleDateString()}
+                    </div>
+
+                    {referral.appointmentDate && (
+                      <div className={styles.infoRow}>
+                        <strong>Appointment:</strong> {new Date(referral.appointmentDate).toLocaleString()}
+                      </div>
+                    )}
+
+                    {referral.followUpRequired && (
+                      <div className={styles.infoRow}>
+                        <strong>⚠️ Follow-up Required</strong>
+                        {referral.followUpNotes && <p>{referral.followUpNotes}</p>}
+                      </div>
+                    )}
+
+                    <div className={styles.infoRow}>
+                      <strong>Created by:</strong> {referral.creator.fullName} ({referral.creator.role})
+                    </div>
+                  </div>
+
+                  <div className={styles.referralActions}>
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handlePrintReferral(referral)}
+                      title="Print referral letter for patient"
+                    >
+                      🖨️ Print Letter
+                    </button>
+
+                    <button
+                      className={styles.actionButton}
+                      onClick={() => handleEdit(referral)}
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      className={`${styles.actionButton} ${styles.deleteButton}`}
+                      onClick={() => handleDelete(referral.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Show Referrals Button - Only show when not in form mode and list is hidden */}
+      {!showForm && !showReferralsList && (
+        <div className={styles.showReferralsButtonContainer}>
+          <button
+            className={styles.showReferralsButton}
+            onClick={() => setShowReferralsList(true)}
+          >
+            📋 View All Referrals ({referrals.length})
+          </button>
+        </div>
+      )}
+
+      {/* Hide Referrals Button - Only show when list is visible */}
+      {!showForm && showReferralsList && (
+        <div className={styles.hideReferralsButtonContainer}>
+          <button
+            className={styles.hideReferralsButton}
+            onClick={() => setShowReferralsList(false)}
+          >
+            ▲ Hide Referrals
+          </button>
         </div>
       )}
 
