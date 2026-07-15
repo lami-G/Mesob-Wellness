@@ -718,12 +718,13 @@
     visibility: visible !important;
   }
 
-  /* Force single page with scaling if needed */
+  /* Force single page with white background */
   html, body {
     height: 100vh !important;
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
   }
 
   .printOnly {
@@ -760,7 +761,12 @@
     display: block !important;
   }
 
-  /* Remove all height/overflow restrictions from ancestors */
+  /* Ensure letter content area is white */
+  .letterContent {
+    background: white !important;
+  }
+
+  /* Remove all height/overflow restrictions from ancestors but keep white background */
   #root,
   #root > div,
   #root > div > div,
@@ -776,6 +782,7 @@
     position: static !important;
     margin: 0 !important;
     padding: 0 !important;
+    background: white !important;
   }
 
   /* Prevent any page breaks */
@@ -812,20 +819,28 @@
   .signature {
     margin-top: 8px !important;
     padding-top: 6px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   .instructions {
     margin-top: 8px !important;
     padding: 6px !important;
+    margin-bottom: 0 !important;
   }
 
   .instructions ul {
     margin: 0 !important;
     padding-left: 12px !important;
+    margin-bottom: 0 !important;
   }
 
   .instructions li {
     margin-bottom: 2px !important;
+  }
+
+  .instructions li:last-child {
+    margin-bottom: 0 !important;
   }
 
   .footer {
@@ -833,6 +848,10 @@
     padding-top: 5px !important;
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
+  }
+
+  .footer p:last-child {
+    margin-bottom: 0 !important;
   }
 
   /* Force single page */
