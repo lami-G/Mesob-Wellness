@@ -49,12 +49,12 @@ function Referrals() {
     try {
       setLoading(true);
       setError('');
-      
+
       let url = '/api/v1/referrals';
       const params = new URLSearchParams();
-      
+
       if (filterUrgency) params.append('urgency', filterUrgency);
-      
+
       if (params.toString()) {
         url += `?${params.toString()}`;
       }
@@ -82,7 +82,7 @@ function Referrals() {
       setError('');
       const response = await api.get(`/api/v1/users?search=${encodeURIComponent(searchTerm)}`);
       setSearchResults(response.data.data || []);
-      
+
       if (response.data.data.length === 0) {
         setError('No patients found');
       }
@@ -96,7 +96,7 @@ function Referrals() {
 
   const handleSelectPatient = (patient) => {
     setSelectedPatient(patient);
-    
+
     // Calculate age if dateOfBirth exists
     let calculatedAge = '';
     if (patient.dateOfBirth) {
@@ -109,7 +109,7 @@ function Referrals() {
       }
       calculatedAge = age.toString();
     }
-    
+
     // Auto-fill patient fields (editable)
     setFormData(prev => ({
       ...prev,
@@ -118,7 +118,7 @@ function Referrals() {
       patientAge: calculatedAge,
       patientSex: patient.gender || '',
     }));
-    
+
     setSearchResults([]);
     setSearchTerm('');
   };
@@ -209,7 +209,7 @@ function Referrals() {
   const handleEdit = (referral) => {
     setEditingReferral(referral);
     setSelectedPatient(referral.patient);
-    
+
     // Calculate age from dateOfBirth if exists
     let calculatedAge = '';
     if (referral.patient.dateOfBirth) {
@@ -222,7 +222,7 @@ function Referrals() {
       }
       calculatedAge = age.toString();
     }
-    
+
     setFormData({
       patientId: referral.patientId,
       patientName: referral.patient.fullName || '',
@@ -253,7 +253,7 @@ function Referrals() {
 
   const handlePrintReferral = (referral) => {
     setPrintingReferral(referral);
-    
+
     // Wait for the component to render, then print
     setTimeout(() => {
       window.print();
@@ -351,7 +351,7 @@ function Referrals() {
       {showForm && (
         <div className={styles.formCard}>
           <h3>{editingReferral ? 'Edit Referral' : 'Create New Referral'}</h3>
-          
+
           {/* Patient Search */}
           {!selectedPatient && (
             <div className={styles.searchSection}>
@@ -392,7 +392,7 @@ function Referrals() {
               <div className={styles.patientInfoSection}>
                 <h4>Patient Information</h4>
                 <p className={styles.infoNote}>Auto-filled from record. You can edit if needed.</p>
-                
+
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label>Patient Name *</label>
@@ -461,7 +461,7 @@ function Referrals() {
             <div className={styles.sectionTitle}>
               <h4>History and Physical Examination (H&PE)</h4>
             </div>
-            
+
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>History and Physical Examination *</label>
@@ -904,6 +904,11 @@ function Referrals() {
       {printingReferral && (
         <div className={styles.printOnly}>
           <div className={styles.letterhead}>
+            <img 
+              src="/Mesob-short-png.png" 
+              alt="MESOB Logo" 
+              className={styles.letterheadLogo}
+            />
             <h1>MESOB WELLNESS CENTER</h1>
             <p>One-Stop Service Center - Federal Democratic Republic of Ethiopia</p>
           </div>
@@ -911,8 +916,8 @@ function Referrals() {
           <div className={styles.documentTitle}>
             <h2>MEDICAL REFERRAL LETTER</h2>
             <span className={`${styles.urgencyBadge} ${styles[`urgency${printingReferral.urgency}`]}`}>
-              {printingReferral.urgency === 'EMERGENCY' ? '🚨 EMERGENCY' : 
-               printingReferral.urgency === 'URGENT' ? '⚠️ URGENT' : 
+              {printingReferral.urgency === 'EMERGENCY' ? '🚨 EMERGENCY' :
+               printingReferral.urgency === 'URGENT' ? '⚠️ URGENT' :
                '📋 ROUTINE'}
             </span>
           </div>
@@ -970,23 +975,9 @@ function Referrals() {
             </div>
 
             <div className={styles.section}>
-              <h3>REASON FOR REFERRAL</h3>
-              <p className={styles.content}>{printingReferral.reason}</p>
+              <h3>HISTORY AND PHYSICAL EXAMINATION</h3>
+              <p className={styles.content}>{printingReferral.clinicalSummary}</p>
             </div>
-
-            {printingReferral.diagnosis && (
-              <div className={styles.section}>
-                <h3>DIAGNOSIS</h3>
-                <p className={styles.content}>{printingReferral.diagnosis}</p>
-              </div>
-            )}
-
-            {printingReferral.clinicalSummary && (
-              <div className={styles.section}>
-                <h3>CLINICAL SUMMARY</h3>
-                <p className={styles.content}>{printingReferral.clinicalSummary}</p>
-              </div>
-            )}
 
             {printingReferral.vitalSigns && (
               <div className={styles.section}>
@@ -995,12 +986,10 @@ function Referrals() {
               </div>
             )}
 
-            {printingReferral.medications && (
-              <div className={styles.section}>
-                <h3>CURRENT MEDICATIONS</h3>
-                <p className={styles.content}>{printingReferral.medications}</p>
-              </div>
-            )}
+            <div className={styles.section}>
+              <h3>ASSESSMENT (DIAGNOSIS)</h3>
+              <p className={styles.content}>{printingReferral.diagnosis}</p>
+            </div>
 
             {printingReferral.labResults && (
               <div className={styles.section}>
@@ -1015,6 +1004,16 @@ function Referrals() {
                 <p className={styles.content}>{printingReferral.imagingResults}</p>
               </div>
             )}
+
+            <div className={styles.section}>
+              <h3>MEDICATION GIVEN</h3>
+              <p className={styles.content}>{printingReferral.medications}</p>
+            </div>
+
+            <div className={styles.section}>
+              <h3>REASON FOR REFERRAL</h3>
+              <p className={styles.content}>{printingReferral.reason}</p>
+            </div>
 
             {printingReferral.appointmentDate && (
               <div className={styles.appointmentNotice}>

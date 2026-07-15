@@ -500,213 +500,351 @@
   }
 }
 
-/* Print-specific styles for referral letter */
+/* ============================================================
+   Print-specific styles for referral letter
+   ============================================================ */
+
+/* Hidden on screen at all times. Only rendered visibly via
+   @media print, when the browser's print engine takes over. */
 .printOnly {
   display: none;
 }
 
+.letterhead {
+  text-align: center;
+  background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%);
+  color: white;
+  padding: 12px 15px;
+  margin: -40px -40px 15px -40px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.letterheadLogo {
+  max-width: 50px;
+  height: auto;
+  margin-bottom: 2px;
+}
+
+.letterhead h1 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.letterhead p {
+  margin: 0;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.documentTitle {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.documentTitle h2 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #001f3f;
+}
+
+.urgencyBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.urgencyROUTINE {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.urgencyURGENT {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.urgencyEMERGENCY {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.letterContent {
+  font-size: 8pt;
+  line-height: 1.25;
+}
+
+.dateSection {
+  margin-bottom: 8px;
+}
+
+.dateSection p {
+  margin: 1px 0;
+  font-size: 8pt;
+}
+
+.recipientSection {
+  margin-bottom: 8px;
+  padding: 6px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #001f3f;
+}
+
+.recipientSection p {
+  margin: 1px 0;
+}
+
+.toLabel {
+  font-weight: bold;
+  color: #001f3f;
+  font-size: 9pt;
+}
+
+.section {
+  margin-bottom: 8px;
+}
+
+.section h3 {
+  font-size: 9pt;
+  color: #001f3f;
+  margin: 0 0 3px 0;
+  border-bottom: 1.5px solid #001f3f;
+  padding-bottom: 2px;
+}
+
+.section .content {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 7.5pt;
+}
+
+.infoTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.infoTable td {
+  padding: 2px 0;
+  font-size: 7.5pt;
+}
+
+.infoTable td:first-child {
+  width: 35%;
+  font-weight: bold;
+}
+
+.appointmentNotice {
+  padding: 6px;
+  background-color: #fff3cd;
+  border-left: 3px solid #ffc107;
+  margin-bottom: 8px;
+}
+
+.appointmentNotice p {
+  margin: 0;
+  font-size: 7.5pt;
+}
+
+.signature {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.signature p {
+  margin: 1px 0;
+  font-size: 7.5pt;
+}
+
+.instructions {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: #e8f5e9;
+  border-left: 3px solid #22c55e;
+}
+
+.instructionsTitle {
+  margin: 0 0 3px 0;
+  font-weight: bold;
+  color: #16a34a;
+  font-size: 8pt;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 12px;
+}
+
+.instructions li {
+  margin-bottom: 2px;
+  font-size: 7.5pt;
+  line-height: 1.25;
+}
+
+.urgentInstruction {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.footer {
+  margin-top: 12px;
+  padding-top: 6px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+.footer p {
+  margin: 1px 0;
+  font-size: 6.5pt;
+  color: #666;
+}
+
 @media print {
   /* Hide everything except the printable letter */
-  .container > *:not(.printOnly) {
-    display: none !important;
+  body * {
+    visibility: hidden !important;
+  }
+
+  .printOnly,
+  .printOnly * {
+    visibility: visible !important;
+  }
+
+  /* Force single page with scaling if needed */
+  html, body {
+    height: 100vh !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .printOnly {
     display: block !important;
-    padding: 40px;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+    padding: 20px 30px !important;
     font-family: 'Times New Roman', serif;
-    color: #000;
-    background: white;
+    color: #000 !important;
+    background: white !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
   }
 
+  /* Preserve letterhead colors and styling in print */
   .letterhead {
-    text-align: center;
-    border-bottom: 3px solid #001f3f;
-    padding-bottom: 20px;
-    margin-bottom: 30px;
+    background: linear-gradient(135deg, #2c5aa0 0%, #1e3a5f 100%) !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin: -20px -30px 10px -30px !important;
   }
 
-  .letterhead h1 {
-    margin: 0;
-    font-size: 28px;
-    color: #001f3f;
-    font-weight: bold;
-  }
-
+  .letterhead h1,
   .letterhead p {
-    margin: 8px 0 0 0;
-    font-size: 14px;
-    color: #666;
+    color: white !important;
   }
 
-  .documentTitle {
-    text-align: center;
-    margin-bottom: 30px;
+  .letterheadLogo {
+    display: block !important;
   }
 
-  .documentTitle h2 {
-    margin: 0 0 12px 0;
-    font-size: 22px;
-    color: #001f3f;
+  /* Remove all height/overflow restrictions from ancestors */
+  #root,
+  #root > div,
+  #root > div > div,
+  [class*="layout"],
+  [class*="dashboard"],
+  [class*="content"],
+  [class*="main"],
+  .container {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  .urgencyBadge {
-    display: inline-block;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: bold;
+  /* Prevent any page breaks */
+  * {
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
   }
 
-  .urgencyROUTINE {
-    background-color: #e3f2fd;
-    color: #1976d2;
-  }
-
-  .urgencyURGENT {
-    background-color: #fff3e0;
-    color: #f57c00;
-  }
-
-  .urgencyEMERGENCY {
-    background-color: #ffebee;
-    color: #d32f2f;
-  }
-
-  .letterContent {
-    font-size: 12pt;
-    line-height: 1.6;
-  }
-
-  .dateSection {
-    margin-bottom: 25px;
-  }
-
-  .dateSection p {
-    margin: 5px 0;
-    font-size: 12pt;
-  }
-
-  .recipientSection {
-    margin-bottom: 25px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-left: 4px solid #001f3f;
-  }
-
-  .recipientSection p {
-    margin: 5px 0;
-  }
-
-  .toLabel {
-    font-weight: bold;
-    color: #001f3f;
-    font-size: 13pt;
-  }
-
+  /* Compact spacing */
   .section {
-    margin-bottom: 25px;
-    page-break-inside: avoid;
+    margin-bottom: 6px !important;
   }
 
   .section h3 {
-    font-size: 14pt;
-    color: #001f3f;
-    margin: 0 0 10px 0;
-    border-bottom: 2px solid #001f3f;
-    padding-bottom: 5px;
+    margin-bottom: 2px !important;
+    font-size: 9pt !important;
   }
 
   .section .content {
-    margin: 0;
-    white-space: pre-wrap;
-    font-size: 11pt;
+    font-size: 7.5pt !important;
+    line-height: 1.2 !important;
   }
 
-  .infoTable {
-    width: 100%;
-    border-collapse: collapse;
+  .dateSection {
+    margin-bottom: 6px !important;
   }
 
-  .infoTable td {
-    padding: 8px 0;
-    font-size: 11pt;
-  }
-
-  .infoTable td:first-child {
-    width: 40%;
-    font-weight: bold;
-  }
-
-  .appointmentNotice {
-    padding: 15px;
-    background-color: #fff3cd;
-    border-left: 4px solid #ffc107;
-    margin-bottom: 25px;
-  }
-
-  .appointmentNotice p {
-    margin: 0;
-    font-size: 11pt;
+  .recipientSection {
+    margin-bottom: 6px !important;
+    padding: 5px !important;
   }
 
   .signature {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-  }
-
-  .signature p {
-    margin: 5px 0;
-    font-size: 11pt;
+    margin-top: 8px !important;
+    padding-top: 6px !important;
   }
 
   .instructions {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #e8f5e9;
-    border-left: 4px solid #22c55e;
-  }
-
-  .instructionsTitle {
-    margin: 0 0 10px 0;
-    font-weight: bold;
-    color: #16a34a;
-    font-size: 13pt;
+    margin-top: 8px !important;
+    padding: 6px !important;
   }
 
   .instructions ul {
-    margin: 0;
-    padding-left: 20px;
+    margin: 0 !important;
+    padding-left: 12px !important;
   }
 
   .instructions li {
-    margin-bottom: 8px;
-    font-size: 11pt;
-    line-height: 1.6;
-  }
-
-  .urgentInstruction {
-    color: #d32f2f;
-    font-weight: bold;
+    margin-bottom: 2px !important;
   }
 
   .footer {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-    text-align: center;
+    margin-top: 8px !important;
+    padding-top: 5px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 
-  .footer p {
-    margin: 5px 0;
-    font-size: 10pt;
-    color: #666;
-  }
-
-  /* Force page breaks */
+  /* Force single page */
   @page {
-    margin: 1cm;
+    margin: 0.5cm;
+    size: A4 portrait;
+  }
+
+  /* Absolutely prevent second page */
+  @page :blank {
+    @top-center { content: none; }
+    @bottom-center { content: none; }
   }
 }
 

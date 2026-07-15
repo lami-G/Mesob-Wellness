@@ -774,22 +774,10 @@ export async function sendReferralLetterEmail(
               </table>
             </div>
 
-            <!-- Reason for Referral -->
-            <div style="margin-bottom: 25px;">
-              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">REASON FOR REFERRAL</h3>
-              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.reason}</p>
-            </div>
-
-            ${referralData.diagnosis ? `
-            <div style="margin-bottom: 25px;">
-              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">DIAGNOSIS</h3>
-              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.diagnosis}</p>
-            </div>
-            ` : ''}
-
+            <!-- History and Physical Examination -->
             ${referralData.clinicalSummary ? `
             <div style="margin-bottom: 25px;">
-              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">CLINICAL SUMMARY</h3>
+              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">HISTORY AND PHYSICAL EXAMINATION</h3>
               <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.clinicalSummary}</p>
             </div>
             ` : ''}
@@ -801,10 +789,11 @@ export async function sendReferralLetterEmail(
             </div>
             ` : ''}
 
-            ${referralData.medications ? `
+            <!-- Assessment (Diagnosis) -->
+            ${referralData.diagnosis ? `
             <div style="margin-bottom: 25px;">
-              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">CURRENT MEDICATIONS</h3>
-              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.medications}</p>
+              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">ASSESSMENT (DIAGNOSIS)</h3>
+              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.diagnosis}</p>
             </div>
             ` : ''}
 
@@ -821,6 +810,20 @@ export async function sendReferralLetterEmail(
               <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.imagingResults}</p>
             </div>
             ` : ''}
+
+            <!-- Medication Given -->
+            ${referralData.medications ? `
+            <div style="margin-bottom: 25px;">
+              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">MEDICATION GIVEN</h3>
+              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.medications}</p>
+            </div>
+            ` : ''}
+
+            <!-- Reason for Referral -->
+            <div style="margin-bottom: 25px;">
+              <h3 style="color: #001f3f; font-size: 16px; margin: 0 0 12px 0; border-bottom: 2px solid #001f3f; padding-bottom: 6px;">REASON FOR REFERRAL</h3>
+              <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${referralData.reason}</p>
+            </div>
 
             ${referralData.appointmentDate ? `
             <div style="margin-bottom: 25px; padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
