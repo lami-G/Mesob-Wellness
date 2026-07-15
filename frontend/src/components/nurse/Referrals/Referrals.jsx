@@ -323,17 +323,105 @@ function Referrals() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>Patient Referrals</h2>
-        <button
-          className={styles.primaryButton}
-          onClick={() => {
-            setShowForm(!showForm);
-            if (showForm) resetForm();
-          }}
-        >
-          {showForm ? 'Cancel' : '+ New Referral'}
-        </button>
+      {/* Modern Header Section */}
+      <div className={styles.pageHeader}>
+        <div className={styles.headerContent}>
+          <div className={styles.titleSection}>
+            <div>
+              <h2 className={styles.pageTitle}>Patient Referrals</h2>
+              <p className={styles.pageSubtitle}>Manage and track patient referrals to external facilities</p>
+            </div>
+          </div>
+          
+          <div className={styles.headerActions}>
+            {!showForm && (
+              <>
+                <div className={styles.filterGroup}>
+                  <label className={styles.filterLabel}>Filter by urgency:</label>
+                  <select
+                    value={filterUrgency}
+                    onChange={(e) => setFilterUrgency(e.target.value)}
+                    className={styles.modernSelect}
+                  >
+                    <option value="">All Urgencies</option>
+                    <option value="ROUTINE">📋 Routine</option>
+                    <option value="URGENT">⚠️ Urgent</option>
+                    <option value="EMERGENCY">🚨 Emergency</option>
+                  </select>
+                  {filterUrgency && (
+                    <button
+                      className={styles.clearFilterBtn}
+                      onClick={() => setFilterUrgency('')}
+                      title="Clear filter"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {showReferralsList && (
+                  <button
+                    className={styles.hideReferralsButton}
+                    onClick={() => setShowReferralsList(false)}
+                  >
+                    <span>Hide Referrals</span>
+                  </button>
+                )}
+              </>
+            )}
+            
+            <button
+              className={styles.newReferralButton}
+              onClick={() => {
+                setShowForm(!showForm);
+                if (showForm) resetForm();
+              }}
+            >
+              <span className={styles.buttonIcon}>{showForm ? '✕' : '+'}</span>
+              <span>{showForm ? 'Cancel' : 'New Referral'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Summary (when not in form mode) */}
+        {!showForm && (
+          <div className={styles.statsBar}>
+            <div className={styles.statCard}>
+              <span className={styles.statIcon}>📊</span>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>{referrals.length}</span>
+                <span className={styles.statLabel}>Total Referrals</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statIcon}>🚨</span>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {referrals.filter(r => r.urgency === 'EMERGENCY').length}
+                </span>
+                <span className={styles.statLabel}>Emergency</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statIcon}>⚠️</span>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {referrals.filter(r => r.urgency === 'URGENT').length}
+                </span>
+                <span className={styles.statLabel}>Urgent</span>
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statIcon}>📋</span>
+              <div className={styles.statInfo}>
+                <span className={styles.statValue}>
+                  {referrals.filter(r => r.urgency === 'ROUTINE').length}
+                </span>
+                <span className={styles.statLabel}>Routine</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -750,31 +838,6 @@ function Referrals() {
       </div>
       )}
 
-      {/* Filters - Only show when not in form mode */}
-      {!showForm && (
-        <div className={styles.filters}>
-          <select
-            value={filterUrgency}
-            onChange={(e) => setFilterUrgency(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="">All Urgencies</option>
-            <option value="ROUTINE">Routine</option>
-            <option value="URGENT">Urgent</option>
-            <option value="EMERGENCY">Emergency</option>
-          </select>
-
-          {filterUrgency && (
-            <button
-              className={styles.linkButton}
-              onClick={() => setFilterUrgency('')}
-            >
-              Clear Filter
-            </button>
-          )}
-        </div>
-      )}
-
       {/* Referrals List - Only show when showReferralsList is true and not in form mode */}
       {!showForm && showReferralsList && (
         <>
@@ -888,18 +951,6 @@ function Referrals() {
         </div>
       )}
 
-      {/* Hide Referrals Button - Only show when list is visible */}
-      {!showForm && showReferralsList && (
-        <div className={styles.hideReferralsButtonContainer}>
-          <button
-            className={styles.hideReferralsButton}
-            onClick={() => setShowReferralsList(false)}
-          >
-            ▲ Hide Referrals
-          </button>
-        </div>
-      )}
-
       {/* Printable Referral Letter - Hidden on screen, visible when printing */}
       {printingReferral && (
         <div className={styles.printOnly}>
@@ -910,7 +961,7 @@ function Referrals() {
               className={styles.letterheadLogo}
             />
             <h1>MESOB WELLNESS CENTER</h1>
-            <p>One-Stop Service Center - Federal Democratic Republic of Ethiopia</p>
+            
           </div>
 
           <div className={styles.documentTitle}>
