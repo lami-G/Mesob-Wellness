@@ -39,6 +39,8 @@ export async function getAppointments(req: AuthRequest, res: Response): Promise<
     const userId = req.user?.userId; // Get authenticated user's ID
     const status = req.query.status as string | undefined;
 
+    console.log('[getAppointments] Request from user:', userId, 'status:', status);
+
     const appointments = await listAppointments(userId, status);
 
     res.status(200).json({
@@ -49,9 +51,11 @@ export async function getAppointments(req: AuthRequest, res: Response): Promise<
       },
     });
   } catch (error) {
+    console.error('[getAppointments] Error:', error);
     res.status(500).json({
       status: "error",
       message: "Failed to retrieve appointments",
+      ...(process.env.NODE_ENV === 'development' && { error: error instanceof Error ? error.message : String(error) }),
     });
   }
 }
@@ -355,6 +359,8 @@ export async function getAvailableSlotsHandler(req: AuthRequest, res: Response):
     const centerId = req.query.centerId as string;
     const userCenterId = req.user?.centerId;
 
+    console.log('[getAvailableSlots] Request - date:', date, 'centerId:', centerId, 'userCenterId:', userCenterId);
+
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       res.status(400).json({
         status: 'error',
@@ -374,6 +380,8 @@ export async function getAvailableSlotsHandler(req: AuthRequest, res: Response):
       return;
     }
 
+    console.log('[getAvailableSlots] Querying with centerId:', queryCenter);
+
     const availableSlots = await getAvailableTimeSlots(date, queryCenter);
 
     res.status(200).json({
@@ -386,10 +394,11 @@ export async function getAvailableSlotsHandler(req: AuthRequest, res: Response):
       },
     });
   } catch (error) {
-    console.error('Get available slots error:', error);
+    console.error('[getAvailableSlots] Error:', error);
     res.status(500).json({
       status: 'error',
       message: 'Failed to get available time slots',
+      ...(process.env.NODE_ENV === 'development' && { error: error instanceof Error ? error.message : String(error) }),
     });
   }
 }
