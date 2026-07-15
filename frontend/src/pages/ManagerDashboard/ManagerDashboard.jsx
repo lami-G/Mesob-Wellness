@@ -8,6 +8,7 @@ import Analytics from '../../components/manager/Analytics/Analytics';
 import Users from '../../components/manager/Users/Users';
 import Audit from '../../components/manager/Audit/Audit';
 import Settings from '../../components/manager/Settings/Settings';
+import Referrals from '../../components/nurse/Referrals/Referrals';
 import '../../styles/admin-dashboard.css';
 import '../../styles/tooltip-fix.css';
 import styles from './ManagerDashboard.module.css';
@@ -120,6 +121,7 @@ const ManagerDashboard = () => {
     { id: 'overview',  label: '📊 Overview'  },
     { id: 'capacity',  label: '📈 Capacity'  },
     { id: 'analytics', label: 'Analytics' },
+    { id: 'referrals', label: 'Referrals' },
     { id: 'users',     label: `Staff (${users.length})`     },
     { id: 'audit',     label: 'Audit'     },
     { id: 'settings',  label: 'Settings'  },
@@ -156,6 +158,12 @@ const ManagerDashboard = () => {
         return (
           <div className="dashboard-section">
             <Analytics loading={loading} queueData={queueData} healthData={healthData} trendsData={trendsData} />
+          </div>
+        );
+      case 'referrals':
+        return (
+          <div className="dashboard-section">
+            <Referrals />
           </div>
         );
       case 'users':

@@ -182,6 +182,7 @@ export const MANAGER_CONFIG = {
       items: [
         { id: "overview", label: "Overview", icon: Icons.overview },
         { id: "analytics", label: "Analytics", icon: Icons.analytics },
+        { id: "referrals", label: "Referrals", icon: Icons.referrals },
         { id: "users", label: "Staff", icon: Icons.users, showCount: true },
         { id: "audit", label: "Audit", icon: Icons.audit },
         { id: "settings", label: "Settings", icon: Icons.settings },

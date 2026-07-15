@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import styles from './Referrals.module.css';
 
 function Referrals() {
+  const { user } = useAuth(); // Get current user to check role
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -925,12 +927,15 @@ function Referrals() {
                       Edit
                     </button>
 
-                    <button
-                      className={`${styles.actionButton} ${styles.deleteButton}`}
-                      onClick={() => handleDelete(referral.id)}
-                    >
-                      Delete
-                    </button>
+                    {/* Only show Delete button for MANAGER and above */}
+                    {user && ['MANAGER', 'REGIONAL_OFFICE', 'FEDERAL_OFFICE', 'SYSTEM_ADMIN'].includes(user.role) && (
+                      <button
+                        className={`${styles.actionButton} ${styles.deleteButton}`}
+                        onClick={() => handleDelete(referral.id)}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

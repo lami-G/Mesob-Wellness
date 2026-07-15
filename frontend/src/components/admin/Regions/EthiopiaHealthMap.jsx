@@ -1,8 +1,36 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { MapContainer, GeoJSON, TileLayer } from "react-leaflet";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { MapContainer, GeoJSON, TileLayer, ZoomControl, useMap } from "react-leaflet";
 import { adminService } from "../../../services/adminService";
 import "leaflet/dist/leaflet.css";
 import styles from "./EthiopiaHealthMap.module.css";
+
+/**
+ * Component to handle map resize
+ */
+function MapResizeHandler() {
+  const map = useMap();
+  
+  useEffect(() => {
+    // Invalidate size when component mounts
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    
+    // Handle window resize
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [map]);
+  
+  return null;
+}
 
 /**
  * EthiopiaHealthMap Component
@@ -295,14 +323,22 @@ function EthiopiaHealthMap({ timePeriod = "monthly", selectedRegion = "all" }) {
 
       <div className={styles.mapWrapper}>
         <MapContainer
-          bounds={ethiopiaBounds}
+          center={[9.145, 40.489673]}
+          zoom={6}
+          minZoom={5}
+          maxZoom={9}
           style={{ height: "100%", width: "100%", background: "#f8fafc" }}
-          scrollWheelZoom={false}
-          doubleClickZoom={false}
+          scrollWheelZoom={true}
+          doubleClickZoom={true}
           dragging={true}
           zoomControl={false}
           className={styles.leafletContainer}
+          bounds={ethiopiaBounds}
+          boundsOptions={{ padding: [20, 20] }}
         >
+          <MapResizeHandler />
+          <ZoomControl position="topright" />
+          
           {/* Optional: Add a subtle base map */}
           <TileLayer
             url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
