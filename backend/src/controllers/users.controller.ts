@@ -31,6 +31,8 @@ export const searchUsers = async (req: AuthRequest, res: Response): Promise<void
         role: user.role,
         isExternal: user.isExternal,
         userId: user.userId,
+        dateOfBirth: user.dateOfBirth,
+        gender: user.gender,
       })),
     });
   } catch (error) {

@@ -18,6 +18,9 @@ function Referrals() {
   const [showReferralsList, setShowReferralsList] = useState(false);
   const [formData, setFormData] = useState({
     patientId: '',
+    patientName: '',
+    patientAge: '',
+    patientSex: '',
     destinationFacility: '',
     destinationFacilityType: 'HOSPITAL',
     destinationAddress: '',
@@ -93,10 +96,29 @@ function Referrals() {
 
   const handleSelectPatient = (patient) => {
     setSelectedPatient(patient);
+    
+    // Calculate age if dateOfBirth exists
+    let calculatedAge = '';
+    if (patient.dateOfBirth) {
+      const birthDate = new Date(patient.dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      calculatedAge = age.toString();
+    }
+    
+    // Auto-fill patient fields (editable)
     setFormData(prev => ({
       ...prev,
       patientId: patient.userId || patient.id,
+      patientName: patient.fullName || '',
+      patientAge: calculatedAge,
+      patientSex: patient.gender || '',
     }));
+    
     setSearchResults([]);
     setSearchTerm('');
   };
@@ -117,8 +139,43 @@ function Referrals() {
       return;
     }
 
-    if (!formData.destinationFacility.trim() || !formData.reason.trim()) {
-      setError('Destination facility and reason are required');
+    if (!formData.patientName.trim()) {
+      setError('Patient name is required');
+      return;
+    }
+
+    if (!formData.patientAge) {
+      setError('Patient age is required');
+      return;
+    }
+
+    if (!formData.patientSex) {
+      setError('Patient sex is required');
+      return;
+    }
+
+    if (!formData.clinicalSummary.trim()) {
+      setError('History and Physical Examination is required');
+      return;
+    }
+
+    if (!formData.diagnosis.trim()) {
+      setError('Assessment (Diagnosis) is required');
+      return;
+    }
+
+    if (!formData.medications.trim()) {
+      setError('Medications Given is required');
+      return;
+    }
+
+    if (!formData.reason.trim()) {
+      setError('Reason for Referral is required');
+      return;
+    }
+
+    if (!formData.destinationFacility.trim()) {
+      setError('Destination Facility is required');
       return;
     }
 
@@ -152,8 +209,25 @@ function Referrals() {
   const handleEdit = (referral) => {
     setEditingReferral(referral);
     setSelectedPatient(referral.patient);
+    
+    // Calculate age from dateOfBirth if exists
+    let calculatedAge = '';
+    if (referral.patient.dateOfBirth) {
+      const birthDate = new Date(referral.patient.dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      calculatedAge = age.toString();
+    }
+    
     setFormData({
       patientId: referral.patientId,
+      patientName: referral.patient.fullName || '',
+      patientAge: calculatedAge,
+      patientSex: referral.patient.gender || '',
       destinationFacility: referral.destinationFacility,
       destinationFacilityType: referral.destinationFacilityType || 'HOSPITAL',
       destinationAddress: referral.destinationAddress || '',
@@ -209,6 +283,9 @@ function Referrals() {
   const resetForm = () => {
     setFormData({
       patientId: '',
+      patientName: '',
+      patientAge: '',
+      patientSex: '',
       destinationFacility: '',
       destinationFacilityType: 'HOSPITAL',
       destinationAddress: '',
@@ -308,25 +385,223 @@ function Referrals() {
             </div>
           )}
 
+          {/* Form starts after patient is selected */}
           {selectedPatient && (
-            <div className={styles.selectedPatient}>
-              <div>
-                <strong>Patient:</strong> {selectedPatient.fullName}
-                <span className={styles.patientId}>(ID: {selectedPatient.userId})</span>
-              </div>
-              {!editingReferral && (
-                <button
-                  type="button"
-                  className={styles.linkButton}
-                  onClick={() => setSelectedPatient(null)}
-                >
-                  Change Patient
-                </button>
-              )}
-            </div>
-          )}
+            <form onSubmit={handleSubmit} className={styles.form}>
+              {/* Patient Information Section - Editable */}
+              <div className={styles.patientInfoSection}>
+                <h4>Patient Information</h4>
+                <p className={styles.infoNote}>Auto-filled from record. You can edit if needed.</p>
+                
+                <div className={styles.formRow}>
+                  <div className={styles.formGroup}>
+                    <label>Patient Name *</label>
+                    <input
+                      type="text"
+                      name="patientName"
+                      value={formData.patientName}
+                      onChange={handleChange}
+                      required
+                      placeholder="Patient full name"
+                    />
+                  </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
+                  <div className={styles.formGroup}>
+                    <label>Age (years) *</label>
+                    <input
+                      type="number"
+                      name="patientAge"
+                      value={formData.patientAge}
+                      onChange={handleChange}
+                      required
+                      min="0"
+                      max="150"
+                      placeholder="Age"
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Sex *</label>
+                    <select
+                      name="patientSex"
+                      value={formData.patientSex}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select...</option>
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className={styles.patientIdDisplay}>
+                  <span><strong>Patient ID:</strong> {selectedPatient.userId || 'N/A'}</span>
+                  {!editingReferral && (
+                    <button
+                      type="button"
+                      className={styles.linkButton}
+                      onClick={() => {
+                        setSelectedPatient(null);
+                        setFormData(prev => ({
+                          ...prev,
+                          patientId: '',
+                          patientName: '',
+                          patientAge: '',
+                          patientSex: '',
+                        }));
+                      }}
+                    >
+                      Change Patient
+                    </button>
+                  )}
+                </div>
+              </div>
+            {/* Section 1: History and Physical Examination */}
+            <div className={styles.sectionTitle}>
+              <h4>History and Physical Examination (H&PE)</h4>
+            </div>
+            
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>History and Physical Examination *</label>
+                <textarea
+                  name="clinicalSummary"
+                  value={formData.clinicalSummary}
+                  onChange={handleChange}
+                  required
+                  rows="4"
+                  placeholder="Brief clinical history, presenting complaints, and physical examination findings..."
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Vital Signs</label>
+                <textarea
+                  name="vitalSigns"
+                  value={formData.vitalSigns}
+                  onChange={handleChange}
+                  rows="2"
+                  placeholder="BP, HR, Temp, RR, SpO2, etc."
+                />
+              </div>
+            </div>
+
+            {/* Section 2: Assessment (Diagnosis) */}
+            <div className={styles.sectionTitle}>
+              <h4>Assessment</h4>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Assessment (Diagnosis) *</label>
+                <textarea
+                  name="diagnosis"
+                  value={formData.diagnosis}
+                  onChange={handleChange}
+                  required
+                  rows="2"
+                  placeholder="Primary and differential diagnosis..."
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Lab Results</label>
+                <textarea
+                  name="labResults"
+                  value={formData.labResults}
+                  onChange={handleChange}
+                  rows="2"
+                  placeholder="Relevant laboratory test results..."
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Imaging Results</label>
+                <textarea
+                  name="imagingResults"
+                  value={formData.imagingResults}
+                  onChange={handleChange}
+                  rows="2"
+                  placeholder="X-ray, CT, MRI, ultrasound findings..."
+                />
+              </div>
+            </div>
+
+            {/* Section 3: Medication Given */}
+            <div className={styles.sectionTitle}>
+              <h4>Medication Given</h4>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Medications Given/Current Medications *</label>
+                <textarea
+                  name="medications"
+                  value={formData.medications}
+                  onChange={handleChange}
+                  required
+                  rows="3"
+                  placeholder="List medications given at this facility (name, dose, route, frequency)..."
+                />
+              </div>
+            </div>
+
+            {/* Section 4: Reason for Referral */}
+            <div className={styles.sectionTitle}>
+              <h4>Reason for Referral</h4>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Reason for Referral *</label>
+                <textarea
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleChange}
+                  required
+                  rows="3"
+                  placeholder="Why is this patient being referred? What services/expertise are needed?"
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Urgency *</label>
+                <select
+                  name="urgency"
+                  value={formData.urgency}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="ROUTINE">Routine</option>
+                  <option value="URGENT">Urgent</option>
+                  <option value="EMERGENCY">Emergency</option>
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Specialist Type Requested</label>
+                <input
+                  type="text"
+                  name="specialistType"
+                  value={formData.specialistType}
+                  onChange={handleChange}
+                  placeholder="e.g., Cardiologist, Neurologist, Surgeon"
+                />
+              </div>
+            </div>
+
+            {/* Section 5: Destination Facility Information */}
+            <div className={styles.sectionTitle}>
+              <h4>Destination Facility Information</h4>
+            </div>
+
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Destination Facility *</label>
@@ -336,7 +611,7 @@ function Referrals() {
                   value={formData.destinationFacility}
                   onChange={handleChange}
                   required
-                  placeholder="e.g., St. Paul's Hospital"
+                  placeholder="e.g., St. Paul's Hospital, Black Lion Hospital"
                 />
               </div>
 
@@ -365,7 +640,7 @@ function Referrals() {
                   name="destinationAddress"
                   value={formData.destinationAddress}
                   onChange={handleChange}
-                  placeholder="Full address"
+                  placeholder="Full address of referral destination"
                 />
               </div>
 
@@ -381,126 +656,14 @@ function Referrals() {
               </div>
             </div>
 
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Reason for Referral *</label>
-                <textarea
-                  name="reason"
-                  value={formData.reason}
-                  onChange={handleChange}
-                  required
-                  rows="3"
-                  placeholder="Describe the reason for referral..."
-                />
-              </div>
+            {/* Section 6: Appointment & Follow-up */}
+            <div className={styles.sectionTitle}>
+              <h4>Appointment & Follow-up</h4>
             </div>
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Urgency *</label>
-                <select
-                  name="urgency"
-                  value={formData.urgency}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="ROUTINE">Routine</option>
-                  <option value="URGENT">Urgent</option>
-                  <option value="EMERGENCY">Emergency</option>
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Specialist Type</label>
-                <input
-                  type="text"
-                  name="specialistType"
-                  value={formData.specialistType}
-                  onChange={handleChange}
-                  placeholder="e.g., Cardiologist, Neurologist"
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Diagnosis</label>
-                <textarea
-                  name="diagnosis"
-                  value={formData.diagnosis}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="Current diagnosis..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Clinical Summary</label>
-                <textarea
-                  name="clinicalSummary"
-                  value={formData.clinicalSummary}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Brief clinical history and examination findings..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Current Medications</label>
-                <textarea
-                  name="medications"
-                  value={formData.medications}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="List current medications..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Vital Signs</label>
-                <textarea
-                  name="vitalSigns"
-                  value={formData.vitalSigns}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="Recent vital signs (BP, HR, Temp, etc.)..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Lab Results</label>
-                <textarea
-                  name="labResults"
-                  value={formData.labResults}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="Relevant lab results..."
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label>Imaging Results</label>
-                <textarea
-                  name="imagingResults"
-                  value={formData.imagingResults}
-                  onChange={handleChange}
-                  rows="2"
-                  placeholder="X-ray, CT, MRI findings..."
-                />
-              </div>
-            </div>
-
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label>Appointment Date</label>
+                <label>Appointment Date (if scheduled)</label>
                 <input
                   type="datetime-local"
                   name="appointmentDate"
@@ -529,7 +692,7 @@ function Referrals() {
                     checked={formData.followUpRequired}
                     onChange={handleChange}
                   />
-                  Follow-up Required
+                  Follow-up Required at This Facility
                 </label>
               </div>
             </div>
@@ -537,18 +700,19 @@ function Referrals() {
             {formData.followUpRequired && (
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
-                  <label>Follow-up Notes</label>
+                  <label>Follow-up Instructions</label>
                   <textarea
                     name="followUpNotes"
                     value={formData.followUpNotes}
                     onChange={handleChange}
                     rows="2"
-                    placeholder="Follow-up instructions..."
+                    placeholder="Follow-up instructions for patient or referring facility..."
                   />
                 </div>
               </div>
             )}
 
+            {/* Section 7: Additional Notes */}
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>Additional Notes</label>
@@ -556,8 +720,8 @@ function Referrals() {
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  rows="3"
-                  placeholder="Any additional notes..."
+                  rows="2"
+                  placeholder="Any other relevant information..."
                 />
               </div>
             </div>
@@ -582,7 +746,8 @@ function Referrals() {
               </button>
             </div>
           </form>
-        </div>
+        )}
+      </div>
       )}
 
       {/* Filters - Only show when not in form mode */}
