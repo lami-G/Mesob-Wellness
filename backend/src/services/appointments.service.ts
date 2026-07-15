@@ -231,6 +231,13 @@ export async function listAppointments(userId?: string, status?: string): Promis
           phone: true,
         },
       },
+      center: {
+        select: {
+          id: true,
+          name: true,
+          region: true,
+        },
+      },
     },
   });
 
@@ -242,6 +249,8 @@ export async function listAppointments(userId?: string, status?: string): Promis
     status: apt.status.toLowerCase(),
     createdAt: apt.createdAt.toISOString(),
     patient: apt.user,
+    centerId: apt.centerId,
+    center: apt.center,
     notes: apt.notes || undefined,
     diagnosis: apt.diagnosis || undefined,
     prescription: apt.prescription || undefined,
@@ -348,9 +357,7 @@ export async function getQueueAppointments(dateString?: string, centerId?: strin
 
   // Filter by center if centerId is provided
   if (centerId) {
-    whereClause.user = {
-      centerId: centerId,
-    };
+    whereClause.centerId = centerId;
     console.log(`Filtering queue appointments for center: ${centerId}`);
   }
 
