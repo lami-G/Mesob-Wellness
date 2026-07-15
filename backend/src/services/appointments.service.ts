@@ -390,14 +390,13 @@ export async function getQueueAppointments(dateString?: string, centerId?: strin
           phone: true,
           userId: true,
           isExternal: true,
-          centerId: true,
-          center: {
-            select: {
-              id: true,
-              name: true,
-              region: true,
-            },
-          },
+        },
+      },
+      center: {
+        select: {
+          id: true,
+          name: true,
+          region: true,
         },
       },
     },
@@ -421,9 +420,9 @@ export async function getQueueAppointments(dateString?: string, centerId?: strin
     status: apt.status === AppointmentStatus.PENDING ? 'WAITING' : apt.status, // Map legacy PENDING to WAITING
     type: 'ONLINE', // Default to ONLINE, can be enhanced later
     notes: apt.notes || undefined,
-    centerId: apt.user.centerId,
-    centerName: apt.user.center?.name,
-    centerRegion: apt.user.center?.region,
+    centerId: apt.centerId,
+    centerName: apt.center?.name,
+    centerRegion: apt.center?.region,
   }));
 }
 
