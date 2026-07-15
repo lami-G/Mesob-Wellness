@@ -115,27 +115,31 @@ export const createReferral = async (
       return;
     }
 
+    // Clean up empty strings and convert to null
+    const cleanString = (value: any) => (value && value.trim() !== '' ? value : undefined);
+    const cleanDate = (value: any) => (value && value.trim() !== '' ? new Date(value) : undefined);
+
     const referral = await ReferralService.createReferral({
       patientId: resolvedPatientId,
       destinationFacility,
-      destinationFacilityType,
-      destinationAddress,
-      destinationPhone,
+      destinationFacilityType: cleanString(destinationFacilityType),
+      destinationAddress: cleanString(destinationAddress),
+      destinationPhone: cleanString(destinationPhone),
       reason,
       urgency: urgency as ReferralUrgency,
-      specialistType,
-      diagnosis,
-      clinicalSummary,
-      medications,
-      vitalSigns,
-      labResults,
-      imagingResults,
-      appointmentDate: appointmentDate ? new Date(appointmentDate) : undefined,
-      expectedReturnDate: expectedReturnDate ? new Date(expectedReturnDate) : undefined,
+      specialistType: cleanString(specialistType),
+      diagnosis: cleanString(diagnosis),
+      clinicalSummary: cleanString(clinicalSummary),
+      medications: cleanString(medications),
+      vitalSigns: cleanString(vitalSigns),
+      labResults: cleanString(labResults),
+      imagingResults: cleanString(imagingResults),
+      appointmentDate: cleanDate(appointmentDate),
+      expectedReturnDate: cleanDate(expectedReturnDate),
       followUpRequired,
-      followUpNotes,
-      documents,
-      notes,
+      followUpNotes: cleanString(followUpNotes),
+      documents: cleanString(documents),
+      notes: cleanString(notes),
       createdBy: req.user.userId,
     });
 
@@ -438,13 +442,31 @@ export const updateReferral = async (
 
     const updateData: any = { ...req.body };
 
-    // Convert date strings to Date objects
-    if (updateData.appointmentDate) {
-      updateData.appointmentDate = new Date(updateData.appointmentDate);
+    // Convert date strings to Date objects, or set to null if empty
+    if (updateData.appointmentDate !== undefined) {
+      updateData.appointmentDate = updateData.appointmentDate && updateData.appointmentDate.trim() !== '' 
+        ? new Date(updateData.appointmentDate) 
+        : null;
     }
-    if (updateData.expectedReturnDate) {
-      updateData.expectedReturnDate = new Date(updateData.expectedReturnDate);
+    if (updateData.expectedReturnDate !== undefined) {
+      updateData.expectedReturnDate = updateData.expectedReturnDate && updateData.expectedReturnDate.trim() !== '' 
+        ? new Date(updateData.expectedReturnDate) 
+        : null;
     }
+
+    // Clean up empty string fields - convert to null or remove
+    const fieldsToClean = [
+      'destinationFacilityType', 'destinationAddress', 'destinationPhone',
+      'specialistType', 'diagnosis', 'clinicalSummary', 'medications',
+      'vitalSigns', 'labResults', 'imagingResults', 'followUpNotes',
+      'notes', 'documents'
+    ];
+    
+    fieldsToClean.forEach(field => {
+      if (updateData[field] === '') {
+        updateData[field] = null;
+      }
+    });
 
     const referral = await ReferralService.updateReferral(referralId, updateData);
 
