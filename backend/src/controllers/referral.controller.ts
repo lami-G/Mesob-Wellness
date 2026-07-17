@@ -258,6 +258,15 @@ export const getAllReferrals = async (
       filters.endDate = new Date(endDate);
     }
 
+    // CENTER-BASED FILTERING
+    // MANAGER and NURSE_OFFICER: Only see referrals from their center
+    // REGIONAL_OFFICE, FEDERAL_OFFICE, SYSTEM_ADMIN: See all referrals
+    const centerSpecificRoles = ['MANAGER', 'NURSE_OFFICER'];
+    if (centerSpecificRoles.includes(req.user.role) && req.user.centerId) {
+      filters.centerId = req.user.centerId;
+      console.log(`[REFERRALS] Filtering by center: ${req.user.centerId} for ${req.user.role}`);
+    }
+
     const referrals = await ReferralService.getReferrals(filters);
 
     res.status(200).json({
@@ -589,6 +598,15 @@ export const getReferralStats = async (
 
     if (createdBy && typeof createdBy === 'string') {
       filters.createdBy = createdBy;
+    }
+
+    // CENTER-BASED FILTERING
+    // MANAGER and NURSE_OFFICER: Only see stats from their center
+    // REGIONAL_OFFICE, FEDERAL_OFFICE, SYSTEM_ADMIN: See all stats
+    const centerSpecificRoles = ['MANAGER', 'NURSE_OFFICER'];
+    if (centerSpecificRoles.includes(req.user.role) && req.user.centerId) {
+      filters.centerId = req.user.centerId;
+      console.log(`[REFERRAL STATS] Filtering by center: ${req.user.centerId} for ${req.user.role}`);
     }
 
     const stats = await ReferralService.getReferralStats(filters);

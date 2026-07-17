@@ -141,6 +141,7 @@ export async function getReferrals(filters?: {
   createdBy?: string;
   startDate?: Date;
   endDate?: Date;
+  centerId?: string; // Filter by creator's center
 }) {
   const where: any = {};
 
@@ -166,6 +167,13 @@ export async function getReferrals(filters?: {
     }
   }
 
+  // Filter by creator's center (for MANAGER and NURSE_OFFICER)
+  if (filters?.centerId) {
+    where.creator = {
+      centerId: filters.centerId,
+    };
+  }
+
   return await prisma.referral.findMany({
     where,
     include: {
@@ -183,6 +191,7 @@ export async function getReferrals(filters?: {
           id: true,
           fullName: true,
           role: true,
+          centerId: true, // Include centerId in response
         },
       },
     },
@@ -257,6 +266,7 @@ export async function getReferralStats(filters?: {
   startDate?: Date;
   endDate?: Date;
   createdBy?: string;
+  centerId?: string; // Filter by creator's center
 }) {
   const where: any = {};
 
@@ -272,6 +282,13 @@ export async function getReferralStats(filters?: {
 
   if (filters?.createdBy) {
     where.createdBy = filters.createdBy;
+  }
+
+  // Filter by creator's center (for MANAGER and NURSE_OFFICER)
+  if (filters?.centerId) {
+    where.creator = {
+      centerId: filters.centerId,
+    };
   }
 
   const [
