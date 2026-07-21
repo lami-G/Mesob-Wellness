@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import { env } from '../config/env';
 import {
   sendWelcomeEmail,
+  sendPasswordChangedNotification,
   sendAppointmentReminder,
   sendWellnessPlanEmail,
   sendVitalsEmail,
@@ -10,6 +11,7 @@ import {
 } from '../services/email.service';
 import {
   WelcomeEmailData,
+  PasswordChangedEmailData,
   AppointmentReminderData,
   WellnessPlanEmailData,
   VitalsEmailData,
@@ -56,6 +58,23 @@ const emailWorker = new Worker(
           }
 
           return { success: true, type: 'welcome-email', recipient: data.recipientEmail };
+        }
+
+        case 'password-changed': {
+          const data = job.data as PasswordChangedEmailData;
+          const success = await sendPasswordChangedNotification(
+            data.recipientEmail,
+            data.fullName,
+            data.changedAt,
+            data.ipAddress,
+            data.userAgent
+          );
+
+          if (!success) {
+            throw new Error('Failed to send password changed notification');
+          }
+
+          return { success: true, type: 'password-changed', recipient: data.recipientEmail };
         }
 
         case 'appointment-reminder': {

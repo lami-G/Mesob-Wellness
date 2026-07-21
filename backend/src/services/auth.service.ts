@@ -6,6 +6,7 @@ import { prisma } from "../config/prisma";
 import { NotificationService } from "./notifications.service";
 import SettingsService from "./settings.service";
 import { generateNextDisplayId } from "../utils/sequentialId";
+import { queueWelcomeEmail, queuePasswordChangedEmail } from "./queue.service";
 
 // Constants
 const SALT_ROUNDS = 12;
@@ -151,7 +152,10 @@ export class AuthService {
       throw new Error("User with this email already exists");
     }
 
-    // Step C: Password Hashing
+    // Step C: Store plain password before hashing (for welcome email)
+    const plainPassword = input.password;
+    
+    // Hash the password
     const hashedPassword = await bcrypt.hash(input.password, SALT_ROUNDS);
 
     // Step D: Atomic Transaction - Create User and HealthProfile
@@ -228,6 +232,25 @@ export class AuthService {
         "Failed to create registration notification:",
         notificationError,
       );
+    }
+
+    // 🔥 FIX 1: Send welcome email with login credentials
+    try {
+      await queueWelcomeEmail({
+        recipientEmail: user.email || input.email,
+        fullName: user.fullName,
+        username: user.email || input.email,
+        temporaryPassword: plainPassword, // Send the original password before hashing
+        role: user.role,
+      });
+      console.log(`✅ Welcome email queued for ${user.email}`);
+    } catch (emailError) {
+      // Log but don't fail registration if email queueing fails
+      console.warn(
+        "Failed to queue welcome email:",
+        emailError,
+      );
+      // Email failure should not prevent user creation
     }
 
     const settings = await SettingsService.getSettings();
@@ -489,6 +512,7 @@ export class AuthService {
     userId: string,
     currentPassword: string,
     newPassword: string,
+    auditContext?: Partial<AuditLogInput>,
   ): Promise<void> {
     // Get user
     const user = await prisma.user.findUnique({
@@ -533,7 +557,30 @@ export class AuthService {
       action: "PASSWORD_CHANGED",
       resource: "USER",
       details: { method: "self_service" },
+      ipAddress: auditContext?.ipAddress,
+      userAgent: auditContext?.userAgent,
     });
+
+    // 🔥 FIX 2: Send password change notification email
+    if (user.email) {
+      try {
+        await queuePasswordChangedEmail({
+          recipientEmail: user.email,
+          fullName: user.fullName,
+          changedAt: new Date(),
+          ipAddress: auditContext?.ipAddress,
+          userAgent: auditContext?.userAgent,
+        });
+        console.log(`✅ Password change notification queued for ${user.email}`);
+      } catch (emailError) {
+        // Log but don't fail password change if email queueing fails
+        console.warn(
+          "Failed to queue password change notification:",
+          emailError,
+        );
+        // Email failure should not prevent password change
+      }
+    }
   }
 
   /**

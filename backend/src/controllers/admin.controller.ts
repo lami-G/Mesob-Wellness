@@ -4,6 +4,7 @@ import AdminService from "../services/admin.service";
 import prisma from "../config/prisma";
 import { NotificationService } from "../services/notifications.service";
 import { generateNextDisplayId } from "../utils/sequentialId";
+import { queueWelcomeEmail } from "../services/queue.service";
 import {
   UserFilters,
   CenterFilters,
@@ -304,6 +305,9 @@ export const createUser = async (
       return;
     }
 
+    // Store plain password before hashing (for welcome email)
+    const plainPassword = password;
+    
     // Hash password
     const bcrypt = await import("bcryptjs");
     const hashedPassword = await bcrypt.default.hash(password, 10);
@@ -333,6 +337,22 @@ export const createUser = async (
         userId: true,
       },
     });
+
+    // 🔥 FIX 1: Send welcome email with login credentials
+    if (email) {
+      try {
+        await queueWelcomeEmail({
+          recipientEmail: email,
+          fullName,
+          username: email,
+          temporaryPassword: plainPassword,
+          role,
+        });
+        console.log(`✅ Welcome email queued for ${email}`);
+      } catch (emailError) {
+        console.warn("Failed to queue welcome email:", emailError);
+      }
+    }
 
     // Create notification for system admin about new user creation
     try {
@@ -376,6 +396,122 @@ export const createUser = async (
     res.status(500).json({
       status: "error",
       message: "Failed to create user",
+    });
+  }
+};
+
+/**
+ * PATCH /api/v1/admin/users/:id/toggle-status
+ * Toggle user active/inactive status (Activate/Deactivate)
+ * Only SYSTEM_ADMIN and FEDERAL_OFFICE can toggle user status
+ */
+export const toggleUserStatus = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({
+        status: "error",
+        message: "Authentication required",
+      });
+      return;
+    }
+
+    // Only SYSTEM_ADMIN and FEDERAL_OFFICE can activate/deactivate users
+    const allowedRoles = ["SYSTEM_ADMIN", "FEDERAL_OFFICE"];
+    if (!allowedRoles.includes(req.user.role)) {
+      res.status(403).json({
+        status: "error",
+        message: "Only SYSTEM_ADMIN and FEDERAL_OFFICE can activate/deactivate users",
+      });
+      return;
+    }
+
+    const userId = req.params.id as string;
+
+    if (!userId) {
+      res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
+      return;
+    }
+
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        isActive: true,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+      return;
+    }
+
+    // Prevent deactivating yourself
+    if (user.id === req.user.userId) {
+      res.status(400).json({
+        status: "error",
+        message: "You cannot deactivate your own account",
+      });
+      return;
+    }
+
+    // Toggle the status
+    const newStatus = !user.isActive;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: newStatus },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        isActive: true,
+        isVerified: true,
+        userId: true,
+      },
+    });
+
+    // Create notification for the affected user
+    try {
+      await NotificationService.createNotification(
+        userId,
+        "USER_REGISTRATION",
+        "HIGH",
+        newStatus ? "Account Activated" : "Account Deactivated",
+        newStatus
+          ? "Your account has been activated by an administrator. You can now login."
+          : "Your account has been deactivated by an administrator. Please contact support if you believe this is a mistake.",
+        req.user.userId,
+      );
+    } catch (notificationError) {
+      console.warn("Failed to create status change notification:", notificationError);
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: updatedUser,
+      message: newStatus
+        ? `User ${user.fullName} has been activated successfully`
+        : `User ${user.fullName} has been deactivated successfully`,
+    });
+  } catch (error) {
+    console.error("Toggle user status error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to toggle user status",
     });
   }
 };

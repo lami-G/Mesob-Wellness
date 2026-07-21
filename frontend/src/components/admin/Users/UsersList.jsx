@@ -6,6 +6,7 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
   const [allUsers, setAllUsers] = useState([]); // Store all users
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [togglingStatus, setTogglingStatus] = useState({}); // Track which user's status is being toggled
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -102,6 +103,33 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
 
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const handleToggleStatus = async (userId, currentStatus) => {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    if (!window.confirm(`Are you sure you want to ${action} this user?`)) {
+      return;
+    }
+
+    setTogglingStatus(prev => ({ ...prev, [userId]: true }));
+
+    try {
+      const result = await adminService.toggleUserStatus(userId);
+      
+      // Update the user in the list
+      setAllUsers(prev => prev.map(user => 
+        user.id === userId 
+          ? { ...user, isActive: !currentStatus }
+          : user
+      ));
+      
+      alert(result.message || `User ${action}d successfully`);
+    } catch (err) {
+      alert(`Failed to ${action} user: ` + (err.response?.data?.message || err.message));
+      console.error(`Error toggling user status:`, err);
+    } finally {
+      setTogglingStatus(prev => ({ ...prev, [userId]: false }));
+    }
   };
 
   if (loading) {
@@ -266,6 +294,14 @@ function UsersList({ filters, onEdit, onDelete, onCreateClick, onFilterChange, s
                   </span>
                 </td>
                 <td className={styles.cellActions}>
+                  <button
+                    className={`${styles.btnAction} ${user.isActive ? styles.btnDeactivate : styles.btnActivate}`}
+                    onClick={() => handleToggleStatus(user.id, user.isActive)}
+                    disabled={togglingStatus[user.id]}
+                    title={user.isActive ? "Deactivate user" : "Activate user"}
+                  >
+                    {togglingStatus[user.id] ? 'Loading...' : (user.isActive ? 'Deactivate' : 'Activate')}
+                  </button>
                   <button
                     className={`${styles.btnIcon} ${styles.btnIconEdit}`}
                     onClick={() => onEdit(user)}

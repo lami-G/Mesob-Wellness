@@ -256,6 +256,17 @@ export const adminService = {
     }
   },
 
+  // Toggle user status (activate/deactivate)
+  toggleUserStatus: async (userId) => {
+    try {
+      const response = await api.patch(`/admin/users/${userId}/toggle-status`);
+      return response.data;
+    } catch (err) {
+      console.error("Error toggling user status:", err);
+      throw err;
+    }
+  },
+
   // Regional Health Comparison
   getRegionalHealthComparison: async (timePeriod = "monthly") => {
     const params = new URLSearchParams();

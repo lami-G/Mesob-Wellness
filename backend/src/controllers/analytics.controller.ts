@@ -5,6 +5,7 @@ import { AppointmentStatus, UserRole } from "../generated/prisma";
 import bcrypt from "bcryptjs";
 import { generateNextDisplayId } from "../utils/sequentialId";
 import AdminService, { calculateQueueMetrics } from "../services/admin.service";
+import { queueWelcomeEmail } from "../services/queue.service";
 
 // ─── System Settings ──────────────────────────────────────────────────────────
 export async function getSystemSettings(req: Request, res: Response) {
@@ -988,9 +989,30 @@ export async function resetUserPassword(req: AuthRequest, res: Response) {
       data: { password: hashedPassword },
     });
 
+    // 🔥 FIX 3: Send welcome email with new password when admin resets password
+    if (user.email) {
+      try {
+        await queueWelcomeEmail({
+          recipientEmail: user.email,
+          fullName: user.fullName,
+          username: user.email,
+          temporaryPassword: newPassword, // Send the new password
+          role: user.role,
+        });
+        console.log(`✅ Password reset email queued for ${user.email}`);
+      } catch (emailError) {
+        // Log but don't fail password reset if email queueing fails
+        console.warn(
+          "Failed to queue password reset email:",
+          emailError,
+        );
+        // Email failure should not prevent password reset
+      }
+    }
+
     res.json({ 
       success: true, 
-      message: "Password reset successfully" 
+      message: "Password reset successfully. User will receive an email with their new credentials." 
     });
   } catch (error) {
     console.error("Error resetting user password:", error);

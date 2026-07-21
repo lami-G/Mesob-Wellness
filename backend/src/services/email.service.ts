@@ -140,7 +140,145 @@ This is an automated message. Please do not reply to this email.
 }
 
 /**
- * 2. Send Appointment Reminder
+ * 2. Send Password Changed Notification
+ * Used when user changes their password - security notification
+ */
+export async function sendPasswordChangedNotification(
+  recipientEmail: string,
+  fullName: string,
+  changedAt: Date,
+  ipAddress?: string,
+  userAgent?: string
+): Promise<boolean> {
+  try {
+    const client = getResendClient();
+
+    const { data, error } = await client.emails.send({
+      from: env.EMAIL_FROM,
+      to: recipientEmail,
+      subject: '🔒 Your Password Has Been Changed - MESOB Wellness',
+      html: `
+        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 26px; font-weight: 600;">🔒 Password Changed</h1>
+            <p style="color: #fee2e2; margin: 10px 0 0 0; font-size: 14px;">MESOB Wellness Platform</p>
+          </div>
+
+          <!-- Main Content -->
+          <div style="padding: 30px 20px; background-color: white; border-radius: 0 0 8px 8px;">
+            <p style="color: #333; font-size: 16px; line-height: 1.6;">Dear <strong>${fullName}</strong>,</p>
+            
+            <p style="color: #666; font-size: 15px; line-height: 1.6;">Your password was successfully changed on your MESOB Wellness Platform account.</p>
+            
+            <!-- Change Details Box -->
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); padding: 20px; border-left: 5px solid #dc2626; margin: 25px 0; border-radius: 4px;">
+              <p style="color: #991b1b; font-weight: 600; font-size: 16px; margin: 0 0 15px 0;">🔐 Change Details</p>
+              
+              <div style="margin-bottom: 12px;">
+                <span style="color: #555; font-weight: 500;">⏰ Date & Time:</span>
+                <span style="color: #333; margin-left: 10px; font-weight: 600;">${new Date(changedAt).toLocaleString()}</span>
+              </div>
+              
+              ${ipAddress ? `
+              <div style="margin-bottom: 12px;">
+                <span style="color: #555; font-weight: 500;">🌐 IP Address:</span>
+                <span style="color: #333; margin-left: 10px; font-family: monospace;">${ipAddress}</span>
+              </div>
+              ` : ''}
+              
+              ${userAgent ? `
+              <div style="margin-bottom: 0;">
+                <span style="color: #555; font-weight: 500;">💻 Device:</span>
+                <span style="color: #333; margin-left: 10px; font-size: 13px;">${userAgent}</span>
+              </div>
+              ` : ''}
+            </div>
+
+            <!-- Security Warning -->
+            <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #856404; margin: 0 0 10px 0; font-weight: 600;">⚠️ If this wasn't you:</p>
+              <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.6;">
+                Someone may have accessed your account. Please contact your system administrator <strong>immediately</strong> and report this unauthorized access.
+              </p>
+            </div>
+
+            <!-- Security Tips -->
+            <div style="background-color: #e8f5e9; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #16a34a; margin: 0 0 10px 0; font-weight: 600;">🛡️ Security Tips:</p>
+              <ul style="margin: 0; padding-left: 20px; color: #333; font-size: 14px; line-height: 1.8;">
+                <li>Never share your password with anyone</li>
+                <li>Use a strong, unique password</li>
+                <li>Change your password regularly</li>
+                <li>Log out when using shared computers</li>
+              </ul>
+            </div>
+
+            <p style="color: #666; font-size: 14px; line-height: 1.6;">
+              If you have any questions or concerns about your account security, please contact your system administrator.
+            </p>
+
+            <!-- Footer -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+              <p style="color: #999; font-size: 13px; margin: 5px 0;">
+                <strong>MESOB One-Stop Service Center</strong>
+              </p>
+              <p style="color: #bbb; font-size: 12px; margin: 5px 0;">
+                Federal Democratic Republic of Ethiopia
+              </p>
+              <p style="color: #bbb; font-size: 11px; margin: 10px 0 0 0;">
+                This is an automated security notification. Please do not reply to this email.
+              </p>
+            </div>
+          </div>
+        </div>
+      `,
+      text: `
+MESOB WELLNESS PLATFORM
+Password Changed Notification
+
+Dear ${fullName},
+
+Your password was successfully changed on your MESOB Wellness Platform account.
+
+CHANGE DETAILS:
+- Date & Time: ${new Date(changedAt).toLocaleString()}
+${ipAddress ? `- IP Address: ${ipAddress}\n` : ''}${userAgent ? `- Device: ${userAgent}\n` : ''}
+
+⚠️ IF THIS WASN'T YOU:
+Someone may have accessed your account. Please contact your system administrator IMMEDIATELY and report this unauthorized access.
+
+SECURITY TIPS:
+• Never share your password with anyone
+• Use a strong, unique password
+• Change your password regularly
+• Log out when using shared computers
+
+If you have any questions or concerns about your account security, please contact your system administrator.
+
+---
+MESOB One-Stop Service Center
+Federal Democratic Republic of Ethiopia
+
+This is an automated security notification. Please do not reply to this email.
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Resend error:', error);
+      return false;
+    }
+
+    console.log(`✅ Password changed notification sent to ${recipientEmail}. ID: ${data?.id}`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Failed to send password changed notification to ${recipientEmail}:`, error);
+    return false;
+  }
+}
+
+/**
+ * 3. Send Appointment Reminder
  * Used by nurses to send reminders to patients about upcoming appointments
  */
 export async function sendAppointmentReminder(

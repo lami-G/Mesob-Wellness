@@ -237,6 +237,48 @@
 }
 
 /* Action Buttons */
+.btnAction {
+  padding: 0.375rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin: 0 0.25rem;
+  white-space: nowrap;
+  color: white;
+}
+
+.btnActivate {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.25);
+}
+
+.btnActivate:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(30, 64, 175, 0.35);
+}
+
+.btnDeactivate {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
+}
+
+.btnDeactivate:hover:not(:disabled) {
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.35);
+}
+
+.btnAction:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btnIcon {
   background: none;
   border: none;
@@ -261,6 +303,24 @@
 .btnIconEdit:hover {
   background-color: #dbeafe;
   color: #1e3a8a;
+}
+
+.btnIconActivate {
+  color: #22c55e;
+}
+
+.btnIconActivate:hover {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.btnIconDeactivate {
+  color: #ef4444;
+}
+
+.btnIconDeactivate:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
 }
 
 .btnIconDelete {

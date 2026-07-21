@@ -81,6 +81,14 @@ export interface WelcomeEmailData {
   role: string;
 }
 
+export interface PasswordChangedEmailData {
+  recipientEmail: string;
+  fullName: string;
+  changedAt: Date;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
 export interface AppointmentReminderData {
   appointmentId: string;
   recipientEmail: string;
@@ -174,6 +182,24 @@ export async function queueWelcomeEmail(data: WelcomeEmailData): Promise<string>
   } catch (error) {
     console.error('❌ Failed to queue welcome email:', error);
     throw new Error('Failed to queue welcome email');
+  }
+}
+
+/**
+ * 2. Queue Password Changed Notification
+ * Used when user changes their own password
+ */
+export async function queuePasswordChangedEmail(data: PasswordChangedEmailData): Promise<string> {
+  try {
+    const job = await emailQueue.add('password-changed', data, {
+      priority: 1, // High priority (security notification)
+    });
+    
+    console.log(`📧 Password changed notification queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+    return job.id || 'unknown';
+  } catch (error) {
+    console.error('❌ Failed to queue password changed email:', error);
+    throw new Error('Failed to queue password changed email');
   }
 }
 

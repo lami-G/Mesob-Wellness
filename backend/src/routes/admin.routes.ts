@@ -25,6 +25,7 @@ router.get("/regions/:region/centers", AdminController.getCentersByRegion);
 router.post("/users", AdminController.createUser);
 router.get("/users", AdminController.getUsers);
 router.put("/users/:id", AdminController.updateUser);
+router.patch("/users/:id/toggle-status", AdminController.toggleUserStatus);
 router.delete("/users/:id", AdminController.deleteUser);
 router.post("/users/:id/unlock", AdminController.unlockUser);
 

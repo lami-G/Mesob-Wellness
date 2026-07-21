@@ -467,7 +467,15 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
     }
 
     // Change password
-    await AuthService.changePassword(req.user.userId, currentPassword, newPassword);
+    await AuthService.changePassword(
+      req.user.userId, 
+      currentPassword, 
+      newPassword,
+      {
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+      }
+    );
 
     res.status(200).json({
       status: "success",
