@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  UserCheck,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 import AnimatedWaveBackground from "../../components/AnimatedWaveBackground";
 import { getApiUrl } from "../../services/apiBase";
 import styles from "./Register.module.css";
@@ -27,16 +34,19 @@ function Register() {
     emergencyContactPhone: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  
+
   // HR lookup state
   const [hrLoading, setHrLoading] = useState(false);
   const [hrError, setHrError] = useState("");
   const [hrSuccess, setHrSuccess] = useState("");
-  
+
   // Regions and centers state
   const [regions, setRegions] = useState([]);
   const [centers, setCenters] = useState([]);
@@ -54,7 +64,7 @@ function Register() {
       fetchCenters(formData.region);
     } else {
       setCenters([]);
-      setFormData(prev => ({ ...prev, centerId: "" }));
+      setFormData((prev) => ({ ...prev, centerId: "" }));
     }
   }, [formData.region]);
 
@@ -62,18 +72,16 @@ function Register() {
     setRegionsLoading(true);
     try {
       const url = getApiUrl("/api/v1/regions");
-      console.log('Fetching regions from:', url);
       const response = await fetch(url);
       const data = await response.json();
-      console.log('Regions response:', data);
       if (data.status === "success" && Array.isArray(data.data)) {
         setRegions(data.data);
-        console.log('Regions loaded:', data.data);
       } else {
-        console.error('Invalid regions response format:', data);
+        setRegions([]);
       }
     } catch (error) {
       console.error("Error fetching regions:", error);
+      setRegions([]);
     } finally {
       setRegionsLoading(false);
     }
@@ -83,14 +91,11 @@ function Register() {
     setCentersLoading(true);
     try {
       const url = getApiUrl(`/api/v1/centers?region=${encodeURIComponent(region)}`);
-      console.log('Fetching centers from:', url);
       const response = await fetch(url);
       const data = await response.json();
-      console.log('Centers response:', data);
       if (data.status === "success" && Array.isArray(data.data)) {
         setCenters(data.data);
       } else {
-        console.error('Invalid centers response format:', data);
         setCenters([]);
       }
     } catch (error) {
@@ -113,7 +118,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        getApiUrl(`/api/v1/hr/employee/${formData.employeeId}`),
+        getApiUrl(`/api/v1/hr/employee/${encodeURIComponent(formData.employeeId)}`),
       );
       const data = await response.json();
 
@@ -133,7 +138,7 @@ function Register() {
         centerId: employee.centerId || prev.centerId,
       }));
 
-      setHrSuccess("Employee data loaded successfully! Please review and complete the form.");
+      setHrSuccess("Employee data loaded successfully!");
     } catch (error) {
       setHrError(error.message || "Failed to fetch employee data");
     } finally {
@@ -145,14 +150,14 @@ function Register() {
     const fieldOrder = [
       "employeeId",
       "fullName",
-      "email",
-      "password",
-      "confirmPassword",
       "phone",
+      "email",
       "dateOfBirth",
       "gender",
       "region",
       "centerId",
+      "password",
+      "confirmPassword",
       "emergencyContactName",
       "emergencyContactPhone",
     ];
@@ -161,17 +166,8 @@ function Register() {
     if (firstErrorField) {
       const element = document.querySelector(`[name="${firstErrorField}"]`);
       if (element) {
-        const scrollContainer = document.querySelector(`.${styles.formScroll}`);
-        if (scrollContainer) {
-          const elementRect = element.getBoundingClientRect();
-          const containerRect = scrollContainer.getBoundingClientRect();
-          const scrollTop = scrollContainer.scrollTop;
-          const elementTop = elementRect.top - containerRect.top + scrollTop;
-          scrollContainer.scrollTo({
-            top: elementTop - 50,
-            behavior: "smooth",
-          });
-        }
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.focus({ preventScroll: true });
       }
     }
   };
@@ -251,12 +247,12 @@ function Register() {
     }
 
     setErrors(newErrors);
-    
+
     // Auto-scroll to first error field
     if (Object.keys(newErrors).length > 0) {
       setTimeout(() => scrollToFirstError(newErrors), 0);
     }
-    
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -328,211 +324,161 @@ function Register() {
   return (
     <div className={styles.wrapper}>
       <AnimatedWaveBackground />
-      
+
       <div className={styles.container}>
         <div className={styles.card}>
-          {/* Logo and Header Section */}
-          <div className={styles.logoSection}>
-            <div className={styles.logoCircle}>
-              <img
-                src="/Mesob-short-png.png"
-                alt="MESOB Logo"
-              />
-            </div>
-            <div className={styles.titleAmharic}>
-              በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ
-            </div>
-            <div className={styles.titleAmharic}>
-              የመሶብ አገልግሎት
-            </div>
-            <div className={styles.titleEnglish}>
-              Federal Democratic Republic of Ethiopia
-            </div>
-            <div className={styles.serviceTitle}>
-              MESOB Service
-            </div>
-            <div className={styles.welcome}>
-              Create Account
-            </div>
-            <div className={styles.subtitle}>
-              Join the MESOB Wellness Center System
-            </div>
+          {/* Header Section */}
+          <div className={styles.headerSection}>
+            <img
+              src="/image.png"
+              alt="MESOB One-Stop Service Center"
+              className={styles.brandLogo}
+            />
+            <h1 className={styles.welcomeTitle}>Create Account</h1>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form} noValidate>
             {serverError && (
-              <div className={`${styles.alert} ${styles.alertError}`} role="alert">
-                {serverError}
+              <div className={`${styles.alertBox} ${styles.alertError}`} role="alert">
+                <AlertCircle size={15} />
+                <span>{serverError}</span>
               </div>
             )}
 
             {successMessage && (
-              <div className={`${styles.alert} ${styles.alertSuccess}`} role="alert">
-                {successMessage}
+              <div className={`${styles.alertBox} ${styles.alertSuccess}`} role="alert">
+                <CheckCircle2 size={15} />
+                <span>{successMessage}</span>
               </div>
             )}
 
-            {/* Scrollable Form Content */}
-            <div className={styles.formScroll}>
-              {/* Employee ID Lookup Section */}
-              <div className={styles.hrSection}>
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>
-                    Employee ID (Optional)
-                    <span className={styles.formHint}> - Auto-fill from HR system</span>
-                  </label>
-                  <div className={styles.inputWithButton}>
-                    <input
-                      type="text"
-                      name="employeeId"
-                      value={formData.employeeId}
-                      onChange={handleChange}
-                      placeholder="e.g., EMP001"
-                      disabled={loading || hrLoading}
-                      className={styles.formInput}
-                    />
-                    <button
-                      type="button"
-                      className={`${styles.btn} ${styles.btnSecondary}`}
-                      onClick={handleFetchFromHR}
-                      disabled={loading || hrLoading || !formData.employeeId.trim()}
-                    >
-                      {hrLoading ? "Loading..." : "Search"}
-                    </button>
-                  </div>
-                  {hrError && (
-                    <span className={styles.formError}>{hrError}</span>
-                  )}
-                  {hrSuccess && (
-                    <span className={styles.formSuccess}>{hrSuccess}</span>
-                  )}
-                </div>
+            {/* Employee ID Lookup Banner */}
+            <div className={styles.hrBanner}>
+              <div className={styles.hrInputRow}>
+                <input
+                  type="text"
+                  name="employeeId"
+                  value={formData.employeeId}
+                  onChange={handleChange}
+                  placeholder="Employee ID (Auto-fill from HR)"
+                  disabled={loading || hrLoading}
+                  className={styles.hrInput}
+                />
+                <button
+                  type="button"
+                  className={styles.hrButton}
+                  onClick={handleFetchFromHR}
+                  disabled={loading || hrLoading || !formData.employeeId.trim()}
+                >
+                  <UserCheck size={13} />
+                  {hrLoading ? "..." : "Auto-fill"}
+                </button>
               </div>
+              {hrError && (
+                <span className={styles.fieldError} style={{ marginTop: "0.25rem", display: "block" }}>
+                  {hrError}
+                </span>
+              )}
+              {hrSuccess && (
+                <span style={{ color: "#86efac", fontSize: "0.72rem", marginTop: "0.25rem", display: "block" }}>
+                  {hrSuccess}
+                </span>
+              )}
+            </div>
 
+            {/* Inputs 2-Column Grid */}
+            <div className={styles.gridTwoCol}>
               {/* Full Name */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Full Name<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="fullName">
+                  <span>Full Name<span className={styles.required}>*</span></span>
                 </label>
                 <input
+                  id="fullName"
                   type="text"
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="John Doe"
                   disabled={loading}
-                  className={`${styles.formInput} ${errors.fullName ? styles.error : ""}`}
+                  className={`${styles.formInput} ${errors.fullName ? styles.inputError : ""}`}
                 />
                 {errors.fullName && (
-                  <span className={styles.formError}>{errors.fullName}</span>
-                )}
-              </div>
-
-              {/* Email */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Email<span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="mail@example.com"
-                  disabled={loading}
-                  className={`${styles.formInput} ${errors.email ? styles.error : ""}`}
-                />
-                {errors.email && (
-                  <span className={styles.formError}>{errors.email}</span>
-                )}
-              </div>
-
-              {/* Password */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Password<span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Min 8 chars with uppercase, lowercase, numbers, special chars"
-                  disabled={loading}
-                  className={`${styles.formInput} ${errors.password ? styles.error : ""}`}
-                />
-                {errors.password && (
-                  <span className={styles.formError}>{errors.password}</span>
-                )}
-              </div>
-
-              {/* Confirm Password */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Confirm Password<span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  disabled={loading}
-                  className={`${styles.formInput} ${errors.confirmPassword ? styles.error : ""}`}
-                />
-                {errors.confirmPassword && (
-                  <span className={styles.formError}>{errors.confirmPassword}</span>
+                  <span className={styles.fieldError}>{errors.fullName}</span>
                 )}
               </div>
 
               {/* Phone */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Phone Number<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="phone">
+                  <span>Phone Number<span className={styles.required}>*</span></span>
                 </label>
                 <input
+                  id="phone"
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+251 9XX XXX XXXX"
                   disabled={loading}
-                  className={`${styles.formInput} ${errors.phone ? styles.error : ""}`}
+                  className={`${styles.formInput} ${errors.phone ? styles.inputError : ""}`}
                 />
                 {errors.phone && (
-                  <span className={styles.formError}>{errors.phone}</span>
+                  <span className={styles.fieldError}>{errors.phone}</span>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel} htmlFor="email">
+                  <span>Email<span className={styles.required}>*</span></span>
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="mail@example.com"
+                  disabled={loading}
+                  className={`${styles.formInput} ${errors.email ? styles.inputError : ""}`}
+                />
+                {errors.email && (
+                  <span className={styles.fieldError}>{errors.email}</span>
                 )}
               </div>
 
               {/* Date of Birth */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Date of Birth<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="dateOfBirth">
+                  <span>Date of Birth<span className={styles.required}>*</span></span>
                 </label>
                 <input
+                  id="dateOfBirth"
                   type="date"
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
                   disabled={loading}
-                  className={`${styles.formInput} ${errors.dateOfBirth ? styles.error : ""}`}
+                  className={`${styles.formInput} ${errors.dateOfBirth ? styles.inputError : ""}`}
                 />
                 {errors.dateOfBirth && (
-                  <span className={styles.formError}>{errors.dateOfBirth}</span>
+                  <span className={styles.fieldError}>{errors.dateOfBirth}</span>
                 )}
               </div>
 
               {/* Gender */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Gender<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="gender">
+                  <span>Gender<span className={styles.required}>*</span></span>
                 </label>
                 <select
+                  id="gender"
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
                   disabled={loading}
-                  className={`${styles.formSelect} ${errors.gender ? styles.error : ""}`}
+                  className={`${styles.formSelect} ${errors.gender ? styles.inputError : ""}`}
                 >
                   <option value="">Select Gender</option>
                   <option value="MALE">Male</option>
@@ -540,21 +486,22 @@ function Register() {
                   <option value="OTHER">Other</option>
                 </select>
                 {errors.gender && (
-                  <span className={styles.formError}>{errors.gender}</span>
+                  <span className={styles.fieldError}>{errors.gender}</span>
                 )}
               </div>
 
               {/* Region */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Region<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="region">
+                  <span>Region<span className={styles.required}>*</span></span>
                 </label>
                 <select
+                  id="region"
                   name="region"
                   value={formData.region}
                   onChange={handleChange}
                   disabled={loading || regionsLoading}
-                  className={`${styles.formSelect} ${errors.region ? styles.error : ""}`}
+                  className={`${styles.formSelect} ${errors.region ? styles.inputError : ""}`}
                 >
                   <option value="">
                     {regionsLoading ? "Loading regions..." : "Select Region"}
@@ -566,21 +513,22 @@ function Register() {
                   ))}
                 </select>
                 {errors.region && (
-                  <span className={styles.formError}>{errors.region}</span>
+                  <span className={styles.fieldError}>{errors.region}</span>
                 )}
               </div>
 
-              {/* Health Center */}
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                   Center <span className={styles.required}>*</span>
+              {/* Center */}
+              <div className={`${styles.formGroup} ${styles.colSpanFull}`}>
+                <label className={styles.formLabel} htmlFor="centerId">
+                  <span>Center<span className={styles.required}>*</span></span>
                 </label>
                 <select
+                  id="centerId"
                   name="centerId"
                   value={formData.centerId}
                   onChange={handleChange}
                   disabled={loading || centersLoading || !formData.region}
-                  className={`${styles.formSelect} ${errors.centerId ? styles.error : ""}`}
+                  className={`${styles.formSelect} ${errors.centerId ? styles.inputError : ""}`}
                 >
                   <option value="">
                     {!formData.region
@@ -598,45 +546,109 @@ function Register() {
                   ))}
                 </select>
                 {errors.centerId && (
-                  <span className={styles.formError}>{errors.centerId}</span>
+                  <span className={styles.fieldError}>{errors.centerId}</span>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel} htmlFor="password">
+                  <span>Password<span className={styles.required}>*</span></span>
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Min 8 chars, mixed"
+                    disabled={loading}
+                    className={`${styles.formInput} ${errors.password ? styles.inputError : ""}`}
+                  />
+                  <button
+                    type="button"
+                    className={styles.passwordToggle}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    tabIndex={-1}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <span className={styles.fieldError}>{errors.password}</span>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel} htmlFor="confirmPassword">
+                  <span>Confirm Password<span className={styles.required}>*</span></span>
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Re-enter password"
+                    disabled={loading}
+                    className={`${styles.formInput} ${errors.confirmPassword ? styles.inputError : ""}`}
+                  />
+                  <button
+                    type="button"
+                    className={styles.passwordToggle}
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    tabIndex={-1}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <span className={styles.fieldError}>{errors.confirmPassword}</span>
                 )}
               </div>
 
               {/* Emergency Contact Name */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Emergency Contact Name<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="emergencyContactName">
+                  <span>Emergency Contact Name<span className={styles.required}>*</span></span>
                 </label>
                 <input
+                  id="emergencyContactName"
                   type="text"
                   name="emergencyContactName"
                   value={formData.emergencyContactName}
                   onChange={handleChange}
                   placeholder="Contact person name"
                   disabled={loading}
-                  className={`${styles.formInput} ${errors.emergencyContactName ? styles.error : ""}`}
+                  className={`${styles.formInput} ${errors.emergencyContactName ? styles.inputError : ""}`}
                 />
                 {errors.emergencyContactName && (
-                  <span className={styles.formError}>{errors.emergencyContactName}</span>
+                  <span className={styles.fieldError}>{errors.emergencyContactName}</span>
                 )}
               </div>
 
               {/* Emergency Contact Phone */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>
-                  Emergency Contact Phone<span className={styles.required}>*</span>
+                <label className={styles.formLabel} htmlFor="emergencyContactPhone">
+                  <span>Emergency Phone<span className={styles.required}>*</span></span>
                 </label>
                 <input
+                  id="emergencyContactPhone"
                   type="tel"
                   name="emergencyContactPhone"
                   value={formData.emergencyContactPhone}
                   onChange={handleChange}
                   placeholder="+251 9XX XXX XXXX"
                   disabled={loading}
-                  className={`${styles.formInput} ${errors.emergencyContactPhone ? styles.error : ""}`}
+                  className={`${styles.formInput} ${errors.emergencyContactPhone ? styles.inputError : ""}`}
                 />
                 {errors.emergencyContactPhone && (
-                  <span className={styles.formError}>{errors.emergencyContactPhone}</span>
+                  <span className={styles.fieldError}>{errors.emergencyContactPhone}</span>
                 )}
               </div>
             </div>
@@ -644,7 +656,7 @@ function Register() {
             {/* Submit Button */}
             <button
               type="submit"
-              className={`${styles.btn} ${styles.btnPrimary}`}
+              className={styles.submitButton}
               disabled={loading}
             >
               {loading ? "Creating Account..." : "Create Account"}
@@ -654,8 +666,8 @@ function Register() {
           {/* Footer */}
           <div className={styles.footer}>
             <p className={styles.footerText}>
-              Already have an account?{" "}
-              <Link to="/login" className={styles.link}>
+              Already have an account?
+              <Link to="/login" className={styles.signinLink}>
                 Sign in here
               </Link>
             </p>
