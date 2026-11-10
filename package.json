@@ -1,0 +1,28 @@
+{
+  "name": "mesob-wellness",
+  "version": "1.0.0",
+  "description": "MESOB Wellness Platform - Modern Ethiopian Services for Organized Benefit",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:worker": "npm --prefix backend run worker",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "npm --prefix backend run dev",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "typecheck": "npm --prefix backend run typecheck",
+    "prisma:studio": "npm --prefix backend run prisma:studio",
+    "prisma:migrate": "npm --prefix backend run prisma:migrate:dev",
+    "seed": "node backend/seed.mjs"
+  },
+  "keywords": [
+    "mesob",
+    "wellness",
+    "ethiopia",
+    "healthcare"
+  ],
+  "author": "MESOB One-Stop Service Center",
+  "license": "UNLICENSED"
+}
+

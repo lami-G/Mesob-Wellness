@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { api } from "../services/adminService";
-import ChangePasswordModal from "../components/admin/ChangePasswordModal";
-import "../styles/admin-settings.css";
+import { api } from "../../services/adminService";
+import ChangePasswordModal from "../../components/admin/ChangePasswordModal";
+import "../../styles/admin-settings.css";
 
 function RegionalDashboardProfile() {
   const navigate = useNavigate();

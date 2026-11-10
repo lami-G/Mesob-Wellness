@@ -35,33 +35,32 @@
 
 ## 🎯 Overview
 
-Mesob Wellness is a complete healthcare management system designed for the Government of Ethiopia's Ministry of Health. It provides end-to-end digital health services with robust analytics, multi-center operations, and comprehensive reporting capabilities.
+MESOB Wellness is a digital healthcare management platform integrated into the **MESOB One-Stop Service Center** ([https://mesobcenter.et/](https://mesobcenter.et/)) — the Federal Democratic Republic of Ethiopia's unified public service delivery initiative. It provides end-to-end preventative health screenings, vitals tracking, appointment scheduling, clinical referrals, and multi-tier analytics across over 70 centers and 11 regions nationwide.
 
 ### Key Highlights
 
-- 🏥 **Multi-Center Management** - Manage healthcare centers across regions and nationally
-- 📊 **Advanced Analytics** - Real-time dashboards with regional and national insights
-- 🗺️ **GeoJSON Mapping** - Interactive Ethiopia regional map with health data visualization
-- 🔐 **Enterprise Security** - JWT authentication, audit logging, RBAC with 5 role levels
-- 📱 **Responsive Design** - Mobile-first UI with React and Tailwind CSS
-- 🚀 **Production Ready** - Docker support, PostgreSQL, comprehensive testing
+- 🏥 **Multi-Center Operations** - Manage wellness centers across all 11 Ethiopian regions and nationally
+- 📊 **Advanced Analytics** - Real-time dashboards with regional and national epidemiological insights
+- 🗺️ **GeoJSON Mapping** - Interactive Ethiopia regional map with regional health metrics visualization
+- 🔐 **Enterprise Security** - JWT authentication, audit logging, account lockout, and RBAC with 7 role levels
+- 📱 **Responsive Design** - Mobile-first UI with React 18 and Tailwind CSS
+- 🚀 **Production Ready** - PostgreSQL with Prisma ORM, BullMQ async queues, and automated 24h reminders
 
 ---
 
 ## ✨ Features
 
 ### 🔐 Authentication & Authorization
-- Multi-level role-based access control (5 roles)
-- JWT token authentication with secure refresh
+- Multi-level role-based access control (7 roles)
+- JWT token authentication with secure session timeout
 - Hierarchical user creation system
 - Password encryption with bcrypt
-- Session management and audit trails
+- Session management, account lockout protection, and comprehensive audit trails
 
 ### 👥 User Management
-- Comprehensive user profiles
-- Health record management
-- Multi-role support (Customer Staff, Nurse, Manager, Regional Office, Federal Admin)
-- User activity tracking
+- Comprehensive user profiles and longitudinal health records
+- 7-tier role support (External Patient, Staff, Nurse Officer, Manager, Regional Office, Federal Office, System Admin)
+- User activity and security audit tracking
 - Profile picture upload
 
 ### 📈 Vitals Tracking
@@ -173,7 +172,7 @@ Mesob Wellness is a complete healthcare management system designed for the Gover
 │  ├─ Business Logic (Services)                          │
 │  ├─ Controllers (Request Handlers)                     │
 │  ├─ Middleware (Auth, Validation, Logging)             │
-│  └─ Routes (31 API Endpoints)                          │
+│  └─ Routes (REST Endpoints across 18 Modules)           │
 └───────────────────┬─────────────────────────────────────┘
                     │
 ┌───────────────────▼─────────────────────────────────────┐
@@ -438,18 +437,38 @@ All protected endpoints require a JWT token in the Authorization header:
 Authorization: Bearer <your_jwt_token>
 ```
 
-### API Endpoints (31 Total)
+### API Endpoints Overview
 
-#### Authentication (6 endpoints)
+The backend exposes RESTful endpoints organized across 18 dedicated modules:
+- `/api/v1/auth` - Registration, login, token verification, current user, hierarchical user creation
+- `/api/v1/users` - User profiles, updates, password change, user search
+- `/api/v1/vitals` - BMI, blood pressure, complete vitals recording, vitals history & trends
+- `/api/v1/appointments` - Booking, scheduling, queue status updates, cancellation, walk-in management
+- `/api/v1/plans` - Personalized wellness plan creation, retrieval, updates
+- `/api/v1/feedback` - Patient satisfaction ratings (1-5 stars) and Net Promoter Score (NPS)
+- `/api/v1/centers` - Multi-center operations, status, regional & national analytics
+- `/api/v1/analytics` - Center metrics, capacity tracking, staff users management, audit logs, trends
+- `/api/v1/patients` - Walk-in patient registration
+- `/api/v1/reports` - Health report PDF generation (via PDFKit)
+- `/api/v1/admin` - System admin dashboard metrics, regions, center & health comparison
+- `/api/v1/notifications` - In-app alerts, unread counts, status management
+- `/api/v1/settings` - System settings (lockout duration, session timeout, maintenance mode toggle)
+- `/api/v1/conditions` - Automated clinical condition calculations, patient conditions, trends
+- `/api/v1/referrals` - Medical referral letters (creation, email dispatch, printable letter)
+- `/api/v1/regions` - Ethiopian administrative regional queries
+- `/api/v1/hr` - Staff employee auto-fill integration
+- `/health` & `/api/health` - Health check endpoints
+
+#### Core Authentication Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/auth/register` | Public registration (CUSTOMER_STAFF only) | ❌ |
-| POST | `/auth/create-user` | Hierarchical user creation | ✅ |
-| POST | `/auth/login` | Login and receive JWT token | ❌ |
-| POST | `/auth/verify-token` | Verify token validity | ❌ |
-| GET | `/auth/me` | Get current authenticated user | ✅ |
-| POST | `/auth/logout` | Logout user | ✅ |
+| POST | `/api/v1/auth/register` | Public self-registration (STAFF role only) | ❌ |
+| POST | `/api/v1/auth/create-user` | Hierarchical user creation | ✅ |
+| POST | `/api/v1/auth/login` | Login and receive JWT token | ❌ |
+| POST | `/api/v1/auth/verify-token` | Verify token validity | ❌ |
+| GET | `/api/v1/auth/me` | Get current authenticated user | ✅ |
+| POST | `/api/v1/auth/logout` | Logout user | ✅ |
 
 #### Users (3 endpoints)
 
@@ -560,78 +579,74 @@ Authorization: Bearer <your_jwt_token>
 
 ## 🔐 Role-Based Access Control
 
-### Roles Hierarchy
+### 7-Tier Role Hierarchy
 
-1. **CUSTOMER_STAFF** - Basic patient access
-2. **NURSE_OFFICER** - Medical staff, record vitals
-3. **MANAGER** - Center management
-4. **REGIONAL_OFFICE** - Regional oversight
-5. **FEDERAL_ADMIN** - Full system access
+1. **EXTERNAL_PATIENT (Level 0)** - Walk-in citizens registered on-site by nurses (`canLogin: false`). Receives services, referrals, and printed PDF reports.
+2. **STAFF (Level 1)** - Employees & citizens accessing wellness checks, booking appointments, viewing their records, and submitting feedback.
+3. **NURSE_OFFICER (Level 2)** - Medical staff operating live queue, registering walk-ins, recording vitals, approving detected conditions, creating wellness plans, and issuing referrals (assigned center only).
+4. **MANAGER (Level 3)** - Center administrator overseeing operational capacity, queue metrics, staff user creation, and center audit logs (assigned center only).
+5. **REGIONAL_OFFICE (Level 4)** - Regional health officer monitoring centers across their assigned Ethiopian region.
+6. **FEDERAL_OFFICE (Level 5)** - Federal oversight with nationwide analytics, GeoJSON regional health map, and cross-regional health trends.
+7. **SYSTEM_ADMIN (Level 6)** - Full technical administration: global user CRUD, center & regional management, system security parameters, and maintenance mode toggle.
 
 ### Permission Matrix
 
-| Feature | Customer | Nurse | Manager | Regional | Federal |
-|---------|----------|-------|---------|----------|---------|
-| View own profile | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Update profile | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Record vitals | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Create appointments | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Update appointments | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Create wellness plans | ❌ | ✅ | ✅ | ✅ | ✅ |
-| Submit feedback | ✅ | ✅ | ✅ | ✅ | ✅ |
-| View all feedback | ❌ | ❌ | ✅ | ✅ | ✅ |
-| View center analytics | ❌ | Own | Own | Region | All |
-| View regional analytics | ❌ | ❌ | ❌ | Own | All |
-| Manage centers | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Create users | ❌ | ❌ | Limited | ❌ | ✅ |
-| View audit logs | ❌ | ❌ | Limited | Limited | All |
+| Feature | External Patient | Staff | Nurse Officer | Manager | Regional Office | Federal Office | System Admin |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| View own profile | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Update profile | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Record vitals | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Book appointments | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Update queue / appointments | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Create wellness plans | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Issue medical referrals | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Submit feedback | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| View center analytics | ❌ | ❌ | Own | Own | Region | All | All |
+| View regional analytics | ❌ | ❌ | ❌ | ❌ | Own | All | All |
+| Manage centers & regions | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Create users | ❌ | ❌ | ❌ | Nurse/Staff | ❌ | ❌ | All |
+| View audit logs | ❌ | ❌ | ❌ | Own Center | Region | All | All |
+| Configure system settings | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ### Hierarchical User Creation
 
 | Creator Role | Can Create Roles |
-|--------------|------------------|
-| Public Registration | CUSTOMER_STAFF only |
-| MANAGER | NURSE_OFFICER, CUSTOMER_STAFF |
-| FEDERAL_ADMIN | All roles |
+|---|---|
+| Public Self-Registration | `STAFF` only |
+| `MANAGER` | `NURSE_OFFICER`, `STAFF` (restricted to own center) |
+| `SYSTEM_ADMIN` | All roles (`EXTERNAL_PATIENT`, `STAFF`, `NURSE_OFFICER`, `MANAGER`, `REGIONAL_OFFICE`, `FEDERAL_OFFICE`, `SYSTEM_ADMIN`) |
 
 ---
 
-## 🧪 Testing
+## 🧪 Testing & Verification
 
-### Test Credentials
+### Test Credentials (from Seed)
 
 | Role | Email | Password |
-|------|-------|----------|
-| Customer Staff | customer@mesob.et | Customer123! |
-| Nurse Officer | nurse@mesob.et | Nurse123! |
-| Manager | manager@mesob.et | Manager123! |
-| Regional Office | regional@mesob.et | Regional123! |
-| Federal Admin | admin@mesob.et | Admin123! |
+|---|---|---|
+| System Admin | `admin@mesob.et` | `Admin123!` |
+| Federal Office | `federal@mesob.et` | `Federal123!` |
+| Regional Office | `regional@mesob.et` | `Regional123!` |
+| Center Manager | `manager@mesob.et` | `Manager123!` |
+| Nurse Officer | `nurse@mesob.et` | `Nurse123!` |
+| Staff Member | `staff@mesob.et` | `Staff123!` |
 
-### Running Tests
+### Running the Seed Script
 
 ```bash
-# Seed test users
-cd backend
-node seed.mjs
-
-# Run comprehensive test suite
-cd docs
-bash test-all-endpoints.sh
-
-# Test database connection
-cd backend
-node test-postgres-connection.js
+# Seed initial test users and display sequence
+node backend/seed.mjs
 ```
 
-### Test Coverage
+### Verification Commands
 
-- ✅ 30+ automated test cases
-- ✅ All 31 API endpoints tested
-- ✅ Authentication & authorization flows
-- ✅ Role-based access control validation
-- ✅ Error handling & edge cases
-- ✅ Multi-role testing scenarios
+```bash
+# Verify backend TypeScript types
+npm run typecheck
+
+# Verify frontend production build
+npm run build:frontend
+```
 
 ---
 
@@ -701,11 +716,13 @@ We welcome contributions! Please follow these guidelines:
 
 ## 📝 License
 
-**Government of Ethiopia - Ministry of Health**
+**MESOB One-Stop Service Center — Federal Democratic Republic of Ethiopia**
+
+Website: [https://mesobcenter.et/](https://mesobcenter.et/)
 
 This software is proprietary and confidential. Unauthorized copying, distribution, or use of this software, via any medium, is strictly prohibited.
 
-© 2026 Ministry of Health, Ethiopia. All rights reserved.
+© 2026 MESOB One-Stop Service Center. All rights reserved.
 
 ---
 

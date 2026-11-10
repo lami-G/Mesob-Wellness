@@ -111,9 +111,11 @@ export const env = Object.freeze({
   EMAIL_FROM: getOptionalEnv("EMAIL_FROM") || "noreply@mesob.et",
   
   // Redis Configuration (for job queue)
+  REDIS_ENABLED: process.env.REDIS_ENABLED !== "false" && process.env.REDIS_HOST !== "none",
   REDIS_HOST: getOptionalEnv("REDIS_HOST") || "localhost",
   REDIS_PORT: getOptionalPort("REDIS_PORT", 6379),
   REDIS_PASSWORD: getOptionalEnv("REDIS_PASSWORD"),
+  REDIS_TLS: process.env.REDIS_TLS !== undefined ? process.env.REDIS_TLS === "true" : undefined,
   
   // Frontend URL (for email links)
   FRONTEND_URL: getOptionalEnv("FRONTEND_URL") || "http://localhost:3000",

@@ -19,16 +19,30 @@ import {
 } from '../services/queue.service';
 import { prisma } from '../config/prisma';
 
-// Redis connection for worker (requires TLS for Upstash)
+// Redis connection for worker (detects TLS automatically)
+const isLocal = ['localhost', '127.0.0.1'].includes((env.REDIS_HOST || '').toLowerCase());
+const shouldUseTls = env.REDIS_TLS !== undefined ? env.REDIS_TLS : (!isLocal && Boolean(env.REDIS_HOST && !env.REDIS_HOST.startsWith('192.168.')));
+
 const connection = new Redis({
   host: env.REDIS_HOST,
   port: env.REDIS_PORT,
   password: env.REDIS_PASSWORD || undefined,
-  tls: {
-    rejectUnauthorized: false, // Upstash uses self-signed certificates
-  },
+  ...(shouldUseTls ? { tls: { rejectUnauthorized: false } } : {}),
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
+  connectTimeout: 5000,
+  retryStrategy(times) {
+    if (times > 2) {
+      console.warn(`⚠️ Email worker: Redis unavailable at ${env.REDIS_HOST}. Stopped reconnect attempts.`);
+      return null;
+    }
+    return Math.min(times * 500, 1500);
+  },
+});
+
+connection.on('error', (err: any) => {
+  // Gracefully handle connection or DNS errors
+  console.warn(`⚠️ Worker Redis error: ${err.message}`);
 });
 
 /**

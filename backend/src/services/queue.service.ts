@@ -1,74 +1,108 @@
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { env } from '../config/env';
+import {
+  sendWelcomeEmail,
+  sendPasswordChangedNotification,
+  sendAppointmentReminder,
+  sendWellnessPlanEmail,
+  sendVitalsEmail,
+  sendReferralLetterEmail,
+} from './email.service';
 
-// Redis connection configuration for Upstash (requires TLS)
-const connection = new Redis({
-  host: env.REDIS_HOST,
-  port: env.REDIS_PORT,
-  password: env.REDIS_PASSWORD || undefined,
-  tls: {
-    rejectUnauthorized: false, // Upstash uses self-signed certificates
-  },
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-  connectTimeout: 30000, // 30 seconds connection timeout
-  lazyConnect: false, // Connect immediately
-  retryStrategy(times) {
-    if (times > 10) {
-      console.error('❌ Redis connection failed after 10 retries');
-      return null; // Stop retrying
+/**
+ * Determine Redis connectivity settings
+ */
+const isLocal = ['localhost', '127.0.0.1'].includes((env.REDIS_HOST || '').toLowerCase());
+const shouldUseTls = env.REDIS_TLS !== undefined ? env.REDIS_TLS : (!isLocal && Boolean(env.REDIS_HOST && !env.REDIS_HOST.startsWith('192.168.')));
+const isRedisConfigured = Boolean(
+  env.REDIS_ENABLED &&
+  env.REDIS_HOST &&
+  env.REDIS_HOST !== 'none' &&
+  env.REDIS_HOST !== 'disabled'
+);
+
+let connection: Redis | null = null;
+export let emailQueue: Queue | null = null;
+let isRedisAvailable = false;
+let hasReportedUnavailable = false;
+
+if (isRedisConfigured) {
+  try {
+    const redisOptions: any = {
+      host: env.REDIS_HOST,
+      port: env.REDIS_PORT,
+      password: env.REDIS_PASSWORD || undefined,
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+      connectTimeout: 5000,
+      lazyConnect: false,
+      retryStrategy(times: number) {
+        if (times > 2) {
+          if (!hasReportedUnavailable) {
+            hasReportedUnavailable = true;
+            console.warn(`⚠️ Redis is unavailable at ${env.REDIS_HOST}. Background email queue switched to direct delivery mode.`);
+          }
+          return null; // Stop retrying to prevent continuous error spam
+        }
+        return Math.min(times * 300, 1500);
+      },
+      reconnectOnError() {
+        return false;
+      },
+    };
+
+    if (shouldUseTls) {
+      redisOptions.tls = { rejectUnauthorized: false };
     }
-    const delay = Math.min(times * 100, 3000);
-    return delay;
-  },
-  reconnectOnError(err) {
-    console.error('❌ Redis connection error:', err.message);
-    return true; // Always try to reconnect
-  },
-});
 
-// Log connection status
-connection.on('connect', () => {
-  console.log('✅ Redis connected successfully');
-});
+    connection = new Redis(redisOptions);
 
-connection.on('error', (err) => {
-  console.error('❌ Redis connection error:', err.message);
-});
+    connection.on('connect', () => {
+      isRedisAvailable = true;
+      hasReportedUnavailable = false;
+      console.log('✅ Redis connected successfully');
+    });
 
-// Email queue instance
-export const emailQueue = new Queue('emails', { 
-  connection: {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-    password: env.REDIS_PASSWORD || undefined,
-    tls: {
-      rejectUnauthorized: false,
-    },
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-  },
-  defaultJobOptions: {
-    attempts: 3, // Retry failed jobs up to 3 times
-    backoff: {
-      type: 'exponential',
-      delay: 2000, // Start with 2 second delay, then 4s, 8s
-    },
-    removeOnComplete: {
-      age: 24 * 3600, // Keep completed jobs for 24 hours
-      count: 1000, // Keep max 1000 completed jobs
-    },
-    removeOnFail: {
-      age: 7 * 24 * 3600, // Keep failed jobs for 7 days
-    },
-  },
-});
+    connection.on('error', (err: any) => {
+      isRedisAvailable = false;
+      if (!hasReportedUnavailable) {
+        hasReportedUnavailable = true;
+        console.warn(`⚠️ Redis connection notice: ${err.message}. Email queue is operating in direct-dispatch fallback mode.`);
+      }
+    });
 
-// Log queue events
-emailQueue.on('error', (error) => {
-  console.error('❌ Email queue error:', error);
-});
+    emailQueue = new Queue('emails', {
+      connection: redisOptions,
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: {
+          age: 24 * 3600,
+          count: 1000,
+        },
+        removeOnFail: {
+          age: 7 * 24 * 3600,
+        },
+      },
+    });
+
+    emailQueue.on('error', (error: any) => {
+      isRedisAvailable = false;
+      if (!hasReportedUnavailable) {
+        hasReportedUnavailable = true;
+        console.warn(`⚠️ Email queue error: ${error.message}. Direct email dispatch active.`);
+      }
+    });
+  } catch (initErr) {
+    console.warn('⚠️ Could not initialize Redis queue. Direct email fallback enabled.');
+  }
+} else {
+  console.log('ℹ️ Redis is disabled. All emails will be sent directly via Resend.');
+}
 
 /**
  * Queue Types - defines the structure of email job data
@@ -169,125 +203,201 @@ export interface ReferralLetterEmailData {
 
 /**
  * 1. Queue Welcome Email (User Registration)
- * Used when creating new users
+ * Falls back to direct email sending if queue is offline
  */
 export async function queueWelcomeEmail(data: WelcomeEmailData): Promise<string> {
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('welcome-email', data, { priority: 2 });
+      console.log(`📧 Welcome email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue welcome email, sending directly:', error);
+    }
+  }
+
   try {
-    const job = await emailQueue.add('welcome-email', data, {
-      priority: 2, // Medium priority
-    });
-    
-    console.log(`📧 Welcome email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
+    const success = await sendWelcomeEmail(
+      data.recipientEmail,
+      data.fullName,
+      data.username,
+      data.temporaryPassword,
+      data.role
+    );
+    console.log(`📧 Welcome email dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
   } catch (error) {
-    console.error('❌ Failed to queue welcome email:', error);
-    throw new Error('Failed to queue welcome email');
+    console.error('❌ Direct welcome email failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
  * 2. Queue Password Changed Notification
- * Used when user changes their own password
+ * Falls back to direct email sending if queue is offline
  */
 export async function queuePasswordChangedEmail(data: PasswordChangedEmailData): Promise<string> {
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('password-changed', data, { priority: 1 });
+      console.log(`📧 Password changed notification queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue password changed email, sending directly:', error);
+    }
+  }
+
   try {
-    const job = await emailQueue.add('password-changed', data, {
-      priority: 1, // High priority (security notification)
-    });
-    
-    console.log(`📧 Password changed notification queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
+    const success = await sendPasswordChangedNotification(
+      data.recipientEmail,
+      data.fullName,
+      data.changedAt,
+      data.ipAddress,
+      data.userAgent
+    );
+    console.log(`📧 Password changed email dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
   } catch (error) {
-    console.error('❌ Failed to queue password changed email:', error);
-    throw new Error('Failed to queue password changed email');
+    console.error('❌ Direct password changed email failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
- * 2. Queue Appointment Reminder
- * Used by nurses to send reminders manually or automatically
+ * 3. Queue Appointment Reminder
+ * Falls back to direct email sending if queue is offline
  */
 export async function queueAppointmentReminder(data: AppointmentReminderData): Promise<string> {
-  try {
-    const job = await emailQueue.add('appointment-reminder', data, {
-      priority: 1, // High priority (time-sensitive)
-    });
-    
-    console.log(`📧 Appointment reminder queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
-  } catch (error) {
-    console.error('❌ Failed to queue appointment reminder:', error);
-    
-    // Provide more helpful error message
-    if (error instanceof Error) {
-      if (error.message.includes('ECONNREFUSED') || error.message.includes('ETIMEDOUT')) {
-        throw new Error('Cannot connect to Redis. Please check your Redis configuration.');
-      }
-      throw new Error(`Failed to queue reminder: ${error.message}`);
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('appointment-reminder', data, { priority: 1 });
+      console.log(`📧 Appointment reminder queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue appointment reminder, sending directly:', error);
     }
-    throw new Error('Failed to queue appointment reminder');
+  }
+
+  try {
+    const success = await sendAppointmentReminder(
+      data.recipientEmail,
+      data.customerName,
+      data.appointmentId,
+      data.scheduledAt,
+      data.reason
+    );
+    console.log(`📧 Appointment reminder dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
+  } catch (error) {
+    console.error('❌ Direct appointment reminder failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
- * 3. Queue Wellness Plan Email with PDF
- * Used when creating wellness plans
+ * 4. Queue Wellness Plan Email with PDF
+ * Falls back to direct email sending if queue is offline
  */
 export async function queueWellnessPlan(data: WellnessPlanEmailData): Promise<string> {
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('wellness-plan', data, { priority: 3 });
+      console.log(`📧 Wellness plan email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue wellness plan email, sending directly:', error);
+    }
+  }
+
   try {
-    const job = await emailQueue.add('wellness-plan', data, {
-      priority: 3, // Lower priority (not time-sensitive)
-    });
-    
-    console.log(`📧 Wellness plan email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
+    const success = await sendWellnessPlanEmail(
+      data.recipientEmail,
+      data.patientName,
+      data.planTitle,
+      data.planContent,
+      data.vitalsData
+    );
+    console.log(`📧 Wellness plan email dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
   } catch (error) {
-    console.error('❌ Failed to queue wellness plan email:', error);
-    throw new Error('Failed to queue wellness plan email');
+    console.error('❌ Direct wellness plan email failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
- * 4. Queue Vitals Record Email
- * Used when recording patient vitals
+ * 5. Queue Vitals Record Email
+ * Falls back to direct email sending if queue is offline
  */
 export async function queueVitalsEmail(data: VitalsEmailData): Promise<string> {
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('vitals-email', data, { priority: 3 });
+      console.log(`📧 Vitals email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue vitals email, sending directly:', error);
+    }
+  }
+
   try {
-    const job = await emailQueue.add('vitals-email', data, {
-      priority: 3, // Lower priority (not time-sensitive)
-    });
-    
-    console.log(`📧 Vitals email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
+    const success = await sendVitalsEmail(
+      data.recipientEmail,
+      data.patientName,
+      data.vitalsData
+    );
+    console.log(`📧 Vitals email dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
   } catch (error) {
-    console.error('❌ Failed to queue vitals email:', error);
-    throw new Error('Failed to queue vitals email');
+    console.error('❌ Direct vitals email failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
- * 5. Queue Referral Letter Email
- * Used when creating a referral - sends referral letter to patient
+ * 6. Queue Referral Letter Email
+ * Falls back to direct email sending if queue is offline
  */
 export async function queueReferralLetterEmail(data: ReferralLetterEmailData): Promise<string> {
+  if (isRedisAvailable && emailQueue) {
+    try {
+      const job = await emailQueue.add('referral-letter', data, { priority: 1 });
+      console.log(`📧 Referral letter email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
+      return job.id || 'queued';
+    } catch (error) {
+      console.warn('⚠️ Failed to enqueue referral letter email, sending directly:', error);
+    }
+  }
+
   try {
-    const job = await emailQueue.add('referral-letter', data, {
-      priority: 1, // High priority (important medical document)
-    });
-    
-    console.log(`📧 Referral letter email queued for ${data.recipientEmail} (Job ID: ${job.id})`);
-    return job.id || 'unknown';
+    const success = await sendReferralLetterEmail(
+      data.recipientEmail,
+      data.referralData
+    );
+    console.log(`📧 Referral letter dispatched directly to ${data.recipientEmail} (Success: ${success})`);
+    return 'direct-dispatch';
   } catch (error) {
-    console.error('❌ Failed to queue referral letter email:', error);
-    throw new Error('Failed to queue referral letter email');
+    console.error('❌ Direct referral letter email failed:', error);
+    return 'fallback-failed';
   }
 }
 
 /**
  * Get queue statistics
- * Useful for monitoring and debugging
  */
 export async function getQueueStats() {
+  if (!emailQueue || !isRedisAvailable) {
+    return {
+      waiting: 0,
+      active: 0,
+      completed: 0,
+      failed: 0,
+      delayed: 0,
+      total: 0,
+      status: 'offline-direct-mode',
+    };
+  }
+
   try {
     const [waiting, active, completed, failed, delayed] = await Promise.all([
       emailQueue.getWaitingCount(),
@@ -304,6 +414,7 @@ export async function getQueueStats() {
       failed,
       delayed,
       total: waiting + active + completed + failed + delayed,
+      status: 'online',
     };
   } catch (error) {
     console.error('❌ Failed to get queue stats:', error);
@@ -315,6 +426,10 @@ export async function getQueueStats() {
  * Get failed jobs for debugging
  */
 export async function getFailedJobs(limit: number = 10) {
+  if (!emailQueue || !isRedisAvailable) {
+    return [];
+  }
+
   try {
     const jobs = await emailQueue.getFailed(0, limit - 1);
     return jobs.map(job => ({
@@ -335,6 +450,10 @@ export async function getFailedJobs(limit: number = 10) {
  * Retry a failed job
  */
 export async function retryFailedJob(jobId: string): Promise<boolean> {
+  if (!emailQueue || !isRedisAvailable) {
+    return false;
+  }
+
   try {
     const job = await emailQueue.getJob(jobId);
     if (!job) {
@@ -355,9 +474,13 @@ export async function retryFailedJob(jobId: string): Promise<boolean> {
  * Clean up old jobs (maintenance)
  */
 export async function cleanupQueue() {
+  if (!emailQueue || !isRedisAvailable) {
+    return;
+  }
+
   try {
-    await emailQueue.clean(24 * 3600 * 1000, 1000, 'completed'); // Clean completed jobs older than 24h
-    await emailQueue.clean(7 * 24 * 3600 * 1000, 100, 'failed'); // Clean failed jobs older than 7 days
+    await emailQueue.clean(24 * 3600 * 1000, 1000, 'completed');
+    await emailQueue.clean(7 * 24 * 3600 * 1000, 100, 'failed');
     console.log('✅ Queue cleanup completed');
   } catch (error) {
     console.error('❌ Queue cleanup failed:', error);
@@ -366,16 +489,19 @@ export async function cleanupQueue() {
 
 /**
  * Graceful shutdown
- * Close Redis connection when server stops
  */
 export async function closeQueue(): Promise<void> {
   try {
-    await emailQueue.close();
-    await connection.quit();
+    if (emailQueue) {
+      await emailQueue.close();
+    }
+    if (connection) {
+      await connection.quit();
+    }
     console.log('✅ Email queue closed gracefully');
   } catch (error) {
     console.error('❌ Error closing email queue:', error);
   }
 }
 
-console.log('✅ Email queue service initialized');
+console.log('✅ Email queue service initialized (resilient mode)');
