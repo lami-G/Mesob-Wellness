@@ -82,7 +82,7 @@ function Login() {
           <div className={styles.brandDivider} aria-hidden="true"></div>
           <div className={styles.brandTitles}>
             <span className={styles.brandName}>MESOB</span>
-            <span className={styles.brandTagline}>MESOB Service</span>
+            <span className={styles.brandTagline}>Wellness Portal</span>
           </div>
         </div>
       </header>
@@ -93,11 +93,11 @@ function Login() {
         <div className={styles.heroColumn}>
           <h1 className={styles.heroTitle}>
             Welcome to <br />
-            <span className={styles.heroHighlight}>MESOB</span> Service
+            <span className={styles.heroHighlight}>MESOB</span> Wellness Center
           </h1>
           <div className={styles.heroAccentBar}></div>
           <p className={styles.heroSubtitle}>
-            Access your account and enjoy our services with ease and security.
+            Your comprehensive healthcare and wellness portal. Access health assessments, medical checkups, and personalized wellness plans with ease and security.
           </p>
         </div>
 
@@ -132,7 +132,7 @@ function Login() {
                 Welcome <span className={styles.welcomeHighlight}>Back!</span>
               </h2>
               <p className={styles.welcomeSubtitle}>
-                Login to your account to continue
+                Sign in to your wellness account
               </p>
             </div>
 
